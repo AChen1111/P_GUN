@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Enemy : MonoBehaviour {
@@ -7,11 +8,15 @@ public class Enemy : MonoBehaviour {
         gameObject.AddComponent<CircleCollider2D>();
         gameObject.tag = "Enemy";
     }
-
+    [Header("引用组件")]
     public GameObject bulletPrefab;
     public SpriteRenderer sr;
     public Rigidbody2D rb;
     
+    public List<AudioClip> shootSounds = new List<AudioClip>();
+    private AudioSource audioSource;
+
+
     public enum EnemyState {
         Follow,
         Shoot,
@@ -25,8 +30,11 @@ public class Enemy : MonoBehaviour {
     private static readonly WaitForSeconds s_ShootDelay = new WaitForSeconds(0.2f);
     private void Awake() {
         rb = GetComponent<Rigidbody2D>();
+        audioSource = GetComponent<AudioSource>();
     }
+
     private void Update() {
+        //巡逻状态
         if(state == EnemyState.Follow) {
             if(timer >= timerMax) {
                 state = EnemyState.Shoot;
@@ -37,6 +45,7 @@ public class Enemy : MonoBehaviour {
             }
             Follow();
         } 
+        //射击状态
         else if(state == EnemyState.Shoot) {
             if(timer >= timerMax) {
                 state = EnemyState.Follow;
@@ -64,14 +73,23 @@ public class Enemy : MonoBehaviour {
 
         rb.velocity = dir * 5f;
     }
-    private void Shoot() {
-        var bullet = Instantiate(bulletPrefab, transform.position + Vector3.right, Quaternion.identity);
-        bullet.SetActive(true);
+
+
+    private void Shoot(Vector2 dirToPlayer) {
+        var obj = Instantiate(bulletPrefab, transform.position + Vector3.right, Quaternion.identity);
+        obj.transform.position = transform.position;
+        obj.GetComponent<EnemyBullet>().dir = dirToPlayer;
+        obj.SetActive(true);
+
+        //播放射击音效
+        var randomIndex = Random.Range(0, shootSounds.Count);
+        audioSource.PlayOneShot(shootSounds[randomIndex]);
     }
+    
     IEnumerator ShootCoroutine() {
         isShoot = true;
         yield return s_ShootDelay;  
-        Shoot();
+        Shoot((Global.player.transform.position - transform.position).normalized);
         isShoot = false;
     }
 }
