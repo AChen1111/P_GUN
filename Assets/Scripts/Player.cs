@@ -7,7 +7,7 @@ public class Player : MonoBehaviour
     public GameObject bulletPrefab;
     void Awake()
     {
-        
+        Global.player = this;
     }
 
     private void Reset() {
