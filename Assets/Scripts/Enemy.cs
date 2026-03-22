@@ -8,7 +8,6 @@ public class Enemy : MonoBehaviour {
         gameObject.tag = "Enemy";
     }
 
-    public Player player;
     public GameObject bulletPrefab;
 
     public enum EnemyState {
@@ -46,7 +45,8 @@ public class Enemy : MonoBehaviour {
         }
     }
     private void Follow() {
-        var dir = (player.transform.position - transform.position).normalized;
+        if(Global.player == null) return;
+        var dir = (Global.player.transform.position - transform.position).normalized;
         transform.Translate(Time.deltaTime * 5f * dir);
     }
     private void Shoot() {

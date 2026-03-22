@@ -1,8 +1,8 @@
 using UnityEngine;
 
 public class CameraController : MonoBehaviour {
-    public GameObject player;
     private void LateUpdate() {
-        transform.position = player.transform.position + new Vector3(0, 0, -10);
+        if(Global.player == null) return;
+        transform.position = Global.player.transform.position + new Vector3(0, 0, -10);
     }
 }
