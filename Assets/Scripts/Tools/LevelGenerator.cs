@@ -2,8 +2,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 public class LevelGenerator : MonoBehaviour {
-    public TileBase tiles;
-    public Tilemap tilemap;
+    [Header("Tile")]
+    public List<TileBase> WallTiles;
+    public List<TileBase> FloorTiles;
+    public Tilemap WallTileMap;
+    public Tilemap FloorTileMap;
 
     [Header("预制体")]
     public GameObject enemyPrefab;
@@ -64,6 +67,14 @@ public class LevelGenerator : MonoBehaviour {
         "1111111111",
     };
 
+    /// <summary>
+    /// 随机墙砖
+    /// </summary>
+    private TileBase wallTile => WallTiles[Random.Range(0, WallTiles.Count)];
+    /// <summary>
+    /// 随机地板砖
+    /// </summary>
+    private TileBase floorTile => FloorTiles[Random.Range(0, FloorTiles.Count)];
 
     private void Start() {
         int curX = 0;
@@ -76,7 +87,8 @@ public class LevelGenerator : MonoBehaviour {
 
     }
 
-   
+
+    
     /// <summary>
     /// 生成地图
     /// </summary>
@@ -85,19 +97,24 @@ public class LevelGenerator : MonoBehaviour {
             for(int j = 0; j < map[i].Length; j++) {
                 int x = startX + j;
                 int y = startY + i;
+                //地板
+                FloorTileMap.SetTile(new Vector3Int(x, y, 0), floorTile);
+                //墙
                 if(map[i][j] == '1') {
-                    tilemap.SetTile(new Vector3Int(x, y, 0), tiles);
+                    WallTileMap.SetTile(new Vector3Int(x, y, 0), wallTile);
                 }
+                //敌人
                 if(map[i][j] == 'e') {
                     var obj = Instantiate(enemyPrefab, new Vector3(x + 0.5f, y + 0.5f, 0), Quaternion.identity);
                     obj.SetActive(true);
                 }
+                //玩家
                 if(map[i][j] == 'p') {
                     var obj = Instantiate(playerPrefab, new Vector3(x + 0.5f, y + 0.5f, 0), Quaternion.identity);
                     obj.SetActive(true);
                 }
                 if(map[i][j] == '#') {
-                    var obj = Instantiate(doorPrefab, new Vector3(x + 0.5f, y + 0.5f, 0), Quaternion.identity);
+                    var obj = Instantiate(doorPrefab, new Vector3(x, y, 0), Quaternion.identity);
                     obj.SetActive(true);
                 }
             }

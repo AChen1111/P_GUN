@@ -9,7 +9,9 @@ public class Enemy : MonoBehaviour {
     }
 
     public GameObject bulletPrefab;
-
+    public SpriteRenderer sr;
+    public Rigidbody2D rb;
+    
     public enum EnemyState {
         Follow,
         Shoot,
@@ -21,6 +23,9 @@ public class Enemy : MonoBehaviour {
     bool isShoot = false;
     
     private static readonly WaitForSeconds s_ShootDelay = new WaitForSeconds(0.2f);
+    private void Awake() {
+        rb = GetComponent<Rigidbody2D>();
+    }
     private void Update() {
         if(state == EnemyState.Follow) {
             if(timer >= timerMax) {
@@ -44,10 +49,20 @@ public class Enemy : MonoBehaviour {
                 StartCoroutine(ShootCoroutine());
         }
     }
+
     private void Follow() {
         if(Global.player == null) return;
+        //方向向量处理
         var dir = (Global.player.transform.position - transform.position).normalized;
-        transform.Translate(Time.deltaTime * 5f * dir);
+        //朝向处理
+        if(dir.x < 0) {
+            sr.flipX = true;
+        }
+        else if(dir.x > 0) {
+            sr.flipX = false;
+        }
+
+        rb.velocity = dir * 5f;
     }
     private void Shoot() {
         var bullet = Instantiate(bulletPrefab, transform.position + Vector3.right, Quaternion.identity);
