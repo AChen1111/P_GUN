@@ -7,11 +7,11 @@ public class Player : MonoBehaviour
     private Rigidbody2D rb;
     [Header("角色贴图")]
     public SpriteRenderer sr;
-    [Header("子弹预制体")]
-    public GameObject bulletPrefab;
     [Header("角色移动速度")]
     public float moveSpeed = 5f;
-
+    [Header("武器节点")]
+    public Transform Weapon;
+    public Pistol pistol;
     void Awake()
     {
         Global.player = this;
@@ -26,6 +26,17 @@ public class Player : MonoBehaviour
 
     void Update()
     {
+        //获取鼠标位置
+        var mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        //获取鼠标位置与角色位置的向量
+        Vector2 dir = (mousePosition - transform.position).normalized;  
+
+        //转成欧拉角
+        float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+        //设置武器旋转
+        Weapon.localRotation = Quaternion.Euler(0, 0, angle);
+        Weapon.localScale = new Vector3(1, dir.x > 0 ? 1 : -1,1);
+
         var horizontal = Input.GetAxisRaw("Horizontal");
         var vertical = Input.GetAxisRaw("Vertical");
         
@@ -42,16 +53,7 @@ public class Player : MonoBehaviour
         }
 
         if(Input.GetMouseButtonDown(0)) {
-            //获取鼠标位置
-            var mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            var dir = (mousePosition - transform.position).normalized;
-            //实例化子弹
-            var bullet = Instantiate(bulletPrefab);
-            bullet.transform.position = transform.position;
-            //设置子弹方向
-            bullet.GetComponent<PlayerBullet>().dir = dir;
-            //激活子弹
-            bullet.SetActive(true);
+            pistol.ShootDown(dir);
         }
     }
 
@@ -64,4 +66,5 @@ public class Player : MonoBehaviour
         }
         Global.OnHPChange?.Invoke();
     }
+
 }

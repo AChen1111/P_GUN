@@ -1,10 +1,17 @@
 using UnityEngine;
 
-public class PlayerBullet : MonoBehaviour {
+public class EnemyBullet : MonoBehaviour {
+    public Rigidbody2D rb;
     public Vector2 dir;
+    public float speed = 10f;
+    
+    private void Awake() 
+    {
+        rb = GetComponent<Rigidbody2D>();
+    }
     private void OnCollisionEnter2D(Collision2D other) {
-        if(other.gameObject.CompareTag("Enemy")) {
-            Destroy(other.gameObject);
+        if(other.gameObject.CompareTag("Player")) {
+            other.gameObject.GetComponent<Player>().Hurt();
             Destroy(gameObject);
         }
         else if(other.gameObject.CompareTag("Grid")) {
@@ -15,6 +22,6 @@ public class PlayerBullet : MonoBehaviour {
         gameObject.AddComponent<CircleCollider2D>();
     }
     private void Update() {
-        transform.Translate(Time.deltaTime * 10f * dir);
+        rb.velocity = dir * speed;
     }
 }
