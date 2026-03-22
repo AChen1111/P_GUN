@@ -3,9 +3,11 @@ using UnityEngine;
 public class EnemyBullet : MonoBehaviour {
     private void OnCollisionEnter2D(Collision2D other) {
         if(other.gameObject.CompareTag("Player")) {
-            //Destroy(other.gameObject);
+            other.gameObject.GetComponent<Player>().Hurt();
             Destroy(gameObject);
-            GameUI.Instance.ShowOverPanel();
+        }
+        else if(other.gameObject.CompareTag("Grid")) {
+            Destroy(gameObject);
         }
     }
     private void Reset() {
