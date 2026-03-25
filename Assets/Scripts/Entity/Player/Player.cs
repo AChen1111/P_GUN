@@ -12,7 +12,7 @@ public class Player : MonoBehaviour
     public float moveSpeed = 5f;
     [Header("武器节点")]
     public Transform Weapon;
-    public Pistol pistol;
+    public Gun gun;
     void Awake()
     {
         Global.player = this;
@@ -52,9 +52,17 @@ public class Player : MonoBehaviour
         {
             sr.flipX = false;
         }
-
+        //按下
         if(Input.GetMouseButtonDown(0)) {
-            pistol.ShootDown(dir);
+            gun.ShootDown(dir);
+        }
+        //抬起
+        if(Input.GetMouseButtonUp(0)) {
+            gun.ShootUp(dir);
+        }
+        //按住
+        if(Input.GetMouseButton(0)) {
+            gun.Shooting(dir);
         }
     }
 
