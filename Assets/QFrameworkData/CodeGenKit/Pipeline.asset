@@ -19,14 +19,11 @@ MonoBehaviour:
     From: 0
     NameToFullName: []
     BindInfos:
-    - TypeName: SpriteRenderer
-      PathToRoot: SR
-      MemberName: SR
     - TypeName: PlayerBullet
       PathToRoot: PlayerBullet
       MemberName: PlayerBullet
-    ScriptsFolder: Assets\Scripts\Entity\Player\Weapon
-    ClassName: Pistol
+    ScriptsFolder: Assets/Scripts/Entity/Player/Weapon
+    ClassName: MP5
     Namespace: QFramework.PG
     MainCode: 
     DesignerCode: 

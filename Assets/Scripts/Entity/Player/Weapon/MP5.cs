@@ -3,11 +3,42 @@ using QFramework;
 
 namespace QFramework.PG
 {
-	public partial class MP5 : ViewController
+	public partial class MP5 : Gun
 	{
-		void Start()
+		public override PlayerBullet BulletPrefab => PlayerBullet;
+		public override AudioSource PlayerAudioSource => SelfAudioSource;
+		//子弹发射间隔
+		private float timer = 0f;
+		private float timerMax = 0.1f;
+		public override void ShootDown(Vector2 dir)
+		{	
+			PlayerAudioSource.clip = shootSounds[0];
+			PlayerAudioSource.loop = true;
+			PlayerAudioSource.Play();
+
+		}
+        public override void Shooting(Vector2 dir)
+        {
+
+
+			if(timer >= timerMax) {
+				timer = 0f;
+				//实例化子弹
+				var obj = Instantiate(BulletPrefab);
+				obj.transform.position = transform.position;
+
+				//设置子弹方向
+				obj.dir = dir;
+				obj.gameObject.SetActive(true);
+
+				//播放射击音效
+				
+			}
+			timer += Time.deltaTime;
+        }
+		public override void ShootUp(Vector2 dir)
 		{
-			// Code Here
+			PlayerAudioSource.Stop();
 		}
 	}
 }

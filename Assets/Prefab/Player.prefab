@@ -51,7 +51,7 @@ MonoBehaviour:
   sr: {fileID: 8980726362857158556}
   moveSpeed: 5
   Weapon: {fileID: 5918398537855737486}
-  pistol: {fileID: 5261374030294561210}
+  gun: {fileID: 2727177544181365011}
 --- !u!50 &6481072556287412660
 Rigidbody2D:
   serializedVersion: 4
@@ -187,7 +187,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 1
-  m_Sprite: {fileID: 21300000, guid: ebd35303f0034ee4aab06bfced6d81de, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 406ef51de9dbb2f46be8cc1c646c5f93, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -599,7 +599,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 1
-  m_Sprite: {fileID: 21300000, guid: ebd35303f0034ee4aab06bfced6d81de, type: 3}
+  m_Sprite: {fileID: 21300000, guid: e80c7e6080d1edf46a3126017004c41f, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -626,7 +626,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &3351063098243044127
 Transform:
   m_ObjectHideFlags: 0
@@ -683,7 +683,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 1
-  m_Sprite: {fileID: 21300000, guid: ebd35303f0034ee4aab06bfced6d81de, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 277985b7cfc3c954a9449e86c21cceed, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -741,11 +741,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d07e652b522e8994eaff8b39a3679d97, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Namespace: 
-  ScriptName: 
-  ScriptsFolder: 
+  Namespace: QFramework.PG
+  ScriptName: RocketGun
+  ScriptsFolder: Assets\Scripts\Entity\Player\Weapon
   GeneratePrefab: 0
-  PrefabFolder: 
+  PrefabFolder: Assets/Prefab
   ArchitectureFullTypeName: 
   ViewControllerFullTypeName: 
   shootSounds:
@@ -864,6 +864,7 @@ GameObject:
   - component: {fileID: 2474115177679023109}
   - component: {fileID: 1807580633846234392}
   - component: {fileID: 7172979318006208287}
+  - component: {fileID: 2465338788808360374}
   m_Layer: 6
   m_Name: PlayerBullet
   m_TagString: Untagged
@@ -1015,6 +1016,22 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &2465338788808360374
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2486686601100052749}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0d51f3a7c41ab0346b49ae50d456bece, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  MarkType: 0
+  CustomComponentName: PlayerBullet
+  CustomComment: 
+  mComponentName: PlayerBullet
 --- !u!1 &3177087230529991304
 GameObject:
   m_ObjectHideFlags: 0
@@ -1228,7 +1245,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 1
-  m_Sprite: {fileID: 21300000, guid: ebd35303f0034ee4aab06bfced6d81de, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 81af13a4162b539469c8f22e41efbdd6, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -1286,11 +1303,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d07e652b522e8994eaff8b39a3679d97, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Namespace: 
-  ScriptName: 
-  ScriptsFolder: 
+  Namespace: QFramework.PG
+  ScriptName: ShotGun
+  ScriptsFolder: Assets\Scripts\Entity\Player\Weapon
   GeneratePrefab: 0
-  PrefabFolder: 
+  PrefabFolder: Assets/Prefab
   ArchitectureFullTypeName: 
   ViewControllerFullTypeName: 
   shootSounds:
@@ -1633,7 +1650,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 1
-  m_Sprite: {fileID: 21300000, guid: ebd35303f0034ee4aab06bfced6d81de, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 7127fbc26c4ba0f49ac610f697dd5947, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -1655,13 +1672,15 @@ GameObject:
   - component: {fileID: 2406977954052767757}
   - component: {fileID: 4392008346668967226}
   - component: {fileID: 2727177544181365011}
+  - component: {fileID: 6026384166436651932}
+  - component: {fileID: 8829128439272879803}
   m_Layer: 0
   m_Name: MP5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &2406977954052767757
 Transform:
   m_ObjectHideFlags: 0
@@ -1714,6 +1733,121 @@ MonoBehaviour:
   PrefabFolder: Assets/Art/Prefab
   ArchitectureFullTypeName: 
   ViewControllerFullTypeName: 
+  shootSounds:
+  - {fileID: 8300000, guid: 7f5ebb3ad6679da4793726201cea6868, type: 3}
+  PlayerBullet: {fileID: 2474115177679023109}
+  SelfAudioSource: {fileID: 8829128439272879803}
+--- !u!114 &6026384166436651932
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4619199208042661116}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 411e729afed24c62a04e2b99d9122e78, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Binds:
+  - MemberName: SelfAudioSource
+    Object: {fileID: 8829128439272879803}
+--- !u!82 &8829128439272879803
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4619199208042661116}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_PlayOnAwake: 1
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &4651470050767089895
 GameObject:
   m_ObjectHideFlags: 0
@@ -1761,11 +1895,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d07e652b522e8994eaff8b39a3679d97, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Namespace: 
-  ScriptName: 
-  ScriptsFolder: 
+  Namespace: QFramework.PG
+  ScriptName: Bow
+  ScriptsFolder: Assets\Scripts\Entity\Player\Weapon
   GeneratePrefab: 0
-  PrefabFolder: 
+  PrefabFolder: Assets/Prefab
   ArchitectureFullTypeName: 
   ViewControllerFullTypeName: 
   shootSounds:
@@ -2028,7 +2162,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 1
-  m_Sprite: {fileID: 21300000, guid: ebd35303f0034ee4aab06bfced6d81de, type: 3}
+  m_Sprite: {fileID: 21300000, guid: c4f5774d1bbe5a04a9d2630a39f0abfc, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -2250,11 +2384,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d07e652b522e8994eaff8b39a3679d97, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Namespace: 
-  ScriptName: 
-  ScriptsFolder: 
+  Namespace: QFramework.PG
+  ScriptName: AK
+  ScriptsFolder: Assets\Scripts\Entity\Player\Weapon
   GeneratePrefab: 0
-  PrefabFolder: 
+  PrefabFolder: Assets/Prefab
   ArchitectureFullTypeName: 
   ViewControllerFullTypeName: 
   shootSounds:
@@ -2433,7 +2567,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 1
-  m_Sprite: {fileID: 21300000, guid: ebd35303f0034ee4aab06bfced6d81de, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 6e00296dcbf12324dac4fcfe2f416287, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -2491,11 +2625,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d07e652b522e8994eaff8b39a3679d97, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Namespace: 
-  ScriptName: 
-  ScriptsFolder: 
+  Namespace: QFramework.PG
+  ScriptName: Laser
+  ScriptsFolder: Assets\Scripts\Entity\Player\Weapon
   GeneratePrefab: 0
-  PrefabFolder: 
+  PrefabFolder: Assets/Prefab
   ArchitectureFullTypeName: 
   ViewControllerFullTypeName: 
   shootSounds:
@@ -2620,7 +2754,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2307848537493646308
 Transform:
   m_ObjectHideFlags: 0
@@ -3009,11 +3143,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d07e652b522e8994eaff8b39a3679d97, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Namespace: 
-  ScriptName: 
-  ScriptsFolder: 
+  Namespace: QFramework.PG
+  ScriptName: AWP
+  ScriptsFolder: Assets\Scripts\Entity\Player\Weapon
   GeneratePrefab: 0
-  PrefabFolder: 
+  PrefabFolder: Assets/Prefab
   ArchitectureFullTypeName: 
   ViewControllerFullTypeName: 
   shootSounds:
