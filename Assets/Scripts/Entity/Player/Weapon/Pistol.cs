@@ -1,19 +1,15 @@
 using System.Collections.Generic;
+using QFramework;
 using UnityEngine;
-
-public class Pistol : MonoBehaviour {
-    public PlayerBullet bullet;
+namespace QFramework.PG {
+public partial class Pistol : ViewController {
     public List<AudioClip> shootSounds = new List<AudioClip>();
-    private AudioSource audioSource;
-
-    private void Awake() {
-        audioSource = GetComponent<AudioSource>();
-    }
+   
 
     public void ShootDown(Vector2 dir)
     {
         //实例化子弹
-        var obj = Instantiate(bullet);
+        var obj = Instantiate(PlayerBullet);
         obj.transform.position = transform.position;
 
         //设置子弹方向
@@ -22,7 +18,7 @@ public class Pistol : MonoBehaviour {
 
         //播放射击音效
         var randomIndex = Random.Range(0, shootSounds.Count);
-        audioSource.PlayOneShot(shootSounds[randomIndex]);
+        SelfAudioSource.PlayOneShot(shootSounds[randomIndex]);
         
     }
     public void ShootUp(Vector2 dir)
@@ -33,4 +29,5 @@ public class Pistol : MonoBehaviour {
     {
 
     }
+}
 }
