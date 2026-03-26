@@ -1,9 +1,9 @@
-// Generate Id:bdfc7fc8-ee9d-4f7d-854d-0aedb6dc794d
+// Generate Id:d53e3d12-b98b-415d-8003-79282de0f2b3
 using UnityEngine;
 
 namespace QFramework.PG
 {
-	public partial class Pistol
+	public partial class ShotGun
 	{
 		public SpriteRenderer SR;
 		
