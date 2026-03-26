@@ -18,12 +18,9 @@ MonoBehaviour:
     GameObject: {fileID: 0}
     From: 0
     NameToFullName: []
-    BindInfos:
-    - TypeName: PlayerBullet
-      PathToRoot: PlayerBullet
-      MemberName: PlayerBullet
+    BindInfos: []
     ScriptsFolder: Assets/Scripts/Entity/Player/Weapon
-    ClassName: MP5
+    ClassName: AK
     Namespace: QFramework.PG
     MainCode: 
     DesignerCode: 
