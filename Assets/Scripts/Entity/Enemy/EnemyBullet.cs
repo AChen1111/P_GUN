@@ -21,7 +21,7 @@ public class EnemyBullet : MonoBehaviour {
     private void Reset() {
         gameObject.AddComponent<CircleCollider2D>();
     }
-    private void Update() {
+    private void FixedUpdate() {
         rb.velocity = dir * speed;
     }
 }
