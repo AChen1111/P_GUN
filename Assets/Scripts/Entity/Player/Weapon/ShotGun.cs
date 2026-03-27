@@ -1,5 +1,6 @@
 using UnityEngine;
 using QFramework;
+using System.Collections;
 
 namespace QFramework.PG
 {
@@ -20,9 +21,19 @@ namespace QFramework.PG
 				PlayerAudioSource?.PlayOneShot(shootSounds[randomIndex]);
 			}
 		}
-		
+
+		private float _duration = 1f;
+		private bool _canShoot = true;
+		IEnumerator ShootCoroutine()
+		{
+			_canShoot = false;
+			yield return new WaitForSeconds(_duration);
+			_canShoot = true;
+		}
 		public override void ShootDown(Vector2 dir)
         {
+			if(!_canShoot) return;
+			StartCoroutine(ShootCoroutine());
             var angle = dir.ToAngle();
 			var originPos = transform.parent.Position2D();
 			var radius = (BulletPrefab.Position2D() - originPos).magnitude;
@@ -39,6 +50,10 @@ namespace QFramework.PG
 				var pos = originPos + dir2 * radius;
 				Shoot(pos,dir2.normalized,i==0);
 			}
+        }
+        public override void Shooting(Vector2 dir)
+        {
+            ShootDown(dir);
         }
 	}
 }

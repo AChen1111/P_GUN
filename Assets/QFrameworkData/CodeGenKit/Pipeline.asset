@@ -18,9 +18,15 @@ MonoBehaviour:
     GameObject: {fileID: 0}
     From: 0
     NameToFullName: []
-    BindInfos: []
+    BindInfos:
+    - TypeName: PlayerBullet
+      PathToRoot: PlayerBullet
+      MemberName: PlayerBullet
+    - TypeName: SpriteRenderer
+      PathToRoot: Arrow
+      MemberName: Arrow
     ScriptsFolder: Assets/Scripts/Entity/Player/Weapon
-    ClassName: AK
+    ClassName: Bow
     Namespace: QFramework.PG
     MainCode: 
     DesignerCode: 
