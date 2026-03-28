@@ -34,6 +34,8 @@ namespace QFramework.PG
 				obj.transform.position = transform.position;
 				obj.dir = dir;
 				obj.gameObject.SetActive(true);
+			} else if(!_gunClip.CanShoot) {
+				PlayerAudioSource.Stop();
 			}
         }
 		public override void ShootUp(Vector2 dir)

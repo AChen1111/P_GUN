@@ -19,11 +19,11 @@ MonoBehaviour:
     From: 0
     NameToFullName: []
     BindInfos:
-    - TypeName: UnityEngine.UI.Text
-      PathToRoot: BulletText
-      MemberName: BulletText
-    ScriptsFolder: Assets\Scripts\UI
-    ClassName: GameUI
+    - TypeName: QFramework.ViewController
+      PathToRoot: Weapon/MP5
+      MemberName: MP5
+    ScriptsFolder: Assets\Scripts\Entity\Player
+    ClassName: Player
     Namespace: QFramework.PG
     MainCode: 
     DesignerCode: 
