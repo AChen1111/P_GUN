@@ -7,35 +7,26 @@ namespace QFramework.PG
 	{
 		public override PlayerBullet BulletPrefab => PlayerBullet;
 		public override UnityEngine.AudioSource PlayerAudioSource => SelfAudioSource;
+		[SerializeField] private float _duration = 0.1f;
+		private ShootDuration _shootDuration;
 
-		private float timer = 0f;
-		private float timerMax = 0.1f;
+		private void Awake() => _shootDuration = new ShootDuration(_duration);
 
 		public override void ShootDown(Vector2 dir)
 		{	
 			PlayerAudioSource.clip = shootSounds[0];
 			PlayerAudioSource.loop = true;
 			PlayerAudioSource.Play();
-
 		}
         public override void Shooting(Vector2 dir)
         {
-
-
-			if(timer >= timerMax) {
-				timer = 0f;
-				//实例化子弹
+			if(_shootDuration.CanShoot) {
+				_shootDuration.RecordShootTime();
 				var obj = Instantiate(BulletPrefab);
 				obj.transform.position = transform.position;
-
-				//设置子弹方向
 				obj.dir = dir;
 				obj.gameObject.SetActive(true);
-
-				//播放射击音效
-				
 			}
-			timer += Time.deltaTime;
         }
 		public override void ShootUp(Vector2 dir)
 		{
