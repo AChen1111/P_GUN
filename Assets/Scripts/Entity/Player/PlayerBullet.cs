@@ -10,7 +10,7 @@ public class PlayerBullet : MonoBehaviour {
     }
     private void OnCollisionEnter2D(Collision2D other) {
         if(other.gameObject.CompareTag("Enemy")) {
-            Destroy(other.gameObject);
+            other.gameObject.GetComponent<Enemy>().Hurt(1);
             Destroy(gameObject);
         }
         else if(other.gameObject.CompareTag("Grid")) {
