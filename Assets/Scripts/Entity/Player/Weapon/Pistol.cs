@@ -5,8 +5,17 @@ namespace QFramework.PG {
 public partial class Pistol : Gun {
     public override PlayerBullet BulletPrefab => PlayerBullet;
     public override AudioSource PlayerAudioSource => SelfAudioSource;
-    public override void ShootDown(Vector2 dir) {
-        //实例化子弹
+    [Header("属性")]
+    [SerializeField] private int _maxAmmo = 10;//最大弹药量
+    private GunClip GunClip ;//枪弹夹
+
+    private void Awake()
+    {
+        GunClip = new GunClip(_maxAmmo);
+    }
+
+    public override void Shoot(Vector2 dir)
+    {
         var obj = Instantiate(BulletPrefab);
         obj.transform.position = transform.position;
 
@@ -16,7 +25,19 @@ public partial class Pistol : Gun {
 
         //播放射击音效
         var randomIndex = Random.Range(0, shootSounds.Count);
-        PlayerAudioSource?.PlayOneShot(shootSounds[randomIndex]);        
+        PlayerAudioSource?.PlayOneShot(shootSounds[randomIndex]);   
+    }
+
+    public override void ShootDown(Vector2 dir) {
+        if(GunClip.CanShoot) {
+            GunClip.Shoot();
+            Shoot(dir);
+        }
+    }
+
+    public override void Reload()
+    {
+        GunClip.Reload();
     }
 }
 }

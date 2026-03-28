@@ -64,6 +64,10 @@ public class Player : MonoBehaviour
         if(Input.GetMouseButton(0)) {
             gun.Shooting(dir);
         }
+        //换子弹
+        if(Input.GetKeyDown(KeyCode.R)) {
+            gun.Reload();
+        }
     }
 
     public void Hurt() {
