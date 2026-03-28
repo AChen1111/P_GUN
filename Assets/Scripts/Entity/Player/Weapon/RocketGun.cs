@@ -1,6 +1,5 @@
 using UnityEngine;
 using QFramework;
-using System.Collections;
 
 namespace QFramework.PG
 {
@@ -9,28 +8,22 @@ namespace QFramework.PG
 		public override PlayerBullet BulletPrefab => PlayerBullet;
 		
 		public override UnityEngine.AudioSource PlayerAudioSource => SelfAudioSource;
-		
-		private float _duration = 1f;
-		private bool _canShoot = true;
 
+		[SerializeField] private float _duration = 1f;
+		private ShootDuration _shootDuration;
+
+		private void Awake() => _shootDuration = new ShootDuration(_duration);
 
 		public override void Shoot(Vector2 dir)
 		{
-			if(!_canShoot) return;
-			StartCoroutine(ShootCoroutine());
+			if(!_shootDuration.CanShoot) return;
+			_shootDuration.RecordShootTime();
 			var obj = Instantiate(BulletPrefab);
 			obj.transform.position = transform.position;
 			obj.dir = dir;
 			obj.transform.right = dir;
 			obj.gameObject.SetActive(true);
 			SelfAudioSource.PlayOneShot(shootSounds[Random.Range(0, shootSounds.Count)]);
-		}
-
-		IEnumerator ShootCoroutine()
-		{
-			_canShoot = false;
-			yield return new WaitForSeconds(_duration);
-			_canShoot = true;
 		}
 		
 		public override void ShootDown(Vector2 dir)
