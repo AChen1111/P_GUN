@@ -1,6 +1,6 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using QFramework.PG;
 
 public class Enemy : MonoBehaviour {
     private void Reset() {
@@ -16,6 +16,9 @@ public class Enemy : MonoBehaviour {
     public List<AudioClip> shootSounds = new List<AudioClip>();
     private AudioSource audioSource;
 
+    [Header("属性")]
+    [SerializeField]private int hp = 3;//血量
+    [SerializeField] private float _shootInterval = 0.2f;//射击间隔
 
     public enum EnemyState {
         Follow,
@@ -25,12 +28,14 @@ public class Enemy : MonoBehaviour {
     //计时器
     public float timer = 0f;
     public float timerMax = 3f;
-    bool isShoot = false;
-    
-    private static readonly WaitForSeconds s_ShootDelay = new WaitForSeconds(0.2f);
+
+
+    private ShootDuration _shootDuration;
+
     private void Awake() {
         rb = GetComponent<Rigidbody2D>();
         audioSource = GetComponent<AudioSource>();
+        _shootDuration = new ShootDuration(_shootInterval);
     }
 
     private void Update() {
@@ -54,8 +59,10 @@ public class Enemy : MonoBehaviour {
             } else {
                 timer += Time.deltaTime;
             }
-            if(!isShoot)
-                StartCoroutine(ShootCoroutine());
+            if(_shootDuration.CanShoot) {
+                _shootDuration.RecordShootTime();
+                Shoot((Global.player.transform.position - transform.position).normalized);
+            }
         }
     }
 
@@ -74,6 +81,13 @@ public class Enemy : MonoBehaviour {
         rb.velocity = dir * 5f;
     }
 
+    public void Hurt(int damage)
+    {
+        hp -= damage;
+        if(hp <= 0) {
+            Destroy(gameObject);
+        }
+    }
 
     private void Shoot(Vector2 dirToPlayer) {
         var obj = Instantiate(bulletPrefab, transform.position + Vector3.right, Quaternion.identity);
@@ -86,10 +100,4 @@ public class Enemy : MonoBehaviour {
         audioSource.PlayOneShot(shootSounds[randomIndex]);
     }
     
-    IEnumerator ShootCoroutine() {
-        isShoot = true;
-        yield return s_ShootDelay;  
-        Shoot((Global.player.transform.position - transform.position).normalized);
-        isShoot = false;
-    }
 }
