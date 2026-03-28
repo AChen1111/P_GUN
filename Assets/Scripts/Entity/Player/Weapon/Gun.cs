@@ -27,5 +27,10 @@ public abstract class Gun : ViewController {
         obj.dir = dir;
         obj.gameObject.SetActive(true);
     }
+    
+    public virtual void Reload()
+    {
+        
+    }
 }
 }

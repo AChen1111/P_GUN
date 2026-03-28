@@ -8,6 +8,11 @@ public class PlayerBullet : MonoBehaviour {
     private void Awake() {
         rb = GetComponent<Rigidbody2D>();
     }
+
+    ///<summary>
+    ///碰撞检测
+    ///</summary>
+    ///<param name="other">碰撞对象</param>
     private void OnCollisionEnter2D(Collision2D other) {
         if(other.gameObject.CompareTag("Enemy")) {
             other.gameObject.GetComponent<Enemy>().Hurt(1);
@@ -17,10 +22,16 @@ public class PlayerBullet : MonoBehaviour {
             Destroy(gameObject);
         }
     }
+
+
     private void Reset() {
         gameObject.AddComponent<CircleCollider2D>();
     }
-    private void Update() {
+    
+    ///<summary>
+    ///固定更新
+    ///</summary>
+    private void FixedUpdate() {
         rb.velocity = dir * speed;
     }
 }

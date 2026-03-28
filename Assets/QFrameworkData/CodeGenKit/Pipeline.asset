@@ -19,14 +19,11 @@ MonoBehaviour:
     From: 0
     NameToFullName: []
     BindInfos:
-    - TypeName: PlayerBullet
-      PathToRoot: PlayerBullet
-      MemberName: PlayerBullet
-    - TypeName: SpriteRenderer
-      PathToRoot: Arrow
-      MemberName: Arrow
-    ScriptsFolder: Assets/Scripts/Entity/Player/Weapon
-    ClassName: Bow
+    - TypeName: UnityEngine.UI.Text
+      PathToRoot: BulletText
+      MemberName: BulletText
+    ScriptsFolder: Assets\Scripts\UI
+    ClassName: GameUI
     Namespace: QFramework.PG
     MainCode: 
     DesignerCode: 
