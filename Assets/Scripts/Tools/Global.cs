@@ -1,5 +1,5 @@
 using System;
-
+using QFramework.PG;
 public class Global
 {
     public static Player player;

@@ -1,5 +1,5 @@
 using UnityEngine;
-
+using QFramework.PG;
 public class EnemyBullet : MonoBehaviour {
     public Rigidbody2D rb;
     public Vector2 dir;

@@ -8,10 +8,17 @@ namespace QFramework.PG
         public override PlayerBullet BulletPrefab => PlayerBullet;
         public override AudioSource PlayerAudioSource => SelfAudioSource;
 
+        [Header("属性")]
         [SerializeField] private float _duration = 1f;
+        [SerializeField] private int _maxAmmo = 8;
         private ShootDuration _shootDuration;
+        private GunClip _gunClip;
 
-        private void Awake() => _shootDuration = new ShootDuration(_duration);
+        private void Awake()
+        {
+            _shootDuration = new ShootDuration(_duration);
+            _gunClip = new GunClip(_maxAmmo);
+        }
 
         public void Shoot(Vector2 pos,Vector2 dir,bool playSound = true)
 		{
@@ -28,8 +35,9 @@ namespace QFramework.PG
 
 		public override void ShootDown(Vector2 dir)
         {
-			if(!_shootDuration.CanShoot) return;
+			if(!_shootDuration.CanShoot || !_gunClip.CanShoot) return;
 			_shootDuration.RecordShootTime();
+			_gunClip.Shoot();
             var angle = dir.ToAngle();
 			var originPos = transform.parent.Position2D();
 			var radius = (BulletPrefab.Position2D() - originPos).magnitude;
@@ -51,5 +59,6 @@ namespace QFramework.PG
         {
             ShootDown(dir);
         }
+        public override void Reload() => _gunClip.Reload();
 	}
 }

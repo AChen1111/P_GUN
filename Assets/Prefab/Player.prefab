@@ -48,10 +48,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1321d3787141db4498a5b67ff3a1282c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Namespace: QFramework.PG
+  ScriptName: Player
+  ScriptsFolder: Assets\Scripts\Entity\Player
+  GeneratePrefab: 0
+  PrefabFolder: Assets/Prefab
+  ArchitectureFullTypeName: 
+  ViewControllerFullTypeName: 
   sr: {fileID: 8980726362857158556}
   moveSpeed: 5
   Weapon: {fileID: 5918398537855737486}
-  gun: {fileID: 5261374030294561210}
+  guns:
+  - {fileID: 5261374030294561210}
+  - {fileID: 2727177544181365011}
+  - {fileID: 2374162302897725077}
+  - {fileID: 5815614268384406311}
+  - {fileID: 7107783154120449437}
+  - {fileID: 8880939252703841068}
+  - {fileID: 7008026857846404563}
+  - {fileID: 1102764994404814642}
+  gun: {fileID: 2374162302897725077}
+  currentGunIndex: 0
+  MP5: {fileID: 2727177544181365011}
 --- !u!50 &6481072556287412660
 Rigidbody2D:
   serializedVersion: 4
@@ -915,6 +933,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 95a6a9ff9d3fe504b8e58db76ee90a4d, type: 3}
   - {fileID: 8300000, guid: 28c92310ee1990f46ac1304dadb37c7b, type: 3}
   _duration: 1
+  _maxAmmo: 5
   PlayerBullet: {fileID: 6789907676700621392}
   SelfAudioSource: {fileID: 462594882465687621}
 --- !u!1 &2486686601100052749
@@ -1340,7 +1359,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &6687123497083603149
 Transform:
   m_ObjectHideFlags: 0
@@ -1478,6 +1497,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 8782fb9d1e84d5c46bc9e257fb1b99b9, type: 3}
   - {fileID: 8300000, guid: 6d8e4595e1d5ac44faf8f72551d23276, type: 3}
   _duration: 1
+  _maxAmmo: 8
   SR: {fileID: 5292693877722665481}
   PlayerBullet: {fileID: 6546264564367982953}
   SelfAudioSource: {fileID: 1131672502801556350}
@@ -1884,6 +1904,7 @@ MonoBehaviour:
   shootSounds:
   - {fileID: 8300000, guid: 7f5ebb3ad6679da4793726201cea6868, type: 3}
   _duration: 0.1
+  _maxAmmo: 30
   PlayerBullet: {fileID: 2474115177679023109}
   SelfAudioSource: {fileID: 8829128439272879803}
 --- !u!114 &6026384166436651932
@@ -2713,6 +2734,7 @@ MonoBehaviour:
   shootSounds:
   - {fileID: 8300000, guid: 98ed46cee309cdd44a4b35d7a853b8cd, type: 3}
   _duration: 0.1
+  _maxAmmo: 30
   SR: {fileID: 1753784220704834651}
   PlayerBullet: {fileID: 3637317672845138356}
   SelfAudioSource: {fileID: 9050451391940257978}
@@ -3097,7 +3119,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2307848537493646308
 Transform:
   m_ObjectHideFlags: 0
@@ -3138,6 +3160,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 1e3302f441835cb4ba46ceb235f3180a, type: 3}
   - {fileID: 8300000, guid: 38a5caf6a3bd4324dbe2fbf779720caf, type: 3}
   - {fileID: 8300000, guid: df89cef0e87e61a4889501976dc3edc4, type: 3}
+  _maxAmmo: 10
   SR: {fileID: 5033538656300639338}
   PlayerBullet: {fileID: 5382055945535339470}
   SelfAudioSource: {fileID: 7728048956874678106}
@@ -3602,6 +3625,7 @@ MonoBehaviour:
   shootSounds:
   - {fileID: 8300000, guid: f38bbc0189220d24887634fb48b72bdf, type: 3}
   _duration: 2
+  _maxAmmo: 5
   PlayerBullet: {fileID: 1803967659659467377}
   SelfAudioSource: {fileID: 3964581675033554850}
 --- !u!1 &9097263481953605749
