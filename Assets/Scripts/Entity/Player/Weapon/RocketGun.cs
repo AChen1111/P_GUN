@@ -34,11 +34,13 @@ namespace QFramework.PG
 			SelfAudioSource.PlayOneShot(shootSounds[Random.Range(0, shootSounds.Count)]);
 		}
 		public override void Reload() => _gunClip.Reload();
+		public override void OnGunUsed() => _gunClip.OnGunUsed();
 		
 		public override void ShootDown(Vector2 dir)
         {
 			Shoot(dir);
         }
+		
         public override void Shooting(Vector2 dir)
         {
             Shoot(dir);

@@ -32,13 +32,29 @@ public abstract class Gun : ViewController {
     {
         
     }
+    
+    /// <summary>
+    /// 显示枪
+    /// </summary>
     public void Show()
     {
         gameObject.SetActive(true);
     }
+
+    /// <summary>
+    /// 隐藏枪
+    /// </summary>
     public void Hide()
     {
         gameObject.SetActive(false);
+    }
+
+    /// <summary>
+    /// 枪被使用时调用
+    /// </summary>
+    public virtual void OnGunUsed()
+    {
+
     }
 }
 }

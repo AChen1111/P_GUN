@@ -44,5 +44,13 @@ namespace QFramework.PG {
         {
             GameUI.Instance.UpdateBulletText(this);
         }
+
+        /// <summary>
+        /// 枪被使用时更新UI
+        /// </summary>
+        public void OnGunUsed()
+        {
+            UpdateUI();
+        }
     }
 }

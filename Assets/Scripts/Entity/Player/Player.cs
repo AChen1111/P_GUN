@@ -67,31 +67,38 @@ namespace QFramework.PG {
             if(Input.GetMouseButtonDown(0)) {
                 gun.ShootDown(dir);
             }
+            
             //抬起
             if(Input.GetMouseButtonUp(0)) {
                 gun.ShootUp(dir);
             }
+
             //按住
             if(Input.GetMouseButton(0)) {
                 gun.Shooting(dir);
             }
+
             //换子弹
             if(Input.GetKeyDown(KeyCode.R)) {
                 gun.Reload();
             }
+
             //前一把枪
             if(Input.GetKeyDown(KeyCode.Q)) {
                 gun.Hide();
                 currentGunIndex = (currentGunIndex - 1 + guns.Count) % guns.Count;
                 gun = guns[currentGunIndex];
                 gun.Show();
+                gun.OnGunUsed();
             }
+
             //后一把枪
             if(Input.GetKeyDown(KeyCode.E)) {
                 gun.Hide();
                 currentGunIndex = (currentGunIndex + 1) % guns.Count;
                 gun = guns[currentGunIndex];
                 gun.Show();
+                gun.OnGunUsed();
             }
         }
 
