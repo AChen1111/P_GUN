@@ -59,7 +59,7 @@ namespace QFramework.PG
         {
             ShootDown(dir);
         }
-        public override void Reload() => _gunClip.Reload();
+        public override void Reload() => _gunClip.Reload(ReloadSound);
         public override void OnGunUsed() => _gunClip.OnGunUsed();
 	}
 }

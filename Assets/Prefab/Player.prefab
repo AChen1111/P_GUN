@@ -932,6 +932,7 @@ MonoBehaviour:
   shootSounds:
   - {fileID: 8300000, guid: 95a6a9ff9d3fe504b8e58db76ee90a4d, type: 3}
   - {fileID: 8300000, guid: 28c92310ee1990f46ac1304dadb37c7b, type: 3}
+  ReloadSound: {fileID: 8300000, guid: 70c6ba4eb93b17d4a9ce83cfb26c281f, type: 3}
   _duration: 1
   _maxAmmo: 5
   PlayerBullet: {fileID: 6789907676700621392}
@@ -1496,6 +1497,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 2cc471f384c90af4f8e0e063fe6c0ddf, type: 3}
   - {fileID: 8300000, guid: 8782fb9d1e84d5c46bc9e257fb1b99b9, type: 3}
   - {fileID: 8300000, guid: 6d8e4595e1d5ac44faf8f72551d23276, type: 3}
+  ReloadSound: {fileID: 8300000, guid: d4ce39efc317eb845a6d13ff273a5a31, type: 3}
   _duration: 1
   _maxAmmo: 8
   SR: {fileID: 5292693877722665481}
@@ -1903,6 +1905,7 @@ MonoBehaviour:
   ViewControllerFullTypeName: 
   shootSounds:
   - {fileID: 8300000, guid: 7f5ebb3ad6679da4793726201cea6868, type: 3}
+  ReloadSound: {fileID: 8300000, guid: 14adb12de103ab64582403089e31a746, type: 3}
   _duration: 0.1
   _maxAmmo: 30
   PlayerBullet: {fileID: 2474115177679023109}
@@ -2194,6 +2197,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 58508dbb4ef4e18478c3c64634e0667a, type: 3}
   - {fileID: 8300000, guid: 982334509bf96f549acadf7a5627f7c9, type: 3}
   - {fileID: 8300000, guid: 8024fdb37d66f634c85e57499069b28d, type: 3}
+  ReloadSound: {fileID: 8300000, guid: 70c6ba4eb93b17d4a9ce83cfb26c281f, type: 3}
   PlayerBullet: {fileID: 5104934423507247616}
   Arrow: {fileID: 9082374949248212128}
   SelfAudioSource: {fileID: 2553414890998613949}
@@ -2733,6 +2737,7 @@ MonoBehaviour:
   ViewControllerFullTypeName: 
   shootSounds:
   - {fileID: 8300000, guid: 98ed46cee309cdd44a4b35d7a853b8cd, type: 3}
+  ReloadSound: {fileID: 8300000, guid: e83829ac711cc4b46887d2c2030cf5d8, type: 3}
   _duration: 0.1
   _maxAmmo: 30
   SR: {fileID: 1753784220704834651}
@@ -3098,6 +3103,7 @@ MonoBehaviour:
   ViewControllerFullTypeName: 
   shootSounds:
   - {fileID: 8300000, guid: dd3d170db2ba52f4ab2916ee2d37da13, type: 3}
+  ReloadSound: {fileID: 8300000, guid: 09f63d32f8a42f742b15ae6198b3c400, type: 3}
   PlayerBullet: {fileID: 6833524307614553315}
   SelfAudioSource: {fileID: 5941280728720691522}
   SelfLineRenderer: {fileID: 1601432382872910571}
@@ -3160,6 +3166,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 1e3302f441835cb4ba46ceb235f3180a, type: 3}
   - {fileID: 8300000, guid: 38a5caf6a3bd4324dbe2fbf779720caf, type: 3}
   - {fileID: 8300000, guid: df89cef0e87e61a4889501976dc3edc4, type: 3}
+  ReloadSound: {fileID: 8300000, guid: 322a3dede8105894a8588a6e24b001b8, type: 3}
   _maxAmmo: 10
   SR: {fileID: 5033538656300639338}
   PlayerBullet: {fileID: 5382055945535339470}
@@ -3624,6 +3631,7 @@ MonoBehaviour:
   ViewControllerFullTypeName: 
   shootSounds:
   - {fileID: 8300000, guid: f38bbc0189220d24887634fb48b72bdf, type: 3}
+  ReloadSound: {fileID: 8300000, guid: 09f63d32f8a42f742b15ae6198b3c400, type: 3}
   _duration: 2
   _maxAmmo: 5
   PlayerBullet: {fileID: 1803967659659467377}

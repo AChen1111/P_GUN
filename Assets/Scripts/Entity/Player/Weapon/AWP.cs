@@ -31,7 +31,7 @@ namespace QFramework.PG
 			obj.gameObject.SetActive(true);
 			SelfAudioSource.PlayOneShot(shootSounds[0]);
 		}
-		public override void Reload() => _gunClip.Reload();
+		public override void Reload() => _gunClip.Reload(ReloadSound);
 		public override void OnGunUsed() => _gunClip.OnGunUsed();
 		
 		public override void ShootDown(Vector2 dir)
