@@ -8,6 +8,7 @@ public abstract class Gun : ViewController {
     public List<AudioClip> shootSounds = new List<AudioClip>();
     public abstract PlayerBullet BulletPrefab { get; }
     public abstract AudioSource PlayerAudioSource { get; }
+    public  AudioClip ReloadSound;
 
     public virtual void ShootDown(Vector2 dir) {    
         
@@ -32,7 +33,7 @@ public abstract class Gun : ViewController {
     {
         
     }
-    
+
     /// <summary>
     /// 显示枪
     /// </summary>

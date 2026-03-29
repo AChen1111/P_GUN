@@ -56,6 +56,6 @@ namespace QFramework.PG
 			PlayerAudioSource.loop = false;
 		}
 
-		public override void Reload() => _gunClip.Reload();
+		public override void Reload() => _gunClip.Reload(ReloadSound);
 	}
 }

@@ -35,7 +35,7 @@ public partial class Pistol : Gun {
         }
     }
 
-    public override void Reload() => GunClip.Reload();
+    public override void Reload() => GunClip.Reload(ReloadSound);
     public override void OnGunUsed() => GunClip.OnGunUsed();
 }
 }

@@ -16,11 +16,16 @@ namespace QFramework.PG {
             currentAmmo = maxAmmo;
             UpdateUI();
         }
-        
+
+        /// <summary>
+        /// 是否正在换弹
+        /// </summary>
+        private bool isReloading = false;
+
         /// <summary>
         /// 当前是否还有子弹可以射击
         /// </summary>
-        public bool CanShoot => currentAmmo > 0;
+        public bool CanShoot => currentAmmo > 0 && !isReloading;
 
         /// <summary>
         /// 发射一发，消耗一颗子弹
@@ -34,10 +39,20 @@ namespace QFramework.PG {
         /// <summary>
         /// 换弹，恢复至满弹
         /// </summary>
-        public void Reload()
+        public void Reload(AudioClip reloadSound = null)
         {
-            currentAmmo = maxAmmo;
-            UpdateUI();
+            if(isReloading) return;
+
+            isReloading = true;
+            //设置回调,换弹完成后恢复满弹
+            ActionKit.Sequence()
+            .PlaySound(reloadSound)
+            .Callback(() => {
+                currentAmmo = maxAmmo;
+                isReloading = false;
+                UpdateUI();
+            })
+            .StartCurrentScene();
         }
 
         private void UpdateUI()
