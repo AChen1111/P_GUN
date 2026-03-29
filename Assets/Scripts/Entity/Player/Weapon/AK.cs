@@ -13,10 +13,18 @@ namespace QFramework.PG
 		private ShootDuration _shootDuration;
 		private GunClip _gunClip;
 
+		/// <summary>
+		/// 初始化
+		/// </summary>
 		private void Awake()
 		{
 			_shootDuration = new ShootDuration(_duration);
 			_gunClip = new GunClip(_maxAmmo);
+		}
+
+		public override void OnGunUsed()
+		{
+			_gunClip.OnGunUsed();
 		}
 
 		public override void ShootDown(Vector2 dir)
@@ -25,6 +33,7 @@ namespace QFramework.PG
 			PlayerAudioSource.loop = true;
 			PlayerAudioSource.Play();
 		}
+
         public override void Shooting(Vector2 dir)
         {
 			if(_shootDuration.CanShoot && _gunClip.CanShoot) {
@@ -38,6 +47,7 @@ namespace QFramework.PG
 				PlayerAudioSource.Stop();
 			}
         }
+
 		public override void ShootUp(Vector2 dir)
 		{
 			PlayerAudioSource.Stop();
@@ -45,6 +55,7 @@ namespace QFramework.PG
 			PlayerAudioSource.Play();
 			PlayerAudioSource.loop = false;
 		}
+
 		public override void Reload() => _gunClip.Reload();
 	}
 }
