@@ -18,15 +18,23 @@ namespace QFramework.PG {
         
         public Gun gun;
         public int currentGunIndex = 0;
+        public static Player Instance { get; private set; }
 
+    
         void Awake()
         {
             Global.player = this;
+            Instance = this;
             rb = GetComponent<Rigidbody2D>();
             
             gun.Hide();
             gun = guns[0];
             gun.Show();
+        }
+
+        void OnDestroy()
+        {
+            Instance = null;
         }
 
         private void Reset() {

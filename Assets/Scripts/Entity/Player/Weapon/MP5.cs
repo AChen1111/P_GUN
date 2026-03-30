@@ -12,6 +12,7 @@ namespace QFramework.PG
 		[SerializeField] private int _maxAmmo = 30;
 		private ShootDuration _shootDuration;
 		private GunClip _gunClip;
+		private GunFire _gunFire = new GunFire();
 
 		private void Awake()
 		{
@@ -43,6 +44,7 @@ namespace QFramework.PG
 				obj.transform.position = transform.position;
 				obj.dir = dir;
 				obj.gameObject.SetActive(true);
+				_gunFire.Show(BulletPrefab.Position2D(), dir);
 			} else if(_gunClip.IsOutOfAmmo || _gunClip.IsReloading) {
 				PlayerAudioSource.Stop();
 			}

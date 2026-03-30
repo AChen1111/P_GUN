@@ -13,6 +13,7 @@ namespace QFramework.PG
 		[SerializeField] private int _maxAmmo = 5;
 		private ShootDuration _shootDuration;
 		private GunClip _gunClip;
+		private GunFire _gunFire = new GunFire();
 
 		private void Awake()
 		{
@@ -29,6 +30,7 @@ namespace QFramework.PG
 			obj.transform.position = transform.position;
 			obj.dir = dir;
 			obj.gameObject.SetActive(true);
+			_gunFire.Show(BulletPrefab.Position2D(), dir);
 			SelfAudioSource.PlayOneShot(shootSounds[0]);
 		}
 		public override void Reload() => _gunClip.Reload(ReloadSound);
