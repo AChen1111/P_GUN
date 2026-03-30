@@ -28,6 +28,16 @@ namespace QFramework.PG {
         public bool CanShoot => currentAmmo > 0 && !isReloading;
 
         /// <summary>
+        /// 弹药是否真正耗尽（不含换弹状态，用于判断是否停止声音）
+        /// </summary>
+        public bool IsOutOfAmmo => currentAmmo <= 0;
+
+        /// <summary>
+        /// 是否正处于换弹过程中
+        /// </summary>
+        public bool IsReloading => isReloading;
+
+        /// <summary>
         /// 发射一发，消耗一颗子弹
         /// </summary>
         public void Shoot()

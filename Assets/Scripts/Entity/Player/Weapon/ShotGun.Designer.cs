@@ -10,6 +10,6 @@ namespace QFramework.PG
 		public PlayerBullet PlayerBullet;
 		
 		public UnityEngine.AudioSource SelfAudioSource;
-		
 	}
+	
 }

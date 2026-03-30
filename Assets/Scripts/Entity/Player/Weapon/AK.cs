@@ -24,11 +24,14 @@ namespace QFramework.PG
 
 		public override void OnGunUsed()
 		{
+			PlayerAudioSource.Stop();
 			_gunClip.OnGunUsed();
 		}
 
 		public override void ShootDown(Vector2 dir)
-		{	
+		{
+			// 弹药耗尽或换弹中时不启动音效
+			if(_gunClip.IsOutOfAmmo || !_gunClip.CanShoot) return;
 			PlayerAudioSource.clip = shootSounds[0];
 			PlayerAudioSource.loop = true;
 			PlayerAudioSource.Play();
@@ -37,19 +40,27 @@ namespace QFramework.PG
         public override void Shooting(Vector2 dir)
         {
 			if(_shootDuration.CanShoot && _gunClip.CanShoot) {
+				// 切枪后持续按住时，声音可能未启动，补启动
+				if(!PlayerAudioSource.isPlaying) {
+					PlayerAudioSource.clip = shootSounds[0];
+					PlayerAudioSource.loop = true;
+					PlayerAudioSource.Play();
+				}
 				_shootDuration.RecordShootTime();
 				_gunClip.Shoot();
 				var obj = Instantiate(BulletPrefab);
 				obj.transform.position = transform.position;
 				obj.dir = dir;
 				obj.gameObject.SetActive(true);
-			} else if(!_gunClip.CanShoot) {
+			} else if(_gunClip.IsOutOfAmmo || _gunClip.IsReloading) {
 				PlayerAudioSource.Stop();
 			}
         }
 
 		public override void ShootUp(Vector2 dir)
 		{
+			// 只在有声音播放时才触发结束音效，避免空切音
+			if(!PlayerAudioSource.isPlaying) return;
 			PlayerAudioSource.Stop();
 			PlayerAudioSource.clip = AKShootEnd;
 			PlayerAudioSource.Play();
