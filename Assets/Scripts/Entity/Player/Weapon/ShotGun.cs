@@ -13,6 +13,7 @@ namespace QFramework.PG
         [SerializeField] private int _maxAmmo = 8;
         private ShootDuration _shootDuration;
         private GunClip _gunClip;
+        private GunFire _gunFire = new GunFire();
 
         private void Awake()
         {
@@ -30,6 +31,7 @@ namespace QFramework.PG
 			{
 				var randomIndex = Random.Range(0, shootSounds.Count);
 				PlayerAudioSource?.PlayOneShot(shootSounds[randomIndex]);
+                _gunFire.Show(BulletPrefab.Position2D(), dir);
 			}
 		}
 

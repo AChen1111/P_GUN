@@ -8,6 +8,7 @@ public partial class Pistol : Gun {
     [Header("属性")]
     [SerializeField] private int _maxAmmo = 10;//最大弹药量
     private GunClip GunClip ;//枪弹夹
+    private GunFire GunFire = new GunFire();//枪火特效
 
     private void Awake()
     {
@@ -25,7 +26,8 @@ public partial class Pistol : Gun {
 
         //播放射击音效
         var randomIndex = Random.Range(0, shootSounds.Count);
-        PlayerAudioSource?.PlayOneShot(shootSounds[randomIndex]);   
+        PlayerAudioSource?.PlayOneShot(shootSounds[randomIndex]);  
+        GunFire.Show(BulletPrefab.Position2D(),dir);
     }
 
     public override void ShootDown(Vector2 dir) {
