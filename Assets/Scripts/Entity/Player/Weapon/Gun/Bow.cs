@@ -9,7 +9,9 @@ namespace QFramework.PG
 		
 		public SpriteRenderer ArrowSpriteRenderer => Arrow;
 
-		private bool mPressing = false;
+        public override BulletBag BulletBag => new BulletBag(-1);
+
+        private bool mPressing = false;
 
 		public override void Shoot(Vector2 dir)
 		{

@@ -35,6 +35,13 @@ public abstract class Gun : ViewController {
 
 
     /// <summary>
+    /// 子弹袋
+    /// </summary>
+    public abstract BulletBag BulletBag { get; }
+    [Header("备弹设置")]
+    public int MaxBulletBagNum;
+
+    /// <summary>
     /// 鼠标按下
     /// </summary>
     public virtual void ShootDown(Vector2 dir) {    
@@ -98,7 +105,7 @@ public abstract class Gun : ViewController {
     /// </summary>
     public virtual void OnGunUsed()
     {
-
+        GameUI.Instance.UpdateBulletBagText(BulletBag);
     }
 
     /// <summary>

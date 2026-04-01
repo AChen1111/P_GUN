@@ -103,6 +103,7 @@ MonoBehaviour:
   dir: {x: 0, y: 0}
   speed: 15
   rb: {fileID: 0}
+  damage: 0
 --- !u!58 &7698180757498788941
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -445,7 +446,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Namespace: QFramework.PG
   ScriptName: AK
-  ScriptsFolder: Assets/Scripts/Entity/Player/Weapon
+  ScriptsFolder: Assets\Scripts\Entity\Player\Weapon\Gun
   GeneratePrefab: 0
   PrefabFolder: Assets/Prefab
   ArchitectureFullTypeName: 
@@ -455,6 +456,7 @@ MonoBehaviour:
   ReloadSound: {fileID: 8300000, guid: e83829ac711cc4b46887d2c2030cf5d8, type: 3}
   MinDamage: 11
   MaxDamage: 20
+  MaxBulletBagNum: 100
   _duration: 0.1
   _maxAmmo: 30
   SR: {fileID: 4322138692861771031}

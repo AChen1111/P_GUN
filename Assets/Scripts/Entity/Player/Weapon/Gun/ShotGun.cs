@@ -7,17 +7,21 @@ namespace QFramework.PG
 	{
         public override PlayerBullet BulletPrefab => PlayerBullet;
 
+        public override BulletBag BulletBag => _bulletBag;
+
         [Header("属性")]
         [SerializeField] private float _duration = 1f;
         [SerializeField] private int _maxAmmo = 8;
         private ShootDuration _shootDuration;
         private GunClip _gunClip;
+        private BulletBag _bulletBag;
         private GunFire _gunFire = new GunFire();
 
         private void Awake()
         {
             _shootDuration = new ShootDuration(_duration);
             _gunClip = new GunClip(_maxAmmo);
+            _bulletBag = new BulletBag(MaxBulletBagNum);
         }
 
         public void Shoot(Vector2 dir,bool playSound = true)
@@ -61,7 +65,11 @@ namespace QFramework.PG
             ShootDown(dir);
         }
 
-        public override void Reload() => _gunClip.Reload(ReloadSound);
-        public override void OnGunUsed() => _gunClip.OnGunUsed();
+        public override void Reload() => BulletBag.Reload(_gunClip,ReloadSound);
+        public override void OnGunUsed() 
+        {
+            base.OnGunUsed();
+            _gunClip.OnGunUsed();
+        }
 	}
 }

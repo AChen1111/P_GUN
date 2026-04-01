@@ -38,6 +38,11 @@ namespace QFramework.PG {
         public bool IsReloading => isReloading;
 
         /// <summary>
+        /// 是否满弹
+        /// </summary>
+        public bool IsFull => currentAmmo == maxAmmo;
+
+        /// <summary>
         /// 发射一发，消耗一颗子弹
         /// </summary>
         public void Shoot()

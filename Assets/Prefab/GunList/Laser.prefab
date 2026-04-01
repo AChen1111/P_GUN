@@ -268,7 +268,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Namespace: QFramework.PG
   ScriptName: Laser
-  ScriptsFolder: Assets/Scripts/Entity/Player/Weapon
+  ScriptsFolder: Assets\Scripts\Entity\Player\Weapon\Gun
   GeneratePrefab: 0
   PrefabFolder: Assets/Prefab
   ArchitectureFullTypeName: 
@@ -278,6 +278,7 @@ MonoBehaviour:
   ReloadSound: {fileID: 8300000, guid: 09f63d32f8a42f742b15ae6198b3c400, type: 3}
   MinDamage: 5
   MaxDamage: 10
+  MaxBulletBagNum: 0
   PlayerBullet: {fileID: 3392344992374250860}
   SelfAudioSource: {fileID: 2572156488689866957}
   SelfLineRenderer: {fileID: 7491992717285946212}
@@ -331,6 +332,7 @@ MonoBehaviour:
   dir: {x: 0, y: 0}
   speed: 15
   rb: {fileID: 0}
+  damage: 0
 --- !u!58 &6949517647006600970
 CircleCollider2D:
   m_ObjectHideFlags: 0

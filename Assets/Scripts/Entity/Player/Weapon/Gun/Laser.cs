@@ -8,8 +8,9 @@ namespace QFramework.PG
 		public override PlayerBullet BulletPrefab => PlayerBullet;
 		public LineRenderer LineRenderer => SelfLineRenderer;
 
+        public override BulletBag BulletBag => new BulletBag(-1);
 
-		public override void ShootDown(Vector2 dir)
+        public override void ShootDown(Vector2 dir)
 		{
 			LineRenderer.enabled = true;
 			//播放音效

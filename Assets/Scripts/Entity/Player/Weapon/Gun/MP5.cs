@@ -6,17 +6,21 @@ namespace QFramework.PG
 	public partial class MP5 : Gun
 	{
 		public override PlayerBullet BulletPrefab => PlayerBullet;
+
+        public override BulletBag BulletBag => _bulletBag;
 		[Header("属性")]
 		[SerializeField] private float _duration = 0.1f;
 		[SerializeField] private int _maxAmmo = 30;
 		private ShootDuration _shootDuration;
 		private GunClip _gunClip;
+		private BulletBag _bulletBag;
 		private GunFire _gunFire = new GunFire();
 
 		private void Awake()
 		{
 			_shootDuration = new ShootDuration(_duration);
 			_gunClip = new GunClip(_maxAmmo);
+			_bulletBag = new BulletBag(MaxBulletBagNum);
 		}
 
 		public override void ShootDown(Vector2 dir)
@@ -48,9 +52,10 @@ namespace QFramework.PG
 			PlayerAudioSource.Stop();
 		}
 
-		public override void Reload() => _gunClip.Reload(ReloadSound);
+		public override void Reload() => BulletBag.Reload(_gunClip,ReloadSound);
 		public override void OnGunUsed()
 		{
+			base.OnGunUsed();
 			PlayerAudioSource.Stop();
 			_gunClip.OnGunUsed();
 		}
