@@ -4,6 +4,8 @@ public class PlayerBullet : MonoBehaviour {
     public Vector2 dir;
     public float speed = 15f;
     public Rigidbody2D rb;
+    public int damage;
+
 
     private void Awake() {
         rb = GetComponent<Rigidbody2D>();
@@ -15,7 +17,7 @@ public class PlayerBullet : MonoBehaviour {
     ///<param name="other">碰撞对象</param>
     private void OnCollisionEnter2D(Collision2D other) {
         if(other.gameObject.CompareTag("Enemy")) {
-            other.gameObject.GetComponent<Enemy>().Hurt(1);
+            other.gameObject.GetComponent<Enemy>().Hurt(damage);
             Destroy(gameObject);
         }
         else if(other.gameObject.CompareTag("Grid")) {
