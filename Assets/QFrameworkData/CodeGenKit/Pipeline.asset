@@ -20,13 +20,13 @@ MonoBehaviour:
     NameToFullName: []
     BindInfos:
     - TypeName: QFramework.ViewController
-      PathToRoot: Weapon/MP5
+      PathToRoot: MP5
       MemberName: MP5
     - TypeName: SpriteRenderer
-      PathToRoot: Weapon/GunFire
+      PathToRoot: GunFire
       MemberName: GunFire
-    ScriptsFolder: Assets\Scripts\Entity\Player
-    ClassName: Player
+    ScriptsFolder: Assets/Scripts/Entity/Player/Weapon/Global
+    ClassName: WeaponGlobal
     Namespace: QFramework.PG
     MainCode: 
     DesignerCode: 
