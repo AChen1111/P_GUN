@@ -6,7 +6,6 @@ namespace QFramework.PG
 	public partial class AWP : QFramework.PG.Gun
 	{
 		public override PlayerBullet BulletPrefab => PlayerBullet;
-		public override UnityEngine.AudioSource PlayerAudioSource => SelfAudioSource;
 
 		[Header("属性")]
 		[SerializeField] private float _duration = 2f;
@@ -26,12 +25,10 @@ namespace QFramework.PG
 			if(!_shootDuration.CanShoot || !_gunClip.CanShoot) return;
 			_shootDuration.RecordShootTime();
 			_gunClip.Shoot();
-			var obj = Instantiate(BulletPrefab);
-			obj.transform.position = transform.position;
-			obj.dir = dir;
-			obj.gameObject.SetActive(true);
+			var obj = GetBullet(dir);
 			_gunFire.Show(BulletPrefab.Position2D(), dir);
-			SelfAudioSource.PlayOneShot(shootSounds[0]);
+
+			TryPlaySound(false);
 		}
 		public override void Reload() => _gunClip.Reload(ReloadSound);
 		public override void OnGunUsed() => _gunClip.OnGunUsed();

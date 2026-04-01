@@ -6,7 +6,6 @@ namespace QFramework.PG
 	public partial class Laser : QFramework.PG.Gun
 	{
 		public override PlayerBullet BulletPrefab => PlayerBullet;
-		public override UnityEngine.AudioSource PlayerAudioSource => SelfAudioSource;
 		public LineRenderer LineRenderer => SelfLineRenderer;
 
 
@@ -14,16 +13,11 @@ namespace QFramework.PG
 		{
 			LineRenderer.enabled = true;
 			//播放音效
-			PlayerAudioSource.clip = shootSounds[0];
-			PlayerAudioSource.Play();
-			PlayerAudioSource.loop = true;
+			TryPlaySound(true);
 		}
 		public override void Shooting(Vector2 dir)
 		{
-			var obj = Instantiate(BulletPrefab);
-			obj.transform.position = transform.position;
-			obj.dir = dir;
-			obj.gameObject.SetActive(true);
+			var obj = GetBullet(dir);
 
 			//获取墙体和敌人的layerMask
 			var layerMask = LayerMask.GetMask("Default","Enemy");

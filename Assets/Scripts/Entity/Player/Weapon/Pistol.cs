@@ -4,7 +4,6 @@ using UnityEngine;
 namespace QFramework.PG {
 public partial class Pistol : Gun {
     public override PlayerBullet BulletPrefab => PlayerBullet;
-    public override AudioSource PlayerAudioSource => SelfAudioSource;
     [Header("属性")]
     [SerializeField] private int _maxAmmo = 10;//最大弹药量
     private GunClip GunClip ;//枪弹夹
@@ -17,16 +16,9 @@ public partial class Pistol : Gun {
 
     public override void Shoot(Vector2 dir)
     {
-        var obj = Instantiate(BulletPrefab);
-        obj.transform.position = transform.position;
-
-        //设置子弹方向
-        obj.dir = dir;
-        obj.gameObject.SetActive(true);
-
+        GetBullet(dir);
         //播放射击音效
-        var randomIndex = Random.Range(0, shootSounds.Count);
-        PlayerAudioSource?.PlayOneShot(shootSounds[randomIndex]);  
+        TryPlaySound(false);
         GunFire.Show(BulletPrefab.Position2D(),dir);
     }
 

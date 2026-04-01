@@ -5,7 +5,7 @@ namespace QFramework.PG
 {
 	public partial class Player
 	{
-		public QFramework.ViewController MP5;
+		//public QFramework.ViewController MP5;
 		
 		public SpriteRenderer GunFire;
 		

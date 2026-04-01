@@ -7,19 +7,15 @@ namespace QFramework.PG
 	{
 		public override PlayerBullet BulletPrefab => PlayerBullet;
 		
-		public override UnityEngine.AudioSource PlayerAudioSource => SelfAudioSource;
 		public SpriteRenderer ArrowSpriteRenderer => Arrow;
 
 		private bool mPressing = false;
 
 		public override void Shoot(Vector2 dir)
 		{
-			var obj = Instantiate(BulletPrefab);
-			obj.transform.position = transform.position;
-			obj.dir = dir;
+			var obj = GetBullet(dir);
 			obj.transform.right = dir;
-			obj.gameObject.SetActive(true);
-			SelfAudioSource.PlayOneShot(shootSounds[Random.Range(0, shootSounds.Count)]);
+			TryPlaySound(false);
 		}
 
 		public override void ShootDown(Vector2 dir)
