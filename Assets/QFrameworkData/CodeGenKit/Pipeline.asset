@@ -19,14 +19,14 @@ MonoBehaviour:
     From: 0
     NameToFullName: []
     BindInfos:
-    - TypeName: QFramework.ViewController
-      PathToRoot: MP5
-      MemberName: MP5
-    - TypeName: SpriteRenderer
-      PathToRoot: GunFire
-      MemberName: GunFire
-    ScriptsFolder: Assets/Scripts/Entity/Player/Weapon/Global
-    ClassName: WeaponGlobal
+    - TypeName: UnityEngine.UI.Text
+      PathToRoot: BulletBugText
+      MemberName: BulletBugText
+    - TypeName: UnityEngine.UI.Text
+      PathToRoot: BulletText
+      MemberName: BulletText
+    ScriptsFolder: Assets\Scripts\UI
+    ClassName: GameUI
     Namespace: QFramework.PG
     MainCode: 
     DesignerCode: 

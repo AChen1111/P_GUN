@@ -5,6 +5,7 @@ using QFramework;
 namespace QFramework.PG {
     public partial class GameUI : ViewController {
         public static GameUI Instance;
+        [Header("UI元素")]
         public GameObject WinPanel;
         public GameObject OverPanel;
         public Text HPText;
@@ -59,6 +60,24 @@ namespace QFramework.PG {
         {
             string text = $"Bullet: {gunClip.currentAmmo}/{gunClip.maxAmmo}";
             BulletText.text = text;
+        }
+
+
+        ///<summary>
+        ///更新备弹弹药文本
+        ///</summary>
+        ///<param name="bulletBag">子弹袋</param>
+        public void UpdateBulletBagText(BulletBag bulletBag)
+        {
+            ///如果子弹袋最大子弹数为-1，则不显示
+            if(bulletBag.maxBullet == -1) 
+            {
+                BulletBugText.gameObject.SetActive(false);
+                return;
+            }
+            BulletBugText.gameObject.SetActive(true);
+            string text = $"({bulletBag.currentBullet}/{bulletBag.maxBullet})";
+            BulletBugText.text = text;
         }
     }
 }

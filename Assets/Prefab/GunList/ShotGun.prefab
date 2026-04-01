@@ -146,7 +146,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Namespace: QFramework.PG
   ScriptName: ShotGun
-  ScriptsFolder: Assets\Scripts\Entity\Player\Weapon
+  ScriptsFolder: Assets\Scripts\Entity\Player\Weapon\Gun
   GeneratePrefab: 0
   PrefabFolder: Assets/Prefab
   ArchitectureFullTypeName: 
@@ -158,6 +158,7 @@ MonoBehaviour:
   ReloadSound: {fileID: 8300000, guid: d4ce39efc317eb845a6d13ff273a5a31, type: 3}
   MinDamage: 15
   MaxDamage: 18
+  MaxBulletBagNum: 10
   _duration: 1
   _maxAmmo: 8
   SR: {fileID: 8067500290940751689}
@@ -382,6 +383,7 @@ MonoBehaviour:
   dir: {x: 0, y: 0}
   speed: 15
   rb: {fileID: 0}
+  damage: 0
 --- !u!58 &819750114799240892
 CircleCollider2D:
   m_ObjectHideFlags: 0
