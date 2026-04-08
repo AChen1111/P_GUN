@@ -19,10 +19,11 @@ namespace QFramework.PG {
         public Gun gun;
         public int currentGunIndex = 0;
         public static Player Instance { get; private set; }
-
     
         void Awake()
         {
+            //默认不显示
+            DisPlayText.gameObject.SetActive(false);
             Global.player = this;
             Instance = this;
             rb = GetComponent<Rigidbody2D>();
@@ -118,6 +119,31 @@ namespace QFramework.PG {
                 return;
             }
             Global.OnHPChange?.Invoke();
+        }
+
+
+        ///<summary>
+        ///显示头顶文字
+        ///</summary>
+        ///<param name="text">头顶文字</param>
+        ///<param name="duration">显示时间</param>
+        IEnumerator ShowDisPlayerCoroutine(string text,float duration)
+        {
+            DisPlayText.gameObject.SetActive(true);
+            DisPlayText.text = text;
+            yield return new WaitForSeconds(duration);
+            DisPlayText.gameObject.SetActive(false);
+        }
+
+
+        ///<summary>
+        ///对外接口显示头顶文字
+        ///</summary>
+        ///<param name="text">头顶文字</param>
+        ///<param name="duration">显示时间</param>
+        public void ShowDisPlayer(string text,float duration)
+        {
+            StartCoroutine(ShowDisPlayerCoroutine(text,duration));
         }
 
     }

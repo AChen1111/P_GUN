@@ -18,9 +18,12 @@ MonoBehaviour:
     GameObject: {fileID: 0}
     From: 0
     NameToFullName: []
-    BindInfos: []
-    ScriptsFolder: Assets\Scripts\Game
-    ClassName: RoomPlayManager
+    BindInfos:
+    - TypeName: UnityEngine.TextMesh
+      PathToRoot: DisPlayText
+      MemberName: DisPlayText
+    ScriptsFolder: Assets\Scripts\Entity\Player
+    ClassName: Player
     Namespace: QFramework.PG
     MainCode: 
     DesignerCode: 

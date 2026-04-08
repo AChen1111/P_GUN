@@ -58,6 +58,12 @@ namespace QFramework.PG {
         ///<param name="gunClip">枪弹夹</param>
         public void UpdateBulletText(GunClip gunClip)
         {
+            BulletText.gameObject.SetActive(true);
+            if(gunClip.maxAmmo == -1)
+            {
+                BulletText.text = "Bullet: ∞";
+                return;
+            }
             string text = $"Bullet: {gunClip.currentAmmo}/{gunClip.maxAmmo}";
             BulletText.text = text;
         }

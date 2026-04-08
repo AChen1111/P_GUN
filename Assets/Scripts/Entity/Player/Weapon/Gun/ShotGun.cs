@@ -7,23 +7,6 @@ namespace QFramework.PG
 	{
         public override PlayerBullet BulletPrefab => PlayerBullet;
 
-        public override BulletBag BulletBag => _bulletBag;
-
-        [Header("属性")]
-        [SerializeField] private float _duration = 1f;
-        [SerializeField] private int _maxAmmo = 8;
-        private ShootDuration _shootDuration;
-        private GunClip _gunClip;
-        private BulletBag _bulletBag;
-        private GunFire _gunFire = new GunFire();
-
-        private void Awake()
-        {
-            _shootDuration = new ShootDuration(_duration);
-            _gunClip = new GunClip(_maxAmmo);
-            _bulletBag = new BulletBag(MaxBulletBagNum);
-        }
-
         public void Shoot(Vector2 dir,bool playSound = true)
 		{
 			var obj = GetBullet(dir);
@@ -31,22 +14,20 @@ namespace QFramework.PG
 			if(playSound && shootSounds.Count > 0)
 			{
 				TryPlaySound(false);
-                _gunFire.Show(BulletPrefab.Position2D(), dir);
+                gunFireEffect.Show(BulletPrefab.Position2D(), dir);
 			}
 		}
 
 		public override void ShootDown(Vector2 dir)
         {
-			if(!_shootDuration.CanShoot || !_gunClip.CanShoot) return;
-			_shootDuration.RecordShootTime();
-			_gunClip.Shoot();
-			
+			if(!shootDuration.CanShoot || !gunClip.CanShoot) return;
+			shootDuration.RecordShootTime();
+			gunClip.Shoot();
 
             var angle = dir.ToAngle();
 			var originPos = transform.parent.Position2D();
 			var radius = (BulletPrefab.Position2D() - originPos).magnitude;
 
-			//生成五个方向的子弹
 			for(int i = 0; i < 5; i++)
 			{
 				int j = i % 2 == 0 ? 1 : -1;
@@ -56,20 +37,13 @@ namespace QFramework.PG
 					angle2 = angle;
 				}
 				var dir2 = angle2.AngleToDirection2D();
-				//var pos = originPos + dir2 * radius;
 				Shoot(dir2.normalized,i==0);
 			}
         }
+
         public override void Shooting(Vector2 dir)
         {
             ShootDown(dir);
-        }
-
-        public override void Reload() => BulletBag.Reload(_gunClip,ReloadSound);
-        public override void OnGunUsed() 
-        {
-            base.OnGunUsed();
-            _gunClip.OnGunUsed();
         }
 	}
 }

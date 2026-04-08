@@ -162,7 +162,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Namespace: QFramework.PG
   ScriptName: Bow
-  ScriptsFolder: Assets/Scripts/Entity/Player/Weapon
+  ScriptsFolder: Assets\Scripts\Entity\Player\Weapon\Gun
   GeneratePrefab: 0
   PrefabFolder: Assets/Prefab
   ArchitectureFullTypeName: 
@@ -179,6 +179,9 @@ MonoBehaviour:
   ReloadSound: {fileID: 8300000, guid: 70c6ba4eb93b17d4a9ce83cfb26c281f, type: 3}
   MinDamage: 20
   MaxDamage: 30
+  MaxBulletBagNum: -1
+  clipSize: -1
+  shootInterval: 0
   PlayerBullet: {fileID: 877616365706282941}
   Arrow: {fileID: 3818672352476444957}
   SelfAudioSource: {fileID: 7609457125886288384}
@@ -285,6 +288,7 @@ MonoBehaviour:
   dir: {x: 0, y: 0}
   speed: 15
   rb: {fileID: 0}
+  damage: 0
 --- !u!58 &4101932552436274947
 CircleCollider2D:
   m_ObjectHideFlags: 0

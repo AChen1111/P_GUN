@@ -1,13 +1,11 @@
-// Generate Id:c9b6b900-8b5d-4f6c-83f9-4038600da841
+// Generate Id:e4fbb123-d1f8-45e7-95b5-12a7af765e15
 using UnityEngine;
 
 namespace QFramework.PG
 {
 	public partial class Player
 	{
-		//public QFramework.ViewController MP5;
-		
-		public SpriteRenderer GunFire;
+		public UnityEngine.TextMesh DisPlayText;
 		
 	}
 }
