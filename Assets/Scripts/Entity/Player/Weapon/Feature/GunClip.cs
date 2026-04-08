@@ -49,7 +49,13 @@ namespace QFramework.PG {
         /// </summary>
         public void Shoot()
         {
-            if (!IsInfinite) currentAmmo--;
+            if (IsInfinite) return;
+            if(IsOutOfAmmo)
+            {
+                Player.Instance.ShowDisPlayer("没有备弹", 2f);
+                return;
+            }
+            currentAmmo--;
             UpdateUI();
         }
 

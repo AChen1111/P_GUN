@@ -7,6 +7,7 @@ namespace QFramework.PG {
     public partial class Player : ViewController
     {
         private Rigidbody2D rb;
+        private Coroutine mDisplayTextCoroutine;
         [Header("角色贴图")]
         public SpriteRenderer sr;
         [Header("角色移动速度")]
@@ -133,6 +134,7 @@ namespace QFramework.PG {
             DisPlayText.text = text;
             yield return new WaitForSeconds(duration);
             DisPlayText.gameObject.SetActive(false);
+            mDisplayTextCoroutine = null;
         }
 
 
@@ -143,7 +145,12 @@ namespace QFramework.PG {
         ///<param name="duration">显示时间</param>
         public void ShowDisPlayer(string text,float duration)
         {
-            StartCoroutine(ShowDisPlayerCoroutine(text,duration));
+            if(mDisplayTextCoroutine != null)
+            {
+                StopCoroutine(mDisplayTextCoroutine);
+                DisPlayText.gameObject.SetActive(false);
+            }
+            mDisplayTextCoroutine = StartCoroutine(ShowDisPlayerCoroutine(text,duration));
         }
 
     }
