@@ -18,15 +18,9 @@ MonoBehaviour:
     GameObject: {fileID: 0}
     From: 0
     NameToFullName: []
-    BindInfos:
-    - TypeName: UnityEngine.UI.Text
-      PathToRoot: BulletBugText
-      MemberName: BulletBugText
-    - TypeName: UnityEngine.UI.Text
-      PathToRoot: BulletText
-      MemberName: BulletText
-    ScriptsFolder: Assets\Scripts\UI
-    ClassName: GameUI
+    BindInfos: []
+    ScriptsFolder: Assets\Scripts\Game
+    ClassName: RoomPlayManager
     Namespace: QFramework.PG
     MainCode: 
     DesignerCode: 

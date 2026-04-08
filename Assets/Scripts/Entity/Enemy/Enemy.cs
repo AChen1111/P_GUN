@@ -86,6 +86,9 @@ public class Enemy : MonoBehaviour {
         hp -= damage;
         if(hp <= 0) {
             Destroy(gameObject);
+            if(RoomPlayManager.Instance != null) {
+                RoomPlayManager.Instance.DecreaseEnemyCount();
+            }
         }
     }
 
