@@ -31,15 +31,32 @@ public abstract class Gun : ViewController {
     [Header("伤害设置")]
     public int MinDamage;
     public int MaxDamage;
-    public int Damage => Random.Range(MinDamage, MaxDamage);
+    public int Damage => Random.Range(MinDamage, MaxDamage + 1);
 
 
-    /// <summary>
-    /// 子弹袋
-    /// </summary>
-    public abstract BulletBag BulletBag { get; }
     [Header("备弹设置")]
     public int MaxBulletBagNum;
+    [Header("弹夹容量")]
+    [SerializeField] protected int clipSize;
+    [Header("射击间隔")]
+    [SerializeField] protected float shootInterval;
+
+    protected ShootDuration shootDuration;
+    protected GunClip gunClip;
+    protected BulletBag bulletBag;
+    protected GunFire gunFireEffect = new GunFire();
+
+    public virtual BulletBag BulletBag => bulletBag;
+
+    protected virtual void Awake()
+    {
+        if (clipSize != 0)
+        {
+            shootDuration = new ShootDuration(shootInterval);
+            gunClip = new GunClip(clipSize);
+            bulletBag = new BulletBag(MaxBulletBagNum);
+        }
+    }
 
     /// <summary>
     /// 鼠标按下
@@ -69,15 +86,26 @@ public abstract class Gun : ViewController {
     /// </summary>
     public virtual void Shoot(Vector2 dir)
     {
+        if(gunClip.IsOutOfAmmo)
+        {
+            Player.Instance.ShowDisPlayer("没有子弹", 2f);
+            return;
+        }
         GetBullet(dir);
     }
     
     /// <summary>
-    /// 换子弹
+    /// 换子弹（默认实现含"没有子弹"提示）
     /// </summary>
     public virtual void Reload()
     {
-        
+        if (bulletBag == null || gunClip == null) return;
+        if (gunClip.IsOutOfAmmo && !bulletBag.HasBullet)
+        {
+            Player.Instance.ShowDisPlayer("没有子弹", 2f);
+            return;
+        }
+        bulletBag.Reload(gunClip, ReloadSound);
     }
 
     private void Start() {
@@ -105,7 +133,8 @@ public abstract class Gun : ViewController {
     /// </summary>
     public virtual void OnGunUsed()
     {
-        GameUI.Instance.UpdateBulletBagText(BulletBag);
+        if (BulletBag != null) GameUI.Instance.UpdateBulletBagText(BulletBag);
+        gunClip?.OnGunUsed();
     }
 
     /// <summary>

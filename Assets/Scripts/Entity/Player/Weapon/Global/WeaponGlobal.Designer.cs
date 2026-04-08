@@ -1,11 +1,10 @@
-// Generate Id:e6760fd2-dbcd-48dd-bdc0-6009855fc7a2
+// Generate Id:915e3ab9-d668-4850-943a-b0e290ec7fb1
 using UnityEngine;
 
 namespace QFramework.PG
 {
 	public partial class WeaponGlobal
 	{
-		public QFramework.ViewController MP5;
 		
 		public SpriteRenderer GunFire;
 		

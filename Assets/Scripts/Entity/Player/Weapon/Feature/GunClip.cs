@@ -25,12 +25,14 @@ namespace QFramework.PG {
         /// <summary>
         /// 当前是否还有子弹可以射击
         /// </summary>
-        public bool CanShoot => currentAmmo > 0 && !isReloading;
+        public bool IsInfinite => maxAmmo == -1;
+
+        public bool CanShoot => (IsInfinite || currentAmmo > 0) && !isReloading;
 
         /// <summary>
         /// 弹药是否真正耗尽（不含换弹状态，用于判断是否停止声音）
         /// </summary>
-        public bool IsOutOfAmmo => currentAmmo <= 0;
+        public bool IsOutOfAmmo => !IsInfinite && currentAmmo <= 0;
 
         /// <summary>
         /// 是否正处于换弹过程中
@@ -47,7 +49,7 @@ namespace QFramework.PG {
         /// </summary>
         public void Shoot()
         {
-            currentAmmo--;
+            if (!IsInfinite) currentAmmo--;
             UpdateUI();
         }
 

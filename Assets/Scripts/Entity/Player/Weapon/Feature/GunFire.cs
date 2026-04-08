@@ -6,14 +6,14 @@ namespace QFramework.PG
     {
         public void Show(Vector2 pos,Vector2 dir)
         {
-            Player.Instance.GunFire.Position2D(pos);
-            Player.Instance.GunFire.transform.right = dir;
-            Player.Instance.GunFire.Show();
+            WeaponGlobal.Instance.GunFire.Position2D(pos);
+            WeaponGlobal.Instance.GunFire.transform.right = dir;
+            WeaponGlobal.Instance.GunFire.Show();
             
             //3帧后隐藏
             ActionKit.DelayFrame(3,
                 () => {
-                    Player.Instance.GunFire.Hide();
+                    WeaponGlobal.Instance.GunFire.Hide();
                 }
             ).StartCurrentScene();
         }

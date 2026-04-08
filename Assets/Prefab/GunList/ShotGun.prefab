@@ -159,8 +159,8 @@ MonoBehaviour:
   MinDamage: 15
   MaxDamage: 18
   MaxBulletBagNum: 10
-  _duration: 1
-  _maxAmmo: 8
+  clipSize: 8
+  shootInterval: 1
   SR: {fileID: 8067500290940751689}
   PlayerBullet: {fileID: 8962138241633917993}
   SelfAudioSource: {fileID: 2968553758901501502}

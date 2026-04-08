@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 8811024540852279748}
   - component: {fileID: 7491992717285946212}
   - component: {fileID: 792324402273993379}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Laser
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -276,9 +276,13 @@ MonoBehaviour:
   shootSounds:
   - {fileID: 8300000, guid: dd3d170db2ba52f4ab2916ee2d37da13, type: 3}
   ReloadSound: {fileID: 8300000, guid: 09f63d32f8a42f742b15ae6198b3c400, type: 3}
-  MinDamage: 5
-  MaxDamage: 10
-  MaxBulletBagNum: 0
+  MinDamage: 1
+  MaxDamage: 2
+  MaxBulletBagNum: -1
+  clipSize: -1
+  shootInterval: 0
+  damageInterval: 0.1
+  maxLaserDistance: 100
   PlayerBullet: {fileID: 3392344992374250860}
   SelfAudioSource: {fileID: 2572156488689866957}
   SelfLineRenderer: {fileID: 7491992717285946212}
@@ -295,7 +299,7 @@ GameObject:
   - component: {fileID: 6949517647006600970}
   - component: {fileID: 3522540144796056823}
   - component: {fileID: 6605982844310234687}
-  m_Layer: 6
+  m_Layer: 8
   m_Name: PlayerBullet
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -311,7 +315,7 @@ Transform:
   m_GameObject: {fileID: 5367549244398800342}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.519, y: 0.044, z: 0}
+  m_LocalPosition: {x: 0.561, y: -0.005, z: 0}
   m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -421,7 +425,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2107136504324034181}
   - component: {fileID: 4023071968136869664}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: SR
   m_TagString: Untagged
   m_Icon: {fileID: 0}
