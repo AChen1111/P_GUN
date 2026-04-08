@@ -12,6 +12,7 @@ namespace QFramework.PG
         Shop,
         Final,
         Next,
+        Complete,
     }
 
     public class RoomConfig
