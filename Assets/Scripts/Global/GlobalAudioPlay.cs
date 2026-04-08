@@ -25,7 +25,7 @@ namespace QFramework.PG
 			}
 			else
 			{
-				AudioClips[name] = Resources.Load<AudioClip>("SFX/" + name);
+				AudioClips[name] = Resources.Load<AudioClip>(Config.AudioClipPath + name);
 				if(AudioClips[name] == null)
 				{
 					Debug.LogError("AudioClip not found: " + name);

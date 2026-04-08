@@ -34,14 +34,14 @@ namespace QFramework.PG
 		/// </summary>
 		private void OnEnable() {
 			RoomPlayManager.Instance.OnPlayerEnterRoomEvent += CloseDoor;
-			RoomPlayManager.Instance.OnRoomEnemysDiedEvent += OpenDoor;
+			RoomPlayManager.Instance.OnRoomAllWavesEndEvent += OpenDoor;
 		}
 		/// <summary>
 		/// 禁用时取消订阅玩家进入房间事件
 		/// </summary>
 		private void OnDisable() {
 			RoomPlayManager.Instance.OnPlayerEnterRoomEvent -= CloseDoor;
-			RoomPlayManager.Instance.OnRoomEnemysDiedEvent -= OpenDoor;
+			RoomPlayManager.Instance.OnRoomAllWavesEndEvent -= OpenDoor;
 		}
 
 	

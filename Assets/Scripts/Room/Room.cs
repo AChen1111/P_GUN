@@ -41,11 +41,15 @@ namespace QFramework.PG
 		/// </summary>
 		public void GenerateEnemies()
 		{
-			foreach(var position in EnemyPositions)
+
+			int num = Random.Range(1, EnemyPositions.Count + 1);
+			RoomPlayManager.Instance.ResetEnemyCount(num);
+			for(int i = 0; i < num; i++)
 			{
-				var obj = Instantiate(EnemyPrefab, position, Quaternion.identity);
-                obj.SetActive(true);
+				var obj = Instantiate(EnemyPrefab, EnemyPositions[i], Quaternion.identity);
+				obj.SetActive(true);
 			}
+			
 		}
 
 
@@ -88,6 +92,15 @@ namespace QFramework.PG
 				GenerateDoors();
 				Debug.Log("生成门");
 			}
+
+			if(EnemyPositions.Count > 0)
+			{
+				//排序敌人的位置,按照与玩家距离降序排序
+				EnemyPositions.Sort((a, b) =>
+				{
+					return (Global.player.transform.position - a).sqrMagnitude.CompareTo((Global.player.transform.position - b).sqrMagnitude);
+				});
+			}
 		}
 
 
@@ -101,13 +114,29 @@ namespace QFramework.PG
 			{
 				if(RoomConfig.roomType == RoomTypes.Normal)
 				{
-					RoomPlayManager.Instance.ResetEnemyCount(EnemyPositions.Count);
-					//GenerateDoors();
+					//设置波数
+					RoomPlayManager.Instance.ResetWaveCount(RoomConfig.waveNum);
+					//生成敌人
 					GenerateEnemies();
+					//订阅波次结束事件
+					RoomPlayManager.Instance.OnRoomCurrentWaveEndEvent += GenerateEnemies;
+					RoomPlayManager.Instance.OnRoomAllWavesEndEvent += OnRoomAllWavesEnd;
 				}
 
 			}
 		}
+
+		private void OnRoomAllWavesEnd()
+		{
+			//设置房间类型为完成
+			RoomConfig.roomType = RoomTypes.Complete;
+
+			//取消订阅波次结束事件
+			RoomPlayManager.Instance.OnRoomCurrentWaveEndEvent -= GenerateEnemies;
+			RoomPlayManager.Instance.OnRoomAllWavesEndEvent -= OnRoomAllWavesEnd;
+		}
+
+
 	}	
 }
 
