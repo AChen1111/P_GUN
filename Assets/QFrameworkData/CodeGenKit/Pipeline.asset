@@ -18,12 +18,9 @@ MonoBehaviour:
     GameObject: {fileID: 0}
     From: 0
     NameToFullName: []
-    BindInfos:
-    - TypeName: UnityEngine.TextMesh
-      PathToRoot: DisPlayText
-      MemberName: DisPlayText
-    ScriptsFolder: Assets\Scripts\Entity\Player
-    ClassName: Player
+    BindInfos: []
+    ScriptsFolder: Assets/Scripts/Global
+    ClassName: GlobalAudioPlay
     Namespace: QFramework.PG
     MainCode: 
     DesignerCode: 

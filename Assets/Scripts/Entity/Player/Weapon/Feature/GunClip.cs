@@ -50,6 +50,7 @@ namespace QFramework.PG {
             if(IsOutOfAmmo)
             {
                 Player.Instance.ShowDisPlayer("没有备弹", 2f);
+                GlobalAudioPlay.Instance.PlayerAudioSource("EmptyBulletSound");
                 return;
             }
         }

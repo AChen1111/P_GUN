@@ -16,6 +16,8 @@ namespace QFramework.PG
 
     public class RoomConfig
     {
+        //敌人波数
+        public int waveNum = -1;
         public RoomTypes roomType;
         public List<string> codes = new List<string>();
 
@@ -31,6 +33,12 @@ namespace QFramework.PG
         public RoomConfig L(string code)
         {
             codes.Add(code);
+            return this;
+        }
+
+        public RoomConfig WaveNum(int waveNum)
+        {
+            this.waveNum = waveNum;
             return this;
         }
 
@@ -67,7 +75,8 @@ namespace QFramework.PG
         L("1        1").
         L("1        1").
         L("1        1").
-        L("1111111111");
+        L("1111111111").
+        WaveNum(3);
 
 
         public static RoomConfig FinalRoom = new RoomConfig().Type(RoomTypes.Final).
@@ -82,6 +91,8 @@ namespace QFramework.PG
         L("1        1").
         L("1        1").
         L("1111111111");
+
+
         public static RoomConfig GetRoomConfigWithType(RoomTypes type)
         {
             switch(type)
