@@ -20,6 +20,7 @@ namespace QFramework.PG
 
 		public override void ShootDown(Vector2 dir)
         {
+			gunClip.CheckAmmo();
 			if(!shootDuration.CanShoot || !gunClip.CanShoot) return;
 			shootDuration.RecordShootTime();
 			gunClip.Shoot();

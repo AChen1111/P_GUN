@@ -44,17 +44,21 @@ namespace QFramework.PG {
         /// </summary>
         public bool IsFull => currentAmmo == maxAmmo;
 
+
+        public void CheckAmmo()
+        {
+            if(IsOutOfAmmo)
+            {
+                Player.Instance.ShowDisPlayer("没有备弹", 2f);
+                return;
+            }
+        }
         /// <summary>
         /// 发射一发，消耗一颗子弹
         /// </summary>
         public void Shoot()
         {
             if (IsInfinite) return;
-            if(IsOutOfAmmo)
-            {
-                Player.Instance.ShowDisPlayer("没有备弹", 2f);
-                return;
-            }
             currentAmmo--;
             UpdateUI();
         }
