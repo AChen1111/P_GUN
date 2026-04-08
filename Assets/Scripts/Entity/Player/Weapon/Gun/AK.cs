@@ -21,6 +21,7 @@ namespace QFramework.PG
 
         public override void Shooting(Vector2 dir)
         {
+			gunClip.CheckAmmo();
 			if(shootDuration.CanShoot && gunClip.CanShoot) {
 				if(!PlayerAudioSource.isPlaying) {
 					TryPlaySound(true);
