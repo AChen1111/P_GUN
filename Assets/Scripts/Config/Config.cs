@@ -2,9 +2,8 @@ namespace QFramework.PG
 {
     public class Config
     {
-        public static string AudioClipPath = "SFX/";
+        public static string GunClipPath = "SFX/Gun/";
+        public static string ItemClipPath = "SFX/Item/";
 
     }
-
-    
 }

@@ -15,7 +15,7 @@ namespace QFramework.PG
 		/// 音频列表
 		/// </summary>
 		private Dictionary<string, AudioClip> AudioClips = new Dictionary<string, AudioClip>();
-		public void PlayerAudioSource(string name, bool loop = false)
+		public void PlayerAudioSourceByPath(string name, bool loop = false)
 		{
 			if(AudioClips.ContainsKey(name))
 			{
@@ -25,14 +25,21 @@ namespace QFramework.PG
 			}
 			else
 			{
-				AudioClips[name] = Resources.Load<AudioClip>(Config.AudioClipPath + name);
+				AudioClips[name] = Resources.Load<AudioClip>(Config.GunClipPath + name);
 				if(AudioClips[name] == null)
 				{
 					Debug.LogError("AudioClip not found: " + name);
 					return;
 				}
-				PlayerAudioSource(name, loop);
+				PlayerAudioSourceByPath(name, loop);
 			}
+		}
+
+		public void PlayerAudioSourceByClip(AudioClip clip, bool loop = false)
+		{
+			SelfAudioSource.clip = clip;
+			SelfAudioSource.loop = loop;
+			SelfAudioSource.Play();
 		}
 	}
 }

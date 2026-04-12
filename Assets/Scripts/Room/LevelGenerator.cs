@@ -16,59 +16,6 @@ namespace QFramework.PG {
         public GameObject playerPrefab;
         public GameObject doorPrefab;
         
-        /// <summary>
-        /// 地图数据
-        /// 1:墙 e:敌人 p:玩家 空白:空地, #:出口 d:门
-        /// </summary>
-        
-
-        // ///初始房间
-        // List<string> InitRoom{get; set;}=new List<string>
-        // {
-        //     "1111111111",
-        //     "1        1",
-        //     "1        1",
-        //     "1 p      1",
-        //     "1        d",
-        //     "1        1",
-        //     "1        1",
-        //     "1        1",
-        //     "1        1",
-        //     "1        1",
-        //     "1111111111",
-        // };
-
-        // //普通房间
-        // List<string> NormalRoom{get; set;}=new List<string>
-        // {
-        //     "1111111111",
-        //     "1        1",
-        //     "1 e      1",
-        //     "1        1",
-        //     "d        d",
-        //     "1      e 1",
-        //     "1        1",
-        //     "1        1",
-        //     "1        1",
-        //     "1        1",
-        //     "1111111111",
-        // };
-
-        // //Boss房间
-        // List<string> BossRoom{get; set;}=new List<string>
-        // {
-        //     "1111111111",
-        //     "1        1",
-        //     "1        1",
-        //     "1        1",
-        //     "d        1",
-        //     "1        1",
-        //     "1        1",
-        //     "1   #    1",
-        //     "1        1",
-        //     "1        1",
-        //     "1111111111",
-        // };
 
         /// <summary>
         /// 随机墙砖
