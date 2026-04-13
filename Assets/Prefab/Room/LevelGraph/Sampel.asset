@@ -42,17 +42,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b8400baee4cafd34091c865089a167b2, type: 3}
-  m_Name: Normal
+  m_Name: Sampel
   m_EditorClassIdentifier: 
   Connections:
   - {fileID: -92728217057768590}
   - {fileID: 3715949823057617028}
   - {fileID: 3154117434715023318}
   - {fileID: 2715214741532899064}
-  CorridorIndividualRoomTemplates:
-  - {fileID: 6295766628286017278, guid: d12f56f144e67244f9b540d241a530e7, type: 3}
-  - {fileID: 2707270387595432028, guid: 35efb202e0c0b4b439f45af81a36f5d5, type: 3}
-  CorridorRoomTemplateSets: []
+  CorridorIndividualRoomTemplates: []
+  CorridorRoomTemplateSets:
+  - {fileID: 11400000, guid: c8b0da1bb240b474bbabbe01635c3117, type: 2}
   DefaultIndividualRoomTemplates: []
   DefaultRoomTemplateSets: []
   Rooms:
@@ -177,6 +176,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Position: {x: 256, y: 160}
   Name: Room
-  IndividualRoomTemplates: []
-  RoomTemplateSets:
-  - {fileID: 11400000, guid: 8acd4254036c0644697e6b8953d79ca9, type: 2}
+  IndividualRoomTemplates:
+  - {fileID: 7403787295593108228, guid: 69e0cab51f1222e4bb3e4674e0348bc8, type: 3}
+  RoomTemplateSets: []
