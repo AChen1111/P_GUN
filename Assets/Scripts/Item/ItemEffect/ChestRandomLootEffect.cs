@@ -24,22 +24,12 @@ namespace QFramework.PG
             }
 
             ItemSO drop = null;
+            //从自己的表中获得一个随机物品
             if (lootTable != null && lootTable.Count > 0)
             {
                 drop = lootTable.GetRandomItem();
             }
-            else if (mgr.ItemSOs != null && mgr.ItemSOs.Count > 0)
-            {
-                drop = mgr.GetRandomItemSO();
-                // 全表随机时尽量避免又随到「宝箱自己」
-                if (ctx.SourceItem != null && mgr.ItemSOs.Count > 1)
-                {
-                    for (var i = 0; i < 16 && drop == ctx.SourceItem; i++)
-                    {
-                        drop = mgr.GetRandomItemSO();
-                    }
-                }
-            }
+            
 
             if (drop == null || string.IsNullOrEmpty(drop.itemKey))
             {
@@ -47,7 +37,11 @@ namespace QFramework.PG
                 return;
             }
 
-            mgr.SpawnItemSODelay(drop.itemKey, ctx.WorldPosition, 0.5f);
+            //在周围随机一个位置生成物品
+            var newItemPostion = ctx.WorldPosition + new Vector3(Random.Range(-0.5f, 0.5f), Random.Range(-0.5f, 0.5f), 0);
+            //延迟0.5秒生成物品
+            mgr.SpawnItemSODelay(drop.itemKey, newItemPostion, 0.5f);
         }
     }
 }
+

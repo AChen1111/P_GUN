@@ -36,11 +36,15 @@ namespace QFramework.PG
             if (!other.CompareTag("Player")) return;
             if (_itemSO == null) return;
 
+
+            ///配置物品信息
             var ctx = new ItemEffectContext
             {
                 SourceItem = _itemSO,
                 WorldPosition = transform.position
             };
+
+
             if (_itemSO.effects != null)
             {
                 foreach (var effect in _itemSO.effects)
