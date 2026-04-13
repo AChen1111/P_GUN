@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using QFramework;
@@ -26,6 +27,10 @@ namespace QFramework.PG
             }
         }
 
+        private void Start() {
+            SpawnItemSO("Chest", new Vector3(10, 5, 0));
+        }
+
         [Header("道具配置")]
         [FormerlySerializedAs("ItemDefinitions")]
         public List<ItemSO> ItemSOs = new();
@@ -47,7 +52,11 @@ namespace QFramework.PG
         /// <param name="itemKey">道具配置</param>
         /// <param name="worldPosition">生成位置</param>
         /// <returns>道具拾取物</returns>
-        public ItemPickup SpawnItemSO(string itemKey, Vector3 worldPosition)
+        public ItemPickup SpawnItemSO(
+            string itemKey, 
+            Vector3 worldPosition, 
+            AnimType animType = AnimType.None,
+            Action onComplete = null)
         {
             if (!_items.ContainsKey(itemKey)) {
                 Debug.LogError($"道具配置不存在: {itemKey}");
@@ -69,22 +78,31 @@ namespace QFramework.PG
                 Destroy(instance);
                 return null;
             }
+
             pickup.Init(_items[itemKey]);
+            DOTweenAnimMgr.Play(animType, instance,onComplete: onComplete);
             return pickup;
         }
-
-        public void SpawnItemSODelay(string itemKey, Vector3 worldPosition, float delay)
+        /// <summary>
+        /// 延迟生成道具
+        /// </summary>
+        /// <param name="itemKey">道具配置</param>
+        /// <param name="worldPosition">生成位置</param>
+        /// <param name="delay">延迟时间</param>
+        /// <param name="animType">动画类型</param>
+        public void SpawnItemSODelay(string itemKey, Vector3 worldPosition, float delay, 
+                            AnimType animType = AnimType.None, Action onComplete = null)
         {
-            StartCoroutine(SpawnItemSODelayCoroutine(itemKey, worldPosition, delay));
+            StartCoroutine(SpawnItemSODelayCoroutine(itemKey, worldPosition, delay, animType, onComplete));
         }
-
-        private IEnumerator SpawnItemSODelayCoroutine(string itemKey, Vector3 worldPosition, float delay)
+        private IEnumerator SpawnItemSODelayCoroutine(string itemKey, Vector3 worldPosition, float delay, 
+                            AnimType animType, Action onComplete)
         {
             yield return new WaitForSeconds(delay);
-            SpawnItemSO(itemKey, worldPosition);
+            SpawnItemSO(itemKey, worldPosition, animType, onComplete);
         }
 
-        //todo: 生成物品时播放动画
+
         
     }
 
