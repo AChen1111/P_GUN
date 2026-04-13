@@ -88,10 +88,5 @@ namespace QFramework.PG
         
     }
 
-    public enum AnimType
-    {
-        None,//无动画
-        Jump,
-        Shake,
-    }
+
 }
