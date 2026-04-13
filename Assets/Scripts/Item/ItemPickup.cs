@@ -44,7 +44,7 @@ namespace QFramework.PG
                 WorldPosition = transform.position
             };
 
-
+            //检查并执行物品效果
             if (_itemSO.effects != null)
             {
                 foreach (var effect in _itemSO.effects)
@@ -55,9 +55,11 @@ namespace QFramework.PG
 
             Destroy(gameObject);
 
+
+            //尝试播放音效(若有配置)
             if (_itemSO.pickupAudio != null)
             {
-                GlobalAudioPlay.Instance?.PlayerAudioSourceByClip(_itemSO.pickupAudio);
+                GlobalAudioPlay.Instance.PlayerAudioSourceByClip(_itemSO.pickupAudio);
             }
             
         }

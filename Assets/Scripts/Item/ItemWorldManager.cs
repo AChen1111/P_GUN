@@ -83,6 +83,15 @@ namespace QFramework.PG
             yield return new WaitForSeconds(delay);
             SpawnItemSO(itemKey, worldPosition);
         }
-    
+
+        //todo: 生成物品时播放动画
+        
+    }
+
+    public enum AnimType
+    {
+        None,//无动画
+        Jump,
+        Shake,
     }
 }
