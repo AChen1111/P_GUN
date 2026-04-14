@@ -12,6 +12,7 @@ public class InitRoom : Room
 
     protected override void OnRoomInitialized()
     {
+        needGenerateDoors = false;
         PlacePlayerAtSpawn();
     }
 

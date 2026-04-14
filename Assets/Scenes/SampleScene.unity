@@ -706,7 +706,7 @@ MonoBehaviour:
   InputType: 0
   CustomInputTask: {fileID: 0}
   FixedLevelGraphConfig:
-    LevelGraph: {fileID: 11400000, guid: 39f145d1b7741304485d31c350cc56ec, type: 2}
+    LevelGraph: {fileID: 11400000, guid: 55a2fdf4283883548a4042623e2f8635, type: 2}
     UseCorridors: 1
   GeneratorConfig:
     RootGameObject: {fileID: 0}
