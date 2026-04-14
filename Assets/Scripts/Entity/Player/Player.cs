@@ -16,8 +16,11 @@ namespace QFramework.PG {
         public Transform Weapon;
         [Header("武器列表")]
         public List<Gun> guns = new List<Gun>();
-        
+        [Header("准星")]
+        public GameObject AimPrefab;
+        [Header("当前枪")]
         public Gun gun;
+        [Header("当前枪索引")]
         public int currentGunIndex = 0;
         public static Player Instance { get; private set; }
     
@@ -25,10 +28,12 @@ namespace QFramework.PG {
         {
             //默认不显示
             DisPlayText.gameObject.SetActive(false);
+            AimPrefab.SetActive(false);
+
             Global.player = this;
             Instance = this;
             rb = GetComponent<Rigidbody2D>();
-            
+
             gun.Hide();
             gun = guns[0];
             gun.Show();
@@ -51,6 +56,9 @@ namespace QFramework.PG {
             var mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             //获取鼠标位置与角色位置的向量
             Vector2 dir = (mousePosition - transform.position).normalized;  
+
+            //自动瞄准命中目标时，优先使用锁定目标方向
+            AutoAim(ref dir);
 
             //转成欧拉角
             float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
@@ -110,6 +118,7 @@ namespace QFramework.PG {
                 gun.Show();
                 gun.OnGunUsed();
             }
+
         }
 
         public void Hurt() {
@@ -151,6 +160,22 @@ namespace QFramework.PG {
                 DisPlayText.gameObject.SetActive(false);
             }
             mDisplayTextCoroutine = StartCoroutine(ShowDisPlayerCoroutine(text,duration));
+        }
+
+        public void AutoAim(ref Vector2 dir)
+        {
+            if(FightRoom.currentFightRoom == null) return;
+            var targetEnemy = FightRoom.GetNearestEnemy(transform);
+            if(targetEnemy != null)
+            {
+                AimPrefab.SetActive(true);
+                AimPrefab.transform.position = targetEnemy.transform.position;
+                dir = (targetEnemy.transform.position - transform.position).normalized;
+            }
+            else
+            {
+                AimPrefab.SetActive(false);
+            }
         }
 
     }
