@@ -36,6 +36,7 @@ public class NormalRoom : FightRoom
         {
             var enemy = Instantiate(enemyPrefab, validPoints[i].position, Quaternion.identity);
             enemy.OwnerFightRoom = this;
+            RegisterSpawnedEnemy(enemy);
             enemy.gameObject.SetActive(true);
         }
         

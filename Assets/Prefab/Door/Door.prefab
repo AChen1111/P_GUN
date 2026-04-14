@@ -49,7 +49,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Namespace: QFramework.PG
   ScriptName: Door
-  ScriptsFolder: Assets/Scripts/Room
+  ScriptsFolder: Assets\Scripts\Room\Door
   GeneratePrefab: 1
   PrefabFolder: Assets/Prefab/Room
   ArchitectureFullTypeName: 
@@ -57,6 +57,8 @@ MonoBehaviour:
   OpenDoorSR: {fileID: 3895611859125731685}
   CloseDoorSR: {fileID: 2948678884148804925}
   doorCollider: {fileID: 7513807829956002457}
+  isOpen: 1
+  openDoorSound: {fileID: 8300000, guid: 3595009b13b4b404ca739c3ce80ab7fd, type: 3}
 --- !u!61 &7513807829956002457
 BoxCollider2D:
   m_ObjectHideFlags: 0
