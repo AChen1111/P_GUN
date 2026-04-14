@@ -17,7 +17,7 @@ public abstract class FightRoom : Room
     private int remainWaveCount = 0;
 
     // 当前正在进行战斗流程的房间（给 Enemy 死亡回调使用）
-    private static FightRoom currentFightRoom;
+    public static FightRoom currentFightRoom;
 
 
     /// <summary>
@@ -150,6 +150,49 @@ public abstract class FightRoom : Room
         }
 
         StartNextWave();
+    }
+
+
+    /// <summary>
+    /// 获取距离玩家最近的敌人
+    /// </summary>
+    /// <param name="playerTransform">玩家位置</param>
+    /// <returns>距离玩家最近的敌人</returns>
+    public static Enemy GetNearestEnemy(Transform playerTransform)
+    {
+        if(enemyList.Count == 0 || playerTransform == null) return null;
+
+        Enemy nearestEnemy = null;
+        float nearestSqrDistance = float.MaxValue;
+        List<Enemy> invalidEnemies = null;
+
+        foreach (var enemy in enemyList)
+        {
+            // Unity 对象被 Destroy 后会表现为 null，需要过滤并清理
+            if (enemy == null || enemy.transform == null)
+            {
+                if (invalidEnemies == null) invalidEnemies = new List<Enemy>();
+                invalidEnemies.Add(enemy);
+                continue;
+            }
+
+            float sqrDistance = (enemy.transform.position - playerTransform.position).sqrMagnitude;
+            if (sqrDistance < nearestSqrDistance)
+            {
+                nearestSqrDistance = sqrDistance;
+                nearestEnemy = enemy;
+            }
+        }
+
+        if (invalidEnemies != null)
+        {
+            foreach (var invalidEnemy in invalidEnemies)
+            {
+                enemyList.Remove(invalidEnemy);
+            }
+        }
+
+        return nearestEnemy;
     }
 
 
