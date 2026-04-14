@@ -20,10 +20,16 @@ public class Enemy : MonoBehaviour {
     [SerializeField]private int hp = 3;//血量
     [SerializeField] private float _shootInterval = 0.2f;//射击间隔
 
+    /// <summary>
+    /// 所属战斗房间
+    /// </summary>
+    public FightRoom OwnerFightRoom { get; set; }
+
     public enum EnemyState {
         Follow,
         Shoot,
     }
+
     public EnemyState state = EnemyState.Follow;
     //计时器
     public float timer = 0f;
@@ -86,8 +92,10 @@ public class Enemy : MonoBehaviour {
         hp -= damage;
         if(hp <= 0) {
             Destroy(gameObject);
-            if(RoomPlayManager.Instance != null) {
-                RoomPlayManager.Instance.DecreaseEnemyCount();
+            if (OwnerFightRoom != null) {
+                OwnerFightRoom.DecreaseEnemyCount();
+            } else {
+                FightRoom.NotifyEnemyDefeated();
             }
         }
     }

@@ -13,14 +13,20 @@ public abstract class Room : MonoBehaviour
 	[Header("门设置")]
 	[SerializeField] protected bool needGenerateDoors = false;
 	[SerializeField] private Door doorPrefab;
+	[SerializeField] protected bool doorStateIsOpen = true;
 
 	private bool doorsGenerated;
+	protected List<Door> doorsList = new List<Door>();
 
 
 	/// <summary>
 	/// 玩家进入房间处理
 	/// </summary>
 	protected virtual void OnPlayerEnteredRoom(Collider2D other) { }
+	/// <summary>
+	/// 玩家离开房间处理
+	/// </summary>
+	protected virtual void OnPlayerExitedRoom(Collider2D other) { }
 	/// <summary>
 	/// 房间初始化逻辑
 	/// </summary>
@@ -63,6 +69,8 @@ public abstract class Room : MonoBehaviour
 		{
 			var door = Instantiate(doorPrefab, position, Quaternion.identity);
 			door.gameObject.SetActive(true);
+			door.SetDoorState(this.doorStateIsOpen);
+			doorsList.Add(door);
 		}
 
 		doorsGenerated = true;
@@ -88,21 +96,29 @@ public abstract class Room : MonoBehaviour
 			return result;
 		}
 
+
+		//遍历Edgar插件中的门
 		foreach (var door in roomInfo.RoomInstance.Doors)
 		{
+			//获取门的位置
 			var points = door.DoorLine.GetPoints();
 			var localSum = Vector3.zero;
 			var count = 0;
 
+			//遍历门的位置
 			foreach (var point in points)
 			{
+				//计算门的位置
 				localSum += new Vector3(point.x + 0.5f, point.y + 0.5f, 0f);
+				//计数
 				count++;
 			}
 
 			if (count <= 0) continue;
-
+		
+			//计算门的位置
 			var localCenter = localSum / count;
+			//将门的位置转换为世界坐标
 			var worldCenter = roomTemplateInstance.transform.TransformPoint(localCenter);
 			result.Add(worldCenter);
 		}
@@ -124,6 +140,17 @@ public abstract class Room : MonoBehaviour
 		}
 	}
 
+	/// <summary>
+	/// 检测玩家离开房间
+	/// </summary>
+	/// <param name="other">玩家的碰撞器</param>
+	private void OnTriggerExit2D(Collider2D other)
+	{
+		if (other.CompareTag("Player"))
+		{
+			OnPlayerExitedRoom(other);
+		}
+	}
 
 
 
