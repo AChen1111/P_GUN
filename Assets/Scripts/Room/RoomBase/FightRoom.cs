@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public abstract class FightRoom : Room
@@ -8,17 +9,19 @@ public abstract class FightRoom : Room
     [Header("是否已进入过房间")]
     [SerializeField] private bool hasEnter = false;
 
-    // 当前波剩余敌人数。
+    private static HashSet<Enemy> enemyList = new HashSet<Enemy>();
+    
+    // 当前波剩余敌人数
     private int enemyCount = 0;
-    // 房间剩余波数。
+    // 房间剩余波数
     private int remainWaveCount = 0;
 
-    // 当前正在进行战斗流程的房间（给 Enemy 死亡回调使用）。
+    // 当前正在进行战斗流程的房间（给 Enemy 死亡回调使用）
     private static FightRoom currentFightRoom;
 
 
     /// <summary>
-    /// 所有波次结束回调，给子类扩展。
+    /// 所有波次结束回调，给子类扩展
     /// </summary>
     protected virtual void OnFightAllWavesEnd() {}
 
@@ -27,7 +30,14 @@ public abstract class FightRoom : Room
     /// </summary>
     protected abstract int SpawnWaveEnemies();
 
-
+    /// <summary>
+    /// 将新生成的敌人注册到当前房间敌人集合。
+    /// </summary>
+    protected void RegisterSpawnedEnemy(Enemy enemy)
+    {
+        if (enemy == null) return;
+        enemyList.Add(enemy);
+    }
 
 
     /// <summary>
@@ -93,9 +103,10 @@ public abstract class FightRoom : Room
     /// <summary>
     /// 供 Enemy 调用：将击杀事件路由到当前战斗房间。
     /// </summary>
-    public static void NotifyEnemyDefeated()
+    public static void NotifyEnemyDefeated(Enemy enemy)
     {
         currentFightRoom?.DecreaseEnemyCount();
+        enemyList.Remove(enemy);
     }
 
     /// <summary>
@@ -124,14 +135,16 @@ public abstract class FightRoom : Room
     {
         remainWaveCount--;
         Debug.Log("波次结束, 剩余波数: " + remainWaveCount);
+        
 
+        //如果剩余波数为0，则打开门
         if (remainWaveCount <= 0)
         {
             remainWaveCount = 0;
             OnFightAllWavesEnd();
             foreach (var door in doorsList)
             {
-                door.OpenDoor();
+                door.OpenDoor(true);
             }
             return;
         }

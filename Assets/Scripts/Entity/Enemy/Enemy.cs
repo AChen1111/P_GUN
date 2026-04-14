@@ -95,7 +95,7 @@ public class Enemy : MonoBehaviour {
             if (OwnerFightRoom != null) {
                 OwnerFightRoom.DecreaseEnemyCount();
             } else {
-                FightRoom.NotifyEnemyDefeated();
+                FightRoom.NotifyEnemyDefeated(this);
             }
         }
     }
