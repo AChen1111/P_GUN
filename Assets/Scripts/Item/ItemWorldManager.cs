@@ -15,6 +15,9 @@ namespace QFramework.PG
 
         public static ItemWorldManager Instance { get; private set; }
 
+        //记录已经生成的物品拾取物
+        private HashSet<ItemPickup> itemPickups = new();
+
         private void Awake() {
             Instance = this;
             DontDestroyOnLoad(gameObject);
@@ -55,8 +58,10 @@ namespace QFramework.PG
         public ItemPickup SpawnItemSO(
             string itemKey, 
             Vector3 worldPosition, 
+            bool isActive = true,
             AnimType animType = AnimType.None,
-            Action onComplete = null)
+            Action onComplete = null,
+            bool deferPickupUntilAnimComplete = false)
         {
             if (!_items.ContainsKey(itemKey)) {
                 Debug.LogError($"道具配置不存在: {itemKey}");
@@ -79,10 +84,18 @@ namespace QFramework.PG
                 return null;
             }
 
-            pickup.Init(_items[itemKey]);
-            DOTweenAnimMgr.Play(animType, instance,onComplete: onComplete);
+            var startActive = deferPickupUntilAnimComplete ? false : isActive;
+            pickup.Init(_items[itemKey], startActive);
+            Action wrapped = () =>
+            {
+                if (deferPickupUntilAnimComplete)
+                    pickup.SetPickupEnabled(isActive);
+                onComplete?.Invoke();
+            };
+            DOTweenAnimMgr.Play(animType, instance, onComplete: wrapped);
             return pickup;
         }
+
         /// <summary>
         /// 延迟生成道具
         /// </summary>
@@ -91,16 +104,43 @@ namespace QFramework.PG
         /// <param name="delay">延迟时间</param>
         /// <param name="animType">动画类型</param>
         public void SpawnItemSODelay(string itemKey, Vector3 worldPosition, float delay, 
-                            AnimType animType = AnimType.None, Action onComplete = null)
+                            bool isActive = true, 
+                            AnimType animType = AnimType.None, 
+                            Action onComplete = null,
+                            bool deferPickupUntilAnimComplete = false)
         {
-            StartCoroutine(SpawnItemSODelayCoroutine(itemKey, worldPosition, delay, animType, onComplete));
+            StartCoroutine(SpawnItemSODelayCoroutine(itemKey, worldPosition, delay, isActive, animType, onComplete, deferPickupUntilAnimComplete));
         }
         private IEnumerator SpawnItemSODelayCoroutine(string itemKey, Vector3 worldPosition, float delay, 
-                            AnimType animType, Action onComplete)
+                            bool isActive, AnimType animType, Action onComplete, bool deferPickupUntilAnimComplete)
         {
             yield return new WaitForSeconds(delay);
-            SpawnItemSO(itemKey, worldPosition, animType, onComplete);
+            SpawnItemSO(itemKey, worldPosition, isActive, animType, onComplete, deferPickupUntilAnimComplete);
         }
+
+        /// <summary>
+        /// 移除物品拾取物
+        /// </summary>
+        /// <param name="itemPickup">物品拾取物</param>
+        public void RemoveItemPickup(ItemPickup itemPickup)
+        {
+            if(itemPickup == null) return;
+            if(itemPickups.Contains(itemPickup))
+            {
+                itemPickups.Remove(itemPickup);
+            }
+        }
+
+        /// <summary>
+        /// 添加物品拾取物
+        /// </summary>
+        /// <param name="itemPickup">物品拾取物</param>
+        public void AddItemPickup(ItemPickup itemPickup)
+        {
+            if(itemPickup == null) return;
+            itemPickups.Add(itemPickup);
+        }
+
     }
 
 

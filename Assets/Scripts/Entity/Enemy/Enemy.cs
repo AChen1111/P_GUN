@@ -16,6 +16,9 @@ public class Enemy : MonoBehaviour {
     public List<AudioClip> shootSounds = new List<AudioClip>();
     private AudioSource audioSource;
 
+    [Header("移动速度")]
+    public float moveSpeed = 2.5f;
+
     [Header("属性")]
     [SerializeField]private int hp = 3;//血量
     [SerializeField] private float _shootInterval = 0.2f;//射击间隔
@@ -84,7 +87,7 @@ public class Enemy : MonoBehaviour {
             sr.flipX = false;
         }
 
-        rb.velocity = dir * 5f;
+        rb.velocity = dir * moveSpeed;
     }
 
     public void Hurt(int damage)
