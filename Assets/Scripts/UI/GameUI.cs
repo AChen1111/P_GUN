@@ -9,6 +9,8 @@ namespace QFramework.PG {
         public GameObject WinPanel;
         public GameObject OverPanel;
         public Text HPText;
+        [Header("小地图")]
+        public GameObject MiniMap;
 
         private void Awake() {
             Instance = this;
@@ -50,6 +52,27 @@ namespace QFramework.PG {
         {
             OverPanel.SetActive(true);
             Time.timeScale = 0;
+        }
+
+        public void ShowMiniMap()
+        {
+            MiniMap.SetActive(true);
+        }
+        public void HideMiniMap()
+        {
+            MiniMap.SetActive(false);
+        }
+
+        public void SwicthMinMapState()
+        {
+            if(MiniMap.activeSelf)
+            {
+                HideMiniMap();
+            }
+            else
+            {
+                ShowMiniMap();
+            }
         }
         
         ///<summary>

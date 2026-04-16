@@ -136,6 +136,9 @@ public abstract class Room : MonoBehaviour
 	{
 		if(other.CompareTag("Player"))
 		{
+			if (TryGetComponent<MinimapRoomData>(out var minimapData))
+				minimapData.Highlight();
+
 			OnPlayerEnteredRoom(other);
 		}
 	}

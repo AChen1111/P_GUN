@@ -131,6 +131,11 @@ namespace QFramework.PG {
             if(Input.GetKeyDown(KeyCode.Tab)) {
                 SwitchAutoAim();
             }
+
+            if(Input.GetKeyDown(KeyCode.M))
+            {
+                GameUI.Instance.SwicthMinMapState();
+            }
         }
 
         public void Hurt() {
