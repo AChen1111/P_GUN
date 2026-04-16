@@ -1,5 +1,7 @@
 using System.Collections;
 using UnityEngine;
+using System.Collections.Generic;
+using QFramework.PG;
 
 public class PlayerBullet : MonoBehaviour {
     public Vector2 dir;
@@ -8,7 +10,9 @@ public class PlayerBullet : MonoBehaviour {
     public int damage;
     private bool hasHit;
 
-    
+
+
+
     private void Awake() {
         rb = GetComponent<Rigidbody2D>();
         gameObject.layer = LayerMask.NameToLayer("PlayerBullet");
@@ -23,7 +27,7 @@ public class PlayerBullet : MonoBehaviour {
     ///</summary>
     ///<param name="other">碰撞对象</param>
     private void OnCollisionEnter2D(Collision2D other) {
-        LogHit("Collision", other.gameObject);
+        //LogHit("Collision", other.gameObject);
         HandleHit(other.gameObject);
     }
 
@@ -55,8 +59,20 @@ public class PlayerBullet : MonoBehaviour {
         if(hasHit || target == null) return;
 
         if(target.CompareTag("Enemy")) {
-            target.GetComponent<Enemy>()?.Hurt(damage);
+            
             hasHit = true;
+            
+            var audioSource = target.GetComponent<AudioSource>();
+
+            if(audioSource != null) {
+                GlobalAudioPlay.Instance.PlayerAudioSourceByClip(WeaponGlobal.Instance.hitSoundOnBody);
+                Debug.Log("audioSource is not null__");
+            }
+            else
+            {
+                Debug.Log("audioSource is null__");
+            }
+            target.GetComponent<Enemy>()?.Hurt(damage);
             Destroy(gameObject);
             return;
         }
@@ -65,6 +81,7 @@ public class PlayerBullet : MonoBehaviour {
         var isWall = target.CompareTag("Wall") || (wallLayer != -1 && target.layer == wallLayer);
         if(isWall) {
             hasHit = true;
+            GlobalAudioPlay.Instance.PlayerAudioSourceByClip(WeaponGlobal.Instance.hitSoundOnWall);
             Destroy(gameObject);
         }
     }

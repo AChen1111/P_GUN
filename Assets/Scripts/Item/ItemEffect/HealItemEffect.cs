@@ -19,13 +19,13 @@ namespace QFramework.PG
 
             if (Global.HP >= Global.MaxHP)
             {
-                Player.Instance?.ShowDisPlayer($"{itemName}：生命已满", 1.5f);
+                GameUI.Instance.ShowMessageOnPlayerHead($"{itemName}：生命已满", 1.5f);
                 return;
             }
 
             Global.HP = Mathf.Min(Global.MaxHP, Global.HP + healAmount);
             Global.OnHPChange?.Invoke();
-            Player.Instance?.ShowDisPlayer($"{itemName}：恢复 {healAmount} 点生命", 1.5f);
+            GameUI.Instance.ShowMessageOnPlayerHead($"{itemName}：恢复 {healAmount} 点生命", 1.5f);
         }
     }
 }
