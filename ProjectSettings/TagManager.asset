@@ -8,6 +8,7 @@ TagManager:
   - Grid
   - Item
   - Wall
+  - MiniMap
   layers:
   - Default
   - TransparentFX
@@ -20,7 +21,7 @@ TagManager:
   - EnemyBullet
   - Room
   - Wall
-  - 
+  - MiniMap
   - 
   - 
   - 
