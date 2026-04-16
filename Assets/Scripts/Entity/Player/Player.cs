@@ -22,6 +22,12 @@ namespace QFramework.PG {
         public Gun gun;
         [Header("当前枪索引")]
         public int currentGunIndex = 0;
+        [Header("自动瞄准")]
+        public bool canAutoAim = false;
+        const float AutoAimRefreshInterval = 0.5f;
+        WaitForSeconds _autoAimRefreshWait;
+        Transform _autoAimTarget;
+
         public static Player Instance { get; private set; }
     
         void Awake()
@@ -37,6 +43,9 @@ namespace QFramework.PG {
             gun.Hide();
             gun = guns[0];
             gun.Show();
+
+            _autoAimRefreshWait = new WaitForSeconds(AutoAimRefreshInterval);
+            StartCoroutine(AutoAimRefreshRoutine());
         }
 
         void OnDestroy()
@@ -119,6 +128,9 @@ namespace QFramework.PG {
                 gun.OnGunUsed();
             }
 
+            if(Input.GetKeyDown(KeyCode.Tab)) {
+                SwitchAutoAim();
+            }
         }
 
         public void Hurt() {
@@ -162,20 +174,51 @@ namespace QFramework.PG {
             mDisplayTextCoroutine = StartCoroutine(ShowDisPlayerCoroutine(text,duration));
         }
 
+        ///<summary>
+        ///自动瞄准
+        ///</summary>
+        ///<param name="dir">瞄准方向</param>
         public void AutoAim(ref Vector2 dir)
         {
+            if(!canAutoAim) return;
             if(FightRoom.currentFightRoom == null) return;
-            var targetEnemy = FightRoom.GetNearestEnemy(transform);
-            if(targetEnemy != null)
+
+            if (_autoAimTarget != null)
             {
                 AimPrefab.SetActive(true);
-                AimPrefab.transform.position = targetEnemy.transform.position;
-                dir = (targetEnemy.transform.position - transform.position).normalized;
+                AimPrefab.transform.position = _autoAimTarget.position;
+                dir = (_autoAimTarget.position - transform.position).normalized;
             }
             else
             {
                 AimPrefab.SetActive(false);
             }
+        }
+
+        IEnumerator AutoAimRefreshRoutine()
+        {
+            while (true)
+            {
+                if (canAutoAim && FightRoom.currentFightRoom != null)
+                {
+                    var targetEnemy = FightRoom.GetNearestEnemy(transform);
+                    _autoAimTarget = targetEnemy != null ? targetEnemy.transform : null;
+                }
+                else
+                {
+                    _autoAimTarget = null;
+                }
+
+                yield return _autoAimRefreshWait;
+            }
+        }
+
+        ///<summary>
+        ///切换自动瞄准
+        ///</summary>
+        private void SwitchAutoAim() {
+            canAutoAim = !canAutoAim;
+            ShowDisPlayer("自动瞄准: " + (canAutoAim ? "开启" : "关闭"), 1f);
         }
 
     }
