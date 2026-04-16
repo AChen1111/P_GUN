@@ -59,13 +59,13 @@ namespace QFramework.PG
 			if(playSound && !isPlayingOpenDoorSound)
 			{
 				isPlayingOpenDoorSound = true;
-				Debug.Log("播放开门音效");
 				//播放开门音效,并添加回调
 				GlobalAudioPlay.Instance.PlayerAudioSourceByClip(
 					openDoorSound,
 					onComplete:
 						() => {
 							isPlayingOpenDoorSound = false;
+							//Debug.Log("开门音效播放完成");
 						}
 				);
 			}

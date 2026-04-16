@@ -39,11 +39,8 @@ namespace QFramework.PG
 
             //在周围随机一个位置生成物品
             var newItemPostion = ctx.WorldPosition + new Vector3(Random.Range(-0.5f, 0.5f), Random.Range(-0.5f, 0.5f), 0);
-            //延迟0.5秒生成物品
-            mgr.SpawnItemSODelay(drop.itemKey, newItemPostion, 0.1f, AnimType.Jump, () =>
-            {
-                Debug.Log("物品生成完成");
-            });
+            mgr.SpawnItemSODelay(drop.itemKey, newItemPostion, 0.1f, isActive: true, AnimType.Jump,
+                deferPickupUntilAnimComplete: true);
         
         }
     }
