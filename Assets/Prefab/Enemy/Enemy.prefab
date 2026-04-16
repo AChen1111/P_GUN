@@ -134,9 +134,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c691e7b786f54424797873cefc728630, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rb: {fileID: 0}
   dir: {x: 0, y: 0}
   speed: 10
+  rb: {fileID: 0}
+  hitSoundsOnPlayer:
+  - {fileID: 8300000, guid: 5910836691605a847a7138b387ed0bb8, type: 3}
+  - {fileID: 8300000, guid: f968faf5cbe8f1049a54591745eac144, type: 3}
+  - {fileID: 8300000, guid: 95b2f6eb055766443ae1f8c9e647b3c2, type: 3}
+  - {fileID: 8300000, guid: 026c7bda90970d146a081f9b3e2f97fa, type: 3}
+  - {fileID: 8300000, guid: 39fc9f264592a70468aea1a3c22467a2, type: 3}
+  - {fileID: 8300000, guid: c8768da7fac00f746bf030d81aa4f30c, type: 3}
+  - {fileID: 8300000, guid: 4f529d451f742434d9ebbbed0711e827, type: 3}
+  - {fileID: 8300000, guid: 92ef5f6fcfd17704bace174083a12433, type: 3}
+  - {fileID: 8300000, guid: 4040b3dc7549b444b915b577913983c5, type: 3}
+  hitSoundsOnWall:
+  - {fileID: 8300000, guid: b2dbfa8029e7085438df38aa4fb76b78, type: 3}
+  - {fileID: 8300000, guid: 1278784ae907ba54386d676c440244af, type: 3}
+  - {fileID: 8300000, guid: 0307d9bcd8d1f984aad6690168e6e390, type: 3}
+  - {fileID: 8300000, guid: 92f1dce4686c87b4e97533920e9b48c3, type: 3}
 --- !u!50 &3703156783455981196
 Rigidbody2D:
   serializedVersion: 4
@@ -176,7 +191,7 @@ GameObject:
   - component: {fileID: 4246644681483630828}
   - component: {fileID: 5800285020900019468}
   - component: {fileID: 8748859229545106697}
-  - component: {fileID: 3520389117380740728}
+  - component: {fileID: 7460114896042838681}
   m_Layer: 7
   m_Name: Enemy
   m_TagString: Enemy
@@ -220,6 +235,9 @@ MonoBehaviour:
   - {fileID: 8300000, guid: d6a1e1dba80eb484386bf50f97ec2560, type: 3}
   - {fileID: 8300000, guid: 4ce72a5102c96ac449defd59e5a058c4, type: 3}
   - {fileID: 8300000, guid: 247c3d9a01e9b434899f18098abe4547, type: 3}
+  moveSpeed: 2.5
+  hp: 3
+  _shootInterval: 0.2
   state: 0
   timer: 0
   timerMax: 3
@@ -285,7 +303,7 @@ CircleCollider2D:
   m_Offset: {x: -0.033261746, y: -0.038129747}
   serializedVersion: 2
   m_Radius: 0.39189923
---- !u!82 &3520389117380740728
+--- !u!82 &7460114896042838681
 AudioSource:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

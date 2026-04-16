@@ -108,5 +108,10 @@ namespace QFramework.PG {
             string text = $"({bulletBag.currentBullet}/{bulletBag.maxBullet})";
             BulletBugText.text = text;
         }
+
+        public void ShowMessageOnPlayerHead(string message,float duration)
+        {
+            Player.Instance?.ShowDisPlayer(message, duration);
+        }
     }
 }

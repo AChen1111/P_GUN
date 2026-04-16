@@ -88,7 +88,7 @@ public abstract class Gun : ViewController {
     {
         if(gunClip.IsOutOfAmmo)
         {
-            Player.Instance.ShowDisPlayer("没有子弹", 2f);
+            GameUI.Instance.ShowMessageOnPlayerHead("没有子弹", 2f);
             return;
         }
         GetBullet(dir);
@@ -102,7 +102,7 @@ public abstract class Gun : ViewController {
         if (bulletBag == null || gunClip == null) return;
         if (gunClip.IsOutOfAmmo && !bulletBag.HasBullet)
         {
-            Player.Instance.ShowDisPlayer("没有子弹", 2f);
+            GameUI.Instance.ShowMessageOnPlayerHead("没有子弹", 2f);
             return;
         }
         bulletBag.Reload(gunClip, ReloadSound);
