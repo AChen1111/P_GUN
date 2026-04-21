@@ -105,7 +105,8 @@ public abstract class FightRoom : Room
     /// </summary>
     public static void NotifyEnemyDefeated(EnemyBase enemy)
     {
-        currentFightRoom?.DecreaseEnemyCount();
+        var ownerRoom = enemy != null && enemy.OwnerFightRoom != null ? enemy.OwnerFightRoom : currentFightRoom;
+        ownerRoom?.DecreaseEnemyCount();
         enemyList.Remove(enemy);
     }
 
@@ -169,7 +170,7 @@ public abstract class FightRoom : Room
         foreach (var enemy in enemyList)
         {
             // Unity 对象被 Destroy 后会表现为 null，需要过滤并清理
-            if (enemy == null || enemy.transform == null)
+            if (enemy == null || enemy.transform == null || !enemy.gameObject.activeInHierarchy)
             {
                 if (invalidEnemies == null) invalidEnemies = new List<EnemyBase>();
                 invalidEnemies.Add(enemy);

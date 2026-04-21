@@ -31,16 +31,17 @@ public class NormalRoom : FightRoom
         var spawnCount = Random.Range(enemyCountRange.x, enemyCountRange.y + 1);
         spawnCount = Mathf.Clamp(spawnCount, 0, validPoints.Count);
 
-        //实例化敌人
+        // 从对象池获取敌人；EnemyPool 内部会按 prefab 分池，避免不同敌人类型混用
+        var actualSpawnCount = 0;
         for (int i = 0; i < spawnCount; i++)
         {
-            var enemy = Instantiate(enemyPrefab, validPoints[i].position, Quaternion.identity).GetComponent<EnemyBase>();
-            enemy.Init();
+            var enemy = EnemyPool.Instance.Get(enemyPrefab, validPoints[i].position, Quaternion.identity, this);
+            if (enemy == null) continue;
+
             RegisterSpawnedEnemy(enemy);
-            enemy.gameObject.SetActive(true);
+            actualSpawnCount++;
         }
         
-        return spawnCount;
+        return actualSpawnCount;
     }
 }
-

@@ -14,6 +14,8 @@ namespace QFramework.PG
 			shootDuration.RecordShootTime();
 			gunClip.Shoot();
 			var obj = GetBullet(dir);
+			if(obj == null) return;
+
 			obj.transform.right = dir;
 			gunFireEffect.Show(BulletPrefab.Position2D(), dir);
 			TryPlaySound(false);
