@@ -63,8 +63,8 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 4ce72a5102c96ac449defd59e5a058c4, type: 3}
   - {fileID: 8300000, guid: 247c3d9a01e9b434899f18098abe4547, type: 3}
   shootInterval: 0.2
-  followDuration: 3
-  attackDuration: 1
+  followDuration: 1
+  attackDuration: 0.4
 --- !u!212 &8116403503347937743
 SpriteRenderer:
   m_ObjectHideFlags: 0
