@@ -65,14 +65,11 @@ public abstract class EnemyBase : MonoBehaviour {
         col = GetComponent<Collider2D>();
         audioSource = GetComponent<AudioSource>();
         gameObject.tag = "Enemy";
-        ///初始化属性
-        CurrentHp = MaxHp;
+        ResetRuntimeState();
     }
 
     private void Start() {
         Init();
-        RegisterFSM(FSM);
-        OnStart();
     }
     protected virtual void OnStart(){}
 
@@ -131,11 +128,52 @@ public abstract class EnemyBase : MonoBehaviour {
         if(isInited) return;
         isInited = true;
         OnInit();
+        RegisterFSM(FSM);
+        OnStart();
     }
 
     protected void ApplyDamage(int damage) {
         if(damage <= 0) return;
         CurrentHp -= damage;
+    }
+
+    /// <summary>
+    /// 从对象池取出时调用。敌人复用时 Awake/Start 不会再次执行，所以这里必须重置运行时状态。
+    /// </summary>
+    public void SpawnFromPool(FightRoom ownerFightRoom) {
+        OwnerFightRoom = ownerFightRoom;
+        ResetRuntimeState();
+        Init();
+        OwnerFightRoom = ownerFightRoom;
+    }
+
+    /// <summary>
+    /// 回收到对象池前调用，清理移动和房间引用，避免下一次复用带入旧状态。
+    /// </summary>
+    public void PrepareForPoolRelease() {
+        StopMove();
+        OwnerFightRoom = null;
+    }
+
+    /// <summary>
+    /// 清理敌人的运行时状态。状态机必须清空，否则复用后会残留上一轮注册的状态。
+    /// </summary>
+    private void ResetRuntimeState() {
+        isDead = false;
+        isInited = false;
+        CurrentHp = MaxHp;
+        FSM.Clear();
+        StopMove();
+
+        if(col != null) {
+            col.enabled = true;
+        }
+    }
+
+    private void StopMove() {
+        if(rb != null) {
+            rb.velocity = Vector2.zero;
+        }
     }
     #endregion
 }

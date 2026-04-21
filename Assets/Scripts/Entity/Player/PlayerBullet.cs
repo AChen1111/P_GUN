@@ -1,6 +1,5 @@
 using System.Collections;
 using UnityEngine;
-using System.Collections.Generic;
 using QFramework.PG;
 
 public class PlayerBullet : MonoBehaviour {
@@ -8,18 +7,29 @@ public class PlayerBullet : MonoBehaviour {
     public float speed = 15f;
     public Rigidbody2D rb;
     public int damage;
+    [SerializeField] private float lifeTime = 3f;
     private bool hasHit;
-
-
-
+    private Coroutine autoRecycleCoroutine;
 
     private void Awake() {
         rb = GetComponent<Rigidbody2D>();
         gameObject.layer = LayerMask.NameToLayer("PlayerBullet");
     }
 
-    private void OnEnable() {
-        StartCoroutine(AutoDestroyIfNotHit());
+    /// <summary>
+    /// 每次从对象池取出子弹时调用，重置上一轮使用留下的方向、伤害、命中状态和生命周期。
+    /// </summary>
+    public void Init(Vector2 shootDir, int bulletDamage) {
+        dir = shootDir;
+        damage = bulletDamage;
+        hasHit = false;
+
+        StopAutoRecycleCoroutine();
+        autoRecycleCoroutine = StartCoroutine(AutoRecycleIfNotHit());
+
+        if(rb == null) {
+            rb = GetComponent<Rigidbody2D>();
+        }
     }
 
     ///<summary>
@@ -45,13 +55,16 @@ public class PlayerBullet : MonoBehaviour {
     ///固定更新
     ///</summary>
     private void FixedUpdate() {
+        if(rb == null) return;
         rb.velocity = dir * speed;
     }
 
-    private IEnumerator AutoDestroyIfNotHit() {
-        yield return new WaitForSeconds(3f);
+    private IEnumerator AutoRecycleIfNotHit() {
+        yield return new WaitForSeconds(lifeTime);
+        autoRecycleCoroutine = null;
+
         if(!hasHit && gameObject != null) {
-            Destroy(gameObject);
+            Recycle();
         }
     }
 
@@ -77,7 +90,7 @@ public class PlayerBullet : MonoBehaviour {
             damageInfo.Damage = damage;
 
             target.GetComponent<EnemyBase>()?.Hurt(damageInfo);
-            Destroy(gameObject);
+            Recycle();
             return;
         }
 
@@ -86,8 +99,39 @@ public class PlayerBullet : MonoBehaviour {
         if(isWall) {
             hasHit = true;
             GlobalAudioPlay.Instance.PlayerAudioSourceByClip(WeaponGlobal.Instance.hitSoundOnWall);
-            Destroy(gameObject);
+            Recycle();
         }
+    }
+
+    /// <summary>
+    /// 子弹结束生命周期时归还对象池，而不是 Destroy，避免频繁创建和销毁。
+    /// </summary>
+    private void Recycle() {
+        hasHit = true;
+        StopAutoRecycleCoroutine();
+        StopMove();
+        PlayerBulletPool.Instance.Release(this);
+    }
+
+    /// <summary>
+    /// 回收到池中前清掉速度，避免下次启用时继承上一颗子弹的物理状态。
+    /// </summary>
+    public void StopMove() {
+        if(rb != null) {
+            rb.velocity = Vector2.zero;
+        }
+    }
+
+    private void OnDisable() {
+        StopAutoRecycleCoroutine();
+        StopMove();
+    }
+
+    private void StopAutoRecycleCoroutine() {
+        if(autoRecycleCoroutine == null) return;
+
+        StopCoroutine(autoRecycleCoroutine);
+        autoRecycleCoroutine = null;
     }
 
     private void LogHit(string hitType, GameObject target) {

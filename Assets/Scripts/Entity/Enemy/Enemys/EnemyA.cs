@@ -27,21 +27,22 @@ public class EnemyA : EnemyBase
 
     protected override void RegisterFSM(FSM<EnemyState> fsm)
     {
+        Debug.Log("RegisterFSM");
         // ── Follow 状态：追踪玩家，计时到达后切换到 Attack ──
         fsm.State(EnemyState.Follow)
-            .OnCondition(() => fsm.CurrentStateId == EnemyState.Attack && stateTimer >= attackDuration)
             .OnEnter(() => stateTimer = 0f)
             .OnUpdate(() =>
             {
                 stateTimer += Time.deltaTime;
                 DoFollow();
+                if (stateTimer >= followDuration)
+                    fsm.ChangeState(EnemyState.Attack);
             })
             .OnExit(() => stateTimer = 0f);
 
         // ── Attack 状态：原地射击，计时到达后切换回 Follow ──
         fsm.State(EnemyState.Attack)
-            .OnCondition(() => fsm.CurrentStateId == EnemyState.Follow && stateTimer >= followDuration)
-            .OnEnter(() => stateTimer = 0f)
+            .OnEnter(() => { stateTimer = 0f; if (Rb != null) Rb.velocity = Vector2.zero; })
             .OnUpdate(() =>
             {
                 stateTimer += Time.deltaTime;
@@ -50,6 +51,8 @@ public class EnemyA : EnemyBase
                     shootDuration.RecordShootTime();
                     DoShoot();
                 }
+                if (stateTimer >= attackDuration)
+                    fsm.ChangeState(EnemyState.Follow);
             })
             .OnExit(() => stateTimer = 0f);
 
@@ -65,8 +68,8 @@ public class EnemyA : EnemyBase
     protected override void OnDead()
     {
         if (Rb != null) Rb.velocity = Vector2.zero;
-        OwnerFightRoom?.DecreaseEnemyCount();
-        Destroy(gameObject);
+        FightRoom.NotifyEnemyDefeated(this);
+        EnemyPool.Instance.Release(this);
     }
 
     private void DoFollow()
@@ -91,12 +94,11 @@ public class EnemyA : EnemyBase
     private void DoShoot()
     {
         if (bulletPrefab == null || Global.player == null) return;
-
+        //Debug.Log("DoShoot");
         var dirToPlayer = (Global.player.transform.position - transform.position).normalized;
-        var obj = Instantiate(bulletPrefab, transform.position, Quaternion.identity);
-        var bullet = obj.GetComponent<EnemyBullet>();
-        if (bullet != null) bullet.dir = dirToPlayer;
-        obj.SetActive(true);
+        var spawnPos = transform.position + (Vector3)(dirToPlayer * 0.5f);
+        var bullet = EnemyBulletPool.Instance.Get(bulletPrefab, spawnPos, Quaternion.identity, dirToPlayer);
+        if (bullet == null) return;
 
         if (AudioSource != null && shootSounds != null && shootSounds.Count > 0)
         {

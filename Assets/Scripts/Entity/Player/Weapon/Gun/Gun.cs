@@ -178,12 +178,14 @@ public abstract class Gun : ViewController {
     /// </summary>
     protected virtual PlayerBullet GetBullet(Vector2 dir)
     {
-        var obj = Instantiate(BulletPrefab);
-        obj.transform.position = BulletPrefab.transform.position;
-        obj.dir = dir;
-        obj.damage = Damage;
+        var obj = PlayerBulletPool.Instance.Get(
+            BulletPrefab,
+            BulletPrefab.transform.position,
+            BulletPrefab.transform.rotation,
+            dir,
+            Damage
+        );
         //Debug.Log("damage: " + Damage);
-        obj.gameObject.SetActive(true);
         return obj;
     }
 }

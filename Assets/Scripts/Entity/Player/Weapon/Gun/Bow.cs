@@ -16,6 +16,8 @@ namespace QFramework.PG
 		public override void Shoot(Vector2 dir)
 		{
 			var obj = GetBullet(dir);
+			if(obj == null) return;
+
 			obj.transform.right = dir;
 			TryPlaySound(false);
 		}
