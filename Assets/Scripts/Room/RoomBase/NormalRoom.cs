@@ -3,7 +3,7 @@ using UnityEngine;
 public class NormalRoom : FightRoom
 {
     [Header("敌人预制体")]
-    [SerializeField] private Enemy enemyPrefab;
+    [SerializeField] private GameObject enemyPrefab;
 
     [Header("敌人可能出现的位置坐标点")]
     [SerializeField] private List<Transform> enemyPoints = new List<Transform>();
@@ -34,8 +34,8 @@ public class NormalRoom : FightRoom
         //实例化敌人
         for (int i = 0; i < spawnCount; i++)
         {
-            var enemy = Instantiate(enemyPrefab, validPoints[i].position, Quaternion.identity);
-            enemy.OwnerFightRoom = this;
+            var enemy = Instantiate(enemyPrefab, validPoints[i].position, Quaternion.identity).GetComponent<EnemyBase>();
+            enemy.Init();
             RegisterSpawnedEnemy(enemy);
             enemy.gameObject.SetActive(true);
         }

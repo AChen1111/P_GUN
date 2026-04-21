@@ -3005,20 +3005,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SelfBoxCollider2D: {fileID: 78627306088376484}
-  enemyPrefab: {fileID: 4246644681483630828, guid: a0b926dfc1846044ea6ff112eb690da8, type: 3}
+  needGenerateDoors: 0
   doorPrefab: {fileID: 4627585393492876397, guid: c7feca4fad691424783ee926ca98c9ae, type: 3}
+  doorStateIsOpen: 1
+  waveCount: 3
+  hasEnter: 0
+  enemyPrefab: {fileID: 1354463150124662322, guid: 5997eda64fd4b9e46ab562272521a078, type: 3}
   enemyPoints:
   - {fileID: 17797752623052620}
   - {fileID: 6440587675623481254}
   - {fileID: 6731053414092002247}
-  doorPoints:
-  - {fileID: 5074335196981933134}
-  - {fileID: 6173884160561887101}
-  - {fileID: 2376542227942676401}
-  - {fileID: 5740791180504793408}
-  waveCount: 3
   enemyCountRange: {x: 1, y: 3}
-  hasEnter: 0
 --- !u!61 &78627306088376484
 BoxCollider2D:
   m_ObjectHideFlags: 0
