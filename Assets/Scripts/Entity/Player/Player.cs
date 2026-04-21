@@ -24,7 +24,17 @@ namespace QFramework.PG {
         public int currentGunIndex = 0;
         [Header("自动瞄准")]
         public bool canAutoAim = false;
-        const float AutoAimRefreshInterval = 0.5f;
+        const float AutoAimRefreshInterval = 0.1f;
+
+        [Header("动画器")]
+        [SerializeField]private Animator animator;
+        [SerializeField]private bool isSleep = false;
+        private float sleepTimer = 0f;
+        private const float SleepDuration = 3f;
+        
+        //受击免疫标识
+        bool canHurt = true;
+
         WaitForSeconds _autoAimRefreshWait;
         Transform _autoAimTarget;
 
@@ -32,6 +42,7 @@ namespace QFramework.PG {
     
         void Awake()
         {
+            animator = GetComponentInChildren<Animator>();
             //默认不显示
             DisPlayText.gameObject.SetActive(false);
             AimPrefab.SetActive(false);
@@ -39,6 +50,7 @@ namespace QFramework.PG {
             Global.player = this;
             Instance = this;
             rb = GetComponent<Rigidbody2D>();
+            ResolveAnimator();
 
             gun.Hide();
             gun = guns[0];
@@ -50,6 +62,7 @@ namespace QFramework.PG {
 
         void OnDestroy()
         {
+            
             Instance = null;
         }
 
@@ -57,6 +70,22 @@ namespace QFramework.PG {
             gameObject.AddComponent<Rigidbody2D>();
             gameObject.AddComponent<CircleCollider2D>();
             gameObject.tag = "Player";
+        }
+
+        private void ResolveAnimator()
+        {
+            if (animator != null) return;
+
+            animator = GetComponent<Animator>();
+            if (animator == null)
+            {
+                animator = GetComponentInChildren<Animator>();
+            }
+
+            if (animator == null)
+            {
+                Debug.LogWarning("Player Animator 未绑定，动画将被跳过。");
+            }
         }
 
         void Update()
@@ -79,6 +108,33 @@ namespace QFramework.PG {
             var vertical = Input.GetAxisRaw("Vertical");
             
             rb.velocity = new Vector2(horizontal, vertical).normalized * moveSpeed;
+            if (animator != null)
+            {
+                animator.SetFloat("Speed", rb.velocity.magnitude);
+            }
+
+            #region 睡眠状态检测
+            if(rb.velocity.magnitude < 0.01f && !isSleep) {
+                sleepTimer += Time.deltaTime;
+                if(sleepTimer >= SleepDuration) {
+                    isSleep = true;
+                    if (animator != null)
+                    {
+                        animator.SetBool("Sleep", true);
+                    }
+                }
+            }
+
+            if(isSleep && rb.velocity.magnitude > 0.01f) {
+                isSleep = false;
+                if (animator != null)
+                {
+                    animator.SetBool("Sleep", false);
+                    sleepTimer = 0f;
+                }
+            }
+            #endregion
+
             
             //翻转  
             if(horizontal < 0)
@@ -139,6 +195,9 @@ namespace QFramework.PG {
         }
 
         public void Hurt() {
+            if(!canHurt) return;
+            
+            //扣血判断
             Global.HP--;
             if(Global.HP <= 0) {
                 Global.HP = 0;
@@ -146,6 +205,16 @@ namespace QFramework.PG {
                 return;
             }
             Global.OnHPChange?.Invoke();
+
+            //受击免疫
+            canHurt = false;
+            DOTweenAnimMgr.Play(
+                AnimType.Blink, gameObject,
+                onComplete:()=>{
+                    canHurt = true;
+            }
+            );
+
         }
 
 

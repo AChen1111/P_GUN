@@ -11,8 +11,8 @@ public class EnemyA : EnemyBase
 
     [Header("攻击参数")]
     [SerializeField] private float shootInterval = 0.2f;
-    [SerializeField] private float followDuration = 3f;
-    [SerializeField] private float attackDuration = 1f;
+    [SerializeField] private float followDuration = 1f;
+    [SerializeField] private float attackDuration = 0.1f;
 
     private ShootDuration shootDuration;
     private float stateTimer = 0f;
@@ -27,7 +27,7 @@ public class EnemyA : EnemyBase
 
     protected override void RegisterFSM(FSM<EnemyState> fsm)
     {
-        Debug.Log("RegisterFSM");
+        //Debug.Log(shootInterval + " " + followDuration + " " + attackDuration);
         // ── Follow 状态：追踪玩家，计时到达后切换到 Attack ──
         fsm.State(EnemyState.Follow)
             .OnEnter(() => stateTimer = 0f)
@@ -42,15 +42,16 @@ public class EnemyA : EnemyBase
 
         // ── Attack 状态：原地射击，计时到达后切换回 Follow ──
         fsm.State(EnemyState.Attack)
-            .OnEnter(() => { stateTimer = 0f; if (Rb != null) Rb.velocity = Vector2.zero; })
+            .OnEnter(() =>
+            {
+                stateTimer = 0f;
+                if (Rb != null) Rb.velocity = Vector2.zero;
+                if (shootDuration != null) shootDuration.Duration = shootInterval;
+            })
             .OnUpdate(() =>
             {
                 stateTimer += Time.deltaTime;
-                if (shootDuration != null && shootDuration.CanShoot)
-                {
-                    shootDuration.RecordShootTime();
-                    DoShoot();
-                }
+                TryShootByInterval();
                 if (stateTimer >= attackDuration)
                     fsm.ChangeState(EnemyState.Follow);
             })
@@ -104,5 +105,14 @@ public class EnemyA : EnemyBase
         {
             AudioSource.PlayOneShot(shootSounds[Random.Range(0, shootSounds.Count)]);
         }
+    }
+
+    private void TryShootByInterval()
+    {
+        if (shootDuration == null) return;
+        if (!shootDuration.CanShoot) return;
+
+        shootDuration.RecordShootTime();
+        DoShoot();
     }
 }
