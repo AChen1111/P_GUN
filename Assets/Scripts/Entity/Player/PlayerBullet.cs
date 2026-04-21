@@ -72,7 +72,11 @@ public class PlayerBullet : MonoBehaviour {
             {
                 Debug.Log("audioSource is null__");
             }
-            target.GetComponent<Enemy>()?.Hurt(damage);
+            
+            DamageInfo damageInfo = new DamageInfo();
+            damageInfo.Damage = damage;
+
+            target.GetComponent<EnemyBase>()?.Hurt(damageInfo);
             Destroy(gameObject);
             return;
         }

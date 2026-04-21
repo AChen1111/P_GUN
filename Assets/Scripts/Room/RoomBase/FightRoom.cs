@@ -9,7 +9,7 @@ public abstract class FightRoom : Room
     [Header("是否已进入过房间")]
     [SerializeField] private bool hasEnter = false;
 
-    private static HashSet<Enemy> enemyList = new HashSet<Enemy>();
+    private static HashSet<EnemyBase> enemyList = new HashSet<EnemyBase>();
     
     // 当前波剩余敌人数
     private int enemyCount = 0;
@@ -33,7 +33,7 @@ public abstract class FightRoom : Room
     /// <summary>
     /// 将新生成的敌人注册到当前房间敌人集合。
     /// </summary>
-    protected void RegisterSpawnedEnemy(Enemy enemy)
+    protected void RegisterSpawnedEnemy(EnemyBase enemy)
     {
         if (enemy == null) return;
         enemyList.Add(enemy);
@@ -103,7 +103,7 @@ public abstract class FightRoom : Room
     /// <summary>
     /// 供 Enemy 调用：将击杀事件路由到当前战斗房间。
     /// </summary>
-    public static void NotifyEnemyDefeated(Enemy enemy)
+    public static void NotifyEnemyDefeated(EnemyBase enemy)
     {
         currentFightRoom?.DecreaseEnemyCount();
         enemyList.Remove(enemy);
@@ -158,20 +158,20 @@ public abstract class FightRoom : Room
     /// </summary>
     /// <param name="playerTransform">玩家位置</param>
     /// <returns>距离玩家最近的敌人</returns>
-    public static Enemy GetNearestEnemy(Transform playerTransform)
+    public static EnemyBase GetNearestEnemy(Transform playerTransform)
     {
         if(enemyList.Count == 0 || playerTransform == null) return null;
 
-        Enemy nearestEnemy = null;
+        EnemyBase nearestEnemy = null;
         float nearestSqrDistance = float.MaxValue;
-        List<Enemy> invalidEnemies = null;
+        List<EnemyBase> invalidEnemies = null;
 
         foreach (var enemy in enemyList)
         {
             // Unity 对象被 Destroy 后会表现为 null，需要过滤并清理
             if (enemy == null || enemy.transform == null)
             {
-                if (invalidEnemies == null) invalidEnemies = new List<Enemy>();
+                if (invalidEnemies == null) invalidEnemies = new List<EnemyBase>();
                 invalidEnemies.Add(enemy);
                 continue;
             }

@@ -36,11 +36,15 @@ namespace QFramework.PG
 			{
 				LineRenderer.SetPosition(1, hit.point);
 
-				var enemy = hit.collider.GetComponent<Enemy>();
+				var enemy = hit.collider.GetComponent<EnemyBase>();
 				if(enemy != null && Time.time - mLastDamageTime >= shootInterval)
 				{
 					mLastDamageTime = Time.time;
-					enemy.Hurt(Damage);
+					
+					DamageInfo damageInfo = new DamageInfo();
+					damageInfo.Damage = Damage;
+
+					enemy.Hurt(damageInfo);
 				}
 				return;
 			}
