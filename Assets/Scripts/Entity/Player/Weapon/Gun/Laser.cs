@@ -41,8 +41,7 @@ namespace QFramework.PG
 				{
 					mLastDamageTime = Time.time;
 					
-					DamageInfo damageInfo = new DamageInfo();
-					damageInfo.Damage = Damage;
+					DamageInfo damageInfo = new DamageInfo(Damage, dir);
 
 					enemy.Hurt(damageInfo);
 				}

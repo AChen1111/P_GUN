@@ -215,11 +215,18 @@ namespace QFramework.PG {
         }
 
         public void Hurt() {
+            Hurt(new DamageInfo(1, Vector2.zero));
+        }
+
+        public void Hurt(DamageInfo damageInfo) {
             if(!canHurt) return;
+            if(damageInfo == null) damageInfo = new DamageInfo();
             
             ExitSleepState();
+            VfxPool.Instance.Play(GetBloodVfxPosition(), damageInfo.SourceDirection, BloodVfxColorMode.Green);
+
             //扣血判断
-            HP = Mathf.Max(0, HP - 1);
+            HP = Mathf.Max(0, HP - Mathf.Max(1, damageInfo.Damage));
             OnHPChange?.Invoke();
 
             if(HP <= 0) {
@@ -352,5 +359,17 @@ namespace QFramework.PG {
             ShowDisPlayer("自动瞄准: " + (canAutoAim ? "开启" : "关闭"), 1f);
         }
 
+        private Vector3 GetBloodVfxPosition() {
+            var col = GetComponent<Collider2D>();
+            if(col != null) {
+                return col.bounds.center;
+            }
+
+            if(sr != null) {
+                return sr.bounds.center;
+            }
+
+            return transform.position;
+        }
     }
 }
