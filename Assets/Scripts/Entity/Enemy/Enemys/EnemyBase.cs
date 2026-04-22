@@ -110,8 +110,11 @@ public abstract class EnemyBase : MonoBehaviour {
     /// <param name="damageInfo">伤害信息</param>
     public void Hurt(DamageInfo damageInfo){
         if(isDead) return;
+        if(damageInfo == null) damageInfo = new DamageInfo();
+
         //Debug.Log("Enemy Hurt");
         OnHurt(damageInfo);
+        VfxPool.Instance.Play(GetBloodVfxPosition(), damageInfo.SourceDirection);
         HurtAnim();
 
         if(CurrentHp <= 0) {
@@ -212,6 +215,18 @@ public abstract class EnemyBase : MonoBehaviour {
         if(rb != null) {
             rb.velocity = Vector2.zero;
         }
+    }
+
+    private Vector3 GetBloodVfxPosition() {
+        if(col != null) {
+            return col.bounds.center;
+        }
+
+        if(sr != null) {
+            return sr.bounds.center;
+        }
+
+        return transform.position;
     }
     #endregion
 }

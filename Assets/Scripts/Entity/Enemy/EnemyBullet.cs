@@ -70,7 +70,7 @@ public class EnemyBullet : MonoBehaviour {
         if (hasHit || target == null) return;
 
         if (target.CompareTag("Player")) {
-            target.GetComponent<Player>()?.Hurt();
+            target.GetComponent<Player>()?.Hurt(new DamageInfo(1, dir));
             hasHit = true;
 
             var audioSource = target.GetComponent<AudioSource>();

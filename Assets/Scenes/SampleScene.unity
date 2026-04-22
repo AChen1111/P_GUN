@@ -382,6 +382,37 @@ MonoBehaviour:
   Name: Corridor
   IndividualRoomTemplates: []
   RoomTemplateSets: []
+--- !u!1 &156578217
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 156578218}
+  m_Layer: 0
+  m_Name: InActive
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &156578218
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 156578217}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1019259084}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &243481736
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1028,6 +1059,37 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   offset: {x: 0, y: 0, z: -10}
   smoothTime: 0.2
+--- !u!1 &519806774
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 519806775}
+  m_Layer: 0
+  m_Name: Active
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &519806775
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 519806774}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1019259084}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &542789667
 GameObject:
   m_ObjectHideFlags: 0
@@ -3575,6 +3637,59 @@ MonoBehaviour:
   Name: Corridor
   IndividualRoomTemplates: []
   RoomTemplateSets: []
+--- !u!1 &1019259083
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1019259084}
+  - component: {fileID: 1019259085}
+  m_Layer: 0
+  m_Name: VFXPool
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1019259084
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1019259083}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 519806775}
+  - {fileID: 156578218}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1019259085
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1019259083}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23dd5827bc7a3cb48b95a65ac0e97463, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  defaultPrefab: {fileID: 7284967527061219658, guid: 3752c64bcee20ed4ca0c96a5cc62c95d, type: 3}
+  defaultCapacity: 16
+  maxSize: 128
+  prewarmCount: 0
+  collectionChecks: 1
+  activeRoot: {fileID: 519806775}
+  inactiveRoot: {fileID: 156578218}
 --- !u!1 &1062462434
 GameObject:
   m_ObjectHideFlags: 0
@@ -4157,6 +4272,10 @@ MonoBehaviour:
   initAnimationDuration: 1
   initStepDuration: 0.08
   initHeartInterval: 0.05
+  hpChangeStepDuration: 0.18
+  hpChangeStepInterval: 0.03
+  healPopScale: 1.2
+  damageShrinkScale: 0.72
   autoSyncGlobalHp: 1
 --- !u!1 &1417856003
 GameObject:
@@ -4975,3 +5094,4 @@ SceneRoots:
   - {fileID: 1628268686}
   - {fileID: 1306159634}
   - {fileID: 1417856004}
+  - {fileID: 1019259084}
