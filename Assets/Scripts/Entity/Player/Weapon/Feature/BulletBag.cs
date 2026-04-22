@@ -43,7 +43,8 @@ namespace QFramework.PG
                 currentBullet -= needBullet;
             }
 
-            GameUI.Instance.UpdateBulletBagText(this);
+            if (GameUI.Instance != null)
+                GameUI.Instance.UpdateBulletBagText(this);
             gunClip.Reload(reloadSound);
         }
 
