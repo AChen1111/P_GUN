@@ -32,8 +32,8 @@ namespace QFramework.PG {
 
         public void ResetGame()
         {
+            Global.player?.Restart();
             SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-            Global.Restart();
             Time.timeScale = 1;
         }
         
@@ -105,7 +105,7 @@ namespace QFramework.PG {
 
         public void ShowMessageOnPlayerHead(string message,float duration)
         {
-            Player.Instance?.ShowDisPlayer(message, duration);
+            Global.player?.ShowDisPlayer(message, duration);
         }
     }
 }

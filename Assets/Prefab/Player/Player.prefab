@@ -60,6 +60,7 @@ MonoBehaviour:
   ViewControllerFullTypeName: 
   sr: {fileID: 8980726362857158556}
   moveSpeed: 5
+  maxHp: 6
   Weapon: {fileID: 5918398537855737486}
   guns:
   - {fileID: 5633022426327530336}
