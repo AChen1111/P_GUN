@@ -134,7 +134,7 @@ public class DOTweenAnimMgr : MonoBehaviour
     {
         var sr = target.GetComponentInChildren<SpriteRenderer>();
         if (sr != null)
-        {
+        {                                                                                                  
             sr.DOKill(false);
 
             Color orig = sr.color;

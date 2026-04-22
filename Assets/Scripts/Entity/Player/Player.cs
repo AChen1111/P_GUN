@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -12,18 +13,31 @@ namespace QFramework.PG {
         public SpriteRenderer sr;
         [Header("角色移动速度")]
         public float moveSpeed = 5f;
+
+        [Header("最大血量")]
+        public int maxHp = 5;
+        [Header("当前血量")]
+        public int HP ;
+
+
         [Header("武器节点")]
         public Transform Weapon;
+
         [Header("武器列表")]
         public List<Gun> guns = new List<Gun>();
+
         [Header("准星")]
         public GameObject AimPrefab;
+
         [Header("当前枪")]
         public Gun gun;
+
         [Header("当前枪索引")]
         public int currentGunIndex = 0;
+
         [Header("自动瞄准")]
         public bool canAutoAim = false;
+
         const float AutoAimRefreshInterval = 0.1f;
 
         [Header("动画器")]
@@ -38,17 +52,21 @@ namespace QFramework.PG {
         WaitForSeconds _autoAimRefreshWait;
         Transform _autoAimTarget;
 
-        public static Player Instance { get; private set; }
+        
+        public int MaxHP => Mathf.Max(0, maxHp);
+        public bool IsHPFull => HP >= MaxHP;
+        public event Action OnHPChange;
     
         void Awake()
         {
+            Global.player = this;
+            Restart();
+
             animator = GetComponentInChildren<Animator>();
             //默认不显示
             DisPlayText.gameObject.SetActive(false);
             AimPrefab.SetActive(false);
 
-            Global.player = this;
-            Instance = this;
             rb = GetComponent<Rigidbody2D>();
             ResolveAnimator();
 
@@ -65,8 +83,10 @@ namespace QFramework.PG {
 
         void OnDestroy()
         {
-            
-            Instance = null;
+            if (Global.player == this)
+            {
+                Global.player = null;
+            }
         }
 
         private void Reset() {
@@ -197,14 +217,15 @@ namespace QFramework.PG {
         public void Hurt() {
             if(!canHurt) return;
             
+            ExitSleepState();
             //扣血判断
-            Global.HP--;
-            if(Global.HP <= 0) {
-                Global.HP = 0;
+            HP = Mathf.Max(0, HP - 1);
+            OnHPChange?.Invoke();
+
+            if(HP <= 0) {
                 GameUI.Instance.ShowOverPanel();
                 return;
             }
-            Global.OnHPChange?.Invoke();
 
             //受击免疫
             canHurt = false;
@@ -215,6 +236,21 @@ namespace QFramework.PG {
             }
             );
 
+        }
+
+        public void Restart() {
+            HP = MaxHP;
+            OnHPChange?.Invoke();
+        }
+
+        public int Heal(int amount)
+        {
+            if (amount <= 0 || IsHPFull) return 0;
+
+            var oldHp = HP;
+            HP = Mathf.Min(MaxHP, HP + amount);
+            OnHPChange?.Invoke();
+            return HP - oldHp;
         }
 
 

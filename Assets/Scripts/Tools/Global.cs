@@ -1,8 +1,7 @@
-using System;
 using QFramework.PG;
 
 /// <summary>
-/// 全局变量
+/// 全局玩家引用
 /// </summary>
 
 
@@ -10,13 +9,4 @@ using QFramework.PG;
 public class Global
 {
     public static Player player;
-    public static int HP = 3;
-    public static int MaxHP = 5;
-    public static Action OnHPChange;
-
-    public static void Restart() {
-        HP = MaxHP;
-        OnHPChange?.Invoke();
-    }
-
 }
