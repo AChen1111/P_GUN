@@ -104,11 +104,17 @@ public abstract class EnemyBase : MonoBehaviour {
     /// <param name="damageInfo">伤害信息</param>
     public void Hurt(DamageInfo damageInfo){
         if(isDead) return;
+        //Debug.Log("Enemy Hurt");
         OnHurt(damageInfo);
+        HurtAnim();
 
         if(CurrentHp <= 0) {
             Dead();
         }
+    }
+    protected virtual void HurtAnim()
+    {
+        DOTweenAnimMgr.Play(AnimType.Hurted, gameObject,0.5f);
     }
 
     /// <summary>
@@ -134,6 +140,7 @@ public abstract class EnemyBase : MonoBehaviour {
 
     protected void ApplyDamage(int damage) {
         if(damage <= 0) return;
+        Debug.Log("ApplyDamage: " + damage + " CurrentHp: " + CurrentHp);
         CurrentHp -= damage;
     }
 

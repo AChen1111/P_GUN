@@ -178,6 +178,10 @@ public abstract class Gun : ViewController {
     /// </summary>
     protected virtual PlayerBullet GetBullet(Vector2 dir)
     {
+        Debug.Log("minMaxDamage: " + MinDamage + " " + MaxDamage);
+        Debug.Log("damage: " + Damage);
+
+        
         var obj = PlayerBulletPool.Instance.Get(
             BulletPrefab,
             BulletPrefab.transform.position,
