@@ -5,7 +5,7 @@ namespace QFramework.PG
 {
 	public partial class GameUI
 	{
-		public UnityEngine.UI.Text BulletBugText;
+		public UnityEngine.UI.Text BulletBagText;
 		
 		public UnityEngine.UI.Text BulletText;
 		

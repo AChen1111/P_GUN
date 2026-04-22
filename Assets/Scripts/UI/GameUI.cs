@@ -8,7 +8,6 @@ namespace QFramework.PG {
         [Header("UI元素")]
         public GameObject WinPanel;
         public GameObject OverPanel;
-        public Text HPText;
         [Header("小地图")]
         public GameObject MiniMap;
 
@@ -17,24 +16,19 @@ namespace QFramework.PG {
             WinPanel = transform.Find("WinPanel").gameObject;
             OverPanel = transform.Find("OverPanel").gameObject;
             //HPText = transform.Find("HPText").GetComponent<Text>();
-            UpdateHPText();
+            //UpdateHPText();
         }
         //订阅事件
         private void OnEnable() {
             WinPanel.transform.Find("BtnReset").GetComponent<Button>().onClick.AddListener(ResetGame);
             OverPanel.transform.Find("BtnReset").GetComponent<Button>().onClick.AddListener(ResetGame);
-            Global.OnHPChange += UpdateHPText;
         }
         //取消订阅事件
         private void OnDisable() {
             WinPanel.transform.Find("BtnReset").GetComponent<Button>().onClick.RemoveListener(ResetGame);
             OverPanel.transform.Find("BtnReset").GetComponent<Button>().onClick.RemoveListener(ResetGame);
-            Global.OnHPChange -= UpdateHPText;
         }
         //更新HP文本
-        private void UpdateHPText() {
-            HPText.text = "HP: " + Global.HP;
-        }
 
         public void ResetGame()
         {
@@ -101,12 +95,12 @@ namespace QFramework.PG {
             ///如果子弹袋最大子弹数为-1，则不显示
             if(bulletBag.maxBullet == -1) 
             {
-                BulletBugText.gameObject.SetActive(false);
+                BulletBagText.gameObject.SetActive(false);
                 return;
             }
-            BulletBugText.gameObject.SetActive(true);
+            BulletBagText.gameObject.SetActive(true);
             string text = $"({bulletBag.currentBullet}/{bulletBag.maxBullet})";
-            BulletBugText.text = text;
+            BulletBagText.text = text;
         }
 
         public void ShowMessageOnPlayerHead(string message,float duration)

@@ -133,6 +133,8 @@ public abstract class Gun : ViewController {
     /// </summary>
     public virtual void OnGunUsed()
     {
+        if (GameUI.Instance == null) return;
+
         if (BulletBag != null) GameUI.Instance.UpdateBulletBagText(BulletBag);
         gunClip?.OnGunUsed();
     }

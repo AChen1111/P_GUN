@@ -52,12 +52,15 @@ namespace QFramework.PG {
             rb = GetComponent<Rigidbody2D>();
             ResolveAnimator();
 
-            gun.Hide();
-            gun = guns[0];
-            gun.Show();
+            SelectInitialGun();
 
             _autoAimRefreshWait = new WaitForSeconds(AutoAimRefreshInterval);
             StartCoroutine(AutoAimRefreshRoutine());
+        }
+
+        void Start()
+        {
+            gun?.OnGunUsed();
         }
 
         void OnDestroy()
@@ -282,6 +285,27 @@ namespace QFramework.PG {
 
                 yield return _autoAimRefreshWait;
             }
+        }
+
+        void SelectInitialGun()
+        {
+            if (guns == null || guns.Count == 0)
+            {
+                gun = null;
+                return;
+            }
+
+            currentGunIndex = Mathf.Clamp(currentGunIndex, 0, guns.Count - 1);
+            for (int i = 0; i < guns.Count; i++)
+            {
+                if (guns[i] == null) continue;
+                if (i == currentGunIndex)
+                    guns[i].Show();
+                else
+                    guns[i].Hide();
+            }
+
+            gun = guns[currentGunIndex];
         }
 
         ///<summary>

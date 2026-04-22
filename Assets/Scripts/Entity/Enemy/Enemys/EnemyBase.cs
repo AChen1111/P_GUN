@@ -3,6 +3,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using QFramework.PG;
 using QFramework;
+using DG.Tweening;
 
 /// <summary>
 /// 敌人基类
@@ -29,6 +30,8 @@ public abstract class EnemyBase : MonoBehaviour {
     [SerializeField] Rigidbody2D rb;
     [SerializeField] Collider2D col;
     [SerializeField] AudioSource audioSource;
+    Color defaultSpriteColor = Color.white;
+    bool hasDefaultSpriteColor;
 
     [Header("所属房间")]
     public FightRoom OwnerFightRoom;
@@ -61,9 +64,12 @@ public abstract class EnemyBase : MonoBehaviour {
     private void Awake() {
         ///初始化组件
         sr = GetComponent<SpriteRenderer>();
+        if (sr == null)
+            sr = GetComponentInChildren<SpriteRenderer>();
         rb = GetComponent<Rigidbody2D>();
         col = GetComponent<Collider2D>();
         audioSource = GetComponent<AudioSource>();
+        CaptureDefaultVisualState();
         gameObject.tag = "Enemy";
         ResetRuntimeState();
     }
@@ -114,6 +120,7 @@ public abstract class EnemyBase : MonoBehaviour {
     }
     protected virtual void HurtAnim()
     {
+        ResetVisualState();
         DOTweenAnimMgr.Play(AnimType.Hurted, gameObject,0.5f);
     }
 
@@ -159,6 +166,7 @@ public abstract class EnemyBase : MonoBehaviour {
     /// </summary>
     public void PrepareForPoolRelease() {
         StopMove();
+        ResetVisualState();
         OwnerFightRoom = null;
     }
 
@@ -171,9 +179,32 @@ public abstract class EnemyBase : MonoBehaviour {
         CurrentHp = MaxHp;
         FSM.Clear();
         StopMove();
+        ResetVisualState();
 
         if(col != null) {
             col.enabled = true;
+        }
+    }
+
+    private void CaptureDefaultVisualState() {
+        if(sr == null) return;
+
+        defaultSpriteColor = sr.color;
+        hasDefaultSpriteColor = true;
+    }
+
+    private void ResetVisualState() {
+        transform.DOKill(false);
+
+        if(sr == null) return;
+
+        sr.DOKill(false);
+        if(hasDefaultSpriteColor)
+            sr.color = defaultSpriteColor;
+        else {
+            var color = sr.color;
+            color.a = 1f;
+            sr.color = color;
         }
     }
 

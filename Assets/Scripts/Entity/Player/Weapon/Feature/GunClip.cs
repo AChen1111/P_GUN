@@ -14,7 +14,6 @@ namespace QFramework.PG {
         {
             this.maxAmmo = maxAmmo;
             currentAmmo = maxAmmo;
-            UpdateUI();
         }
 
         /// <summary>
@@ -85,6 +84,7 @@ namespace QFramework.PG {
 
         private void UpdateUI()
         {
+            if (GameUI.Instance == null) return;
             GameUI.Instance.UpdateBulletText(this);
         }
 
