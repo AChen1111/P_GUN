@@ -125,14 +125,8 @@ namespace QFramework.PG {
                 }
             }
 
-            if(isSleep && rb.velocity.magnitude > 0.01f) {
-                isSleep = false;
-                if (animator != null)
-                {
-                    animator.SetBool("Sleep", false);
-                    sleepTimer = 0f;
-                }
-            }
+            if (isSleep && (rb.velocity.magnitude > 0.01f || InputCheck.IsAnyKeyHeld()))
+                ExitSleepState();
             #endregion
 
             
@@ -146,28 +140,34 @@ namespace QFramework.PG {
                 sr.flipX = false;
             }
 
-            //按下
-            if(Input.GetMouseButtonDown(0)) {
+            HandleCombatInput(dir);
+        }
+
+        void ExitSleepState()
+        {
+            if (!isSleep) return;
+            isSleep = false;
+            sleepTimer = 0f;
+            if (animator != null)
+                animator.SetBool("Sleep", false);
+        }
+
+        void HandleCombatInput(Vector2 dir)
+        {
+            if (Input.GetMouseButtonDown(0))
                 gun.ShootDown(dir);
-            }
-            
-            //抬起
-            if(Input.GetMouseButtonUp(0)) {
+
+            if (Input.GetMouseButtonUp(0))
                 gun.ShootUp(dir);
-            }
 
-            //按住
-            if(Input.GetMouseButton(0)) {
+            if (Input.GetMouseButton(0))
                 gun.Shooting(dir);
-            }
 
-            //换子弹
-            if(Input.GetKeyDown(KeyCode.R)) {
+            if (Input.GetKeyDown(KeyCode.R))
                 gun.Reload();
-            }
 
-            //前一把枪
-            if(Input.GetKeyDown(KeyCode.Q)) {
+            if (Input.GetKeyDown(KeyCode.Q))
+            {
                 gun.Hide();
                 currentGunIndex = (currentGunIndex - 1 + guns.Count) % guns.Count;
                 gun = guns[currentGunIndex];
@@ -175,8 +175,8 @@ namespace QFramework.PG {
                 gun.OnGunUsed();
             }
 
-            //后一把枪
-            if(Input.GetKeyDown(KeyCode.E)) {
+            if (Input.GetKeyDown(KeyCode.E))
+            {
                 gun.Hide();
                 currentGunIndex = (currentGunIndex + 1) % guns.Count;
                 gun = guns[currentGunIndex];
@@ -184,14 +184,11 @@ namespace QFramework.PG {
                 gun.OnGunUsed();
             }
 
-            if(Input.GetKeyDown(KeyCode.Tab)) {
+            if (Input.GetKeyDown(KeyCode.Tab))
                 SwitchAutoAim();
-            }
 
-            if(Input.GetKeyDown(KeyCode.M))
-            {
+            if (Input.GetKeyDown(KeyCode.M))
                 GameUI.Instance.SwicthMinMapState();
-            }
         }
 
         public void Hurt() {
@@ -209,7 +206,7 @@ namespace QFramework.PG {
             //受击免疫
             canHurt = false;
             DOTweenAnimMgr.Play(
-                AnimType.Blink, gameObject,
+                AnimType.Hurted, gameObject,1f,
                 onComplete:()=>{
                     canHurt = true;
             }

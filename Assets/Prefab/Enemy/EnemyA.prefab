@@ -48,8 +48,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b6b57c42bf8aba2408dd054b77b5e168, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MaxHp: 3
-  CurrentHp: 3
+  MaxHp: 10
+  CurrentHp: 10
   MoveSpeed: 2.5
   isDead: 0
   sr: {fileID: 8116403503347937743}

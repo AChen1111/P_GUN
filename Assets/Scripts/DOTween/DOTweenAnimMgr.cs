@@ -18,6 +18,8 @@ public class DOTweenAnimMgr : MonoBehaviour
     const float BlinkMinAlpha = 0.35f;
     /// <summary>闪烁循环次数：每次含「变暗 + 恢复」两段。</summary>
     const int BlinkSteps = 4;
+    /// <summary>受击泛红时 G/B 通道相对原色的缩放（越小越红）。</summary>
+    const float HurtTintGbScale = 0.28f;
     /// <summary>默认执行时间</summary>
     const float DefaultDuration = 3f;
     /// <summary>
@@ -47,6 +49,9 @@ public class DOTweenAnimMgr : MonoBehaviour
                 break;
             case AnimType.Shake:
                 PlayShake(target, duration, onComplete);
+                break;
+            case AnimType.Hurted:
+                PlayHurted(target, duration, onComplete);
                 break;
             default:
                 onComplete?.Invoke();
@@ -121,6 +126,45 @@ public class DOTweenAnimMgr : MonoBehaviour
             .OnComplete(() => onComplete?.Invoke());
         tween.Play();
     }
+
+    /// <summary>
+    /// 受击：SpriteRenderer 同步「泛红」与「透明度闪烁」，结束强制还原为播放前颜色且 alpha=1。
+    /// </summary>
+    static void PlayHurted(GameObject target, float duration = DefaultDuration, Action onComplete = null)
+    {
+        var sr = target.GetComponentInChildren<SpriteRenderer>();
+        if (sr != null)
+        {
+            sr.DOKill(false);
+
+            Color orig = sr.color;
+            Color redTint = new Color(1f, orig.g * HurtTintGbScale, orig.b * HurtTintGbScale, orig.a);
+
+            float step = duration / (BlinkSteps * 2f);
+            var seq = DOTween.Sequence();
+            for (int i = 0; i < BlinkSteps; i++)
+            {
+                seq.Append(sr.DOColor(redTint, step));
+                seq.Join(sr.DOFade(BlinkMinAlpha, step));
+                seq.Append(sr.DOColor(orig, step));
+                seq.Join(sr.DOFade(1f, step));
+            }
+
+            seq.SetUpdate(true);
+            seq.OnComplete(() =>
+            {
+                var c = orig;
+                c.a = 1f;
+                sr.color = c;
+                onComplete?.Invoke();
+            });
+            seq.Play();
+            return;
+        }
+
+        Debug.LogWarning($"[DOTweenAnimMgr] Hurted：未找到 SpriteRenderer：{target.name}");
+        onComplete?.Invoke();
+    }
 }
 
 
@@ -136,4 +180,6 @@ public enum AnimType
     Jump,
     /// <summary>位置抖动。</summary>
     Shake,
+    /// <summary>受击动画。</summary>
+    Hurted,
 }
