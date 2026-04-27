@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System;
 using UnityEngine;
 
 public abstract class FightRoom : Room
@@ -8,6 +9,9 @@ public abstract class FightRoom : Room
 
     [Header("是否已进入过房间")]
     [SerializeField] private bool hasEnter = false;
+    
+    [Header("战斗结束效果（SO）")]
+    [SerializeField] private List<FightRoomEndEffectSO> fightEndEffects = new List<FightRoomEndEffectSO>();
 
     private static HashSet<EnemyBase> enemyList = new HashSet<EnemyBase>();
     
@@ -143,6 +147,7 @@ public abstract class FightRoom : Room
         {
             remainWaveCount = 0;
             OnFightAllWavesEnd();
+            ExecuteFightEndEffects();
             foreach (var door in doorsList)
             {
                 door.OpenDoor(true);
@@ -151,6 +156,25 @@ public abstract class FightRoom : Room
         }
 
         StartNextWave();
+    }
+
+    private void ExecuteFightEndEffects()
+    {
+        if (fightEndEffects == null || fightEndEffects.Count == 0) return;
+
+        foreach (var effect in fightEndEffects)
+        {
+            if (effect == null) continue;
+
+            try
+            {
+                effect.Execute(this);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogException(ex, this);
+            }
+        }
     }
 
 
