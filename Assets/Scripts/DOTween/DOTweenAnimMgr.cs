@@ -53,6 +53,9 @@ public class DOTweenAnimMgr : MonoBehaviour
             case AnimType.Hurted:
                 PlayHurted(target, duration, onComplete);
                 break;
+            case AnimType.Scale0To1:
+                PlayScale0To1(target, duration, onComplete);
+                break;
             default:
                 onComplete?.Invoke();
                 break;
@@ -165,6 +168,20 @@ public class DOTweenAnimMgr : MonoBehaviour
         Debug.LogWarning($"[DOTweenAnimMgr] Hurted：未找到 SpriteRenderer：{target.name}");
         onComplete?.Invoke();
     }
+
+    /// <summary>
+    /// 缩放：从 0 放大到 1，常用于生成/出现动画。
+    /// </summary>
+    static void PlayScale0To1(GameObject target, float duration = DefaultDuration, Action onComplete = null)
+    {
+        var t = target.transform;
+        t.localScale = Vector3.zero;
+        t.DOScale(Vector3.one, duration)
+            .SetEase(Ease.OutBack)
+            .SetUpdate(true)
+            .OnComplete(() => onComplete?.Invoke())
+            .Play();
+    }
 }
 
 
@@ -182,4 +199,6 @@ public enum AnimType
     Shake,
     /// <summary>受击动画。</summary>
     Hurted,
+    /// <summary>缩放从 0 到 1。</summary>
+    Scale0To1,
 }

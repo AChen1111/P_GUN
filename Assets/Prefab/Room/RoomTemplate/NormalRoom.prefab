@@ -3008,8 +3008,11 @@ MonoBehaviour:
   needGenerateDoors: 0
   doorPrefab: {fileID: 4627585393492876397, guid: c7feca4fad691424783ee926ca98c9ae, type: 3}
   doorStateIsOpen: 1
+  roomCenterPoint: {fileID: 0}
   waveCount: 3
   hasEnter: 0
+  fightEndEffects:
+  - {fileID: 11400000, guid: fc94f875d23839747ab662510e4204c2, type: 2}
   enemyPrefab: {fileID: 1354463150124662322, guid: 5997eda64fd4b9e46ab562272521a078, type: 3}
   enemyPoints:
   - {fileID: 17797752623052620}

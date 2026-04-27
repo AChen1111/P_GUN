@@ -15,6 +15,9 @@ public abstract class Room : MonoBehaviour
 	[SerializeField] private Door doorPrefab;
 	[SerializeField] protected bool doorStateIsOpen = true;
 
+	[Header("房间中心点")]
+	[SerializeField] private Transform roomCenterPoint;
+
 	private bool doorsGenerated;
 	protected List<Door> doorsList = new List<Door>();
 
@@ -155,6 +158,11 @@ public abstract class Room : MonoBehaviour
 		}
 	}
 
+	public Vector3 GetRoomCenterPoint()
+	{
+		if(roomCenterPoint == null) return transform.position;
+		return roomCenterPoint.position;
+	}
 
 
 	private void Reset() {

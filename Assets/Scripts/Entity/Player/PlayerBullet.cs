@@ -79,7 +79,7 @@ public class PlayerBullet : MonoBehaviour {
 
             if(audioSource != null) {
                 GlobalAudioPlay.Instance.PlayerAudioSourceByClip(WeaponGlobal.Instance.hitSoundOnBody);
-                Debug.Log("audioSource is not null__");
+                //Debug.Log("audioSource is not null__");
             }
             else
             {

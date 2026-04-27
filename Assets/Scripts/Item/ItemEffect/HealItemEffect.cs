@@ -15,18 +15,16 @@ namespace QFramework.PG
             var player = Global.player;
             if (player == null) return;
 
-            var itemName = ctx.SourceItem != null && !string.IsNullOrEmpty(ctx.SourceItem.itemKey)
-                ? ctx.SourceItem.itemKey
-                : "回血道具";
+            var itemName = ctx.SourceObject != null ? ctx.SourceObject.name : "回血道具";
 
             if (player.IsHPFull)
             {
-                GameUI.Instance.ShowMessageOnPlayerHead($"{itemName}：生命已满", 1.5f);
+                GameUI.Instance.ShowMessageOnPlayerHead($"生命已满", 1.5f);
                 return;
             }
 
             var healedAmount = player.Heal(healAmount);
-            GameUI.Instance.ShowMessageOnPlayerHead($"{itemName}：恢复 {healedAmount} 点生命", 1.5f);
+            GameUI.Instance.ShowMessageOnPlayerHead($"恢复 {healedAmount} 点生命", 1.5f);
         }
     }
 }
