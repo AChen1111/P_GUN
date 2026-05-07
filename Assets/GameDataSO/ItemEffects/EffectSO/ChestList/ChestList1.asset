@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: ChestList1
   m_EditorClassIdentifier: 
   lootTable:
-  - {fileID: 3440593063909591598, guid: 16dfbae114f45dd4493adf832f7eb099, type: 3}
+  - {fileID: 5069590999830702722, guid: a4f46db2f0b85564a81ad43c4f0b8880, type: 3}

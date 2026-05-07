@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using UnityEditor;
 using UnityEngine;
 
@@ -52,7 +53,7 @@ public static class ItemCSVImporter
         var items = new List<ItemData>();
         var lineNumber = 0;
 
-        foreach (var line in File.ReadLines(csvPath))
+        foreach (var line in ReadCsvLines(csvPath))
         {
             lineNumber++;
             if (string.IsNullOrWhiteSpace(line)) continue;
@@ -76,6 +77,62 @@ public static class ItemCSVImporter
         }
 
         return items;
+    }
+
+    private static IEnumerable<string> ReadCsvLines(string csvPath)
+    {
+        using var stream = new FileStream(csvPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
+        using var reader = new StreamReader(stream, DetectEncoding(stream), detectEncodingFromByteOrderMarks: true);
+
+        while (!reader.EndOfStream)
+        {
+            yield return reader.ReadLine();
+        }
+    }
+
+    private static Encoding DetectEncoding(FileStream stream)
+    {
+        var buffer = new byte[Mathf.Min(4096, (int)stream.Length)];
+        var bytesRead = stream.Read(buffer, 0, buffer.Length);
+        stream.Position = 0;
+
+        if (bytesRead >= 3 && buffer[0] == 0xEF && buffer[1] == 0xBB && buffer[2] == 0xBF)
+        {
+            return Encoding.UTF8;
+        }
+
+        if (bytesRead >= 2 && buffer[0] == 0xFF && buffer[1] == 0xFE)
+        {
+            return Encoding.Unicode;
+        }
+
+        if (bytesRead >= 2 && buffer[0] == 0xFE && buffer[1] == 0xFF)
+        {
+            return Encoding.BigEndianUnicode;
+        }
+
+        var strictUtf8 = new UTF8Encoding(false, true);
+        try
+        {
+            strictUtf8.GetString(buffer, 0, bytesRead);
+            return Encoding.UTF8;
+        }
+        catch (DecoderFallbackException)
+        {
+            return GetChineseEncoding();
+        }
+    }
+
+    private static Encoding GetChineseEncoding()
+    {
+        try
+        {
+            return Encoding.GetEncoding("GB18030");
+        }
+        catch
+        {
+            return Encoding.Default;
+        }
     }
 
     private static List<string> ParseCsvLine(string line)
