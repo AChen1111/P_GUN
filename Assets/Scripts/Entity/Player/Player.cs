@@ -55,7 +55,6 @@ public class Player : ViewController
     
     public int MaxHP => Mathf.Max(0, maxHp);
     public bool IsHPFull => HP >= MaxHP;
-    public event Action OnHPChange;
 
     void Awake()
     {
@@ -211,7 +210,7 @@ public class Player : ViewController
             SwitchAutoAim();
 
         if (Input.GetKeyDown(KeyCode.M))
-            GameUI.Instance.SwicthMinMapState();
+            EventCenter.Trigger(GameEvent.MiniMapToggleRequested);
     }
 
     public void Hurt() {
@@ -227,10 +226,10 @@ public class Player : ViewController
 
         //扣血判断
         HP = Mathf.Max(0, HP - Mathf.Max(1, damageInfo.Damage));
-        OnHPChange?.Invoke();
+        PublishHPChanged();
 
         if(HP <= 0) {
-            GameUI.Instance.ShowOverPanel();
+            EventCenter.Trigger(GameEvent.PlayerDied);
             return;
         }
 
@@ -247,7 +246,7 @@ public class Player : ViewController
 
     public void Restart() {
         HP = MaxHP;
-        OnHPChange?.Invoke();
+        PublishHPChanged();
     }
 
     public int Heal(int amount)
@@ -256,8 +255,13 @@ public class Player : ViewController
 
         var oldHp = HP;
         HP = Mathf.Min(MaxHP, HP + amount);
-        OnHPChange?.Invoke();
+        PublishHPChanged();
         return HP - oldHp;
+    }
+
+    private void PublishHPChanged()
+    {
+        EventCenter.Trigger(GameEvent.PlayerHPChanged, this);
     }
 
 

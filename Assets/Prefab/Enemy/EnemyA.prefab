@@ -57,7 +57,7 @@ MonoBehaviour:
   col: {fileID: 798435715286779976}
   audioSource: {fileID: 8042861452943358869}
   OwnerFightRoom: {fileID: 0}
-  bulletPrefab: {fileID: 7189879553000536, guid: 10e246e394d07ef4ea3fe43c6de534c0, type: 3}
+  bulletPrefab: {fileID: 0}
   shootSounds:
   - {fileID: 8300000, guid: d6a1e1dba80eb484386bf50f97ec2560, type: 3}
   - {fileID: 8300000, guid: 4ce72a5102c96ac449defd59e5a058c4, type: 3}

@@ -2006,20 +2006,12 @@ MonoBehaviour:
     DoorLines: []
   ManualDoorModeData:
     DoorsList:
-    - From: {x: -1, y: -1, z: 0}
-      To: {x: -1, y: -1, z: 0}
+    - From: {x: 14, y: 0, z: 0}
+      To: {x: 14, y: -1, z: 0}
       Direction: 0
       Socket: {fileID: 0}
     - From: {x: -1, y: 0, z: 0}
-      To: {x: -1, y: 0, z: 0}
-      Direction: 0
-      Socket: {fileID: 0}
-    - From: {x: 14, y: 0, z: 0}
-      To: {x: 14, y: 0, z: 0}
-      Direction: 0
-      Socket: {fileID: 0}
-    - From: {x: 14, y: -1, z: 0}
-      To: {x: 14, y: -1, z: 0}
+      To: {x: -1, y: -1, z: 0}
       Direction: 0
       Socket: {fileID: 0}
   SimpleDoorModeData:

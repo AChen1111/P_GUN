@@ -87,7 +87,7 @@ public virtual void Shoot(Vector2 dir)
 {
     if(gunClip.IsOutOfAmmo)
     {
-        GameUI.Instance.ShowMessageOnPlayerHead("没有子弹", 2f);
+        EventCenter.Trigger(GameEvent.PlayerHeadMessageRequested, new PlayerHeadMessageEvent("没有子弹", 2f));
         return;
     }
     GetBullet(dir);
@@ -101,7 +101,7 @@ public virtual void Reload()
     if (bulletBag == null || gunClip == null) return;
     if (gunClip.IsOutOfAmmo && !bulletBag.HasBullet)
     {
-        GameUI.Instance.ShowMessageOnPlayerHead("没有子弹", 2f);
+        EventCenter.Trigger(GameEvent.PlayerHeadMessageRequested, new PlayerHeadMessageEvent("没有子弹", 2f));
         return;
     }
     bulletBag.Reload(gunClip, ReloadSound);
@@ -132,9 +132,7 @@ public void Hide()
 /// </summary>
 public virtual void OnGunUsed()
 {
-    if (GameUI.Instance == null) return;
-
-    if (BulletBag != null) GameUI.Instance.UpdateBulletBagText(BulletBag);
+    if (BulletBag != null) EventCenter.Trigger(GameEvent.BulletBagChanged, BulletBag);
     gunClip?.OnGunUsed();
 }
 

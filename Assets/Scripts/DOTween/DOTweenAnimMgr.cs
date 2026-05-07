@@ -73,7 +73,7 @@ public class DOTweenAnimMgr : MonoBehaviour
     }
 
     /// <summary>
-    /// 通过 AnimType 枚举播放（兼容旧代码，内部转换为 enum name 查字典）。
+    /// 通过 AnimType 枚举播放
     /// </summary>
     public static void Play(AnimType type, GameObject target, float duration = DefaultDuration, Action onComplete = null)
     {

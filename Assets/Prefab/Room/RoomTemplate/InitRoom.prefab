@@ -2450,36 +2450,20 @@ MonoBehaviour:
     DoorLines: []
   ManualDoorModeData:
     DoorsList:
-    - From: {x: 4, y: -1, z: 0}
+    - From: {x: 4, y: 0, z: 0}
       To: {x: 4, y: -1, z: 0}
       Direction: 0
       Socket: {fileID: 0}
-    - From: {x: -2, y: 4, z: 0}
-      To: {x: -2, y: 4, z: 0}
-      Direction: 0
-      Socket: {fileID: 0}
-    - From: {x: -2, y: -5, z: 0}
-      To: {x: -2, y: -5, z: 0}
-      Direction: 0
-      Socket: {fileID: 0}
-    - From: {x: -7, y: -1, z: 0}
+    - From: {x: -7, y: 0, z: 0}
       To: {x: -7, y: -1, z: 0}
       Direction: 0
       Socket: {fileID: 0}
-    - From: {x: 4, y: 0, z: 0}
-      To: {x: 4, y: 0, z: 0}
-      Direction: 0
-      Socket: {fileID: 0}
-    - From: {x: -1, y: 4, z: 0}
+    - From: {x: -2, y: 4, z: 0}
       To: {x: -1, y: 4, z: 0}
       Direction: 0
       Socket: {fileID: 0}
-    - From: {x: -1, y: -5, z: 0}
+    - From: {x: -2, y: -5, z: 0}
       To: {x: -1, y: -5, z: 0}
-      Direction: 0
-      Socket: {fileID: 0}
-    - From: {x: -7, y: 0, z: 0}
-      To: {x: -7, y: 0, z: 0}
       Direction: 0
       Socket: {fileID: 0}
   SimpleDoorModeData:
