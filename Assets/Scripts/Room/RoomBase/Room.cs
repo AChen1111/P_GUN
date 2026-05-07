@@ -95,34 +95,24 @@ public abstract class Room : MonoBehaviour
 		{
 			return result;
 		}
+		
+		Debug.Log($"房间 {gameObject.name} Edgar门数量: {roomInfo.RoomInstance.Doors.Count}");
 
-
-		//遍历Edgar插件中的门
+		var addedTiles = new HashSet<Vector3Int>();
 		foreach (var door in roomInfo.RoomInstance.Doors)
 		{
-			//获取门的位置
-			var points = door.DoorLine.GetPoints();
-			var localSum = Vector3.zero;
-			var count = 0;
-
-			//遍历门的位置
-			foreach (var point in points)
+			foreach (var point in door.DoorLine.GetPoints())
 			{
-				//计算门的位置
-				localSum += new Vector3(point.x + 0.5f, point.y + 0.5f, 0f);
-				//计数
-				count++;
+				var tile = new Vector3Int(point.x, point.y, point.z);
+				if (!addedTiles.Add(tile)) continue;
+
+				var localCenter = new Vector3(tile.x + 0.5f, tile.y + 0.5f, 0f);
+				var worldCenter = roomTemplateInstance.transform.TransformPoint(localCenter);
+				result.Add(worldCenter);
 			}
-
-			if (count <= 0) continue;
-		
-			//计算门的位置
-			var localCenter = localSum / count;
-			//将门的位置转换为世界坐标
-			var worldCenter = roomTemplateInstance.transform.TransformPoint(localCenter);
-			result.Add(worldCenter);
 		}
-
+		
+		Debug.Log($"房间 {gameObject.name} 生成门位: {result.Count}");
 		return result;
 	}
 

@@ -11,6 +11,7 @@ public enum GameEvent
     PlayerDied,
     GameWin,
     GameOver,
+    MiniMapToggleRequested,
     MiniMapShown,
     MiniMapHidden,
     ItemTipShown,
@@ -18,9 +19,24 @@ public enum GameEvent
     ItemPicked,
     ItemSpawned,
     ItemRemoved,
+    BulletClipChanged,
+    BulletBagChanged,
+    PlayerHeadMessageRequested,
     DoorOpened,
     DoorClosed,
     AllRoomsGenerated
+}
+
+public struct PlayerHeadMessageEvent
+{
+    public string Message;
+    public float Duration;
+
+    public PlayerHeadMessageEvent(string message, float duration)
+    {
+        Message = message;
+        Duration = duration;
+    }
 }
 
 public static class EventCenter

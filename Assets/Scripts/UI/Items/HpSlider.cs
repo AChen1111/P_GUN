@@ -50,7 +50,6 @@ public class HpSlider : MonoBehaviour
     int _maxHp;
     int _currentHp;
     Player _boundPlayer;
-    bool _isSubscribedToPlayer;
     bool _hasPlayedAutoSyncInitAnimation;
     Coroutine _initAnimationCoroutine;
     Sequence _hpChangeSequence;
@@ -67,20 +66,23 @@ public class HpSlider : MonoBehaviour
     void OnEnable()
     {
         if (autoSyncGlobalHp)
+        {
+            EventCenter.AddListener<Player>(GameEvent.PlayerHPChanged, OnPlayerHPChanged);
             BindGlobalPlayer();
+        }
     }
 
     void OnDisable()
     {
         if (autoSyncGlobalHp)
-            UnbindGlobalPlayer();
+            EventCenter.RemoveListener<Player>(GameEvent.PlayerHPChanged, OnPlayerHPChanged);
 
         StopAllAnimations(false);
     }
 
     void OnDestroy()
     {
-        UnbindGlobalPlayer();
+        EventCenter.RemoveListener<Player>(GameEvent.PlayerHPChanged, OnPlayerHPChanged);
         StopAllAnimations(false);
     }
 
@@ -233,29 +235,22 @@ public class HpSlider : MonoBehaviour
     void BindGlobalPlayer()
     {
         var player = Global.player;
-        if (ReferenceEquals(_boundPlayer, player) && _isSubscribedToPlayer) return;
+        if (ReferenceEquals(_boundPlayer, player)) return;
 
-        UnbindGlobalPlayer();
         _boundPlayer = player;
         if (_boundPlayer == null) return;
 
-        _boundPlayer.OnHPChange += SyncFromPlayer;
-        _isSubscribedToPlayer = true;
         SyncFromPlayer(!_hasPlayedAutoSyncInitAnimation);
         _hasPlayedAutoSyncInitAnimation = true;
     }
 
-    void UnbindGlobalPlayer()
+    void OnPlayerHPChanged(Player player)
     {
-        if (_boundPlayer != null && _isSubscribedToPlayer)
-            _boundPlayer.OnHPChange -= SyncFromPlayer;
+        if (!autoSyncGlobalHp) return;
 
-        _boundPlayer = null;
-        _isSubscribedToPlayer = false;
-    }
+        if (player != null && !ReferenceEquals(_boundPlayer, player))
+            _boundPlayer = player;
 
-    void SyncFromPlayer()
-    {
         SyncFromPlayer(false);
     }
 

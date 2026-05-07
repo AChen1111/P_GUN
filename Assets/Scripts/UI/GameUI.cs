@@ -25,17 +25,29 @@ public class GameUI : ViewController {
         Instance = this;
         ResolveItemTipPanel();
     }
+
     //订阅事件
     private void OnEnable() {
-        WinPanel.transform.Find("BtnReset").GetComponent<Button>().onClick.AddListener(ResetGame);
-        OverPanel.transform.Find("BtnReset").GetComponent<Button>().onClick.AddListener(ResetGame);
+        AddButtonListeners();
+        AddEventListeners();
     }
+
     //取消订阅事件
     private void OnDisable() {
-        WinPanel.transform.Find("BtnReset").GetComponent<Button>().onClick.RemoveListener(ResetGame);
-        OverPanel.transform.Find("BtnReset").GetComponent<Button>().onClick.RemoveListener(ResetGame);
+        RemoveButtonListeners();
+        RemoveEventListeners();
     }
-    //更新HP文本
+
+    private void OnDestroy()
+    {
+        RemoveButtonListeners();
+        RemoveEventListeners();
+
+        if (Instance == this)
+        {
+            Instance = null;
+        }
+    }
 
     public void ResetGame()
     {
@@ -58,10 +70,12 @@ public class GameUI : ViewController {
     public void ShowMiniMap()
     {
         MiniMap.SetActive(true);
+        EventCenter.Trigger(GameEvent.MiniMapShown);
     }
     public void HideMiniMap()
     {
         MiniMap.SetActive(false);
+        EventCenter.Trigger(GameEvent.MiniMapHidden);
     }
 
     public void SwicthMinMapState()
@@ -138,5 +152,46 @@ public class GameUI : ViewController {
         {
             itemTipPanel = ItemTipPanel.CreateDefault(transform);
         }
+    }
+
+    private void AddButtonListeners()
+    {
+        WinPanel.transform.Find("BtnReset").GetComponent<Button>().onClick.AddListener(ResetGame);
+        OverPanel.transform.Find("BtnReset").GetComponent<Button>().onClick.AddListener(ResetGame);
+    }
+
+    private void RemoveButtonListeners()
+    {
+        WinPanel.transform.Find("BtnReset").GetComponent<Button>().onClick.RemoveListener(ResetGame);
+        OverPanel.transform.Find("BtnReset").GetComponent<Button>().onClick.RemoveListener(ResetGame);
+    }
+
+    private void AddEventListeners()
+    {
+        EventCenter.AddListener(GameEvent.GameWin, ShowWinPanel);
+        EventCenter.AddListener(GameEvent.PlayerDied, ShowOverPanel);
+        EventCenter.AddListener(GameEvent.MiniMapToggleRequested, SwicthMinMapState);
+        EventCenter.AddListener<ItemData>(GameEvent.ItemTipShown, ShowItemTip);
+        EventCenter.AddListener(GameEvent.ItemTipHidden, HideItemTip);
+        EventCenter.AddListener<GunClip>(GameEvent.BulletClipChanged, UpdateBulletText);
+        EventCenter.AddListener<BulletBag>(GameEvent.BulletBagChanged, UpdateBulletBagText);
+        EventCenter.AddListener<PlayerHeadMessageEvent>(GameEvent.PlayerHeadMessageRequested, OnPlayerHeadMessageRequested);
+    }
+
+    private void RemoveEventListeners()
+    {
+        EventCenter.RemoveListener(GameEvent.GameWin, ShowWinPanel);
+        EventCenter.RemoveListener(GameEvent.PlayerDied, ShowOverPanel);
+        EventCenter.RemoveListener(GameEvent.MiniMapToggleRequested, SwicthMinMapState);
+        EventCenter.RemoveListener<ItemData>(GameEvent.ItemTipShown, ShowItemTip);
+        EventCenter.RemoveListener(GameEvent.ItemTipHidden, HideItemTip);
+        EventCenter.RemoveListener<GunClip>(GameEvent.BulletClipChanged, UpdateBulletText);
+        EventCenter.RemoveListener<BulletBag>(GameEvent.BulletBagChanged, UpdateBulletBagText);
+        EventCenter.RemoveListener<PlayerHeadMessageEvent>(GameEvent.PlayerHeadMessageRequested, OnPlayerHeadMessageRequested);
+    }
+
+    private void OnPlayerHeadMessageRequested(PlayerHeadMessageEvent payload)
+    {
+        ShowMessageOnPlayerHead(payload.Message, payload.Duration);
     }
 }

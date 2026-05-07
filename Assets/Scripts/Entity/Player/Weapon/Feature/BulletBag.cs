@@ -41,8 +41,7 @@ public class BulletBag
             currentBullet -= needBullet;
         }
 
-        if (GameUI.Instance != null)
-            GameUI.Instance.UpdateBulletBagText(this);
+        EventCenter.Trigger(GameEvent.BulletBagChanged, this);
         gunClip.Reload(reloadSound);
     }
 

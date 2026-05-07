@@ -13,15 +13,13 @@ public class HealItemEffect : ItemEffectBase
         var player = Global.player;
         if (player == null) return;
 
-        var itemName = ctx.SourceObject != null ? ctx.SourceObject.name : "回血道具";
-
         if (player.IsHPFull)
         {
-            GameUI.Instance.ShowMessageOnPlayerHead($"生命已满", 1.5f);
+            EventCenter.Trigger(GameEvent.PlayerHeadMessageRequested, new PlayerHeadMessageEvent("生命已满", 1.5f));
             return;
         }
 
         var healedAmount = player.Heal(healAmount);
-        GameUI.Instance.ShowMessageOnPlayerHead($"恢复 {healedAmount} 点生命", 1.5f);
+        EventCenter.Trigger(GameEvent.PlayerHeadMessageRequested, new PlayerHeadMessageEvent($"恢复 {healedAmount} 点生命", 1.5f));
     }
 }

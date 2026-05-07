@@ -123,6 +123,7 @@ public class Item : MonoBehaviour
         hasPicked = true;
         isActive = false;
         HideTip();
+        EventCenter.Trigger(GameEvent.ItemPicked, this);
 
         if (TryPlayAnimatorPickup())
         {
@@ -200,12 +201,12 @@ public class Item : MonoBehaviour
     private void ShowTip()
     {
         if (!isActive || hasPicked) return;
-        GameUI.Instance?.ShowItemTip(ResolveItemData());
+        EventCenter.Trigger(GameEvent.ItemTipShown, ResolveItemData());
     }
 
     private void HideTip()
     {
-        GameUI.Instance?.HideItemTip();
+        EventCenter.Trigger(GameEvent.ItemTipHidden);
     }
 
     private ItemData ResolveItemData()

@@ -92,12 +92,14 @@ public class ItemWorldManager : MonoBehaviour
     {
         if (item == null) return;
         items.Remove(item);
+        EventCenter.Trigger(GameEvent.ItemRemoved, item);
     }
 
     public void AddItem(Item item)
     {
         if (item == null) return;
         items.Add(item);
+        EventCenter.Trigger(GameEvent.ItemSpawned, item);
     }
 
 

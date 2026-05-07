@@ -51,13 +51,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1321d3787141db4498a5b67ff3a1282c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Namespace: 
+  Namespace: QFramework.Example
   ScriptName: Player
   ScriptsFolder: Assets\Scripts\Entity\Player
   GeneratePrefab: 0
   PrefabFolder: Assets/Prefab
   ArchitectureFullTypeName: 
   ViewControllerFullTypeName: 
+  DisPlayText: {fileID: 7341739048906739580}
   sr: {fileID: 8980726362857158556}
   moveSpeed: 5
   maxHp: 6
@@ -78,7 +79,6 @@ MonoBehaviour:
   canAutoAim: 0
   animator: {fileID: 5432406893568840566}
   isSleep: 0
-  DisPlayText: {fileID: 7341739048906739580}
 --- !u!50 &6481072556287412660
 Rigidbody2D:
   serializedVersion: 4
@@ -234,8 +234,8 @@ CapsuleCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: -0.035898328, y: -0.21620435}
-  m_Size: {x: 0.5261079, y: 0.78158}
+  m_Offset: {x: -0.035898328, y: -0.3755365}
+  m_Size: {x: 0.5261079, y: 1.1002442}
   m_Direction: 0
 --- !u!1 &1227615370327962422
 GameObject:
@@ -291,7 +291,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10100, guid: 0000000000000000e000000000000000, type: 0}
+  - {fileID: 2100000, guid: aa945eefd1047034399d2d189e498e7c, type: 3}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -331,7 +331,7 @@ TextMesh:
   m_FontSize: 0
   m_FontStyle: 0
   m_RichText: 1
-  m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
+  m_Font: {fileID: 12800000, guid: aa945eefd1047034399d2d189e498e7c, type: 3}
   m_Color:
     serializedVersion: 2
     rgba: 4294967295
@@ -522,6 +522,7 @@ MonoBehaviour:
   PrefabFolder: Assets/Prefab
   ArchitectureFullTypeName: 
   ViewControllerFullTypeName: 
+  GunFire: {fileID: 1927769435998211504}
   hitSoundsOnBody:
   - {fileID: 8300000, guid: 5910836691605a847a7138b387ed0bb8, type: 3}
   - {fileID: 8300000, guid: f968faf5cbe8f1049a54591745eac144, type: 3}
@@ -538,7 +539,6 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 1278784ae907ba54386d676c440244af, type: 3}
   - {fileID: 8300000, guid: 92f1dce4686c87b4e97533920e9b48c3, type: 3}
   WeaponAudioSource: {fileID: 7879520371624626488}
-  GunFire: {fileID: 1927769435998211504}
 --- !u!1 &4099332197227526820
 GameObject:
   m_ObjectHideFlags: 0

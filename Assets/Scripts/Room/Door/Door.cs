@@ -6,7 +6,6 @@ using System;
 public class Door : ViewController
 {
 	[Header("贴图")]
-	public SpriteRenderer OpenDoorSR;
 	public SpriteRenderer CloseDoorSR;
 
 	[Header("碰撞器")]
@@ -38,7 +37,6 @@ public class Door : ViewController
 	}
 	
 	private void Awake() {
-		OpenDoorSR.gameObject.SetActive(isOpen);
 		CloseDoorSR.gameObject.SetActive(!isOpen);
 	}
 
@@ -48,7 +46,6 @@ public class Door : ViewController
 	public void OpenDoor(bool playSound = false)
 	{
 		isOpen = true;
-		OpenDoorSR.gameObject.SetActive(true);
 		CloseDoorSR.gameObject.SetActive(false);
 		doorCollider.enabled = false;
 		
@@ -63,10 +60,11 @@ public class Door : ViewController
 				onComplete:
 					() => {
 						isPlayingOpenDoorSound = false;
-						//Debug.Log("开门音效播放完成");
 					}
 			);
 		}
+
+		EventCenter.Trigger(GameEvent.DoorOpened, this);
 	}
 
 	/// <summary>
@@ -75,8 +73,8 @@ public class Door : ViewController
 	public void CloseDoor()
 	{
 		isOpen = false;
-		OpenDoorSR.gameObject.SetActive(false);
 		CloseDoorSR.gameObject.SetActive(true);
 		doorCollider.enabled = true;
+		EventCenter.Trigger(GameEvent.DoorClosed, this);
 	}
 }

@@ -98,21 +98,6 @@ MonoBehaviour:
   From: {fileID: -5136948030227078473}
   To: {fileID: -6361455431359808864}
   RoomTemplates: []
---- !u!114 &-694841076380444646
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8f692f83df7c1b5468af64edd22287dc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  From: {fileID: 8951210631340891390}
-  To: {fileID: 8562655684184165390}
-  RoomTemplates: []
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -128,12 +113,10 @@ MonoBehaviour:
   Connections:
   - {fileID: 1643363292464544071}
   - {fileID: 2660976869643786672}
-  - {fileID: -694841076380444646}
   - {fileID: 5444332047428035842}
   - {fileID: 5952940353415141648}
   - {fileID: 8765129214508341302}
   - {fileID: -7029325043297288151}
-  - {fileID: 2672555786022955361}
   - {fileID: -940726087535042278}
   CorridorIndividualRoomTemplates:
   - {fileID: 6295766628286017278, guid: d12f56f144e67244f9b540d241a530e7, type: 3}
@@ -151,8 +134,8 @@ MonoBehaviour:
   - {fileID: -6361455431359808864}
   - {fileID: -5136948030227078473}
   EditorData:
-    PanOffset: {x: 118.358986, y: 106.72974}
-    Zoom: 0.96527314
+    PanOffset: {x: 80.81139, y: 100.56494}
+    Zoom: 1.0406708
   RoomType: Edgar.Unity.Room
   ConnectionType: Edgar.Unity.Connection
   IsDirected: 0
@@ -185,21 +168,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   From: {fileID: 6783212533152397431}
   To: {fileID: 8562655684184165390}
-  RoomTemplates: []
---- !u!114 &2672555786022955361
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8f692f83df7c1b5468af64edd22287dc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  From: {fileID: 8951210631340891390}
-  To: {fileID: -5136948030227078473}
   RoomTemplates: []
 --- !u!114 &3409730145676481047
 MonoBehaviour:

@@ -48,7 +48,7 @@ public class GunClip{
     {
         if(IsOutOfAmmo)
         {
-            GameUI.Instance.ShowMessageOnPlayerHead("没有备弹",2f);
+            EventCenter.Trigger(GameEvent.PlayerHeadMessageRequested, new PlayerHeadMessageEvent("没有备弹", 2f));
             GlobalAudioPlay.Instance.PlayerAudioSourceByPath("EmptyBulletSound");
             return;
         }
@@ -84,8 +84,7 @@ public class GunClip{
 
     private void UpdateUI()
     {
-        if (GameUI.Instance == null) return;
-        GameUI.Instance.UpdateBulletText(this);
+        EventCenter.Trigger(GameEvent.BulletClipChanged, this);
     }
 
     /// <summary>
