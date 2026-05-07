@@ -1,6 +1,4 @@
 using UnityEngine;
-using QFramework.PG;
-
 public class Final : MonoBehaviour {
     void Reset() {
         var collider = gameObject.AddComponent<BoxCollider2D>();

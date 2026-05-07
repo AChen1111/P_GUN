@@ -160,7 +160,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 27e9c27725044c941ac0c5b5fa9aa3cf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Namespace: QFramework.PG
+  Namespace: 
   ScriptName: Bow
   ScriptsFolder: Assets\Scripts\Entity\Player\Weapon\Gun
   GeneratePrefab: 0

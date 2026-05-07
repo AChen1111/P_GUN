@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
-using QFramework.PG;
-
 /// <summary>
 /// 心形血条：每个 heart 表示 2 点血量（full=2, half=1, empty=0）。
 /// </summary>

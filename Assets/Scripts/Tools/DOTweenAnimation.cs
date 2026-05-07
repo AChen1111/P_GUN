@@ -29,7 +29,11 @@ public class DOTweenAnimation : MonoBehaviour
 
     public void Play(Action OnComplete)
     {
-        if (isPlaying) return;
+        if (isPlaying)
+        {
+            OnComplete?.Invoke();
+            return;
+        }
 
         if (spriteRenderer == null)
         {

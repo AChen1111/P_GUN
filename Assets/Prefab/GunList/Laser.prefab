@@ -266,7 +266,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4fa81aa4d36146c4fbbf8085b4406dbd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Namespace: QFramework.PG
+  Namespace: 
   ScriptName: Laser
   ScriptsFolder: Assets\Scripts\Entity\Player\Weapon\Gun
   GeneratePrefab: 0

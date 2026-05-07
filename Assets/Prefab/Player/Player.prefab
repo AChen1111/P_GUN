@@ -11,8 +11,8 @@ GameObject:
   - component: {fileID: 2035428398984939911}
   - component: {fileID: 7553163744435906436}
   - component: {fileID: 6481072556287412660}
-  - component: {fileID: 2338258292082831370}
   - component: {fileID: -6401000781231566243}
+  - component: {fileID: 1333239103578103565}
   m_Layer: 3
   m_Name: Player
   m_TagString: Player
@@ -51,7 +51,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1321d3787141db4498a5b67ff3a1282c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Namespace: QFramework.PG
+  Namespace: 
   ScriptName: Player
   ScriptsFolder: Assets\Scripts\Entity\Player
   GeneratePrefab: 0
@@ -76,7 +76,7 @@ MonoBehaviour:
   gun: {fileID: 2374162302897725077}
   currentGunIndex: 0
   canAutoAim: 0
-  animator: {fileID: 0}
+  animator: {fileID: 5432406893568840566}
   isSleep: 0
   DisPlayText: {fileID: 7341739048906739580}
 --- !u!50 &6481072556287412660
@@ -106,41 +106,6 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 4
---- !u!58 &2338258292082831370
-CircleCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 79155860018165750}
-  m_Enabled: 1
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_ForceSendLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ForceReceiveLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ContactCaptureLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_CallbackLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_IsTrigger: 0
-  m_UsedByEffector: 0
-  m_UsedByComposite: 0
-  m_Offset: {x: 0.017772168, y: -0.11932707}
-  serializedVersion: 2
-  m_Radius: 0.2867346
 --- !u!82 &-6401000781231566243
 AudioSource:
   m_ObjectHideFlags: 0
@@ -237,6 +202,41 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!70 &1333239103578103565
+CapsuleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 79155860018165750}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: -0.035898328, y: -0.21620435}
+  m_Size: {x: 0.5261079, y: 0.78158}
+  m_Direction: 0
 --- !u!1 &1227615370327962422
 GameObject:
   m_ObjectHideFlags: 0
@@ -515,7 +515,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 788aceb07da8cb84ab2ed95639f5d3b1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Namespace: QFramework.PG
+  Namespace: 
   ScriptName: WeaponGlobal
   ScriptsFolder: Assets/Scripts/Entity/Player/Weapon/Global
   GeneratePrefab: 0
@@ -735,7 +735,7 @@ Animator:
   m_GameObject: {fileID: 5365556638450768664}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 99986c0cc49af9e46ac1e7b83779d1ed, type: 2}
+  m_Controller: {fileID: 9100000, guid: 39583c37f22c4d54f9d1a262cc07938f, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0

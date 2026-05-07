@@ -2,9 +2,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using Edgar.Unity;
 using QFramework;
-using QFramework.PG;
-
-
 public abstract class Room : MonoBehaviour
 {
 	[Header("房间碰撞器")]
@@ -171,7 +168,4 @@ public abstract class Room : MonoBehaviour
 		gameObject.tag = "Room";
 		SelfBoxCollider2D.isTrigger = true;
 	}
-}	
-
-
-
+}

@@ -1,25 +1,22 @@
 using UnityEngine;
 
-namespace QFramework.PG
+/// <summary>
+/// Test script: logs "OKKK" when all rooms are generated.
+/// </summary>
+public class AllRoomsGeneratedTester : MonoBehaviour
 {
-    /// <summary>
-    /// Test script: logs "OKKK" when all rooms are generated.
-    /// </summary>
-    public class AllRoomsGeneratedTester : MonoBehaviour
+    private void OnEnable()
     {
-        private void OnEnable()
-        {
-            AllRoomsGeneratedChecker.OnAllRoomsGenerated += HandleAllRoomsGenerated;
-        }
+        AllRoomsGeneratedChecker.OnAllRoomsGenerated += HandleAllRoomsGenerated;
+    }
 
-        private void OnDisable()
-        {
-            AllRoomsGeneratedChecker.OnAllRoomsGenerated -= HandleAllRoomsGenerated;
-        }
+    private void OnDisable()
+    {
+        AllRoomsGeneratedChecker.OnAllRoomsGenerated -= HandleAllRoomsGenerated;
+    }
 
-        private void HandleAllRoomsGenerated()
-        {
-            Debug.Log("OKKK");
-        }
+    private void HandleAllRoomsGenerated()
+    {
+        Debug.Log("OKKK");
     }
 }
