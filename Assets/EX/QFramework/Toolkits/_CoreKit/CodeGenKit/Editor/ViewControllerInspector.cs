@@ -75,16 +75,27 @@ namespace QFramework
 
         private void OnEnable()
         {
+            if (ViewController == null)
+            {
+                return;
+            }
+
             if (string.IsNullOrEmpty(ViewController.ScriptsFolder))
             {
                 var setting = CodeGenKitSetting.Load();
-                ViewController.ScriptsFolder = setting.ScriptDir;
+                if (setting != null)
+                {
+                    ViewController.ScriptsFolder = setting.ScriptDir;
+                }
             }
 
             if (string.IsNullOrEmpty(ViewController.PrefabFolder))
             {
                 var setting = CodeGenKitSetting.Load();
-                ViewController.PrefabFolder = setting.PrefabDir;
+                if (setting != null)
+                {
+                    ViewController.PrefabFolder = setting.PrefabDir;
+                }
             }
 
             if (string.IsNullOrEmpty(ViewController.ScriptName))
@@ -95,7 +106,10 @@ namespace QFramework
             if (string.IsNullOrEmpty(ViewController.Namespace))
             {
                 var setting = CodeGenKitSetting.Load();
-                ViewController.Namespace = setting.Namespace;
+                if (setting != null)
+                {
+                    ViewController.Namespace = setting.Namespace;
+                }
             }
             
             mArchitectureTypes = SearchAllArchitectureTypes();

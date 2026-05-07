@@ -38,7 +38,7 @@ public abstract class Room : MonoBehaviour
 
 	
 	private void Start() {
-		Debug.Log("房间初始化");
+		//Debug.Log("房间初始化");
 		InitRoom();
 	}
 
