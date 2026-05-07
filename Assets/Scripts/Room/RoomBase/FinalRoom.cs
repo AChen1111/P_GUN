@@ -1,6 +1,4 @@
 using UnityEngine;
-using QFramework.PG;
-
 public class FinalRoom : Room
 {
     [Header("最终房间贴图")]

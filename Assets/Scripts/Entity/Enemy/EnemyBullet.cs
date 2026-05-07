@@ -1,8 +1,6 @@
 using System.Collections;
 using UnityEngine;
 using System.Collections.Generic;
-using QFramework.PG;
-
 public class EnemyBullet : MonoBehaviour {
     public Vector2 dir;
     public float speed = 10f;

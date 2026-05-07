@@ -1,7 +1,5 @@
 using System.Collections;
 using UnityEngine;
-using QFramework.PG;
-
 public class PlayerBullet : MonoBehaviour {
     public Vector2 dir;
     public float speed = 15f;

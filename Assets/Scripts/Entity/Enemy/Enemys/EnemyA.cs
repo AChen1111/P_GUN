@@ -1,6 +1,5 @@
 using UnityEngine;
 using QFramework;
-using QFramework.PG;
 using System.Collections.Generic;
 
 public class EnemyA : EnemyBase

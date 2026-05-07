@@ -2466,6 +2466,22 @@ MonoBehaviour:
       To: {x: -7, y: -1, z: 0}
       Direction: 0
       Socket: {fileID: 0}
+    - From: {x: 4, y: 0, z: 0}
+      To: {x: 4, y: 0, z: 0}
+      Direction: 0
+      Socket: {fileID: 0}
+    - From: {x: -1, y: 4, z: 0}
+      To: {x: -1, y: 4, z: 0}
+      Direction: 0
+      Socket: {fileID: 0}
+    - From: {x: -1, y: -5, z: 0}
+      To: {x: -1, y: -5, z: 0}
+      Direction: 0
+      Socket: {fileID: 0}
+    - From: {x: -7, y: 0, z: 0}
+      To: {x: -7, y: 0, z: 0}
+      Direction: 0
+      Socket: {fileID: 0}
   SimpleDoorModeData:
     DistanceFromCorners: 1
     DoorLength: 1
@@ -2496,6 +2512,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SelfBoxCollider2D: {fileID: 5070246570669779861}
+  needGenerateDoors: 0
+  doorPrefab: {fileID: 0}
+  doorStateIsOpen: 1
+  roomCenterPoint: {fileID: 0}
   playerSpawnPoint: {fileID: 977558609046554941}
   playerPrefab: {fileID: 7553163744435906436, guid: 0aedc682d273ead4f9a7a400aa3afe32, type: 3}
 --- !u!61 &5070246570669779861

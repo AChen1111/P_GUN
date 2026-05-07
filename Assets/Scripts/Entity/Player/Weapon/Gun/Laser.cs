@@ -1,60 +1,61 @@
 using UnityEngine;
 using QFramework;
 
-namespace QFramework.PG
+public class Laser : Gun
 {
-	public partial class Laser : QFramework.PG.Gun
+    public PlayerBullet PlayerBullet;
+    public UnityEngine.AudioSource SelfAudioSource;
+    public UnityEngine.LineRenderer SelfLineRenderer;
+
+	public override PlayerBullet BulletPrefab => PlayerBullet;
+	public LineRenderer LineRenderer => SelfLineRenderer;
+	/// <summary>
+	/// 激光最大距离
+	/// </summary>
+	[SerializeField] private float maxLaserDistance = 100f;
+	private float mLastDamageTime;
+
+    public override BulletBag BulletBag => new BulletBag(-1);
+
+    public override void ShootDown(Vector2 dir)
 	{
-		public override PlayerBullet BulletPrefab => PlayerBullet;
-		public LineRenderer LineRenderer => SelfLineRenderer;
-		/// <summary>
-		/// 激光最大距离
-		/// </summary>
-		[SerializeField] private float maxLaserDistance = 100f;
-		private float mLastDamageTime;
+		LineRenderer.enabled = true;
+		mLastDamageTime = Time.time - shootInterval;
+		//播放音效
+		TryPlaySound(true);
+	}
+	public override void Shooting(Vector2 dir)
+	{
+		var origin = BulletPrefab.Position2D();
+		//获取墙体和敌人的layerMask
+		var layerMask = LayerMask.GetMask("Wall","EnemyLayer");
+		//得到碰撞点
+		var hit = Physics2D.Raycast(origin, dir, maxLaserDistance, layerMask);
+		//设置起始点
+		LineRenderer.SetPosition(0, origin);
 
-        public override BulletBag BulletBag => new BulletBag(-1);
-
-        public override void ShootDown(Vector2 dir)
+		if(hit.collider != null)
 		{
-			LineRenderer.enabled = true;
-			mLastDamageTime = Time.time - shootInterval;
-			//播放音效
-			TryPlaySound(true);
-		}
-		public override void Shooting(Vector2 dir)
-		{
-			var origin = BulletPrefab.Position2D();
-			//获取墙体和敌人的layerMask
-			var layerMask = LayerMask.GetMask("Wall","EnemyLayer");
-			//得到碰撞点
-			var hit = Physics2D.Raycast(origin, dir, maxLaserDistance, layerMask);
-			//设置起始点
-			LineRenderer.SetPosition(0, origin);
+			LineRenderer.SetPosition(1, hit.point);
 
-			if(hit.collider != null)
+			var enemy = hit.collider.GetComponent<EnemyBase>();
+			if(enemy != null && Time.time - mLastDamageTime >= shootInterval)
 			{
-				LineRenderer.SetPosition(1, hit.point);
+				mLastDamageTime = Time.time;
+				
+				DamageInfo damageInfo = new DamageInfo(Damage, dir);
 
-				var enemy = hit.collider.GetComponent<EnemyBase>();
-				if(enemy != null && Time.time - mLastDamageTime >= shootInterval)
-				{
-					mLastDamageTime = Time.time;
-					
-					DamageInfo damageInfo = new DamageInfo(Damage, dir);
-
-					enemy.Hurt(damageInfo);
-				}
-				return;
+				enemy.Hurt(damageInfo);
 			}
-
-			LineRenderer.SetPosition(1, origin + dir * maxLaserDistance);
+			return;
 		}
 
-		public override void ShootUp(Vector2 dir)
-		{
-			LineRenderer.enabled = false;
-			PlayerAudioSource.Stop();
-		}
+		LineRenderer.SetPosition(1, origin + dir * maxLaserDistance);
+	}
+
+	public override void ShootUp(Vector2 dir)
+	{
+		LineRenderer.enabled = false;
+		PlayerAudioSource.Stop();
 	}
 }
