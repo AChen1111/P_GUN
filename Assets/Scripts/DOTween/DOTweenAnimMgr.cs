@@ -35,26 +35,20 @@ public class DOTweenAnimMgr : MonoBehaviour
         }
     }
 
+
+
     /// <summary>
-    /// 通过 SO 直接播放（推荐）。
+    /// 通过 string key 播放
     /// </summary>
-    public static void Play(AnimEffectSO effect, GameObject target, float duration = DefaultDuration, Action onComplete = null)
+    public static void Play(string key, GameObject target, float duration = DefaultDuration, Action onComplete = null)
     {
-        if (target == null || duration <= 0f || effect == null)
+        //检查map中有无key
+        if(!Instance.effectMap.ContainsKey(key))
         {
             onComplete?.Invoke();
             return;
         }
 
-        target.transform.DOKill(false);
-        effect.Play(target, duration, onComplete);
-    }
-
-    /// <summary>
-    /// 通过 string key 播放（key 为 SO 资产名）。
-    /// </summary>
-    public static void Play(string key, GameObject target, float duration = DefaultDuration, Action onComplete = null)
-    {
         if (target == null || duration <= 0f || string.IsNullOrEmpty(key))
         {
             onComplete?.Invoke();
@@ -71,37 +65,6 @@ public class DOTweenAnimMgr : MonoBehaviour
         Debug.LogWarning($"[DOTweenAnimMgr] 未找到 key=\"{key}\" 对应的动画 SO。");
         onComplete?.Invoke();
     }
-
-    /// <summary>
-    /// 通过 AnimType 枚举播放
-    /// </summary>
-    public static void Play(AnimType type, GameObject target, float duration = DefaultDuration, Action onComplete = null)
-    {
-        if (target == null || duration <= 0f)
-        {
-            onComplete?.Invoke();
-            return;
-        }
-
-        if (type == AnimType.None)
-        {
-            onComplete?.Invoke();
-            return;
-        }
-
-        Play(type.ToString(), target, duration, onComplete);
-    }
 }
 
-/// <summary>
-/// 动画种类枚举（名称与 SO 资产名对应即可自动匹配）。
-/// </summary>
-public enum AnimType
-{
-    None,
-    Blink,
-    Jump,
-    Shake,
-    Hurted,
-    Scale0To1,
-}
+

@@ -1,0 +1,24 @@
+{
+    "name": "Game.Gameplay",
+    "rootNamespace": "",
+    "references": [
+        "Game.Core",
+        "Game.Pooling",
+        "Game.Animation",
+        "Game.Presentation",
+        "QFramework",
+        "QFramework.CoreKit",
+        "AudioKit",
+        "Edgar.Unity",
+        "Game.Items"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

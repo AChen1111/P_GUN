@@ -53,7 +53,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Namespace: QFramework.Example
   ScriptName: Player
-  ScriptsFolder: Assets\Scripts\Entity\Player
+  ScriptsFolder: Assets\Scripts\Gameplay\Entity\Player
   GeneratePrefab: 0
   PrefabFolder: Assets/Prefab
   ArchitectureFullTypeName: 
@@ -115,7 +115,7 @@ AudioSource:
   m_GameObject: {fileID: 79155860018165750}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: 374010033509238546, guid: 569809b44565dc442ba3ee727965ff13, type: 2}
   m_audioClip: {fileID: 0}
   m_PlayOnAwake: 1
   m_Volume: 1

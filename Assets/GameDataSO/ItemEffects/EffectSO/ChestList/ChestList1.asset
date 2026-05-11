@@ -12,5 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e25e77be5b4e4b540a5693a8e5ca0968, type: 3}
   m_Name: ChestList1
   m_EditorClassIdentifier: 
+  spawnTable: {fileID: 11400000, guid: f963cab0c16d497f8b7eaf8ef16cd5e7, type: 2}
   lootTable:
   - {fileID: 5069590999830702722, guid: a4f46db2f0b85564a81ad43c4f0b8880, type: 3}
+  animEffectKey: Jump
+  randomOffsetRange: {x: 0.5, y: 0.5}
