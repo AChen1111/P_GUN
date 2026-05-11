@@ -1,12 +1,13 @@
 using System.Collections.Generic;
 using System.Collections;
+using DG.Tweening;
 using UnityEngine;
 
 /// <summary>
 /// 场景中的可交互物品：玩家靠近显示描述，按 F 后播放拾取表现并执行效果列表。
 /// </summary>
 [RequireComponent(typeof(Collider2D))]
-public class Item : MonoBehaviour
+public class Item : MonoBehaviour, global::IPoolable
 {
     private const string PickupTriggerName = "OnPickup";
 
@@ -91,6 +92,20 @@ public class Item : MonoBehaviour
         }
     }
 
+    public void OnSpawnFromPool()
+    {
+        ResetPoolRuntimeState();
+        ResetAnimatorState();
+    }
+
+    public void OnRecycleToPool()
+    {
+        StopAnimatorFallbackCoroutine();
+        transform.DOKill(false);
+        HideTip();
+        ResetPoolRuntimeState();
+    }
+
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (!IsPlayer(other)) return;
@@ -167,8 +182,7 @@ public class Item : MonoBehaviour
 
         if (animatorFallbackCoroutine != null)
         {
-            StopCoroutine(animatorFallbackCoroutine);
-            animatorFallbackCoroutine = null;
+            StopAnimatorFallbackCoroutine();
         }
 
         var ctx = new ItemEffectContext
@@ -192,7 +206,7 @@ public class Item : MonoBehaviour
 
         if (isDestroy)
         {
-            Destroy(gameObject);
+            ItemPool.Instance.Release(this);
         }
     }
 
@@ -234,5 +248,31 @@ public class Item : MonoBehaviour
         }
 
         return false;
+    }
+
+    private void ResetPoolRuntimeState()
+    {
+        isActive = true;
+        playerColliderCount = 0;
+        isPlayerInRange = false;
+        hasPicked = false;
+        effectsApplied = false;
+    }
+
+    private void StopAnimatorFallbackCoroutine()
+    {
+        if (animatorFallbackCoroutine == null) return;
+
+        StopCoroutine(animatorFallbackCoroutine);
+        animatorFallbackCoroutine = null;
+    }
+
+    private void ResetAnimatorState()
+    {
+        if (_animator == null) return;
+
+        _animator.ResetTrigger(PickupTriggerName);
+        _animator.Rebind();
+        _animator.Update(0f);
     }
 }

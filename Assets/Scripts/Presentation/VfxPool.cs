@@ -37,10 +37,6 @@ public class VfxPool : PoolBase<BloodVfx> {
         item.OnComplete = Release;
     }
 
-    protected override void OnRelease(BloodVfx item) {
-        item.StopImmediate();
-    }
-
     protected override void OnDestroyItem(BloodVfx item) {
         item.OnComplete = null;
     }

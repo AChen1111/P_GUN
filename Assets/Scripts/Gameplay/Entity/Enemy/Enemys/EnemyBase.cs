@@ -7,7 +7,7 @@ using DG.Tweening;
 /// <summary>
 /// 敌人基类
 /// </summary>
-public abstract class EnemyBase : MonoBehaviour {
+public abstract class EnemyBase : MonoBehaviour, global::IPoolable {
 
     #region 子类实现
     protected abstract void OnHurt(DamageInfo damageInfo);
@@ -153,13 +153,16 @@ public abstract class EnemyBase : MonoBehaviour {
         CurrentHp -= damage;
     }
 
-    /// <summary>
-    /// 从对象池取出时调用。敌人复用时 Awake/Start 不会再次执行，所以这里必须重置运行时状态。
-    /// </summary>
-    public void SpawnFromPool(FightRoom ownerFightRoom) {
-        OwnerFightRoom = ownerFightRoom;
+    public void OnSpawnFromPool() {
         ResetRuntimeState();
         Init();
+    }
+
+    public void OnRecycleToPool() {
+        PrepareForPoolRelease();
+    }
+
+    public void SetOwnerFightRoom(FightRoom ownerFightRoom) {
         OwnerFightRoom = ownerFightRoom;
     }
 

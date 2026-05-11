@@ -22,31 +22,41 @@ public class ItemSpawner : MonoBehaviour
         //随机获取一个物品
         if(itemTable.TryGetRandomPrefab(out GameObject prefab))
         {
-            //todo:生成方式改为对象池
-            var obj = Instantiate(prefab, position, Quaternion.identity);
-
-            //如果有道具组件
-            if(obj.TryGetComponent(out Item item))
-            {
-                item.SetPickupEnabled(false);
-
-                DOTweenAnimMgr.Play(animEffectKey, obj, 1f, () =>
-                {
-                    item.SetPickupEnabled(true);
-                });
-
-                return obj;
-            }
-            else
-            {
-                DOTweenAnimMgr.Play(animEffectKey, obj, 1f);
-                return obj;
-            }
+            return SpawnItem(prefab, position, animEffectKey);
         }
 
         //如果获取失败，则返回null
         Debug.LogWarning("No prefab found in item table");
         return null;
+    }
+
+    public GameObject SpawnItem(GameObject prefab, Vector3 position, string animEffectKey = "")
+    {
+        var item = ItemPool.Instance.Spawn(prefab, position, Quaternion.identity);
+        if(item == null) return null;
+
+        var obj = item.gameObject;
+        item.SetPickupEnabled(false);
+
+        PlaySpawnAnimation(animEffectKey, obj, item);
+        return obj;
+    }
+
+    private static void PlaySpawnAnimation(string animEffectKey, GameObject obj, Item item)
+    {
+        if(string.IsNullOrEmpty(animEffectKey) || DOTweenAnimMgr.Instance == null)
+        {
+            item.SetPickupEnabled(true);
+            return;
+        }
+
+        DOTweenAnimMgr.Play(animEffectKey, obj, 1f, () =>
+        {
+            if(item != null && item.gameObject.activeSelf)
+            {
+                item.SetPickupEnabled(true);
+            }
+        });
     }
 
 }

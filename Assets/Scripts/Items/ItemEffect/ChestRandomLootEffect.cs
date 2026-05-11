@@ -33,7 +33,7 @@ public class ChestRandomLootEffect : ItemEffectBase
         var drop = GetRandomPrefab();
         if (drop == null) return;
 
-        spawner.SpawnItem(newItemPosition, animEffectKey);
+        spawner.SpawnItem(drop, newItemPosition, animEffectKey);
     }
 
     private ItemSpawner ResolveSpawner(ItemEffectContext ctx)

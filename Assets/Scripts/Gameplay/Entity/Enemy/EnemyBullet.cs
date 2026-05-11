@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using System.Collections.Generic;
-public class EnemyBullet : MonoBehaviour {
+public class EnemyBullet : MonoBehaviour, global::IPoolable {
     public Vector2 dir;
     public float speed = 10f;
     public Rigidbody2D rb;
@@ -35,6 +35,20 @@ public class EnemyBullet : MonoBehaviour {
         if (rb == null) {
             rb = GetComponent<Rigidbody2D>();
         }
+    }
+
+    public void OnSpawnFromPool() {
+        hasHit = false;
+
+        if (rb == null) {
+            rb = GetComponent<Rigidbody2D>();
+        }
+    }
+
+    public void OnRecycleToPool() {
+        hasHit = true;
+        StopAutoRecycleCoroutine();
+        StopMove();
     }
 
     private void OnCollisionEnter2D(Collision2D other) {

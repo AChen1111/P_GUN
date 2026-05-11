@@ -45,10 +45,4 @@ public class EnemyBulletPool : PoolBase<EnemyBullet> {
         return bullet;
     }
 
-    /// <summary>
-    /// 回收到池中前清掉刚体速度，避免复用时继承上一颗子弹的速度。
-    /// </summary>
-    protected override void OnRelease(EnemyBullet bullet) {
-        bullet.StopMove();
-    }
 }

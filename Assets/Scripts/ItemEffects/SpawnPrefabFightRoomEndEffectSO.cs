@@ -36,7 +36,7 @@ public class SpawnPrefabFightRoomEndEffectSO : FightRoomEndEffectSO
             return;
         }
 
-        spawner.SpawnItem(spawnPosition, animEffectKey);
+        spawner.SpawnItem(selectedPrefab, spawnPosition, animEffectKey);
     }
 
     private ItemSpawner ResolveSpawner(FightRoom room)
