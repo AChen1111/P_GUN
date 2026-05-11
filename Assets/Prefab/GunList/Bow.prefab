@@ -167,6 +167,8 @@ MonoBehaviour:
   PrefabFolder: Assets/Prefab
   ArchitectureFullTypeName: 
   ViewControllerFullTypeName: 
+  weaponId: Bow
+  weaponDatabase: {fileID: 11400000, guid: 2d7944df0f6646243a02e8220599388e, type: 2}
   shootSounds:
   - {fileID: 8300000, guid: 34f8cb3e29ce529458352e5bd3fe3141, type: 3}
   - {fileID: 8300000, guid: 50b915a22dcd4244cb10082d3fd93846, type: 3}

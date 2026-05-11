@@ -5,6 +5,18 @@ using UnityEngine;
 [ViewControllerChild]
 public abstract class Gun : ViewController {
 /// <summary>
+/// 武器数据 ID。为空时默认使用脚本类名，例如 AK/Pistol。
+/// </summary>
+[SerializeField] private string weaponId;
+
+/// <summary>
+/// 武器数据库。为空时使用 Resources/WeaponDatabase。
+/// </summary>
+[SerializeField] private WeaponDatabase weaponDatabase;
+
+public string WeaponId => string.IsNullOrWhiteSpace(weaponId) ? GetType().Name : weaponId.Trim();
+
+/// <summary>
 /// 射击音频列表
 /// </summary>
 public List<AudioClip> shootSounds = new List<AudioClip>();
@@ -49,11 +61,46 @@ public virtual BulletBag BulletBag => bulletBag;
 
 protected virtual void Awake()
 {
+    ApplyDataFromDatabase();
+
     if (clipSize != 0)
     {
         shootDuration = new ShootDuration(shootInterval);
         gunClip = new GunClip(clipSize);
         bulletBag = new BulletBag(MaxBulletBagNum);
+    }
+}
+
+public void ApplyData(WeaponData data)
+{
+    shootSounds.Clear();
+    if (data.shootSounds != null)
+    {
+        foreach (var sound in data.shootSounds)
+        {
+            if (sound != null)
+            {
+                shootSounds.Add(sound);
+            }
+        }
+    }
+
+    ReloadSound = data.reloadSound;
+    MinDamage = data.minDamage;
+    MaxDamage = data.MaxDamage;
+    MaxBulletBagNum = data.maxBulletBagNum;
+    clipSize = data.clipSize;
+    shootInterval = data.ShootInterval;
+}
+
+private void ApplyDataFromDatabase()
+{
+    var database = weaponDatabase != null ? weaponDatabase : WeaponDatabase.Default;
+    if (database == null) return;
+
+    if (database.TryGetById(WeaponId, out var data))
+    {
+        data.ApplyTo(this);
     }
 }
 
@@ -141,6 +188,8 @@ public virtual void OnGunUsed()
 /// </summary>
 protected virtual void TryPlaySound(AudioClip sound,bool loop = false)
 {
+    if (PlayerAudioSource == null || sound == null) return;
+
     if(PlayerAudioSource.clip != null)
     {
     //停止当前播放的声音
@@ -158,6 +207,8 @@ protected virtual void TryPlaySound(AudioClip sound,bool loop = false)
 /// </summary>
 protected virtual void TryPlaySound(bool loop = false)
 {
+    if (PlayerAudioSource == null || shootSounds == null || shootSounds.Count == 0) return;
+
     if(PlayerAudioSource.clip != null)
     {
     //停止当前播放的声音

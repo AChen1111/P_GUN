@@ -273,6 +273,8 @@ MonoBehaviour:
   PrefabFolder: Assets/Prefab
   ArchitectureFullTypeName: 
   ViewControllerFullTypeName: 
+  weaponId: Laser
+  weaponDatabase: {fileID: 11400000, guid: 2d7944df0f6646243a02e8220599388e, type: 2}
   shootSounds:
   - {fileID: 8300000, guid: dd3d170db2ba52f4ab2916ee2d37da13, type: 3}
   ReloadSound: {fileID: 8300000, guid: 09f63d32f8a42f742b15ae6198b3c400, type: 3}
