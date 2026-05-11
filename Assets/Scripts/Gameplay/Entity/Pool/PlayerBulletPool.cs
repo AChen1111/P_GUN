@@ -28,10 +28,4 @@ public class PlayerBulletPool : PoolBase<PlayerBullet> {
         return bullet;
     }
 
-    /// <summary>
-    /// 回收到池中前清掉刚体速度，避免下一次复用继承上一颗子弹的物理状态。
-    /// </summary>
-    protected override void OnRelease(PlayerBullet bullet) {
-        bullet.StopMove();
-    }
 }

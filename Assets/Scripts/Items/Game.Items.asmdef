@@ -3,6 +3,7 @@
   "rootNamespace": "",
   "references": [
     "Game.Core",
+    "Game.Pooling",
     "Game.Animation",
     "Game.Presentation",
     "QFramework",

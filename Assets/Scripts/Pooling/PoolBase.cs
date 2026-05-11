@@ -6,7 +6,7 @@ using System.Collections.Generic;
 /// 通用对象池基类。
 /// 同一个池组件可以按 prefab 自动拆分多个 ObjectPool，适合不同武器子弹共用一套池管理逻辑。
 /// </summary>
-public abstract class PoolBase<T> : MonoBehaviour where T : MonoBehaviour {
+public abstract class PoolBase<T> : MonoBehaviour where T : MonoBehaviour, IPoolable {
     private static PoolBase<T> instance;
 
     public static PoolBase<T> Instance => instance;
@@ -192,10 +192,12 @@ public abstract class PoolBase<T> : MonoBehaviour where T : MonoBehaviour {
         item.transform.SetParent(activeRoot, false);
         item.gameObject.SetActive(true);
 
+        NotifySpawnFromPool(item);
         OnGet(item);
     }
 
     private void OnReturnedToPool(T item) {
+        NotifyRecycleToPool(item);
         OnRelease(item);
         item.gameObject.SetActive(false);
         item.transform.SetParent(inactiveRoot, false);
@@ -224,6 +226,14 @@ public abstract class PoolBase<T> : MonoBehaviour where T : MonoBehaviour {
         var root = new GameObject(rootName).transform;
         root.SetParent(transform, false);
         return root;
+    }
+
+    private static void NotifySpawnFromPool(T item) {
+        item.OnSpawnFromPool();
+    }
+
+    private static void NotifyRecycleToPool(T item) {
+        item.OnRecycleToPool();
     }
 
     private void OnValidate() {

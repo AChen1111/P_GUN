@@ -41,14 +41,7 @@ public class EnemyPool : PoolBase<EnemyBase> {
         var enemy = Get(prefab, position, rotation);
         if(enemy == null) return null;
 
-        enemy.SpawnFromPool(ownerFightRoom);
+        enemy.SetOwnerFightRoom(ownerFightRoom);
         return enemy;
-    }
-
-    /// <summary>
-    /// 回收前清理移动状态和所属房间引用，避免下一次复用带入旧房间数据。
-    /// </summary>
-    protected override void OnRelease(EnemyBase enemy) {
-        enemy.PrepareForPoolRelease();
     }
 }

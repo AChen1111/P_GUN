@@ -8,7 +8,7 @@ public enum BloodVfxColorMode
 }
 
 [DisallowMultipleComponent]
-public class BloodVfx : MonoBehaviour
+public class BloodVfx : MonoBehaviour, global::IPoolable
 {
     [SerializeField] private ParticleSystem[] particleSystems;
     [SerializeField] private float fallbackLifetime = 1.2f;
@@ -48,6 +48,16 @@ public class BloodVfx : MonoBehaviour
     public void Play(Vector3 position, Vector2 direction)
     {
         Play(position, direction, BloodVfxColorMode.Red);
+    }
+
+    public void OnSpawnFromPool()
+    {
+        StopImmediate();
+    }
+
+    public void OnRecycleToPool()
+    {
+        StopImmediate();
     }
 
     public void Play(Vector3 position, Vector2 direction, BloodVfxColorMode colorMode)

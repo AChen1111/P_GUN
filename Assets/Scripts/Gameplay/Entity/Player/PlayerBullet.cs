@@ -1,6 +1,6 @@
 using System.Collections;
 using UnityEngine;
-public class PlayerBullet : MonoBehaviour {
+public class PlayerBullet : MonoBehaviour, global::IPoolable {
     public Vector2 dir;
     public float speed = 15f;
     public Rigidbody2D rb;
@@ -28,6 +28,20 @@ public class PlayerBullet : MonoBehaviour {
         if(rb == null) {
             rb = GetComponent<Rigidbody2D>();
         }
+    }
+
+    public void OnSpawnFromPool() {
+        hasHit = false;
+
+        if(rb == null) {
+            rb = GetComponent<Rigidbody2D>();
+        }
+    }
+
+    public void OnRecycleToPool() {
+        hasHit = true;
+        StopAutoRecycleCoroutine();
+        StopMove();
     }
 
     ///<summary>
