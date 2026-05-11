@@ -3,7 +3,10 @@
   "rootNamespace": "",
   "references": [
     "Game.Items",
-    "Game.Presentation"
+    "Game.ItemEffects",
+    "Game.Presentation",
+    "Unity.Addressables",
+    "Unity.Addressables.Editor"
   ],
   "includePlatforms": [
     "Editor"

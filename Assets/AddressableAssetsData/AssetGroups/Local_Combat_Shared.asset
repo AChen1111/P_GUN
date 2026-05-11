@@ -1,0 +1,47 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: Local_Combat_Shared
+  m_EditorClassIdentifier: 
+  m_GroupName: Local_Combat_Shared
+  m_Data:
+    m_SerializedData: []
+  m_GUID: eee3692616e83864aaa6c2e7b1ecdb90
+  m_SerializeEntries:
+  - m_GUID: 10e246e394d07ef4ea3fe43c6de534c0
+    m_Address: bullet/enemy
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - bullets
+    - combat_shared
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3752c64bcee20ed4ca0c96a5cc62c95d
+    m_Address: vfx/blood_burst
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - combat_shared
+    - vfx
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 576871a843cdcfa4facd211562818436
+    m_Address: bullet/player
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - bullet/player_bullet
+    - bullets
+    - combat_shared
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 63af2ccf367b1c745b05c3dc480c23af, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: e02d531e8e941ba4b8476513cc28acb3, type: 2}
+    - {fileID: 11400000, guid: 3035b545f51b6e54ca4afcf175acfe35, type: 2}

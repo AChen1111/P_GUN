@@ -329,7 +329,7 @@ AudioSource:
   m_GameObject: {fileID: 8546515740741070984}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: 374010033509238546, guid: 569809b44565dc442ba3ee727965ff13, type: 2}
   m_audioClip: {fileID: 0}
   m_PlayOnAwake: 1
   m_Volume: 1
@@ -445,9 +445,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8671f3f9c6c9b1b488a6b7d3b4cd5832, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Namespace: 
+  Namespace: QFramework.Example
   ScriptName: AK
-  ScriptsFolder: Assets\Scripts\Entity\Player\Weapon\Gun
+  ScriptsFolder: Assets\Scripts\Gameplay\Entity\Player\Weapon\Gun
   GeneratePrefab: 0
   PrefabFolder: Assets/Prefab
   ArchitectureFullTypeName: 
