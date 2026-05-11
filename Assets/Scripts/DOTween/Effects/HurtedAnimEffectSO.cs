@@ -28,10 +28,10 @@ public class HurtedAnimEffectSO : AnimEffectSO
         var seq = DOTween.Sequence();
         for (int i = 0; i < blinkSteps; i++)
         {
-            seq.Append(sr.DOColor(redTint, step));
-            seq.Join(sr.DOFade(minAlpha, step));
-            seq.Append(sr.DOColor(orig, step));
-            seq.Join(sr.DOFade(1f, step));
+            seq.Append(DOTween.To(() => sr.color, x => sr.color = x, redTint, step).SetTarget(sr));
+            seq.Join(DOTween.ToAlpha(() => sr.color, x => sr.color = x, minAlpha, step).SetTarget(sr));
+            seq.Append(DOTween.To(() => sr.color, x => sr.color = x, orig, step).SetTarget(sr));
+            seq.Join(DOTween.ToAlpha(() => sr.color, x => sr.color = x, 1f, step).SetTarget(sr));
         }
 
         seq.SetUpdate(true)

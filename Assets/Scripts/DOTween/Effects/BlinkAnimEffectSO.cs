@@ -22,8 +22,8 @@ public class BlinkAnimEffectSO : AnimEffectSO
         var seq = DOTween.Sequence();
         for (int i = 0; i < blinkSteps; i++)
         {
-            seq.Append(sr.DOFade(minAlpha, step));
-            seq.Append(sr.DOFade(1f, step));
+            seq.Append(DOTween.ToAlpha(() => sr.color, x => sr.color = x, minAlpha, step).SetTarget(sr));
+            seq.Append(DOTween.ToAlpha(() => sr.color, x => sr.color = x, 1f, step).SetTarget(sr));
         }
 
         seq.SetUpdate(true)

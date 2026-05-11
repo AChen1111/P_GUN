@@ -1,0 +1,19 @@
+{
+  "name": "Game.Presentation",
+  "rootNamespace": "",
+  "references": [
+    "Game.Core",
+    "Game.Pooling",
+    "QFramework",
+    "QFramework.CoreKit"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

@@ -13,5 +13,6 @@ MonoBehaviour:
   m_Name: "\u751F\u6210\u5B9D\u7BB1"
   m_EditorClassIdentifier: 
   prefab: {fileID: 449317155252047394, guid: 8b823ea2689c6324ab771e9f22278e2b, type: 3}
+  spawnTable: {fileID: 0}
   worldOffset: {x: 0, y: 0, z: 0}
-  parentToRoom: 1
+  animEffectKey: Scale0To1
