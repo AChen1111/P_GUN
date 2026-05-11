@@ -1,0 +1,87 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: Local_GameScene_Level1
+  m_EditorClassIdentifier: 
+  m_GroupName: Local_GameScene_Level1
+  m_Data:
+    m_SerializedData: []
+  m_GUID: 6078f6b17a80c8f4e9a5d9508264f700
+  m_SerializeEntries:
+  - m_GUID: 20b803d3b7a25a245ac009c34210802c
+    m_Address: prefab/door/final
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - doors
+    - scene_level1
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 35efb202e0c0b4b439f45af81a36f5d5
+    m_Address: room/corridor_ud
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - rooms
+    - scene_level1
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 55a2fdf4283883548a4042623e2f8635
+    m_Address: level/level1
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - level1
+    - scene_level1
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 69e0cab51f1222e4bb3e4674e0348bc8
+    m_Address: room/init
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - rooms
+    - scene_level1
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8c9cfa26abfee488c85f1582747f6a02
+    m_Address: scene/game
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - scene_level1
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c3725d4757effc442acdafa92d4d4329
+    m_Address: room/normal
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - rooms
+    - scene_level1
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c7feca4fad691424783ee926ca98c9ae
+    m_Address: prefab/door/normal
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - doors
+    - scene_level1
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d12f56f144e67244f9b540d241a530e7
+    m_Address: room/corridor_lr
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - rooms
+    - scene_level1
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: fd8d6940222a8bf40800d474d7a6228c
+    m_Address: room/final
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - rooms
+    - scene_level1
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 63af2ccf367b1c745b05c3dc480c23af, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 4b0d36067c473b842a1819c7dc9bcae5, type: 2}
+    - {fileID: 11400000, guid: 222c6f9f17f0a294cab5192b0acbef90, type: 2}

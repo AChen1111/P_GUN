@@ -1,0 +1,81 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: Local_Enemies_Base
+  m_EditorClassIdentifier: 
+  m_GroupName: Local_Enemies_Base
+  m_Data:
+    m_SerializedData: []
+  m_GUID: 4d2cc352b42e2ad4096fb65cf5ad24d9
+  m_SerializeEntries:
+  - m_GUID: 004ac3be59c89d34a84a8b12ab03d5d7
+    m_Address: enemy/orc_shaman
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - enemies_base
+    - enemy_orc_shaman
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 35827546b14bc8d48a139f245049f973
+    m_Address: enemy/orc_masked
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - enemies_base
+    - enemy_orc_masked
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5997eda64fd4b9e46ab562272521a078
+    m_Address: enemy/enemy_a
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - enemies_base
+    - enemy_a
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 62bf63f566fb06a44a78f17618a6b6cf
+    m_Address: enemy/slime
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - enemies_base
+    - enemy_slime
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 66cab04fd3d095d43a8c1ea2eae2f77d
+    m_Address: enemy/goblin
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - enemies_base
+    - enemy_goblin
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 73085d0d90bddfc47afdd98cf9f84cd6
+    m_Address: enemy/ogre
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - enemies_base
+    - enemy_ogre
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b78964bc8875e5142a36b88e05a23ac0
+    m_Address: enemy/orc_warrior
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - enemies_base
+    - enemy_orc_warrior
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c7689240beca890469aab85afd109862
+    m_Address: enemy/bat
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - enemies_base
+    - enemy_bat
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 63af2ccf367b1c745b05c3dc480c23af, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 9762edc3bf630ee4394831d258b8435f, type: 2}
+    - {fileID: 11400000, guid: 827eaf632e009d54a96bfb1522489dc6, type: 2}
