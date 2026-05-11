@@ -166,6 +166,8 @@ MonoBehaviour:
   PrefabFolder: Assets/Prefab
   ArchitectureFullTypeName: 
   ViewControllerFullTypeName: 
+  weaponId: RocketGun
+  weaponDatabase: {fileID: 11400000, guid: 2d7944df0f6646243a02e8220599388e, type: 2}
   shootSounds:
   - {fileID: 8300000, guid: 95a6a9ff9d3fe504b8e58db76ee90a4d, type: 3}
   - {fileID: 8300000, guid: 28c92310ee1990f46ac1304dadb37c7b, type: 3}

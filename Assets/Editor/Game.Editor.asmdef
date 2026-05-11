@@ -4,7 +4,10 @@
   "references": [
     "Game.Items",
     "Game.ItemEffects",
+    "Game.Gameplay",
     "Game.Presentation",
+    "QFramework",
+    "QFramework.CoreKit",
     "Unity.Addressables",
     "Unity.Addressables.Editor"
   ],
