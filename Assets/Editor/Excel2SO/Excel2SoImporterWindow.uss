@@ -1,0 +1,90 @@
+.excel2so-window {
+    flex-grow: 1;
+    min-width: 0;
+    padding-left: 12px;
+    padding-right: 12px;
+    padding-top: 12px;
+    padding-bottom: 12px;
+}
+
+.window-title {
+    font-size: 18px;
+    -unity-font-style: bold;
+    margin-bottom: 12px;
+}
+
+.form-root {
+    flex-shrink: 0;
+    min-width: 0;
+}
+
+.form-row {
+    flex-direction: row;
+    align-items: center;
+    min-height: 28px;
+    min-width: 0;
+    margin-bottom: 8px;
+}
+
+.field-label {
+    width: 94px;
+    min-width: 94px;
+    flex-grow: 0;
+    flex-shrink: 0;
+    -unity-text-align: middle-left;
+}
+
+.field-slot {
+    flex-grow: 1;
+    flex-shrink: 1;
+    min-width: 0;
+}
+
+.importer-popup {
+    flex-grow: 1;
+    flex-shrink: 1;
+    min-width: 0;
+}
+
+.importer-popup .unity-base-field__label {
+    display: none;
+    width: 0;
+    min-width: 0;
+}
+
+.path-field {
+    flex-grow: 1;
+    flex-shrink: 1;
+    min-width: 0;
+    margin-right: 8px;
+}
+
+.path-button {
+    width: 78px;
+    min-width: 78px;
+    flex-grow: 0;
+    flex-shrink: 0;
+}
+
+.target-button {
+    margin-left: 6px;
+}
+
+.action-row {
+    flex-direction: row;
+    justify-content: flex-end;
+    min-width: 0;
+    margin-top: 8px;
+}
+
+.import-button {
+    width: 88px;
+    min-width: 88px;
+    flex-grow: 0;
+    flex-shrink: 0;
+}
+
+.status-label {
+    white-space: normal;
+    margin-top: 14px;
+}

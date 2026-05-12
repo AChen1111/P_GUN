@@ -1,0 +1,107 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff7915ce8c4e46898eab9e0cc200dddc, type: 3}
+  m_Name: WeaponDatabase
+  m_EditorClassIdentifier: 
+  weapons:
+  - weaponId: AK
+    displayName: AK
+    shootSounds:
+    - {fileID: 8300000, guid: 98ed46cee309cdd44a4b35d7a853b8cd, type: 3}
+    reloadSound: {fileID: 8300000, guid: e83829ac711cc4b46887d2c2030cf5d8, type: 3}
+    minDamage: 11
+    maxDamage: 20
+    maxBulletBagNum: 100
+    clipSize: 30
+    shootInterval: 0.1
+  - weaponId: AWP
+    displayName: AWP
+    shootSounds:
+    - {fileID: 8300000, guid: f38bbc0189220d24887634fb48b72bdf, type: 3}
+    reloadSound: {fileID: 8300000, guid: 09f63d32f8a42f742b15ae6198b3c400, type: 3}
+    minDamage: 20
+    maxDamage: 40
+    maxBulletBagNum: 10
+    clipSize: 5
+    shootInterval: 2
+  - weaponId: Bow
+    displayName: Bow
+    shootSounds:
+    - {fileID: 8300000, guid: 34f8cb3e29ce529458352e5bd3fe3141, type: 3}
+    - {fileID: 8300000, guid: 50b915a22dcd4244cb10082d3fd93846, type: 3}
+    - {fileID: 8300000, guid: 37eeb2ef0c716824c924f5c9dafcd444, type: 3}
+    - {fileID: 8300000, guid: 8323f9b267d5f95459ff77cb7de1fad7, type: 3}
+    - {fileID: 8300000, guid: 664dd2e9448910c47b2cc26e261fd5f2, type: 3}
+    - {fileID: 8300000, guid: 58508dbb4ef4e18478c3c64634e0667a, type: 3}
+    - {fileID: 8300000, guid: 982334509bf96f549acadf7a5627f7c9, type: 3}
+    - {fileID: 8300000, guid: 8024fdb37d66f634c85e57499069b28d, type: 3}
+    reloadSound: {fileID: 8300000, guid: 70c6ba4eb93b17d4a9ce83cfb26c281f, type: 3}
+    minDamage: 20
+    maxDamage: 30
+    maxBulletBagNum: -1
+    clipSize: -1
+    shootInterval: 0
+  - weaponId: Laser
+    displayName: Laser
+    shootSounds:
+    - {fileID: 8300000, guid: dd3d170db2ba52f4ab2916ee2d37da13, type: 3}
+    reloadSound: {fileID: 8300000, guid: 09f63d32f8a42f742b15ae6198b3c400, type: 3}
+    minDamage: 1
+    maxDamage: 2
+    maxBulletBagNum: -1
+    clipSize: -1
+    shootInterval: 0
+  - weaponId: MP5
+    displayName: MP5
+    shootSounds:
+    - {fileID: 8300000, guid: 7f5ebb3ad6679da4793726201cea6868, type: 3}
+    reloadSound: {fileID: 8300000, guid: 14adb12de103ab64582403089e31a746, type: 3}
+    minDamage: 10
+    maxDamage: 12
+    maxBulletBagNum: 100
+    clipSize: 30
+    shootInterval: 0.1
+  - weaponId: Pistol
+    displayName: Pistol
+    shootSounds:
+    - {fileID: 8300000, guid: 1e3302f441835cb4ba46ceb235f3180a, type: 3}
+    - {fileID: 8300000, guid: 38a5caf6a3bd4324dbe2fbf779720caf, type: 3}
+    - {fileID: 8300000, guid: df89cef0e87e61a4889501976dc3edc4, type: 3}
+    reloadSound: {fileID: 8300000, guid: 322a3dede8105894a8588a6e24b001b8, type: 3}
+    minDamage: 2
+    maxDamage: 5
+    maxBulletBagNum: 100
+    clipSize: 10
+    shootInterval: 0
+  - weaponId: RocketGun
+    displayName: RocketGun
+    shootSounds:
+    - {fileID: 8300000, guid: 95a6a9ff9d3fe504b8e58db76ee90a4d, type: 3}
+    - {fileID: 8300000, guid: 28c92310ee1990f46ac1304dadb37c7b, type: 3}
+    reloadSound: {fileID: 8300000, guid: 70c6ba4eb93b17d4a9ce83cfb26c281f, type: 3}
+    minDamage: 15
+    maxDamage: 25
+    maxBulletBagNum: 5
+    clipSize: 5
+    shootInterval: 1
+  - weaponId: ShotGun
+    displayName: ShotGun
+    shootSounds:
+    - {fileID: 8300000, guid: 2cc471f384c90af4f8e0e063fe6c0ddf, type: 3}
+    - {fileID: 8300000, guid: 8782fb9d1e84d5c46bc9e257fb1b99b9, type: 3}
+    - {fileID: 8300000, guid: 6d8e4595e1d5ac44faf8f72551d23276, type: 3}
+    reloadSound: {fileID: 8300000, guid: d4ce39efc317eb845a6d13ff273a5a31, type: 3}
+    minDamage: 15
+    maxDamage: 18
+    maxBulletBagNum: 10
+    clipSize: 8
+    shootInterval: 1
