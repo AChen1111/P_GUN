@@ -1,0 +1,31 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="True">
+    <ui:VisualElement name="excel2so-root" class="excel2so-window">
+        <ui:Label name="title-label" text="Excel2SO Importer" class="window-title" />
+
+        <ui:VisualElement name="form-root" class="form-root">
+            <ui:VisualElement class="form-row">
+                <ui:Label text="Importer" class="field-label" />
+                <ui:VisualElement name="importer-container" class="field-slot" />
+            </ui:VisualElement>
+
+            <ui:VisualElement class="form-row">
+                <ui:Label text="Table" class="field-label" />
+                <ui:TextField name="table-path-field" class="path-field" />
+                <ui:Button name="table-browse-button" text="Browse" class="path-button" />
+            </ui:VisualElement>
+
+            <ui:VisualElement class="form-row">
+                <ui:Label text="Target" class="field-label" />
+                <ui:TextField name="target-path-field" class="path-field" />
+                <ui:Button name="target-browse-button" text="Save As" class="path-button target-button" />
+                <ui:Button name="target-default-button" text="Default" class="path-button target-button" />
+            </ui:VisualElement>
+
+            <ui:VisualElement class="action-row">
+                <ui:Button name="import-button" text="Import" class="import-button" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <ui:Label name="status-label" class="status-label" />
+    </ui:VisualElement>
+</ui:UXML>

@@ -1,0 +1,28 @@
+using System.Linq;
+using UnityEngine;
+
+public sealed class WeaponDatabaseExcelImporter : Excel2SoListAssetImporter<WeaponDatabase>
+{
+    protected override string DefaultAssetPath => "Assets/Resources/WeaponDatabase.asset";
+
+    protected override string ListPropertyPath => "weapons";
+
+    protected override void Configure(Excel2SoMapping map)
+    {
+        map.Column("weaponId").To("weaponId").AsString();
+        map.Column("displayName").To("displayName").AsString();
+        map.Column("minDamage").To("minDamage").AsInt();
+        map.Column("maxDamage").To("maxDamage").AsInt();
+        map.Column("maxBulletBagNum").To("maxBulletBagNum").AsInt();
+        map.Column("clipSize").To("clipSize").AsInt();
+        map.Column("shootInterval").To("shootInterval").AsFloat();
+        map.Column("reloadSound").To("reloadSound").AsAsset<AudioClip>();
+        map.Column("shootSounds").To("shootSounds").AsAssetList<AudioClip>(";");
+    }
+
+    protected override void OnAfterImportAsset(WeaponDatabase asset, ExcelTable table, Excel2SoImportReport report)
+    {
+        asset.ReplaceWeapons(asset.Weapons.ToArray());
+        WeaponDatabase.SetDefault(asset);
+    }
+}
