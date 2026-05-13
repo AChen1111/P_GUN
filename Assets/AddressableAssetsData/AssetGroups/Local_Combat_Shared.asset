@@ -31,6 +31,11 @@ MonoBehaviour:
     - combat_shared
     - vfx
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 509b372a670abc94c8dec5ddcce60e69
+    m_Address: Assets/Prefab/Bullet/ArrowBullet.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 576871a843cdcfa4facd211562818436
     m_Address: bullet/player
     m_ReadOnly: 0

@@ -3942,10 +3942,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 23dd5827bc7a3cb48b95a65ac0e97463, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  defaultPrefab: {fileID: 7284967527061219658, guid: 3752c64bcee20ed4ca0c96a5cc62c95d, type: 3}
   defaultCapacity: 16
   maxSize: 128
-  prewarmCount: 0
+  prefabInfos: []
   collectionChecks: 1
   activeRoot: {fileID: 519806775}
   inactiveRoot: {fileID: 156578218}
@@ -4374,10 +4373,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a4df9ff1dfbeab94faeb3a35b0dda173, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  defaultPrefab: {fileID: 8813529008298550284, guid: 10e246e394d07ef4ea3fe43c6de534c0, type: 3}
   defaultCapacity: 16
   maxSize: 128
-  prewarmCount: 20
+  prefabInfos: []
   collectionChecks: 1
   activeRoot: {fileID: 2006711559}
   inactiveRoot: {fileID: 2096509877}
@@ -4582,10 +4580,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a01a3f568e5c84944b04068e104f9143, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  defaultPrefab: {fileID: 0}
   defaultCapacity: 16
   maxSize: 128
-  prewarmCount: 0
+  prefabInfos: []
   collectionChecks: 1
   activeRoot: {fileID: 823884787}
   inactiveRoot: {fileID: 430872711}
@@ -4690,10 +4687,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 098e2ca531244baeb7db55d47df07bdd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  defaultPrefab: {fileID: 8883869366757948090, guid: 576871a843cdcfa4facd211562818436, type: 3}
   defaultCapacity: 16
   maxSize: 128
-  prewarmCount: 16
+  prefabInfos:
+  - prefab: {fileID: 8883869366757948090, guid: 576871a843cdcfa4facd211562818436, type: 3}
+    prewarmCount: 10
+  - prefab: {fileID: 6121020581885493579, guid: 509b372a670abc94c8dec5ddcce60e69, type: 3}
+    prewarmCount: 10
   collectionChecks: 1
   activeRoot: {fileID: 2087560353}
   inactiveRoot: {fileID: 1257509654}
