@@ -29,18 +29,19 @@ public abstract class PoolBase<T> : MonoBehaviour where T : MonoBehaviour, IPool
     [SerializeField] private Transform inactiveRoot;
 
     /// <summary>
-    /// 按prefab分池,key是prefab,value是该prefab对应的ObjectPool
+    /// 通过预制体找对应的池子
     /// </summary>
-    private readonly Dictionary<T, ObjectPool<T>> poolByPrefab = new Dictionary<T, ObjectPool<T>>();
-    /// <summary>
-    /// 按实例分池,key是实例,value是该实例对应的ObjectPool
-    /// </summary>
-    private readonly Dictionary<T, ObjectPool<T>> poolByInstance = new Dictionary<T, ObjectPool<T>>();
+    private readonly Dictionary<T, ObjectPool<T>> _prefab2Pool = new Dictionary<T, ObjectPool<T>>();
 
     /// <summary>
-    /// 按实例分池,key是实例,value是该实例对应的prefab
+    /// 通过实例找对应的池子
     /// </summary>
-    private readonly Dictionary<T, T> prefabByInstance = new Dictionary<T, T>();
+    private readonly Dictionary<T, ObjectPool<T>> _instance2Pool = new Dictionary<T, ObjectPool<T>>();
+
+    /// <summary>
+    /// 通过实例找对应的预制体
+    /// </summary>
+    private readonly Dictionary<T, T> _instance2Prefab = new Dictionary<T, T>();
 
     // 子类需要读取默认 prefab 时使用, 外部仍然通过 Get 接口取对象.
     protected T DefaultPrefab => defaultPrefab;
@@ -52,7 +53,7 @@ public abstract class PoolBase<T> : MonoBehaviour where T : MonoBehaviour, IPool
     public int CountInactive {
         get {
             var count = 0;
-            foreach(var pool in poolByPrefab.Values) {
+            foreach(var pool in _prefab2Pool.Values) {
                 count += pool.CountInactive;
             }
 
@@ -66,7 +67,7 @@ public abstract class PoolBase<T> : MonoBehaviour where T : MonoBehaviour, IPool
     public int CountActive {
         get {
             var count = 0;
-            foreach(var pool in poolByPrefab.Values) {
+            foreach(var pool in _prefab2Pool.Values) {
                 count += pool.CountActive;
             }
 
@@ -80,7 +81,7 @@ public abstract class PoolBase<T> : MonoBehaviour where T : MonoBehaviour, IPool
     public int CountAll {
         get {
             var count = 0;
-            foreach(var pool in poolByPrefab.Values) {
+            foreach(var pool in _prefab2Pool.Values) {
                 count += pool.CountAll;
             }
 
@@ -98,7 +99,6 @@ public abstract class PoolBase<T> : MonoBehaviour where T : MonoBehaviour, IPool
         }
 
         _instance = this;
-        EnsureRoots();
 
         // 预热默认 prefab, 避免战斗中第一次 Instantiate 造成卡顿.
         if(defaultPrefab != null) {
@@ -152,7 +152,7 @@ public abstract class PoolBase<T> : MonoBehaviour where T : MonoBehaviour, IPool
     public void Release(T item) {
         if (item == null || !item.gameObject.activeSelf) return;
 
-        if(poolByInstance.TryGetValue(item, out var pool)) {
+        if(_instance2Pool.TryGetValue(item, out var pool)) {
             pool.Release(item);
             return;
         }
@@ -188,6 +188,8 @@ public abstract class PoolBase<T> : MonoBehaviour where T : MonoBehaviour, IPool
         }
     }
 
+
+#region 子类覆写
     /// <summary>
     /// 对象第一次由 prefab Instantiate 后调用.
     /// 子类可以在这里做一次性初始化, 例如缓存组件或设置父级外的额外数据.
@@ -217,17 +219,17 @@ public abstract class PoolBase<T> : MonoBehaviour where T : MonoBehaviour, IPool
     /// </summary>
     protected virtual void OnDestroyItem(T item) {
     }
+#endregion
+
 
     /// <summary>
     /// 获取 prefab 对应的 ObjectPool.
     /// 如果该 prefab 还没有子池, 就创建一个新的 ObjectPool 并登记到 poolByPrefab.
     /// </summary>
     private ObjectPool<T> GetOrCreatePool(T prefab) {
-        if(poolByPrefab.TryGetValue(prefab, out var pool)) {
+        if(_prefab2Pool.TryGetValue(prefab, out var pool)) {
             return pool;
         }
-
-        EnsureRoots();
 
         var capacity = Mathf.Max(1, defaultCapacity);
         var size = Mathf.Max(capacity, maxSize);
@@ -243,7 +245,7 @@ public abstract class PoolBase<T> : MonoBehaviour where T : MonoBehaviour, IPool
             size
         );
 
-        poolByPrefab.Add(prefab, pool);
+        _prefab2Pool.Add(prefab, pool);
         return pool;
     }
 
@@ -257,7 +259,7 @@ public abstract class PoolBase<T> : MonoBehaviour where T : MonoBehaviour, IPool
         var item = Instantiate(prefab, inactiveRoot);
         item.gameObject.SetActive(false);
 
-        prefabByInstance[item] = prefab;
+        _instance2Prefab[item] = prefab;
 
         OnCreate(item, prefab);
         return item;
@@ -268,15 +270,14 @@ public abstract class PoolBase<T> : MonoBehaviour where T : MonoBehaviour, IPool
     /// 这里负责恢复实例到池的映射, 移动到 activeRoot, 激活对象, 然后通知对象进入使用状态.
     /// </summary>
     private void OnTakeFromPool(T item) {
-        if(prefabByInstance.TryGetValue(item, out var prefab) && poolByPrefab.TryGetValue(prefab, out var pool)) {
-            poolByInstance[item] = pool;
+        if(_instance2Prefab.TryGetValue(item, out var prefab) && _prefab2Pool.TryGetValue(prefab, out var pool)) {
+            _instance2Pool[item] = pool;
         }
 
         item.transform.SetParent(activeRoot, false);
         item.gameObject.SetActive(true);
 
-        //NotifySpawnFromPool(item);
-        item.OnSpawnFromPool();
+        item.OnSpawnFromPool();//重置内部状态
         OnGet(item);
     }
 
@@ -285,7 +286,7 @@ public abstract class PoolBase<T> : MonoBehaviour where T : MonoBehaviour, IPool
     /// 这里先通知对象清理自身状态, 再执行子类回收扩展点, 最后隐藏对象并移到 inactiveRoot.
     /// </summary>
     private void OnReturnedToPool(T item) {
-        item.OnRecycleToPool();
+        item.OnRecycleToPool();//重置内部状态
         OnRelease(item);
         item.gameObject.SetActive(false);
         item.transform.SetParent(inactiveRoot, false);
@@ -298,42 +299,10 @@ public abstract class PoolBase<T> : MonoBehaviour where T : MonoBehaviour, IPool
     private void DestroyItem(T item) {
         OnDestroyItem(item);
         if (item != null) {
-            poolByInstance.Remove(item);
-            prefabByInstance.Remove(item);
+            _instance2Pool.Remove(item);
+            _instance2Prefab.Remove(item);
             Destroy(item.gameObject);
         }
     }
 
-    /// <summary>
-    /// 确保 activeRoot 和 inactiveRoot 存在.
-    /// 如果没有在 Inspector 中手动指定, 就自动创建子节点.
-    /// </summary>
-    private void EnsureRoots() {
-        if (activeRoot == null) {
-            activeRoot = CreateRoot("Active");
-        }
-
-        if (inactiveRoot == null) {
-            inactiveRoot = CreateRoot("Inactive");
-        }
-    }
-
-    /// <summary>
-    /// 创建池内部使用的分组节点.
-    /// </summary>
-    private Transform CreateRoot(string rootName) {
-        var root = new GameObject(rootName).transform;
-        root.SetParent(transform, false);
-        return root;
-    }
-
-    /// <summary>
-    /// Inspector 参数校验.
-    /// 保证容量配置始终有效, 避免运行时创建 ObjectPool 时传入非法数值.
-    /// </summary>
-    private void OnValidate() {
-        defaultCapacity = Mathf.Max(1, defaultCapacity);
-        maxSize = Mathf.Max(defaultCapacity, maxSize);
-        prewarmCount = Mathf.Clamp(prewarmCount, 0, maxSize);
-    }
 }
