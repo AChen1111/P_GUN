@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class DamageInfo {
     public int Damage { get; set; } = 1;
-
+    
     /// <summary>
     /// 伤害来源方向，约定为攻击/子弹从来源飞向受击者的方向。
     /// </summary>
