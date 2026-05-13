@@ -38,13 +38,6 @@ MonoBehaviour:
     - item_chest
     - items
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: f963cab0c16d497f8b7eaf8ef16cd5e7
-    m_Address: item/spawn_table/chest_loot
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - items
-    - spawn_tables
-    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 63af2ccf367b1c745b05c3dc480c23af, type: 2}
   m_SchemaSet:

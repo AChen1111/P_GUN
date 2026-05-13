@@ -13,6 +13,8 @@ public sealed class Excel2SoMapping
 
     internal IReadOnlyList<Excel2SoBinding> Bindings => bindings;
 
+    internal IReadOnlyList<Excel2SoBinding> ExportableBindings => bindings.Where(binding => binding.CanExport).ToArray();
+
     public Excel2SoColumnBuilder Column(string columnName)
     {
         return new Excel2SoColumnBuilder(this, columnName);
@@ -73,48 +75,62 @@ public sealed class Excel2SoValueBuilder
         this.propertyPath = propertyPath;
     }
 
-    public Excel2SoMapping AsString() => Add(Excel2SoValueSetters.SetString);
+    public Excel2SoMapping AsString() => Add(Excel2SoValueSetters.SetString, Excel2SoValueGetters.GetString);
 
-    public Excel2SoMapping AsInt() => Add(Excel2SoValueSetters.SetInt);
+    public Excel2SoMapping AsInt() => Add(Excel2SoValueSetters.SetInt, Excel2SoValueGetters.GetInt);
 
-    public Excel2SoMapping AsFloat() => Add(Excel2SoValueSetters.SetFloat);
+    public Excel2SoMapping AsFloat() => Add(Excel2SoValueSetters.SetFloat, Excel2SoValueGetters.GetFloat);
 
-    public Excel2SoMapping AsBool() => Add(Excel2SoValueSetters.SetBool);
+    public Excel2SoMapping AsBool() => Add(Excel2SoValueSetters.SetBool, Excel2SoValueGetters.GetBool);
 
-    public Excel2SoMapping AsVector2() => Add(Excel2SoValueSetters.SetVector2);
+    public Excel2SoMapping AsVector2() => Add(Excel2SoValueSetters.SetVector2, Excel2SoValueGetters.GetVector2);
 
-    public Excel2SoMapping AsVector3() => Add(Excel2SoValueSetters.SetVector3);
+    public Excel2SoMapping AsVector3() => Add(Excel2SoValueSetters.SetVector3, Excel2SoValueGetters.GetVector3);
 
-    public Excel2SoMapping AsColor() => Add(Excel2SoValueSetters.SetColor);
+    public Excel2SoMapping AsColor() => Add(Excel2SoValueSetters.SetColor, Excel2SoValueGetters.GetColor);
 
     public Excel2SoMapping AsStringList(string separators = ";,|")
     {
-        return Add((row, rawValue, property, context, column, path) =>
-            Excel2SoValueSetters.SetStringList(rawValue, property, context, column, path, separators));
+        return Add(
+            (row, rawValue, property, context, column, path) =>
+                Excel2SoValueSetters.SetStringList(rawValue, property, context, column, path, separators),
+            (SerializedProperty property, Excel2SoExportContext context, string column, string path, out string value) =>
+                Excel2SoValueGetters.GetStringList(property, context, column, path, separators, out value));
     }
 
     public Excel2SoMapping AsIntList(string separators = ";,|")
     {
-        return Add((row, rawValue, property, context, column, path) =>
-            Excel2SoValueSetters.SetIntList(rawValue, property, context, column, path, separators));
+        return Add(
+            (row, rawValue, property, context, column, path) =>
+                Excel2SoValueSetters.SetIntList(rawValue, property, context, column, path, separators),
+            (SerializedProperty property, Excel2SoExportContext context, string column, string path, out string value) =>
+                Excel2SoValueGetters.GetIntList(property, context, column, path, separators, out value));
     }
 
     public Excel2SoMapping AsFloatList(string separators = ";,|")
     {
-        return Add((row, rawValue, property, context, column, path) =>
-            Excel2SoValueSetters.SetFloatList(rawValue, property, context, column, path, separators));
+        return Add(
+            (row, rawValue, property, context, column, path) =>
+                Excel2SoValueSetters.SetFloatList(rawValue, property, context, column, path, separators),
+            (SerializedProperty property, Excel2SoExportContext context, string column, string path, out string value) =>
+                Excel2SoValueGetters.GetFloatList(property, context, column, path, separators, out value));
     }
 
     public Excel2SoMapping AsAsset<TAsset>() where TAsset : Object
     {
-        return Add((row, rawValue, property, context, column, path) =>
-            Excel2SoValueSetters.SetAsset<TAsset>(rawValue, property, context, column, path));
+        return Add(
+            (row, rawValue, property, context, column, path) =>
+                Excel2SoValueSetters.SetAsset<TAsset>(rawValue, property, context, column, path),
+            Excel2SoValueGetters.GetAsset);
     }
 
     public Excel2SoMapping AsAssetList<TAsset>(string separators = ";,|") where TAsset : Object
     {
-        return Add((row, rawValue, property, context, column, path) =>
-            Excel2SoValueSetters.SetAssetList<TAsset>(rawValue, property, context, column, path, separators));
+        return Add(
+            (row, rawValue, property, context, column, path) =>
+                Excel2SoValueSetters.SetAssetList<TAsset>(rawValue, property, context, column, path, separators),
+            (SerializedProperty property, Excel2SoExportContext context, string column, string path, out string value) =>
+                Excel2SoValueGetters.GetAssetList(property, context, column, path, separators, out value));
     }
 
     public Excel2SoMapping AsEnum<TEnum>() where TEnum : struct
@@ -129,13 +145,16 @@ public sealed class Excel2SoValueBuilder
             throw new ArgumentException("Excel2SO enum mapping requires an enum type.", nameof(enumType));
         }
 
-        return Add((row, rawValue, property, context, column, path) =>
-            Excel2SoValueSetters.SetEnum(rawValue, property, context, column, path, enumType));
+        return Add(
+            (row, rawValue, property, context, column, path) =>
+                Excel2SoValueSetters.SetEnum(rawValue, property, context, column, path, enumType),
+            (SerializedProperty property, Excel2SoExportContext context, string column, string path, out string value) =>
+                Excel2SoValueGetters.GetEnum(property, context, column, path, enumType, out value));
     }
 
-    private Excel2SoMapping Add(Excel2SoValueSetter setter)
+    private Excel2SoMapping Add(Excel2SoValueSetter setter, Excel2SoValueGetter getter)
     {
-        mapping.Add(new Excel2SoFieldBinding(columnName, propertyPath, setter));
+        mapping.Add(new Excel2SoFieldBinding(columnName, propertyPath, setter, getter));
         return mapping;
     }
 }
@@ -148,6 +167,13 @@ internal delegate bool Excel2SoValueSetter(
     string columnName,
     string propertyPath);
 
+internal delegate bool Excel2SoValueGetter(
+    SerializedProperty property,
+    Excel2SoExportContext context,
+    string columnName,
+    string propertyPath,
+    out string value);
+
 internal abstract class Excel2SoBinding
 {
     protected Excel2SoBinding(string columnName)
@@ -155,7 +181,9 @@ internal abstract class Excel2SoBinding
         ColumnName = columnName;
     }
 
-    protected string ColumnName { get; }
+    internal string ColumnName { get; }
+
+    internal virtual bool CanExport => false;
 
     public abstract bool Apply(
         ExcelRow row,
@@ -163,6 +191,17 @@ internal abstract class Excel2SoBinding
         SerializedProperty rootProperty,
         ScriptableObject target,
         Excel2SoImportContext context);
+
+    public virtual bool TryExport(
+        SerializedObject serializedObject,
+        SerializedProperty rootProperty,
+        ScriptableObject target,
+        Excel2SoExportContext context,
+        out string value)
+    {
+        value = string.Empty;
+        return false;
+    }
 
     protected bool TryGetCell(ExcelRow row, Excel2SoImportContext context, out string value)
     {
@@ -182,13 +221,21 @@ internal sealed class Excel2SoFieldBinding : Excel2SoBinding
 {
     private readonly string propertyPath;
     private readonly Excel2SoValueSetter setter;
+    private readonly Excel2SoValueGetter getter;
 
-    public Excel2SoFieldBinding(string columnName, string propertyPath, Excel2SoValueSetter setter)
+    public Excel2SoFieldBinding(
+        string columnName,
+        string propertyPath,
+        Excel2SoValueSetter setter,
+        Excel2SoValueGetter getter)
         : base(columnName)
     {
         this.propertyPath = propertyPath;
         this.setter = setter;
+        this.getter = getter;
     }
+
+    internal override bool CanExport => getter != null;
 
     public override bool Apply(
         ExcelRow row,
@@ -226,6 +273,51 @@ internal sealed class Excel2SoFieldBinding : Excel2SoBinding
             context.ConversionErrors++;
             Debug.LogError(
                 $"Excel2SO: Row {row.RowNumber}, column '{ColumnName}' failed to set '{propertyPath}'. {ex.Message}");
+            return false;
+        }
+    }
+
+    public override bool TryExport(
+        SerializedObject serializedObject,
+        SerializedProperty rootProperty,
+        ScriptableObject target,
+        Excel2SoExportContext context,
+        out string value)
+    {
+        value = string.Empty;
+        if (getter == null)
+        {
+            return false;
+        }
+
+        var property = Excel2SoSerializedPropertyUtility.FindProperty(serializedObject, rootProperty, propertyPath);
+        if (property == null)
+        {
+            context.WarnOnce(
+                $"missing-export-property:{target.GetType().FullName}:{propertyPath}",
+                $"SO2Table: Property '{propertyPath}' was not found on {target.GetType().Name}.");
+            context.ConversionErrors++;
+            return false;
+        }
+
+        try
+        {
+            if (!getter(property, context, ColumnName, propertyPath, out value))
+            {
+                context.ConversionErrors++;
+                value = string.Empty;
+                return false;
+            }
+
+            context.ExportedFields++;
+            return true;
+        }
+        catch (Exception ex)
+        {
+            context.ConversionErrors++;
+            Debug.LogError(
+                $"SO2Table: Column '{ColumnName}' failed to export '{propertyPath}'. {ex.Message}");
+            value = string.Empty;
             return false;
         }
     }
@@ -284,6 +376,367 @@ internal sealed class Excel2SoImportContext
         {
             Debug.LogWarning(message);
         }
+    }
+}
+
+internal sealed class Excel2SoExportContext
+{
+    private readonly HashSet<string> warningKeys = new HashSet<string>();
+
+    public int ExportedFields { get; set; }
+
+    public int ConversionErrors { get; set; }
+
+    public void WarnOnce(string key, string message)
+    {
+        if (warningKeys.Add(key))
+        {
+            Debug.LogWarning(message);
+        }
+    }
+}
+
+internal static class Excel2SoValueGetters
+{
+    public static bool GetString(
+        SerializedProperty property,
+        Excel2SoExportContext context,
+        string columnName,
+        string propertyPath,
+        out string value)
+    {
+        value = string.Empty;
+        if (!EnsurePropertyType(property, SerializedPropertyType.String, context, columnName, propertyPath))
+        {
+            return false;
+        }
+
+        value = property.stringValue ?? string.Empty;
+        return true;
+    }
+
+    public static bool GetInt(
+        SerializedProperty property,
+        Excel2SoExportContext context,
+        string columnName,
+        string propertyPath,
+        out string value)
+    {
+        value = string.Empty;
+        if (!EnsurePropertyType(property, SerializedPropertyType.Integer, context, columnName, propertyPath))
+        {
+            return false;
+        }
+
+        value = property.intValue.ToString(CultureInfo.InvariantCulture);
+        return true;
+    }
+
+    public static bool GetFloat(
+        SerializedProperty property,
+        Excel2SoExportContext context,
+        string columnName,
+        string propertyPath,
+        out string value)
+    {
+        value = string.Empty;
+        if (!EnsurePropertyType(property, SerializedPropertyType.Float, context, columnName, propertyPath))
+        {
+            return false;
+        }
+
+        value = property.floatValue.ToString("G9", CultureInfo.InvariantCulture);
+        return true;
+    }
+
+    public static bool GetBool(
+        SerializedProperty property,
+        Excel2SoExportContext context,
+        string columnName,
+        string propertyPath,
+        out string value)
+    {
+        value = string.Empty;
+        if (!EnsurePropertyType(property, SerializedPropertyType.Boolean, context, columnName, propertyPath))
+        {
+            return false;
+        }
+
+        value = property.boolValue ? "TRUE" : "FALSE";
+        return true;
+    }
+
+    public static bool GetVector2(
+        SerializedProperty property,
+        Excel2SoExportContext context,
+        string columnName,
+        string propertyPath,
+        out string value)
+    {
+        value = string.Empty;
+        if (!EnsurePropertyType(property, SerializedPropertyType.Vector2, context, columnName, propertyPath))
+        {
+            return false;
+        }
+
+        var vector = property.vector2Value;
+        value = JoinFloats(vector.x, vector.y);
+        return true;
+    }
+
+    public static bool GetVector3(
+        SerializedProperty property,
+        Excel2SoExportContext context,
+        string columnName,
+        string propertyPath,
+        out string value)
+    {
+        value = string.Empty;
+        if (!EnsurePropertyType(property, SerializedPropertyType.Vector3, context, columnName, propertyPath))
+        {
+            return false;
+        }
+
+        var vector = property.vector3Value;
+        value = JoinFloats(vector.x, vector.y, vector.z);
+        return true;
+    }
+
+    public static bool GetColor(
+        SerializedProperty property,
+        Excel2SoExportContext context,
+        string columnName,
+        string propertyPath,
+        out string value)
+    {
+        value = string.Empty;
+        if (!EnsurePropertyType(property, SerializedPropertyType.Color, context, columnName, propertyPath))
+        {
+            return false;
+        }
+
+        value = $"#{ColorUtility.ToHtmlStringRGBA(property.colorValue)}";
+        return true;
+    }
+
+    public static bool GetEnum(
+        SerializedProperty property,
+        Excel2SoExportContext context,
+        string columnName,
+        string propertyPath,
+        Type enumType,
+        out string value)
+    {
+        value = string.Empty;
+        if (property.propertyType == SerializedPropertyType.Enum)
+        {
+            if (property.enumValueIndex >= 0 && property.enumValueIndex < property.enumNames.Length)
+            {
+                value = property.enumNames[property.enumValueIndex];
+                return true;
+            }
+
+            value = property.enumValueIndex.ToString(CultureInfo.InvariantCulture);
+            return true;
+        }
+
+        if (property.propertyType == SerializedPropertyType.Integer)
+        {
+            value = Enum.GetName(enumType, property.intValue) ??
+                    property.intValue.ToString(CultureInfo.InvariantCulture);
+            return true;
+        }
+
+        context.WarnOnce(
+            $"wrong-export-enum-property:{property.serializedObject.targetObject.GetType().FullName}:{propertyPath}",
+            $"SO2Table: Property '{propertyPath}' is not compatible with enum column '{columnName}'.");
+        return false;
+    }
+
+    public static bool GetStringList(
+        SerializedProperty property,
+        Excel2SoExportContext context,
+        string columnName,
+        string propertyPath,
+        string separators,
+        out string value)
+    {
+        value = string.Empty;
+        if (!EnsureArrayProperty(property, context, columnName, propertyPath))
+        {
+            return false;
+        }
+
+        var values = new List<string>(property.arraySize);
+        for (var i = 0; i < property.arraySize; i++)
+        {
+            var element = property.GetArrayElementAtIndex(i);
+            if (!EnsurePropertyType(element, SerializedPropertyType.String, context, columnName, $"{propertyPath}[{i}]"))
+            {
+                return false;
+            }
+
+            values.Add(element.stringValue ?? string.Empty);
+        }
+
+        value = string.Join(GetExportSeparator(separators), values);
+        return true;
+    }
+
+    public static bool GetIntList(
+        SerializedProperty property,
+        Excel2SoExportContext context,
+        string columnName,
+        string propertyPath,
+        string separators,
+        out string value)
+    {
+        value = string.Empty;
+        if (!EnsureArrayProperty(property, context, columnName, propertyPath))
+        {
+            return false;
+        }
+
+        var values = new List<string>(property.arraySize);
+        for (var i = 0; i < property.arraySize; i++)
+        {
+            var element = property.GetArrayElementAtIndex(i);
+            if (!EnsurePropertyType(element, SerializedPropertyType.Integer, context, columnName, $"{propertyPath}[{i}]"))
+            {
+                return false;
+            }
+
+            values.Add(element.intValue.ToString(CultureInfo.InvariantCulture));
+        }
+
+        value = string.Join(GetExportSeparator(separators), values);
+        return true;
+    }
+
+    public static bool GetFloatList(
+        SerializedProperty property,
+        Excel2SoExportContext context,
+        string columnName,
+        string propertyPath,
+        string separators,
+        out string value)
+    {
+        value = string.Empty;
+        if (!EnsureArrayProperty(property, context, columnName, propertyPath))
+        {
+            return false;
+        }
+
+        var values = new List<string>(property.arraySize);
+        for (var i = 0; i < property.arraySize; i++)
+        {
+            var element = property.GetArrayElementAtIndex(i);
+            if (!EnsurePropertyType(element, SerializedPropertyType.Float, context, columnName, $"{propertyPath}[{i}]"))
+            {
+                return false;
+            }
+
+            values.Add(element.floatValue.ToString("G9", CultureInfo.InvariantCulture));
+        }
+
+        value = string.Join(GetExportSeparator(separators), values);
+        return true;
+    }
+
+    public static bool GetAsset(
+        SerializedProperty property,
+        Excel2SoExportContext context,
+        string columnName,
+        string propertyPath,
+        out string value)
+    {
+        value = string.Empty;
+        if (!EnsurePropertyType(property, SerializedPropertyType.ObjectReference, context, columnName, propertyPath))
+        {
+            return false;
+        }
+
+        value = property.objectReferenceValue == null
+            ? string.Empty
+            : AssetDatabase.GetAssetPath(property.objectReferenceValue);
+        return true;
+    }
+
+    public static bool GetAssetList(
+        SerializedProperty property,
+        Excel2SoExportContext context,
+        string columnName,
+        string propertyPath,
+        string separators,
+        out string value)
+    {
+        value = string.Empty;
+        if (!EnsureArrayProperty(property, context, columnName, propertyPath))
+        {
+            return false;
+        }
+
+        var values = new List<string>(property.arraySize);
+        for (var i = 0; i < property.arraySize; i++)
+        {
+            var element = property.GetArrayElementAtIndex(i);
+            if (!EnsurePropertyType(element, SerializedPropertyType.ObjectReference, context, columnName, $"{propertyPath}[{i}]"))
+            {
+                return false;
+            }
+
+            values.Add(element.objectReferenceValue == null
+                ? string.Empty
+                : AssetDatabase.GetAssetPath(element.objectReferenceValue));
+        }
+
+        value = string.Join(GetExportSeparator(separators), values);
+        return true;
+    }
+
+    private static bool EnsurePropertyType(
+        SerializedProperty property,
+        SerializedPropertyType expected,
+        Excel2SoExportContext context,
+        string columnName,
+        string propertyPath)
+    {
+        if (property.propertyType == expected)
+        {
+            return true;
+        }
+
+        context.WarnOnce(
+            $"wrong-export-property-type:{property.serializedObject.targetObject.GetType().FullName}:{propertyPath}:{expected}",
+            $"SO2Table: Property '{propertyPath}' is {property.propertyType}, but column '{columnName}' expects {expected}.");
+        return false;
+    }
+
+    private static bool EnsureArrayProperty(
+        SerializedProperty property,
+        Excel2SoExportContext context,
+        string columnName,
+        string propertyPath)
+    {
+        if (property.isArray && property.propertyType == SerializedPropertyType.Generic)
+        {
+            return true;
+        }
+
+        context.WarnOnce(
+            $"wrong-export-array-property:{property.serializedObject.targetObject.GetType().FullName}:{propertyPath}",
+            $"SO2Table: Property '{propertyPath}' must be an array or List for column '{columnName}'.");
+        return false;
+    }
+
+    private static string JoinFloats(params float[] values)
+    {
+        return string.Join(";", values.Select(value => value.ToString("G9", CultureInfo.InvariantCulture)));
+    }
+
+    private static string GetExportSeparator(string separators)
+    {
+        return string.IsNullOrEmpty(separators) ? ";" : separators[0].ToString();
     }
 }
 
