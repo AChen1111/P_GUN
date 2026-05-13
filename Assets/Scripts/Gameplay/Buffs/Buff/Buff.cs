@@ -3,21 +3,30 @@ using UnityEngine;
 
 /// <summary>
 /// 所有具体 Buff 的基础资产.
-/// 具体 Buff 继承该类, 并重写 InitEffect 或 OnTrigger 来定义效果.
+/// 具体 Buff 继承该类, 并重写 InitEffect, OnTrigger 或 OnEnd 来定义行为.
 /// </summary>
 public abstract class Buff : ScriptableObject
 {
     [Header("Basic")]
+    [Tooltip("Buff 的唯一 id, 用于数据库查询和道具配置.")]
     [SerializeField] private int id = 0;
+
+    [Tooltip("Buff 的显示名称. 如果为空, 会使用资产名称.")]
     [SerializeField] private string buffName = string.Empty;
 
     [Header("Lifetime")]
+    [Tooltip("Buff 的持续时间, 单位为秒. 当不是永久 Buff 时生效.")]
     [Min(0f)]
     [SerializeField] private float duration = 5f;
+
+    [Tooltip("是否为永久 Buff. 开启后不会因为持续时间结束而自动移除.")]
     [SerializeField] private bool isPermanent = false;
 
     [Header("Trigger")]
-    [SerializeField] private BuffTriggerType triggerType = BuffTriggerType.OnApply;
+    [Tooltip("Buff 存在期间的触发方式. Continuous 为每帧触发, Interval 为按固定间隔触发.")]
+    [SerializeField] private BuffTriggerType triggerType = BuffTriggerType.Continuous;
+
+    [Tooltip("固定间隔触发的时间间隔, 单位为秒. 仅在触发方式为 Interval 时生效.")]
     [Min(0f)]
     [SerializeField] private float interval = 1f;
 
@@ -50,7 +59,19 @@ public abstract class Buff : ScriptableObject
     /// <summary>
     /// 默认效果入口. 简单 Buff 可以直接重写该方法.
     /// </summary>
-    protected virtual void OnTrigger(BuffRuntimeInfo info)
+    protected abstract void OnTrigger(BuffRuntimeInfo info);
+
+    /// <summary>
+    /// Buff 开始时的回调. 所有 Buff 被添加或重复调用时都会调用, 子类可以按需重写.
+    /// </summary>
+    public virtual void OnStart(BuffRuntimeInfo info)
+    {
+    }
+
+    /// <summary>
+    /// Buff 结束时的回调. 所有 Buff 被移除时都会调用, 子类可以按需重写.
+    /// </summary>
+    public virtual void OnEnd(BuffRuntimeInfo info)
     {
     }
 

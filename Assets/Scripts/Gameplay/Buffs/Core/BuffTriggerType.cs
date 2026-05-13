@@ -3,12 +3,6 @@
 /// </summary>
 public enum BuffTriggerType
 {
-    /// <summary>Buff 被添加, 或同一个 Buff 被再次添加时触发一次.</summary>
-    OnApply,
-
-    /// <summary>Buff 被移除前触发一次.</summary>
-    OnRemove,
-
     /// <summary>Buff 存在期间每帧触发.</summary>
     Continuous,
 
