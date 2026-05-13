@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,7 +9,7 @@ using UnityEngine;
 public class BuffManager : MonoBehaviour
 {
     [SerializeField] private BuffDataBase dataBase = null;
-
+    
     /// <summary>
     /// 当前生效的 Buff 列表, 用于每帧顺序更新.
     /// </summary>
@@ -48,7 +49,7 @@ public class BuffManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 直接添加 Buff. 如果 Buff 已存在, 只重置持续时间并触发 OnApply.
+    /// 直接添加 Buff. 如果 Buff 已存在, 只重置持续时间并触发 OnStart.
     /// </summary>
     /// <param name="buff">Buff 配置</param>
     /// <returns>Buff 运行时信息</returns>
@@ -59,7 +60,7 @@ public class BuffManager : MonoBehaviour
         if (buffInfoMap.TryGetValue(buff, out var existing))
         {
             ResetBuffRuntimeInfo(existing, buff);
-            TriggerOnApply(existing);
+            TriggerOnStart(existing);
             return existing;
         }
 
@@ -68,7 +69,7 @@ public class BuffManager : MonoBehaviour
         info.Index = buffs.Count;
         buffs.Add(info);
         buffInfoMap[buff] = info;
-        TriggerOnApply(info);
+        TriggerOnStart(info);
         return info;
     }
 
@@ -83,7 +84,7 @@ public class BuffManager : MonoBehaviour
 
         if (buffInfoMap.TryGetValue(buff, out var info))
         {
-            TriggerOnRemove(info);
+            TriggerOnEnd(info);
             RemoveAt(info.Index);
             return true;
         }
@@ -98,7 +99,7 @@ public class BuffManager : MonoBehaviour
     {
         for (var i = buffs.Count - 1; i >= 0; i--)
         {
-            TriggerOnRemove(buffs[i]);
+            TriggerOnEnd(buffs[i]);
             RemoveAt(i);
         }
 
@@ -206,27 +207,21 @@ public class BuffManager : MonoBehaviour
 #region Trigger
 
     /// <summary>
-    /// 触发 Buff 的添加效果.
+    /// 触发 Buff 的开始回调.
     /// </summary>
     /// <param name="info">Buff 运行时信息</param>
-    private void TriggerOnApply(BuffRuntimeInfo info)
+    private static void TriggerOnStart(BuffRuntimeInfo info)
     {
-        if (info.Buff.TriggerType == BuffTriggerType.OnApply)
-        {
-            InvokeEffect(info);
-        }
+        info.Buff.OnStart(info);
     }
 
     /// <summary>
-    /// 触发 Buff 的移除效果.
+    /// 触发 Buff 的结束回调.
     /// </summary>
     /// <param name="info">Buff 运行时信息</param>
-    private void TriggerOnRemove(BuffRuntimeInfo info)
+    private static void TriggerOnEnd(BuffRuntimeInfo info)
     {
-        if (info.Buff.TriggerType == BuffTriggerType.OnRemove)
-        {
-            InvokeEffect(info);
-        }
+        info.Buff.OnEnd(info);
     }
 
     /// <summary>

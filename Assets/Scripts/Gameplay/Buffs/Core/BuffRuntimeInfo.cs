@@ -5,7 +5,8 @@ using UnityEngine;
 /// </summary>
 public class BuffRuntimeInfo
 {
-    public Buff Buff;
+    public Player owner = Global.player;
+    public Buff Buff;//buff效果
     public float Duration;
     public float RemainingTime;
     public float Interval;

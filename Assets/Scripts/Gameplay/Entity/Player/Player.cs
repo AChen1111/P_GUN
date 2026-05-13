@@ -3,10 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using QFramework;
+
 public class Player : ViewController
 {
     public UnityEngine.TextMesh DisPlayText;
-
     private Rigidbody2D rb;
     private Coroutine mDisplayTextCoroutine;
     [Header("角色贴图")]
@@ -18,17 +18,12 @@ public class Player : ViewController
     public int maxHp = 5;
     [Header("当前血量")]
     public int HP ;
-
-
     [Header("武器节点")]
     public Transform Weapon;
-
     [Header("武器列表")]
     public List<Gun> guns = new List<Gun>();
-
     [Header("准星")]
     public GameObject AimPrefab;
-
     [Header("当前枪")]
     public Gun gun;
 
@@ -39,6 +34,9 @@ public class Player : ViewController
     public bool canAutoAim = false;
 
     const float AutoAimRefreshInterval = 0.1f;
+
+    [Header("Buff管理器")]
+    public BuffManager buffManager;
 
     [Header("动画器")]
     [SerializeField]private Animator animator;
@@ -375,4 +373,23 @@ public class Player : ViewController
 
         return transform.position;
     }
+
+    /// <summary>
+    /// 增加速度
+    /// </summary>
+    /// <param name="value"></param>
+    public void AddSpeedByValue(float value)
+    {
+        moveSpeed += value;
+    }
+    /// <summary>
+    /// 设置速度
+    /// </summary>
+    /// <param name="value"></param>
+    public void SetSpeed(float value)
+    {
+        moveSpeed = value;
+    }
+
+    public float GetSpeed() => moveSpeed;
 }
