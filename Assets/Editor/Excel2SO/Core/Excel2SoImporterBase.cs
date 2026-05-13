@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -37,11 +39,41 @@ public sealed class Excel2SoImportReport
     }
 }
 
+public sealed class Excel2SoExportReport
+{
+    public string SourcePath { get; set; }
+
+    public string CsvPath { get; set; }
+
+    public int ExportedRows { get; set; }
+
+    public int ExportedColumns { get; set; }
+
+    public int ExportedFields { get; set; }
+
+    public int SkippedColumns { get; set; }
+
+    public int ConversionErrors { get; set; }
+
+    public bool Canceled { get; set; }
+
+    public override string ToString()
+    {
+        if (Canceled) return "SO2Table export canceled.";
+
+        return $"SO2Table exported {ExportedRows} rows, {ExportedColumns} columns, " +
+               $"exported {ExportedFields} fields, skipped {SkippedColumns} columns, " +
+               $"conversion errors {ConversionErrors}.";
+    }
+}
+
 public interface IExcel2SoListAssetImporter
 {
     string DefaultTargetAssetPath { get; }
 
     Excel2SoImportReport Import(string tablePath, string assetPath);
+
+    Excel2SoExportReport Export(string assetPath, string csvPath);
 }
 
 public abstract class Excel2SoImporterBase
@@ -123,7 +155,7 @@ public abstract class Excel2SoImporterBase
     {
         if (string.IsNullOrWhiteSpace(path)) return string.Empty;
 
-        path = path.Trim().Replace('\\', '/');
+        path = NormalizePath(path);
         if (path.StartsWith("Assets/", StringComparison.OrdinalIgnoreCase)) return path;
 
         if (Path.IsPathRooted(path))
@@ -136,6 +168,27 @@ public abstract class Excel2SoImporterBase
         }
 
         return path;
+    }
+
+    protected static string ResolveFileSystemPath(string path)
+    {
+        path = NormalizePath(path);
+        if (string.IsNullOrEmpty(path)) return string.Empty;
+
+        if (path.StartsWith("Assets/", StringComparison.OrdinalIgnoreCase))
+        {
+            var projectRoot = Directory.GetParent(Application.dataPath)?.FullName;
+            return string.IsNullOrEmpty(projectRoot)
+                ? path
+                : NormalizePath(Path.Combine(projectRoot, path));
+        }
+
+        return path;
+    }
+
+    protected static string NormalizePath(string path)
+    {
+        return string.IsNullOrWhiteSpace(path) ? string.Empty : path.Trim().Replace('\\', '/');
     }
 
     /// <summary>
@@ -251,6 +304,91 @@ public abstract class Excel2SoListAssetImporter<TAsset> : Excel2SoImporterBase, 
                 TargetPath = assetPath,
                 ConversionErrors = 1
             };
+        }
+    }
+
+    public Excel2SoExportReport Export(string assetPath, string csvPath)
+    {
+        assetPath = NormalizeAssetPath(assetPath);
+        csvPath = NormalizePath(csvPath);
+
+        var report = new Excel2SoExportReport
+        {
+            SourcePath = assetPath,
+            CsvPath = csvPath
+        };
+
+        try
+        {
+            var asset = AssetDatabase.LoadAssetAtPath<TAsset>(assetPath);
+            if (asset == null)
+            {
+                Debug.LogError($"SO2Table: Source asset '{assetPath}' was not found as {typeof(TAsset).Name}.");
+                report.ConversionErrors++;
+                return report;
+            }
+
+            var mapping = BuildMapping();
+            var exportBindings = mapping.ExportableBindings;
+            report.SkippedColumns = mapping.Bindings.Count - exportBindings.Count;
+
+            var serializedObject = new SerializedObject(asset);
+            serializedObject.Update();
+
+            var listProperty = serializedObject.FindProperty(ListPropertyPath);
+            if (listProperty == null || !listProperty.isArray || listProperty.propertyType != SerializedPropertyType.Generic)
+            {
+                Debug.LogError($"SO2Table: List property '{ListPropertyPath}' was not found on {typeof(TAsset).Name}.");
+                report.ConversionErrors++;
+                return report;
+            }
+
+            var context = new Excel2SoExportContext();
+            var headers = new List<string>(exportBindings.Count);
+            foreach (var binding in exportBindings)
+            {
+                headers.Add(binding.ColumnName);
+            }
+
+            var rows = new List<IReadOnlyList<string>>(listProperty.arraySize);
+            for (var i = 0; i < listProperty.arraySize; i++)
+            {
+                var element = listProperty.GetArrayElementAtIndex(i);
+                var cells = new List<string>(exportBindings.Count);
+                foreach (var binding in exportBindings)
+                {
+                    if (!binding.TryExport(serializedObject, element, asset, context, out var value))
+                    {
+                        value = string.Empty;
+                    }
+
+                    cells.Add(value);
+                }
+
+                rows.Add(cells);
+                report.ExportedRows++;
+            }
+
+            report.ExportedColumns = headers.Count;
+            report.ExportedFields = context.ExportedFields;
+            report.ConversionErrors += context.ConversionErrors;
+
+            var resolvedCsvPath = ResolveFileSystemPath(csvPath);
+            Excel2SoCsvWriter.Write(resolvedCsvPath, headers, rows);
+
+            if (NormalizeAssetPath(csvPath).StartsWith("Assets/", StringComparison.OrdinalIgnoreCase))
+            {
+                AssetDatabase.Refresh();
+            }
+
+            Debug.Log($"{GetType().Name}: {report}");
+            return report;
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"SO2Table: Failed to export '{assetPath}' to '{csvPath}'. {ex}");
+            report.ConversionErrors++;
+            return report;
         }
     }
 
@@ -373,6 +511,59 @@ public abstract class Excel2SoListAssetImporter<TAsset> : Excel2SoImporterBase, 
         AssetDatabase.CreateAsset(asset, assetPath);
         created = true;
         return asset;
+    }
+}
+
+internal static class Excel2SoCsvWriter
+{
+    public static void Write(
+        string csvPath,
+        IReadOnlyList<string> headers,
+        IReadOnlyList<IReadOnlyList<string>> rows)
+    {
+        if (string.IsNullOrWhiteSpace(csvPath))
+        {
+            throw new ArgumentException("SO2Table CSV path is empty.", nameof(csvPath));
+        }
+
+        var directory = Path.GetDirectoryName(csvPath);
+        if (!string.IsNullOrEmpty(directory))
+        {
+            Directory.CreateDirectory(directory);
+        }
+
+        using var writer = new StreamWriter(csvPath, false, new UTF8Encoding(true));
+        WriteRow(writer, headers);
+        foreach (var row in rows)
+        {
+            WriteRow(writer, row);
+        }
+    }
+
+    private static void WriteRow(TextWriter writer, IReadOnlyList<string> cells)
+    {
+        for (var i = 0; i < cells.Count; i++)
+        {
+            if (i > 0)
+            {
+                writer.Write(',');
+            }
+
+            writer.Write(Escape(cells[i]));
+        }
+
+        writer.WriteLine();
+    }
+
+    private static string Escape(string value)
+    {
+        value ??= string.Empty;
+        if (value.IndexOfAny(new[] { ',', '"', '\r', '\n' }) < 0)
+        {
+            return value;
+        }
+
+        return $"\"{value.Replace("\"", "\"\"")}\"";
     }
 }
 
