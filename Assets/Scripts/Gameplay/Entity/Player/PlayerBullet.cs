@@ -17,9 +17,10 @@ public class PlayerBullet : MonoBehaviour, global::IPoolable {
     /// <summary>
     /// 每次从对象池取出子弹时调用，重置上一轮使用留下的方向、伤害、命中状态和生命周期
     /// </summary>
-    public void Init(Vector2 shootDir, int bulletDamage) {
+    public void Init(Vector2 shootDir, int bulletDamage,int bulletSpeed) {
         dir = shootDir;
         damage = bulletDamage;
+        speed = bulletSpeed;
     }
 
     /// <summary>
