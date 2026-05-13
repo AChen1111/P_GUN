@@ -20,11 +20,11 @@ public class PlayerBulletPool : PoolBase<PlayerBullet> {
     /// <summary>
     /// 从对应 prefab 的池中取出一颗子弹，并完成本次发射所需的运行时初始化。
     /// </summary>
-    public PlayerBullet Get(PlayerBullet prefab, Vector3 position, Quaternion rotation, Vector2 dir, int damage) {
+    public PlayerBullet Get(PlayerBullet prefab, Vector3 position, Quaternion rotation, Vector2 dir, int damage,int speed) {
         var bullet = Get(prefab, position, rotation);
         if(bullet == null) return null;
 
-        bullet.Init(dir, damage);
+        bullet.Init(dir, damage,speed);
         return bullet;
     }
 

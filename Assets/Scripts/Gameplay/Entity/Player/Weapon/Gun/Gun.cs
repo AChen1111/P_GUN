@@ -51,6 +51,8 @@ public int MaxBulletBagNum;
 [SerializeField] protected int clipSize;
 [Header("射击间隔")]
 [SerializeField] protected float shootInterval;
+[Header("子弹速度")]
+[SerializeField] protected int bulletSpeed;
 
 protected ShootDuration shootDuration;
 protected GunClip gunClip;
@@ -91,6 +93,7 @@ public void ApplyData(WeaponData data)
     MaxBulletBagNum = data.maxBulletBagNum;
     clipSize = data.clipSize;
     shootInterval = data.ShootInterval;
+    bulletSpeed = data.bulletSpeed;
 }
 
 private void ApplyDataFromDatabase()
@@ -227,19 +230,15 @@ protected virtual void TryPlaySound(bool loop = false)
 /// 获取子弹
 /// </summary>
 protected virtual PlayerBullet GetBullet(Vector2 dir)
-{
-    //Debug.Log("minMaxDamage: " + MinDamage + " " + MaxDamage);
-    //Debug.Log("damage: " + Damage);
-
-    
+{    
     var obj = PlayerBulletPool.Instance.Get(
         BulletPrefab,
         BulletPrefab.transform.position,
         BulletPrefab.transform.rotation,
         dir,
-        Damage
+        Damage,
+        bulletSpeed
     );
-    //Debug.Log("damage: " + Damage);
     return obj;
 }
 }

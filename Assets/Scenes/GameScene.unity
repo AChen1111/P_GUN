@@ -3944,7 +3944,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   defaultCapacity: 16
   maxSize: 128
-  prefabInfos: []
+  prefabInfos:
+  - prefab: {fileID: 7284967527061219658, guid: 3752c64bcee20ed4ca0c96a5cc62c95d, type: 3}
+    prewarmCount: 10
   collectionChecks: 1
   activeRoot: {fileID: 519806775}
   inactiveRoot: {fileID: 156578218}

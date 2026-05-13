@@ -9,7 +9,7 @@ public struct WeaponData
     public string displayName;
     public List<AudioClip> shootSounds;
     public AudioClip reloadSound;
-
+    public int bulletSpeed;
     [Header("Damage")]
     public int minDamage;
     public int maxDamage;

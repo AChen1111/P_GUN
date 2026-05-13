@@ -16,6 +16,7 @@ public sealed class WeaponDatabaseExcelImporter : Excel2SoListAssetImporter<Weap
         map.Column("maxBulletBagNum").To("maxBulletBagNum").AsInt();
         map.Column("clipSize").To("clipSize").AsInt();
         map.Column("shootInterval").To("shootInterval").AsFloat();
+        map.Column("bulletSpeed").To("bulletSpeed").AsInt();
         map.Column("reloadSound").To("reloadSound").AsAsset<AudioClip>();
         map.Column("shootSounds").To("shootSounds").AsAssetList<AudioClip>(";");
     }
