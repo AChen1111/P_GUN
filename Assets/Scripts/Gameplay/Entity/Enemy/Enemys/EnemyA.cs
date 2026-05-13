@@ -26,7 +26,6 @@ public class EnemyA : EnemyBase
 
     protected override void RegisterFSM(FSM<EnemyState> fsm)
     {
-        //Debug.Log(shootInterval + " " + followDuration + " " + attackDuration);
         // ── Follow 状态：追踪玩家，计时到达后切换到 Attack ──
         fsm.State(EnemyState.Follow)
             .OnEnter(() => stateTimer = 0f)
