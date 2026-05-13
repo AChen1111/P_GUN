@@ -18,15 +18,26 @@ public abstract class PoolBase<T> : MonoBehaviour where T : MonoBehaviour, IPool
     public static PoolBase<T> Instance => _instance;
 
     [Header("Pool Config")]
-    [SerializeField] private T defaultPrefab;
     [SerializeField] private int defaultCapacity = 16;
     [SerializeField] private int maxSize = 128;
-    [SerializeField] private int prewarmCount = 0;
+    [SerializeField] private List<PrefabInfo> prefabInfos;
+
+#region 池中物体信息
+    [System.Serializable]
+    private struct PrefabInfo
+    {
+        public T prefab; //预制体
+        public int prewarmCount; //预热数量
+    }
+#endregion
+
     [SerializeField] private bool collectionChecks = true;
 
+
+
     [Header("Hierarchy")]
-    [SerializeField] private Transform activeRoot;
-    [SerializeField] private Transform inactiveRoot;
+    [SerializeField] private Transform activeRoot; //激活状态的物体父节点
+    [SerializeField] private Transform inactiveRoot; //未激活状态的物体父节点
 
     /// <summary>
     /// 通过预制体找对应的池子
@@ -43,8 +54,8 @@ public abstract class PoolBase<T> : MonoBehaviour where T : MonoBehaviour, IPool
     /// </summary>
     private readonly Dictionary<T, T> _instance2Prefab = new Dictionary<T, T>();
 
-    // 子类需要读取默认 prefab 时使用, 外部仍然通过 Get 接口取对象.
-    protected T DefaultPrefab => defaultPrefab;
+    protected T defaultPrefab => prefabInfos[0].prefab;
+    public T DefaultPrefab => defaultPrefab;
 
 #region 统计池中数据
     /// <summary>
@@ -100,9 +111,8 @@ public abstract class PoolBase<T> : MonoBehaviour where T : MonoBehaviour, IPool
 
         _instance = this;
 
-        // 预热默认 prefab, 避免战斗中第一次 Instantiate 造成卡顿.
-        if(defaultPrefab != null) {
-            Prewarm(defaultPrefab, prewarmCount);
+        foreach(var prefabInfo in prefabInfos) {
+            Prewarm(prefabInfo.prefab, prefabInfo.prewarmCount);
         }
     }
 
@@ -159,13 +169,6 @@ public abstract class PoolBase<T> : MonoBehaviour where T : MonoBehaviour, IPool
 
         // 如果对象没有登记在任何池里, 说明它不是由本池创建的, 直接销毁避免泄漏.
         Destroy(item.gameObject);
-    }
-
-    /// <summary>
-    /// 预热默认 prefab 对应的池.
-    /// </summary>
-    public void Prewarm(int count) {
-        Prewarm(defaultPrefab, count);
     }
 
     /// <summary>
@@ -237,12 +240,12 @@ public abstract class PoolBase<T> : MonoBehaviour where T : MonoBehaviour, IPool
         // Unity ObjectPool 的四个核心回调分别对应创建, 取出, 回收, 销毁.
         pool = new ObjectPool<T>(
             () => CreateItem(prefab),
-            OnTakeFromPool,
-            OnReturnedToPool,
-            DestroyItem,
-            collectionChecks,
-            capacity,
-            size
+            OnTakeFromPool, //取出时调用
+            OnReturnedToPool, //回收时调用
+            DestroyItem, //销毁时调用
+            collectionChecks, //防止重复回收对象
+            capacity, //容量
+            size //最大数量
         );
 
         _prefab2Pool.Add(prefab, pool);
@@ -251,7 +254,6 @@ public abstract class PoolBase<T> : MonoBehaviour where T : MonoBehaviour, IPool
 
     /// <summary>
     /// 创建指定 prefab 的新实例.
-    /// 新实例默认放在 inactiveRoot 下并保持未激活, 等 ObjectPool 取出时再激活.
     /// </summary>
     private T CreateItem(T prefab) {
 
@@ -306,3 +308,4 @@ public abstract class PoolBase<T> : MonoBehaviour where T : MonoBehaviour, IPool
     }
 
 }
+
