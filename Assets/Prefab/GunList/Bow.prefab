@@ -162,13 +162,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Namespace: QFramework.Example
   ScriptName: Bow
-  ScriptsFolder: Assets\Scripts\Entity\Player\Weapon\Gun
+  ScriptsFolder: Assets\Scripts\Gameplay\Entity\Player\Weapon\Gun
   GeneratePrefab: 0
   PrefabFolder: Assets/Prefab
   ArchitectureFullTypeName: 
   ViewControllerFullTypeName: 
   weaponId: Bow
-  weaponDatabase: {fileID: 11400000, guid: 2d7944df0f6646243a02e8220599388e, type: 2}
+  weaponDatabase: {fileID: 11400000, guid: 6d6e0a3a98503714c899e24a2384c459, type: 2}
   shootSounds:
   - {fileID: 8300000, guid: 34f8cb3e29ce529458352e5bd3fe3141, type: 3}
   - {fileID: 8300000, guid: 50b915a22dcd4244cb10082d3fd93846, type: 3}

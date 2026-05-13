@@ -344,13 +344,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Namespace: QFramework.Example
   ScriptName: AWP
-  ScriptsFolder: Assets\Scripts\Entity\Player\Weapon\Gun
+  ScriptsFolder: Assets\Scripts\Gameplay\Entity\Player\Weapon\Gun
   GeneratePrefab: 0
   PrefabFolder: Assets/Prefab
   ArchitectureFullTypeName: 
   ViewControllerFullTypeName: 
   weaponId: AWP
-  weaponDatabase: {fileID: 11400000, guid: 2d7944df0f6646243a02e8220599388e, type: 2}
+  weaponDatabase: {fileID: 11400000, guid: 6d6e0a3a98503714c899e24a2384c459, type: 2}
   shootSounds:
   - {fileID: 8300000, guid: f38bbc0189220d24887634fb48b72bdf, type: 3}
   ReloadSound: {fileID: 8300000, guid: 09f63d32f8a42f742b15ae6198b3c400, type: 3}

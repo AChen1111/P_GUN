@@ -9,8 +9,8 @@ using UnityEngine.UIElements;
 public sealed class Excel2SoImporterWindow : EditorWindow
 {
     private const string MenuPath = "Tools/Excel2SO/Importer Window";
-    private const string LayoutPath = "Assets/Editor/Excel2SO/Excel2SoImporterWindow.uxml";
-    private const string StylePath = "Assets/Editor/Excel2SO/Excel2SoImporterWindow.uss";
+    private const string LayoutPath = "Assets/Editor/Excel2SO/UI/Excel2SoImporterWindow.uxml";
+    private const string StylePath = "Assets/Editor/Excel2SO/UI/Excel2SoImporterWindow.uss";
 
     private readonly List<ImporterOption> importerOptions = new List<ImporterOption>();
 
@@ -38,7 +38,10 @@ public sealed class Excel2SoImporterWindow : EditorWindow
 
         var root = rootVisualElement;
         root.Clear();
-        LoadWindowLayout(root);
+        if (!LoadWindowLayout(root))
+        {
+            return;
+        }
 
         if (!TryBindLayout(root, out var importerContainer, out var tableBrowseButton, out var targetBrowseButton, out var targetDefaultButton))
         {
@@ -79,13 +82,13 @@ public sealed class Excel2SoImporterWindow : EditorWindow
         UpdateImportState();
     }
 
-    private static void LoadWindowLayout(VisualElement root)
+    private static bool LoadWindowLayout(VisualElement root)
     {
         var visualTree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(LayoutPath);
         if (visualTree == null)
         {
             root.Add(new Label($"Missing Excel2SO importer layout: {LayoutPath}"));
-            return;
+            return false;
         }
 
         visualTree.CloneTree(root);
@@ -95,6 +98,8 @@ public sealed class Excel2SoImporterWindow : EditorWindow
         {
             root.styleSheets.Add(styleSheet);
         }
+
+        return true;
     }
 
     private bool TryBindLayout(

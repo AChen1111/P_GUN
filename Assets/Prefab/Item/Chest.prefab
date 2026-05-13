@@ -92,7 +92,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemId: 2
-  itemDatabase: {fileID: 11400000, guid: eea0ee3936586cd47b4da844074bb211, type: 2}
+  itemDatabase: {fileID: 11400000, guid: d7289ca60b79f7849be1a94d4f3cb4be, type: 2}
   isActive: 1
   effects:
   - {fileID: 11400000, guid: d2d7b5215687ae04093b2f74130105a9, type: 2}

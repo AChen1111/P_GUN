@@ -73,7 +73,7 @@ MonoBehaviour:
   ArchitectureFullTypeName: 
   ViewControllerFullTypeName: 
   weaponId: MP5
-  weaponDatabase: {fileID: 11400000, guid: 2d7944df0f6646243a02e8220599388e, type: 2}
+  weaponDatabase: {fileID: 11400000, guid: 6d6e0a3a98503714c899e24a2384c459, type: 2}
   shootSounds:
   - {fileID: 8300000, guid: 7f5ebb3ad6679da4793726201cea6868, type: 3}
   ReloadSound: {fileID: 8300000, guid: 14adb12de103ab64582403089e31a746, type: 3}
