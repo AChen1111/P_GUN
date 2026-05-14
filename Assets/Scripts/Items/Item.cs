@@ -2,276 +2,283 @@ using System.Collections.Generic;
 using System.Collections;
 using DG.Tweening;
 using UnityEngine;
+using Game.Core;
+using Game.Pooling;
+using Game.Animation;
+using Game.Presentation;
 
-/// <summary>
-/// 场景中的可交互物品：玩家靠近显示描述，按 F 后播放拾取表现并执行效果列表。
-/// </summary>
-[RequireComponent(typeof(Collider2D))]
-public class Item : MonoBehaviour, global::IPoolable
+namespace Game.Items
 {
-    private const string PickupTriggerName = "OnPickup";
-
-    [Header("物品数据")]
-    [SerializeField] private int itemId;
-    [SerializeField] private ItemDatabase itemDatabase;
-
-    [Header("拾取状态")]
-    [SerializeField] private bool isActive = true;
-
-    [Header("效果列表")]
-    [SerializeField] private List<ItemEffectBase> effects = new List<ItemEffectBase>();
-
-    [Header("拾取音效")]
-    [SerializeField] private AudioClip pickupAudio;
-
-    [Header("DOTween动画器")]
-    [SerializeField] private GameDOTweenAnimation _dotweenAnimation;
-
-    [Header("Animator动画器")]
-    [SerializeField] private Animator _animator;
-    [SerializeField] private float pickupAnimatorFallbackDelay = 0.6f;
-
-    [Header("是否销毁")]
-    [SerializeField] private bool isDestroy = true;
-
-    private int playerColliderCount;
-    private bool isPlayerInRange;
-    private bool hasPicked;
-    private bool effectsApplied;
-    private Coroutine animatorFallbackCoroutine;
-
-    private void Awake()
+    /// <summary>
+    /// 场景中的可交互物品：玩家靠近显示描述，按 F 后播放拾取表现并执行效果列表。
+    /// </summary>
+    [RequireComponent(typeof(Collider2D))]
+    public class Item : MonoBehaviour, Game.Pooling.IPoolable
     {
-        if (_dotweenAnimation == null)
+        private const string PickupTriggerName = "OnPickup";
+
+        [Header("物品数据")]
+        [SerializeField] private int itemId;
+        [SerializeField] private ItemDatabase itemDatabase;
+
+        [Header("拾取状态")]
+        [SerializeField] private bool isActive = true;
+
+        [Header("效果列表")]
+        [SerializeField] private List<ItemEffectBase> effects = new List<ItemEffectBase>();
+
+        [Header("拾取音效")]
+        [SerializeField] private AudioClip pickupAudio;
+
+        [Header("DOTween动画器")]
+        [SerializeField] private GameDOTweenAnimation _dotweenAnimation;
+
+        [Header("Animator动画器")]
+        [SerializeField] private Animator _animator;
+        [SerializeField] private float pickupAnimatorFallbackDelay = 0.6f;
+
+        [Header("是否销毁")]
+        [SerializeField] private bool isDestroy = true;
+
+        private int playerColliderCount;
+        private bool isPlayerInRange;
+        private bool hasPicked;
+        private bool effectsApplied;
+        private Coroutine animatorFallbackCoroutine;
+
+        private void Awake()
         {
-            _dotweenAnimation = GetComponent<GameDOTweenAnimation>();
+            if (_dotweenAnimation == null)
+            {
+                _dotweenAnimation = GetComponent<GameDOTweenAnimation>();
+            }
+
+            if (_animator == null)
+            {
+                _animator = GetComponent<Animator>();
+            }
         }
 
-        if (_animator == null)
+        private void Reset()
         {
+            var c = GetComponent<Collider2D>();
+            c.isTrigger = true;
+            _dotweenAnimation = GetComponent<GameDOTweenAnimation>();
             _animator = GetComponent<Animator>();
         }
-    }
 
-    private void Reset()
-    {
-        var c = GetComponent<Collider2D>();
-        c.isTrigger = true;
-        _dotweenAnimation = GetComponent<GameDOTweenAnimation>();
-        _animator = GetComponent<Animator>();
-    }
-
-    private void Update()
-    {
-        if (!isPlayerInRange || !isActive || hasPicked) return;
-
-        if (Input.GetKeyDown(KeyCode.F))
+        private void Update()
         {
-            PickUp();
+            if (!isPlayerInRange || !isActive || hasPicked) return;
+
+            if (Input.GetKeyDown(KeyCode.F))
+            {
+                PickUp();
+            }
         }
-    }
 
-    private void OnDisable()
-    {
-        HideTip();
-    }
-
-    public void SetPickupEnabled(bool enabled)
-    {
-        isActive = enabled;
-
-        if (!isActive)
+        private void OnDisable()
         {
             HideTip();
-            return;
         }
 
-        if (isPlayerInRange && !hasPicked)
+        public void SetPickupEnabled(bool enabled)
         {
-            ShowTip();
+            isActive = enabled;
+
+            if (!isActive)
+            {
+                HideTip();
+                return;
+            }
+
+            if (isPlayerInRange && !hasPicked)
+            {
+                ShowTip();
+            }
         }
-    }
 
-    public void OnSpawnFromPool()
-    {
-        ResetPoolRuntimeState();
-        ResetAnimatorState();
-    }
-
-    public void OnRecycleToPool()
-    {
-        StopAnimatorFallbackCoroutine();
-        transform.DOKill(false);
-        HideTip();
-        ResetPoolRuntimeState();
-    }
-
-    private void OnTriggerEnter2D(Collider2D other)
-    {
-        if (!IsPlayer(other)) return;
-
-        playerColliderCount++;
-        isPlayerInRange = true;
-        ShowTip();
-    }
-
-    private void OnTriggerExit2D(Collider2D other)
-    {
-        if (!IsPlayer(other)) return;
-
-        playerColliderCount = Mathf.Max(0, playerColliderCount - 1);
-        if (playerColliderCount > 0) return;
-
-        isPlayerInRange = false;
-        HideTip();
-    }
-
-    public void OnPickupAnimFinished()
-    {
-        ApplyEffectsAndDestroy();
-    }
-
-    private void PickUp()
-    {
-        if (!isActive || hasPicked) return;
-
-        hasPicked = true;
-        isActive = false;
-        HideTip();
-        EventCenter.Trigger(GameEvent.ItemPicked, this);
-
-        if (TryPlayAnimatorPickup())
+        public void OnSpawnFromPool()
         {
-            return;
+            ResetPoolRuntimeState();
+            ResetAnimatorState();
         }
 
-        if (_dotweenAnimation != null)
-        {
-            _dotweenAnimation.Play(ApplyEffectsAndDestroy);
-            return;
-        }
-
-        ApplyEffectsAndDestroy();
-    }
-
-    private bool TryPlayAnimatorPickup()
-    {
-        if (_animator == null || !HasPickupTrigger(_animator)) return false;
-
-        _animator.SetTrigger(PickupTriggerName);
-
-        if (pickupAnimatorFallbackDelay > 0f)
-        {
-            animatorFallbackCoroutine = StartCoroutine(ApplyEffectsAfterDelay(pickupAnimatorFallbackDelay));
-        }
-
-        return true;
-    }
-
-    private IEnumerator ApplyEffectsAfterDelay(float delay)
-    {
-        yield return new WaitForSeconds(delay);
-        ApplyEffectsAndDestroy();
-        animatorFallbackCoroutine = null;
-    }
-
-    private void ApplyEffectsAndDestroy()
-    {
-        if (effectsApplied) return;
-        effectsApplied = true;
-
-        if (animatorFallbackCoroutine != null)
+        public void OnRecycleToPool()
         {
             StopAnimatorFallbackCoroutine();
+            transform.DOKill(false);
+            HideTip();
+            ResetPoolRuntimeState();
         }
 
-        var ctx = new ItemEffectContext
+        private void OnTriggerEnter2D(Collider2D other)
         {
-            SourceObject = gameObject,
-            WorldPosition = transform.position
-        };
+            if (!IsPlayer(other)) return;
 
-        if (effects != null)
+            playerColliderCount++;
+            isPlayerInRange = true;
+            ShowTip();
+        }
+
+        private void OnTriggerExit2D(Collider2D other)
         {
-            foreach (var effect in effects)
+            if (!IsPlayer(other)) return;
+
+            playerColliderCount = Mathf.Max(0, playerColliderCount - 1);
+            if (playerColliderCount > 0) return;
+
+            isPlayerInRange = false;
+            HideTip();
+        }
+
+        public void OnPickupAnimFinished()
+        {
+            ApplyEffectsAndDestroy();
+        }
+
+        private void PickUp()
+        {
+            if (!isActive || hasPicked) return;
+
+            hasPicked = true;
+            isActive = false;
+            HideTip();
+            EventCenter.Trigger(GameEvent.ItemPicked, this);
+
+            if (TryPlayAnimatorPickup())
             {
-                if (effect != null) effect.OnPick(ctx);
+                return;
+            }
+
+            if (_dotweenAnimation != null)
+            {
+                _dotweenAnimation.Play(ApplyEffectsAndDestroy);
+                return;
+            }
+
+            ApplyEffectsAndDestroy();
+        }
+
+        private bool TryPlayAnimatorPickup()
+        {
+            if (_animator == null || !HasPickupTrigger(_animator)) return false;
+
+            _animator.SetTrigger(PickupTriggerName);
+
+            if (pickupAnimatorFallbackDelay > 0f)
+            {
+                animatorFallbackCoroutine = StartCoroutine(ApplyEffectsAfterDelay(pickupAnimatorFallbackDelay));
+            }
+
+            return true;
+        }
+
+        private IEnumerator ApplyEffectsAfterDelay(float delay)
+        {
+            yield return new WaitForSeconds(delay);
+            ApplyEffectsAndDestroy();
+            animatorFallbackCoroutine = null;
+        }
+
+        private void ApplyEffectsAndDestroy()
+        {
+            if (effectsApplied) return;
+            effectsApplied = true;
+
+            if (animatorFallbackCoroutine != null)
+            {
+                StopAnimatorFallbackCoroutine();
+            }
+
+            var ctx = new ItemEffectContext
+            {
+                SourceObject = gameObject,
+                WorldPosition = transform.position
+            };
+
+            if (effects != null)
+            {
+                foreach (var effect in effects)
+                {
+                    if (effect != null) effect.OnPick(ctx);
+                }
+            }
+
+            if (pickupAudio != null)
+            {
+                GlobalAudioPlay.Instance.PlayerAudioSourceByClip(pickupAudio);
+            }
+
+            if (isDestroy)
+            {
+                ItemPool.Instance.Release(this);
             }
         }
 
-        if (pickupAudio != null)
+        private void ShowTip()
         {
-            GlobalAudioPlay.Instance.PlayerAudioSourceByClip(pickupAudio);
+            if (!isActive || hasPicked) return;
+            EventCenter.Trigger(GameEvent.ItemTipShown, ResolveItemData());
         }
 
-        if (isDestroy)
+        private void HideTip()
         {
-            ItemPool.Instance.Release(this);
-        }
-    }
-
-    private void ShowTip()
-    {
-        if (!isActive || hasPicked) return;
-        EventCenter.Trigger(GameEvent.ItemTipShown, ResolveItemData());
-    }
-
-    private void HideTip()
-    {
-        EventCenter.Trigger(GameEvent.ItemTipHidden);
-    }
-
-    private ItemData ResolveItemData()
-    {
-        if (itemDatabase != null && itemDatabase.TryGetById(itemId, out var data))
-        {
-            return data;
+            EventCenter.Trigger(GameEvent.ItemTipHidden);
         }
 
-        return default;
-    }
-
-    private static bool IsPlayer(Collider2D other)
-    {
-        return other != null && other.CompareTag("Player");
-    }
-
-    private static bool HasPickupTrigger(Animator animator)
-    {
-        foreach (var parameter in animator.parameters)
+        private ItemData ResolveItemData()
         {
-            if (parameter.type == AnimatorControllerParameterType.Trigger && parameter.name == PickupTriggerName)
+            if (itemDatabase != null && itemDatabase.TryGetById(itemId, out var data))
             {
-                return true;
+                return data;
             }
+
+            return default;
         }
 
-        return false;
-    }
+        private static bool IsPlayer(Collider2D other)
+        {
+            return other != null && other.CompareTag("Player");
+        }
 
-    private void ResetPoolRuntimeState()
-    {
-        isActive = true;
-        playerColliderCount = 0;
-        isPlayerInRange = false;
-        hasPicked = false;
-        effectsApplied = false;
-    }
+        private static bool HasPickupTrigger(Animator animator)
+        {
+            foreach (var parameter in animator.parameters)
+            {
+                if (parameter.type == AnimatorControllerParameterType.Trigger && parameter.name == PickupTriggerName)
+                {
+                    return true;
+                }
+            }
 
-    private void StopAnimatorFallbackCoroutine()
-    {
-        if (animatorFallbackCoroutine == null) return;
+            return false;
+        }
 
-        StopCoroutine(animatorFallbackCoroutine);
-        animatorFallbackCoroutine = null;
-    }
+        private void ResetPoolRuntimeState()
+        {
+            isActive = true;
+            playerColliderCount = 0;
+            isPlayerInRange = false;
+            hasPicked = false;
+            effectsApplied = false;
+        }
 
-    private void ResetAnimatorState()
-    {
-        if (_animator == null) return;
+        private void StopAnimatorFallbackCoroutine()
+        {
+            if (animatorFallbackCoroutine == null) return;
 
-        _animator.ResetTrigger(PickupTriggerName);
-        _animator.Rebind();
-        _animator.Update(0f);
+            StopCoroutine(animatorFallbackCoroutine);
+            animatorFallbackCoroutine = null;
+        }
+
+        private void ResetAnimatorState()
+        {
+            if (_animator == null) return;
+
+            _animator.ResetTrigger(PickupTriggerName);
+            _animator.Rebind();
+            _animator.Update(0f);
+        }
     }
 }

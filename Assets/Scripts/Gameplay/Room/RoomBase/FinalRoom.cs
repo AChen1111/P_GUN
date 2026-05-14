@@ -1,18 +1,27 @@
 using UnityEngine;
-public class FinalRoom : Room
+using Game.Core;
+using Game.Pooling;
+using Game.Animation;
+using Game.Presentation;
+using Game.Items;
+
+namespace Game.Gameplay
 {
-    [Header("最终房间贴图")]
-    [SerializeField]private SpriteRenderer finalSR;
-    
-    override protected void OnRoomInitialized()
+    public class FinalRoom : Room
     {
-        needGenerateDoors = true;
-        finalSR.gameObject.SetActive(false);
-    }
+        [Header("最终房间贴图")]
+        [SerializeField]private SpriteRenderer finalSR;
+
+        override protected void OnRoomInitialized()
+        {
+            needGenerateDoors = true;
+            finalSR.gameObject.SetActive(false);
+        }
 
 
-    protected override void OnPlayerEnteredRoom(Collider2D other)
-    {
-        finalSR.gameObject.SetActive(true);
+        protected override void OnPlayerEnteredRoom(Collider2D other)
+        {
+            finalSR.gameObject.SetActive(true);
+        }
     }
 }

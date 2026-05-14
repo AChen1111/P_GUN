@@ -1,6 +1,6 @@
 {
   "name": "Game.Animation",
-  "rootNamespace": "",
+  "rootNamespace": "Game.Animation",
   "references": [],
   "includePlatforms": [],
   "excludePlatforms": [],

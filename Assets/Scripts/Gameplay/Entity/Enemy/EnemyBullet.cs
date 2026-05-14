@@ -1,146 +1,155 @@
 using System.Collections;
 using UnityEngine;
 using System.Collections.Generic;
-public class EnemyBullet : MonoBehaviour, global::IPoolable {
-    public Vector2 dir;
-    public float speed = 10f;
-    public Rigidbody2D rb;
-    [SerializeField] private float lifeTime = 3f;
-    private bool hasHit;
-    private Coroutine autoRecycleCoroutine;
+using Game.Core;
+using Game.Pooling;
+using Game.Animation;
+using Game.Presentation;
+using Game.Items;
 
-    [Header("击中玩家音效")]
-    public List<AudioClip> hitSoundsOnPlayer = new List<AudioClip>();
-    private AudioClip hitSoundOnPlayer => hitSoundsOnPlayer[Random.Range(0, hitSoundsOnPlayer.Count)];
-    [Header("击中墙壁音效")]
-    public List<AudioClip> hitSoundsOnWall = new List<AudioClip>();
-    private AudioClip hitSoundOnWall => hitSoundsOnWall[Random.Range(0, hitSoundsOnWall.Count)];
+namespace Game.Gameplay
+{
+    public class EnemyBullet : MonoBehaviour, Game.Pooling.IPoolable {
+        public Vector2 dir;
+        public float speed = 10f;
+        public Rigidbody2D rb;
+        [SerializeField] private float lifeTime = 3f;
+        private bool hasHit;
+        private Coroutine autoRecycleCoroutine;
 
-    private void Awake() {
-        rb = GetComponent<Rigidbody2D>();
-        rb.bodyType = RigidbodyType2D.Kinematic;
-        gameObject.layer = LayerMask.NameToLayer("EnemyBullet");
-    }
+        [Header("击中玩家音效")]
+        public List<AudioClip> hitSoundsOnPlayer = new List<AudioClip>();
+        private AudioClip hitSoundOnPlayer => hitSoundsOnPlayer[Random.Range(0, hitSoundsOnPlayer.Count)];
+        [Header("击中墙壁音效")]
+        public List<AudioClip> hitSoundsOnWall = new List<AudioClip>();
+        private AudioClip hitSoundOnWall => hitSoundsOnWall[Random.Range(0, hitSoundsOnWall.Count)];
 
-    /// <summary>
-    /// 每次从对象池取出敌人子弹时调用，重置方向、命中状态和生命周期。
-    /// </summary>
-    public void Init(Vector2 shootDir) {
-        dir = shootDir;
-        hasHit = false;
-
-        StopAutoRecycleCoroutine();
-        autoRecycleCoroutine = StartCoroutine(AutoRecycleIfNotHit());
-
-        if (rb == null) {
+        private void Awake() {
             rb = GetComponent<Rigidbody2D>();
+            rb.bodyType = RigidbodyType2D.Kinematic;
+            gameObject.layer = LayerMask.NameToLayer("EnemyBullet");
         }
-    }
 
-    public void OnSpawnFromPool() {
-        hasHit = false;
+        /// <summary>
+        /// 每次从对象池取出敌人子弹时调用，重置方向、命中状态和生命周期。
+        /// </summary>
+        public void Init(Vector2 shootDir) {
+            dir = shootDir;
+            hasHit = false;
 
-        if (rb == null) {
-            rb = GetComponent<Rigidbody2D>();
+            StopAutoRecycleCoroutine();
+            autoRecycleCoroutine = StartCoroutine(AutoRecycleIfNotHit());
+
+            if (rb == null) {
+                rb = GetComponent<Rigidbody2D>();
+            }
         }
-    }
 
-    public void OnRecycleToPool() {
-        hasHit = true;
-        StopAutoRecycleCoroutine();
-        StopMove();
-    }
+        public void OnSpawnFromPool() {
+            hasHit = false;
 
-    private void OnCollisionEnter2D(Collision2D other) {
-        HandleHit(other.gameObject);
-    }
-
-    private void OnTriggerEnter2D(Collider2D other) {
-        LogHit("Trigger", other.gameObject);
-        HandleHit(other.gameObject);
-    }
-
-    private void Reset() {
-        gameObject.AddComponent<CircleCollider2D>();
-    }
-
-    private void FixedUpdate() {
-        if (rb == null) return;
-        rb.velocity = dir * speed;
-    }
-
-    private IEnumerator AutoRecycleIfNotHit() {
-        yield return new WaitForSeconds(lifeTime);
-        autoRecycleCoroutine = null;
-
-        if (!hasHit && gameObject != null) {
-            Recycle();
+            if (rb == null) {
+                rb = GetComponent<Rigidbody2D>();
+            }
         }
-    }
 
-    private void HandleHit(GameObject target) {
-        if (hasHit || target == null) return;
-
-        if (target.CompareTag("Player")) {
-            target.GetComponent<Player>()?.Hurt(new DamageInfo(1, dir));
+        public void OnRecycleToPool() {
             hasHit = true;
+            StopAutoRecycleCoroutine();
+            StopMove();
+        }
 
-            var audioSource = target.GetComponent<AudioSource>();
-            if (audioSource != null && hitSoundsOnPlayer.Count > 0) {
-                audioSource.PlayOneShot(hitSoundOnPlayer);
+        private void OnCollisionEnter2D(Collision2D other) {
+            HandleHit(other.gameObject);
+        }
+
+        private void OnTriggerEnter2D(Collider2D other) {
+            LogHit("Trigger", other.gameObject);
+            HandleHit(other.gameObject);
+        }
+
+        private void Reset() {
+            gameObject.AddComponent<CircleCollider2D>();
+        }
+
+        private void FixedUpdate() {
+            if (rb == null) return;
+            rb.velocity = dir * speed;
+        }
+
+        private IEnumerator AutoRecycleIfNotHit() {
+            yield return new WaitForSeconds(lifeTime);
+            autoRecycleCoroutine = null;
+
+            if (!hasHit && gameObject != null) {
+                Recycle();
+            }
+        }
+
+        private void HandleHit(GameObject target) {
+            if (hasHit || target == null) return;
+
+            if (target.CompareTag("Player")) {
+                target.GetComponent<Player>()?.Hurt(new DamageInfo(1, dir));
+                hasHit = true;
+
+                var audioSource = target.GetComponent<AudioSource>();
+                if (audioSource != null && hitSoundsOnPlayer.Count > 0) {
+                    audioSource.PlayOneShot(hitSoundOnPlayer);
+                }
+
+                Recycle();
+                return;
             }
 
-            Recycle();
-            return;
-        }
-
-        var wallLayer = LayerMask.NameToLayer("Wall");
-        var isWall = target.CompareTag("Wall") || (wallLayer != -1 && target.layer == wallLayer);
-        if (isWall) {
-            hasHit = true;
-            if (hitSoundsOnWall.Count > 0) {
-                GlobalAudioPlay.Instance.PlayerAudioSourceByClip(hitSoundOnWall);
+            var wallLayer = LayerMask.NameToLayer("Wall");
+            var isWall = target.CompareTag("Wall") || (wallLayer != -1 && target.layer == wallLayer);
+            if (isWall) {
+                hasHit = true;
+                if (hitSoundsOnWall.Count > 0) {
+                    GlobalAudioPlay.Instance.PlayerAudioSourceByClip(hitSoundOnWall);
+                }
+                Recycle();
             }
-            Recycle();
         }
-    }
 
-    /// <summary>
-    /// 敌人子弹结束生命周期时归还对象池，而不是 Destroy。
-    /// </summary>
-    private void Recycle() {
-        hasHit = true;
-        StopAutoRecycleCoroutine();
-        StopMove();
-        EnemyBulletPool.Instance.Release(this);
-    }
-
-    /// <summary>
-    /// 清掉刚体速度，避免回收后再次启用时继承旧速度。
-    /// </summary>
-    public void StopMove() {
-        if (rb != null) {
-            rb.velocity = Vector2.zero;
+        /// <summary>
+        /// 敌人子弹结束生命周期时归还对象池，而不是 Destroy。
+        /// </summary>
+        private void Recycle() {
+            hasHit = true;
+            StopAutoRecycleCoroutine();
+            StopMove();
+            EnemyBulletPool.Instance.Release(this);
         }
-    }
 
-    private void OnDisable() {
-        StopAutoRecycleCoroutine();
-        StopMove();
-    }
+        /// <summary>
+        /// 清掉刚体速度，避免回收后再次启用时继承旧速度。
+        /// </summary>
+        public void StopMove() {
+            if (rb != null) {
+                rb.velocity = Vector2.zero;
+            }
+        }
 
-    private void StopAutoRecycleCoroutine() {
-        if (autoRecycleCoroutine == null) return;
+        private void OnDisable() {
+            StopAutoRecycleCoroutine();
+            StopMove();
+        }
 
-        StopCoroutine(autoRecycleCoroutine);
-        autoRecycleCoroutine = null;
-    }
+        private void StopAutoRecycleCoroutine() {
+            if (autoRecycleCoroutine == null) return;
 
-    private void LogHit(string hitType, GameObject target) {
-        if (target == null) return;
+            StopCoroutine(autoRecycleCoroutine);
+            autoRecycleCoroutine = null;
+        }
 
-        var layerName = LayerMask.LayerToName(target.layer);
-        var parentName = target.transform.parent != null ? target.transform.parent.name : "null";
-        Debug.Log($"[EnemyBullet] {hitType} hit name={target.name}, tag={target.tag}, layer={target.layer}({layerName}), parent={parentName}");
+        private void LogHit(string hitType, GameObject target) {
+            if (target == null) return;
+
+            var layerName = LayerMask.LayerToName(target.layer);
+            var parentName = target.transform.parent != null ? target.transform.parent.name : "null";
+            Debug.Log($"[EnemyBullet] {hitType} hit name={target.name}, tag={target.tag}, layer={target.layer}({layerName}), parent={parentName}");
+        }
     }
 }

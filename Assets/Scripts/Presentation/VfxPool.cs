@@ -1,43 +1,48 @@
 using UnityEngine;
+using Game.Core;
+using Game.Pooling;
 
-public class VfxPool : PoolBase<BloodVfx> {
-    public new static VfxPool Instance {
-        get {
-            var instance = PoolBase<BloodVfx>.Instance as VfxPool;
-            if (instance == null) {
-                var go = new GameObject("[VfxPool]");
-                instance = go.AddComponent<VfxPool>();
+namespace Game.Presentation
+{
+    public class VfxPool : PoolBase<BloodVfx> {
+        public new static VfxPool Instance {
+            get {
+                var instance = PoolBase<BloodVfx>.Instance as VfxPool;
+                if (instance == null) {
+                    var go = new GameObject("[VfxPool]");
+                    instance = go.AddComponent<VfxPool>();
+                }
+
+                return instance;
             }
-
-            return instance;
         }
-    }
 
-    /// <summary>
-    /// 从池中取出一个 BloodVfx 并播放。
-    /// </summary>
-    public BloodVfx Play(BloodVfx prefab, Vector3 position, Vector2 direction, BloodVfxColorMode colorMode) {
-        var vfx = Get(prefab, position, Quaternion.identity);
-        if (vfx == null) return null;
+        /// <summary>
+        /// 从池中取出一个 BloodVfx 并播放。
+        /// </summary>
+        public BloodVfx Play(BloodVfx prefab, Vector3 position, Vector2 direction, BloodVfxColorMode colorMode) {
+            var vfx = Get(prefab, position, Quaternion.identity);
+            if (vfx == null) return null;
 
-        vfx.Play(position, direction, colorMode);
-        return vfx;
-    }
-    
+            vfx.Play(position, direction, colorMode);
+            return vfx;
+        }
 
-    public BloodVfx Play(Vector3 position, Vector2 direction, BloodVfxColorMode colorMode) {
-        return Play(DefaultPrefab, position, direction, colorMode);
-    }
 
-    public BloodVfx Play(Vector3 position, Vector2 direction) {
-        return Play(position, direction, BloodVfxColorMode.Red);
-    }
+        public BloodVfx Play(Vector3 position, Vector2 direction, BloodVfxColorMode colorMode) {
+            return Play(DefaultPrefab, position, direction, colorMode);
+        }
 
-    protected override void OnCreate(BloodVfx item, BloodVfx prefab) {
-        item.OnComplete = Release;
-    }
+        public BloodVfx Play(Vector3 position, Vector2 direction) {
+            return Play(position, direction, BloodVfxColorMode.Red);
+        }
 
-    protected override void OnDestroyItem(BloodVfx item) {
-        item.OnComplete = null;
+        protected override void OnCreate(BloodVfx item, BloodVfx prefab) {
+            item.OnComplete = Release;
+        }
+
+        protected override void OnDestroyItem(BloodVfx item) {
+            item.OnComplete = null;
+        }
     }
 }

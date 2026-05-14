@@ -1,5 +1,14 @@
-public enum EnemyState
+using Game.Core;
+using Game.Pooling;
+using Game.Animation;
+using Game.Presentation;
+using Game.Items;
+
+namespace Game.Gameplay
 {
-    Attack,
-    Follow
+    public enum EnemyState
+    {
+        Attack,
+        Follow
+    }
 }

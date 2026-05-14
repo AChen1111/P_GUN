@@ -1,5 +1,8 @@
-public class Config
+namespace Game.Core
 {
-    public static string GunClipPath = "SFX/Gun/";
-    public static string ItemClipPath = "SFX/Item/";
+    public class Config
+    {
+        public static string GunClipPath = "SFX/Gun/";
+        public static string ItemClipPath = "SFX/Item/";
+    }
 }

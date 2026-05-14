@@ -1,38 +1,45 @@
 using UnityEngine;
+using Game.Core;
+using Game.Animation;
+using Game.Items;
+using Game.Gameplay;
 
-[CreateAssetMenu(fileName = "ApplyBuffItemEffect", menuName = "PG/Item/Effects/Apply Buff", order = 3)]
-public class ApplyBuffItemEffect : ItemEffectBase
+namespace Game.ItemEffects
 {
-    [SerializeField] private Buff buff = null;
-    [SerializeField] private int buffId = 0 ;
-    [SerializeField] private BuffDataBase buffDataBase = null;
-    [SerializeField] private bool showHeadMessage = true;
-
-    public override void OnPick(ItemEffectContext ctx)
+    [CreateAssetMenu(fileName = "ApplyBuffItemEffect", menuName = "PG/Item/Effects/Apply Buff", order = 3)]
+    public class ApplyBuffItemEffect : ItemEffectBase
     {
-        var player = Global.player;
-        if (player == null) return;
+        [SerializeField] private Buff buff = null;
+        [SerializeField] private int buffId = 0 ;
+        [SerializeField] private BuffDataBase buffDataBase = null;
+        [SerializeField] private bool showHeadMessage = true;
 
-        var targetBuff = ResolveBuff();
-        if (targetBuff == null) return;
-
-        var manager = player.GetComponent<BuffManager>();
-        if (manager == null)
+        public override void OnPick(ItemEffectContext ctx)
         {
-            manager = player.gameObject.AddComponent<BuffManager>();
+            var player = Global.player;
+            if (player == null) return;
+
+            var targetBuff = ResolveBuff();
+            if (targetBuff == null) return;
+
+            var manager = player.GetComponent<BuffManager>();
+            if (manager == null)
+            {
+                manager = player.gameObject.AddComponent<BuffManager>();
+            }
+
+            var info = manager.AddBuff(targetBuff);
+            if (info == null || !showHeadMessage) return;
+
+            EventCenter.Trigger(GameEvent.PlayerHeadMessageRequested, new PlayerHeadMessageEvent($"{info.Buff.BuffName} 生效", 1.5f));
         }
 
-        var info = manager.AddBuff(targetBuff);
-        if (info == null || !showHeadMessage) return;
+        private Buff ResolveBuff()
+        {
+            if (buff != null) return buff;
 
-        EventCenter.Trigger(GameEvent.PlayerHeadMessageRequested, new PlayerHeadMessageEvent($"{info.Buff.BuffName} 生效", 1.5f));
-    }
-
-    private Buff ResolveBuff()
-    {
-        if (buff != null) return buff;
-
-        var database = buffDataBase != null ? buffDataBase : DataBaseManager.Instance?.Buffs;
-        return database != null && database.TryGetById(buffId, out var targetBuff) ? targetBuff : null;
+            var database = buffDataBase != null ? buffDataBase : DataBaseManager.Instance?.Buffs;
+            return database != null && database.TryGetById(buffId, out var targetBuff) ? targetBuff : null;
+        }
     }
 }

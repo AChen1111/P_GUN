@@ -1,5 +1,8 @@
-public interface IPoolable
+namespace Game.Pooling
 {
-    void OnSpawnFromPool();
-    void OnRecycleToPool();
+    public interface IPoolable
+    {
+        void OnSpawnFromPool();
+        void OnRecycleToPool();
+    }
 }

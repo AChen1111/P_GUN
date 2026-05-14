@@ -1,10 +1,19 @@
-/// <summary>
-/// 全局玩家引用
-/// </summary>
+using Game.Core;
+using Game.Pooling;
+using Game.Animation;
+using Game.Presentation;
+using Game.Items;
 
-
-
-public class Global
+namespace Game.Gameplay
 {
-    public static Player player;
+    /// <summary>
+    /// 全局玩家引用
+    /// </summary>
+
+
+
+    public class Global
+    {
+        public static Player player;
+    }
 }

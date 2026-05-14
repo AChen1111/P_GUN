@@ -1,85 +1,93 @@
 using UnityEngine;
 using System.Collections.Generic;
+using Game.Core;
+using Game.Pooling;
+using Game.Animation;
+using Game.Presentation;
+using Game.Items;
 
-public class AudioPlay : MonoBehaviour {
-    [Header("音源播放源")]
-    [SerializeField] private AudioSource source;
+namespace Game.Gameplay
+{
+    public class AudioPlay : MonoBehaviour {
+        [Header("音源播放源")]
+        [SerializeField] private AudioSource source;
 
-    [Header("音频列表")]
-    [SerializeField] private List<AudioClip> clips;
+        [Header("音频列表")]
+        [SerializeField] private List<AudioClip> clips;
 
-    [Header("当前播放的音源")]
-    [SerializeField] private AudioClip currentClip;
-    [SerializeField] private int index = 0;
-    AudioClip randomClip => clips[UnityEngine.Random.Range(0, clips.Count)];
+        [Header("当前播放的音源")]
+        [SerializeField] private AudioClip currentClip;
+        [SerializeField] private int index = 0;
+        AudioClip randomClip => clips[UnityEngine.Random.Range(0, clips.Count)];
 
 
-    [Header("音源类型(2D/3D)")]
-    [SerializeField] private bool is3D = true;
+        [Header("音源类型(2D/3D)")]
+        [SerializeField] private bool is3D = true;
 
-    [Header("是否循环播放")]
-    [SerializeField] private bool loop = false;
-    [Header("随机播放")]
-    [SerializeField] private bool isRandom = true;
+        [Header("是否循环播放")]
+        [SerializeField] private bool loop = false;
+        [Header("随机播放")]
+        [SerializeField] private bool isRandom = true;
 
-    [Header("声音范围")]
-    [SerializeField] private float min_distance = 1f;
-    [SerializeField] private float max_distance = 20f;
+        [Header("声音范围")]
+        [SerializeField] private float min_distance = 1f;
+        [SerializeField] private float max_distance = 20f;
 
-    void Awake()
-    {
-        source = GetComponent<AudioSource>();
-        source.reverbZoneMix = is3D ? 1 : 0;
-        source.minDistance = min_distance;
-        source.maxDistance = max_distance;
-    }
+        void Awake()
+        {
+            source = GetComponent<AudioSource>();
+            source.reverbZoneMix = is3D ? 1 : 0;
+            source.minDistance = min_distance;
+            source.maxDistance = max_distance;
+        }
 
-    /// <summary>
-    /// 播放音频
-    /// </summary>
-    /// <param name="isRandom">是否随机播放,sfx推荐为true,bgm推荐是false(设置为false会顺序播放)</param>
-    public void Play()
-    {
-        // 没有可播放音频或音源时,直接返回.
-        if (source == null || clips == null || clips.Count == 0) return;
+        /// <summary>
+        /// 播放音频
+        /// </summary>
+        /// <param name="isRandom">是否随机播放,sfx推荐为true,bgm推荐是false(设置为false会顺序播放)</param>
+        public void Play()
+        {
+            // 没有可播放音频或音源时,直接返回.
+            if (source == null || clips == null || clips.Count == 0) return;
 
-        // SFX 正在播放时不打断,BGM 允许打断当前播放.
-        if (is3D && source.isPlaying) return;
+            // SFX 正在播放时不打断,BGM 允许打断当前播放.
+            if (is3D && source.isPlaying) return;
 
-        currentClip = isRandom ? randomClip : clips[index];
+            currentClip = isRandom ? randomClip : clips[index];
 
-        // 顺序播放时,播放后切到下一个索引.
-        if (!isRandom) index = (index + 1) % clips.Count;
+            // 顺序播放时,播放后切到下一个索引.
+            if (!isRandom) index = (index + 1) % clips.Count;
 
-        source.clip = currentClip;
-        source.loop = loop; 
-        source.Play();
-        Debug.Log($"AudioPlay: Playing clip '{currentClip.name}' on '{gameObject.name}'");
+            source.clip = currentClip;
+            source.loop = loop;
+            source.Play();
+            Debug.Log($"AudioPlay: Playing clip '{currentClip.name}' on '{gameObject.name}'");
 
-    }
+        }
 
-    /// <summary>
-    /// 获取下一段可播放音频,用于交给外部音源播放.
-    /// </summary>
-    public AudioClip GetNextClip()
-    {
-        if (clips == null || clips.Count == 0) return null;
+        /// <summary>
+        /// 获取下一段可播放音频,用于交给外部音源播放.
+        /// </summary>
+        public AudioClip GetNextClip()
+        {
+            if (clips == null || clips.Count == 0) return null;
 
-        var clip = isRandom ? randomClip : clips[index];
+            var clip = isRandom ? randomClip : clips[index];
 
-        // 顺序播放时,取出后切到下一个索引.
-        if (!isRandom) index = (index + 1) % clips.Count;
+            // 顺序播放时,取出后切到下一个索引.
+            if (!isRandom) index = (index + 1) % clips.Count;
 
-        currentClip = clip;
-        return clip;
-    }
+            currentClip = clip;
+            return clip;
+        }
 
-    public void Clear()
-    {
-        currentClip = null;
-        index  = 0;
-        if (source == null) return;
-        source.clip = null;
-        source.Stop();
+        public void Clear()
+        {
+            currentClip = null;
+            index  = 0;
+            if (source == null) return;
+            source.clip = null;
+            source.Stop();
+        }
     }
 }
