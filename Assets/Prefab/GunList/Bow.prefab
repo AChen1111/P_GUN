@@ -178,13 +178,15 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 58508dbb4ef4e18478c3c64634e0667a, type: 3}
   - {fileID: 8300000, guid: 982334509bf96f549acadf7a5627f7c9, type: 3}
   - {fileID: 8300000, guid: 8024fdb37d66f634c85e57499069b28d, type: 3}
+  firePoint: {fileID: 329057997544267524}
   ReloadSound: {fileID: 8300000, guid: 70c6ba4eb93b17d4a9ce83cfb26c281f, type: 3}
-  MinDamage: 20
-  MaxDamage: 30
-  MaxBulletBagNum: -1
-  clipSize: -1
+  MinDamage: 0
+  MaxDamage: 0
+  MaxBulletBagNum: 0
+  clipSize: 0
   shootInterval: 0
-  PlayerBullet: {fileID: 877616365706282941}
+  bulletSpeed: 0
+  PlayerBullet: {fileID: 6121020581885493579, guid: 509b372a670abc94c8dec5ddcce60e69, type: 3}
   Arrow: {fileID: 3818672352476444957}
   SelfAudioSource: {fileID: 7609457125886288384}
 --- !u!1 &3431150011091814042
@@ -433,17 +435,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 509b372a670abc94c8dec5ddcce60e69, type: 3}
---- !u!114 &877616365706282941 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 6121020581885493579, guid: 509b372a670abc94c8dec5ddcce60e69, type: 3}
-  m_PrefabInstance: {fileID: 6404066609360389878}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f5dfda7bccfdf5043829a3f933ce222e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!4 &1817490437116976433 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4748717374802959303, guid: 509b372a670abc94c8dec5ddcce60e69, type: 3}

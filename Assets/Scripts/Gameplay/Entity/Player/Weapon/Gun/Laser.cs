@@ -26,7 +26,7 @@ public class Laser : Gun
 	}
 	public override void Shooting(Vector2 dir)
 	{
-		var origin = BulletPrefab.Position2D();
+		var origin = FirePointPosition;
 		//获取墙体和敌人的layerMask
 		var layerMask = LayerMask.GetMask("Wall","EnemyLayer");
 		//得到碰撞点

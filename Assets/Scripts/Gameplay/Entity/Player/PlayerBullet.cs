@@ -7,7 +7,7 @@ public class PlayerBullet : MonoBehaviour, global::IPoolable {
     public int damage;
     [SerializeField] private float lifeTime = 3f;
     private bool hasHit = false;
-    private AudioPlay _audioPlay;
+    [SerializeField]private AudioPlay _audioPlay;
     private Coroutine autoRecycleCoroutine;
 
     private void Awake() {
@@ -30,6 +30,7 @@ public class PlayerBullet : MonoBehaviour, global::IPoolable {
     /// </summary>
     public void OnSpawnFromPool() {
         hasHit = false;
+        _audioPlay?.Clear();
         autoRecycleCoroutine = StartCoroutine(AutoRecycleIfNotHit());
     }
 
@@ -83,13 +84,12 @@ public class PlayerBullet : MonoBehaviour, global::IPoolable {
     /// </summary>
     /// <param name="target"></param>
     private void HandleHit(GameObject target) {
-        if(hasHit) return;
+        if(hasHit || target == null) return;
 
         if(target.CompareTag("Enemy")) {
             hasHit = true;
 
-            //todo:改为从自身播放音效
-            _audioPlay.Play();
+            PlaySelfHitSound();
             DamageInfo damageInfo = new DamageInfo(damage, dir);
 
             target.GetComponent<EnemyBase>()?.Hurt(damageInfo);
@@ -101,10 +101,30 @@ public class PlayerBullet : MonoBehaviour, global::IPoolable {
         var isWall = target.CompareTag("Wall") || target.layer == wallLayer;
         if(isWall) {
             hasHit = true;
-            //todo:改为由墙体播放音效
-            target.GetComponent<AudioPlay>().Play();
+            // 墙体可能没有音效组件,缺少时只回收子弹.
+            target.GetComponent<AudioPlay>()?.Play();
             PlayerBulletPool.Instance.Release(this);
         }
+    }
+
+    /// <summary>
+    /// 播放子弹命中音效,缺少音效组件时跳过避免空引用.
+    /// </summary>
+    private void PlaySelfHitSound() {
+        if(_audioPlay == null) {
+            _audioPlay = GetComponent<AudioPlay>();
+        }
+
+        var clip = _audioPlay?.GetNextClip();
+        if(clip == null) return;
+
+        // 子弹会立刻回收到对象池,命中音效交给全局音源播放.
+        if(GlobalAudioPlay.Instance != null) {
+            GlobalAudioPlay.Instance.PlayOneShot(clip);
+            return;
+        }
+
+        AudioSource.PlayClipAtPoint(clip, transform.position);
     }
 
     /// <summary>

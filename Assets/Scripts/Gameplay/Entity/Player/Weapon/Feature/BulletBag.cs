@@ -8,6 +8,7 @@ public class BulletBag
     public int maxBullet;
     public int currentBullet;
 
+
     public BulletBag(int maxBullet)
     {
         this.maxBullet = maxBullet;
@@ -19,6 +20,8 @@ public class BulletBag
     /// 是否还有子弹
     /// </summary>
     public bool HasBullet => currentBullet > 0;
+
+    public Player owner { get; set; }
 
     /// <summary>
     /// 换弹

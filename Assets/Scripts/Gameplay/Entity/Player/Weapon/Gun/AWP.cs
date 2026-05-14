@@ -15,7 +15,7 @@ public class AWP : Gun
 		shootDuration.RecordShootTime();
 		gunClip.Shoot();
 		var obj = GetBullet(dir);
-		gunFireEffect.Show(BulletPrefab.Position2D(), dir);
+		gunFireEffect.Show(FirePointPosition, dir);
 		TryPlaySound(false);
 	}
 

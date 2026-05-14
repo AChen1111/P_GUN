@@ -6,7 +6,6 @@ using QFramework;
 public class GunClip{
     public int maxAmmo = 30;    // 弹夹容量
     public int currentAmmo = 0; // 当前剩余弹药
-
     /// <summary>
     /// 以满弹状态初始化弹夹
     /// </summary>
