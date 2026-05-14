@@ -34,6 +34,8 @@ public abstract class EnemyBase : MonoBehaviour, global::IPoolable {
 
     [Header("所属房间")]
     public FightRoom OwnerFightRoom;
+    [Header("音频播放")]
+    public AudioPlay audioPlay;
 
     /// <summary>
     /// 状态机

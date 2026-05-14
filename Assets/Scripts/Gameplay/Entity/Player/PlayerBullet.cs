@@ -7,10 +7,12 @@ public class PlayerBullet : MonoBehaviour, global::IPoolable {
     public int damage;
     [SerializeField] private float lifeTime = 3f;
     private bool hasHit = false;
+    private AudioPlay _audioPlay;
     private Coroutine autoRecycleCoroutine;
 
     private void Awake() {
         rb = GetComponent<Rigidbody2D>();
+        _audioPlay = GetComponent<AudioPlay>();
         gameObject.layer = LayerMask.NameToLayer("PlayerBullet");
     }
 
@@ -87,7 +89,7 @@ public class PlayerBullet : MonoBehaviour, global::IPoolable {
             hasHit = true;
 
             //todo:改为从自身播放音效
-            
+            _audioPlay.Play();
             DamageInfo damageInfo = new DamageInfo(damage, dir);
 
             target.GetComponent<EnemyBase>()?.Hurt(damageInfo);
@@ -100,6 +102,7 @@ public class PlayerBullet : MonoBehaviour, global::IPoolable {
         if(isWall) {
             hasHit = true;
             //todo:改为由墙体播放音效
+            target.GetComponent<AudioPlay>().Play();
             PlayerBulletPool.Instance.Release(this);
         }
     }
