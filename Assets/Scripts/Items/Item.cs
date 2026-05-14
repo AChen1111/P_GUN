@@ -223,13 +223,12 @@ public class Item : MonoBehaviour, global::IPoolable
 
     private ItemData ResolveItemData()
     {
-        var database = itemDatabase != null ? itemDatabase : ItemDatabase.Default;
-        if (database != null && database.TryGetById(itemId, out var data))
+        if (itemDatabase != null && itemDatabase.TryGetById(itemId, out var data))
         {
             return data;
         }
 
-        return ItemData.CreateFallback(itemId, gameObject.name);
+        return default;
     }
 
     private static bool IsPlayer(Collider2D other)

@@ -29,14 +29,4 @@ public struct WeaponData
 
         gun.ApplyData(this);
     }
-
-    public static WeaponData CreateFallback(string id)
-    {
-        return new WeaponData
-        {
-            weaponId = id,
-            displayName = string.IsNullOrWhiteSpace(id) ? "Weapon" : id,
-            shootSounds = new List<AudioClip>()
-        };
-    }
 }

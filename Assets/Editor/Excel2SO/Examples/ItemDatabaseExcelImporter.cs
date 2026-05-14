@@ -19,6 +19,5 @@ public sealed class ItemDatabaseExcelImporter : Excel2SoListAssetImporter<ItemDa
     {
         var importedItems = asset.Items.ToArray();
         asset.ReplaceItems(importedItems);
-        ItemDatabase.SetDefault(asset);
     }
 }

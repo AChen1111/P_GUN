@@ -2,6 +2,7 @@
   "name": "Game.Editor",
   "rootNamespace": "",
   "references": [
+    "Game.Core",
     "Game.Items",
     "Game.ItemEffects",
     "Game.Gameplay",

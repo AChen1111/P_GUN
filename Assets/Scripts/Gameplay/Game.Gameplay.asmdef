@@ -10,7 +10,9 @@
         "QFramework.CoreKit",
         "AudioKit",
         "Edgar.Unity",
-        "Game.Items"
+        "Game.Items",
+        "Unity.Addressables",
+        "Unity.ResourceManager"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
