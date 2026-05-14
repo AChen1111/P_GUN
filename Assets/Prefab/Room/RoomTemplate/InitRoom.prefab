@@ -45,6 +45,8 @@ GameObject:
   - component: {fileID: 6246450547194667920}
   - component: {fileID: 5961402240756581668}
   - component: {fileID: 7190365451780454658}
+  - component: {fileID: 210292691612205265}
+  - component: {fileID: 6038063122362149474}
   m_Layer: 10
   m_Name: Walls
   m_TagString: Wall
@@ -720,6 +722,127 @@ CompositeCollider2D:
   m_OffsetDistance: 0.00005
   m_UseDelaunayMesh: 0
   m_CompositeGameObject: {fileID: 3362289160776911995}
+--- !u!114 &210292691612205265
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3362289160776911995}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 57dfb31e620e1b641a05ca43d4dcabe8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  source: {fileID: 6038063122362149474}
+  clips:
+  - {fileID: 8300000, guid: b2dbfa8029e7085438df38aa4fb76b78, type: 3}
+  - {fileID: 8300000, guid: 0307d9bcd8d1f984aad6690168e6e390, type: 3}
+  - {fileID: 8300000, guid: 1278784ae907ba54386d676c440244af, type: 3}
+  - {fileID: 8300000, guid: 92f1dce4686c87b4e97533920e9b48c3, type: 3}
+  currentClip: {fileID: 0}
+  index: 0
+  isSFX: 1
+  loop: 0
+  isRandom: 1
+  min_distance: 1
+  max_distance: 2
+--- !u!82 &6038063122362149474
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3362289160776911995}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_PlayOnAwake: 1
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &3860671431732806917
 GameObject:
   m_ObjectHideFlags: 0
@@ -2500,6 +2623,7 @@ MonoBehaviour:
   doorPrefab: {fileID: 0}
   doorStateIsOpen: 1
   roomCenterPoint: {fileID: 0}
+  itemSpawner: {fileID: 0}
   playerSpawnPoint: {fileID: 977558609046554941}
   playerPrefab: {fileID: 7553163744435906436, guid: 0aedc682d273ead4f9a7a400aa3afe32, type: 3}
 --- !u!61 &5070246570669779861
