@@ -1,27 +1,35 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Game.Core;
+using Game.Pooling;
+using Game.Animation;
+using Game.Presentation;
+using Game.Items;
 
-/// <summary>
-/// 开枪间隔特性
-/// </summary>
-public class ShootDuration
+namespace Game.Gameplay
 {
-    public float Duration { get; set; }//开枪间隔
-    private float lastShootTime;//上一次开枪时间
-
-    public ShootDuration(float duration)
-    {
-        Duration = duration;
-    }
-
-    public bool CanShoot => lastShootTime == 0f||Time.time - lastShootTime >= Duration;
-
     /// <summary>
-    /// 记录开枪时间
+    /// 开枪间隔特性
     /// </summary>
-    public void RecordShootTime()
+    public class ShootDuration
     {
-        lastShootTime = Time.time;
+        public float Duration { get; set; }//开枪间隔
+        private float lastShootTime;//上一次开枪时间
+
+        public ShootDuration(float duration)
+        {
+            Duration = duration;
+        }
+
+        public bool CanShoot => lastShootTime == 0f||Time.time - lastShootTime >= Duration;
+
+        /// <summary>
+        /// 记录开枪时间
+        /// </summary>
+        public void RecordShootTime()
+        {
+            lastShootTime = Time.time;
+        }
     }
 }

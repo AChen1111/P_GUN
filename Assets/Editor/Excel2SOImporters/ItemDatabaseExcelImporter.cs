@@ -1,5 +1,6 @@
 using System.Linq;
 using UnityEngine;
+using Game.Items;
 
 public sealed class ItemDatabaseExcelImporter : Excel2SoListAssetImporter<ItemDatabase>
 {

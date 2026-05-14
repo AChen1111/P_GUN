@@ -1,6 +1,6 @@
 {
   "name": "Game.ItemEffects",
-  "rootNamespace": "",
+  "rootNamespace": "Game.ItemEffects",
   "references": [
     "Game.Core",
     "Game.Animation",

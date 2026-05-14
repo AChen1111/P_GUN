@@ -1,4 +1,5 @@
 using UnityEngine;
+using Game.Items;
 
 public sealed class ItemSpawnTableExcelImporter : Excel2SoListAssetImporter<ItemSpawnTableSO>
 {

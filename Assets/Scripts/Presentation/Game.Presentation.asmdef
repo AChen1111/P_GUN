@@ -1,6 +1,6 @@
 {
   "name": "Game.Presentation",
-  "rootNamespace": "",
+  "rootNamespace": "Game.Presentation",
   "references": [
     "Game.Core",
     "Game.Pooling",

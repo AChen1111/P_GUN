@@ -1,15 +1,23 @@
 using UnityEngine;
 using QFramework;
 using System.Collections.Generic;
+using Game.Core;
+using Game.Pooling;
+using Game.Animation;
+using Game.Presentation;
+using Game.Items;
 
-public class WeaponGlobal : ViewController
+namespace Game.Gameplay
 {
-    public SpriteRenderer GunFire;
+    public class WeaponGlobal : ViewController
+    {
+        public SpriteRenderer GunFire;
 
-	public static WeaponGlobal Instance { get; private set; }
-	private void Awake() {
-		Instance = this;
-	}
-	public AudioSource WeaponAudioSource;
+		public static WeaponGlobal Instance { get; private set; }
+		private void Awake() {
+			Instance = this;
+		}
+		public AudioSource WeaponAudioSource;
 
+    }
 }

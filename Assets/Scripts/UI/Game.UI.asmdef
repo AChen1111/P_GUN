@@ -1,6 +1,6 @@
 {
   "name": "Game.UI",
-  "rootNamespace": "",
+  "rootNamespace": "Game.UI",
   "references": [
     "Game.Core",
     "Game.Items",

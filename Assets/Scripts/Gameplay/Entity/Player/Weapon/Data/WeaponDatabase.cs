@@ -1,26 +1,34 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Game.Core;
+using Game.Pooling;
+using Game.Animation;
+using Game.Presentation;
+using Game.Items;
 
-[CreateAssetMenu(fileName = "WeaponDatabase", menuName = "PG/Weapon/Weapon Database", order = 0)]
-public class WeaponDatabase : ScriptableObjectDatabase<WeaponDatabase, string, WeaponData>
+namespace Game.Gameplay
 {
-    [SerializeField] private List<WeaponData> weapons = new List<WeaponData>();
-
-    public IReadOnlyList<WeaponData> Weapons => weapons;
-
-    public void ReplaceWeapons(IEnumerable<WeaponData> newWeapons)
+    [CreateAssetMenu(fileName = "WeaponDatabase", menuName = "PG/Weapon/Weapon Database", order = 0)]
+    public class WeaponDatabase : ScriptableObjectDatabase<WeaponDatabase, string, WeaponData>
     {
-        ReplaceData(weapons, newWeapons);
-    }
+        [SerializeField] private List<WeaponData> weapons = new List<WeaponData>();
 
-    protected override List<WeaponData> DataValues => weapons;
+        public IReadOnlyList<WeaponData> Weapons => weapons;
 
-    protected override IEqualityComparer<string> KeyComparer => StringComparer.OrdinalIgnoreCase;
+        public void ReplaceWeapons(IEnumerable<WeaponData> newWeapons)
+        {
+            ReplaceData(weapons, newWeapons);
+        }
 
-    protected override bool TryGetKey(WeaponData data, out string key)
-    {
-        key = data.weaponId;
-        return !string.IsNullOrEmpty(key);
+        protected override List<WeaponData> DataValues => weapons;
+
+        protected override IEqualityComparer<string> KeyComparer => StringComparer.OrdinalIgnoreCase;
+
+        protected override bool TryGetKey(WeaponData data, out string key)
+        {
+            key = data.weaponId;
+            return !string.IsNullOrEmpty(key);
+        }
     }
 }

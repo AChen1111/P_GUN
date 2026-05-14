@@ -1,10 +1,18 @@
 using UnityEngine;
+using Game.Core;
+using Game.Pooling;
+using Game.Animation;
+using Game.Presentation;
+using Game.Items;
 
-/// <summary>
-/// 战斗房间结束效果基类。
-/// 在 FightRoom 的战斗全部结束后按列表顺序执行。
-/// </summary>
-public abstract class FightRoomEndEffectSO : ScriptableObject
+namespace Game.Gameplay
 {
-    public abstract void Execute(FightRoom room);
+    /// <summary>
+    /// 战斗房间结束效果基类。
+    /// 在 FightRoom 的战斗全部结束后按列表顺序执行。
+    /// </summary>
+    public abstract class FightRoomEndEffectSO : ScriptableObject
+    {
+        public abstract void Execute(FightRoom room);
+    }
 }

@@ -1,25 +1,32 @@
 using UnityEngine;
+using Game.Core;
+using Game.Animation;
+using Game.Items;
+using Game.Gameplay;
 
-/// <summary>
-/// 拾取后恢复玩家 HP，不超过上限；满血时提示且不增加。
-/// </summary>
-[CreateAssetMenu(fileName = "HealItemEffect", menuName = "PG/Item/Effects/Heal Item Effect", order = 1)]
-public class HealItemEffect : ItemEffectBase
+namespace Game.ItemEffects
 {
-    [SerializeField] private int healAmount = 1;
-
-    public override void OnPick(ItemEffectContext ctx)
+    /// <summary>
+    /// 拾取后恢复玩家 HP，不超过上限；满血时提示且不增加。
+    /// </summary>
+    [CreateAssetMenu(fileName = "HealItemEffect", menuName = "PG/Item/Effects/Heal Item Effect", order = 1)]
+    public class HealItemEffect : ItemEffectBase
     {
-        var player = Global.player;
-        if (player == null) return;
+        [SerializeField] private int healAmount = 1;
 
-        if (player.IsHPFull)
+        public override void OnPick(ItemEffectContext ctx)
         {
-            EventCenter.Trigger(GameEvent.PlayerHeadMessageRequested, new PlayerHeadMessageEvent("生命已满", 1.5f));
-            return;
-        }
+            var player = Global.player;
+            if (player == null) return;
 
-        var healedAmount = player.Heal(healAmount);
-        EventCenter.Trigger(GameEvent.PlayerHeadMessageRequested, new PlayerHeadMessageEvent($"恢复 {healedAmount} 点生命", 1.5f));
+            if (player.IsHPFull)
+            {
+                EventCenter.Trigger(GameEvent.PlayerHeadMessageRequested, new PlayerHeadMessageEvent("生命已满", 1.5f));
+                return;
+            }
+
+            var healedAmount = player.Heal(healAmount);
+            EventCenter.Trigger(GameEvent.PlayerHeadMessageRequested, new PlayerHeadMessageEvent($"恢复 {healedAmount} 点生命", 1.5f));
+        }
     }
 }
