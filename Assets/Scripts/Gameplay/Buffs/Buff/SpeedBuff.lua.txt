@@ -1,0 +1,42 @@
+local SpeedBuff = {}
+
+local speedUp = 10
+
+function SpeedBuff.OnAdd(runtimeInfo)
+    local player = runtimeInfo.Owner
+    if player == nil then
+        return
+    end
+
+    if runtimeInfo:GetParam("OriginSpeed") == nil then
+        runtimeInfo:SetParam("OriginSpeed", player:GetSpeed())
+        player:AddSpeedByValue(speedUp)
+    end
+
+    CS.UnityEngine.Debug.Log("SpeedBuff OnAdd")
+end
+
+function SpeedBuff.OnRemove(runtimeInfo)
+    local player = runtimeInfo.Owner
+    if player == nil then
+        return
+    end
+
+    local originSpeed = runtimeInfo:GetParam("OriginSpeed")
+    if originSpeed ~= nil then
+        player:SetSpeed(originSpeed)
+    end
+
+    CS.UnityEngine.Debug.Log("SpeedBuff OnRemove")
+end
+
+function SpeedBuff.OnUpdate(runtimeInfo, deltaTime)
+end
+
+function SpeedBuff.OnInterval(runtimeInfo)
+end
+
+function SpeedBuff.OnTrigger(runtimeInfo)
+end
+
+return SpeedBuff

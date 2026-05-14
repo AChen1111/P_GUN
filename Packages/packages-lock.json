@@ -21,7 +21,7 @@
       },
       "url": "https://package.openupm.com"
     },
-    "com.pgun.excel2so": {
+    "com.achen.excel2so": {
       "version": "file:com.pgun.excel2so",
       "depth": 0,
       "source": "embedded",
