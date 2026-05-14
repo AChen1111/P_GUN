@@ -24,6 +24,5 @@ public sealed class WeaponDatabaseExcelImporter : Excel2SoListAssetImporter<Weap
     protected override void OnAfterImportAsset(WeaponDatabase asset, ExcelTable table, Excel2SoImportReport report)
     {
         asset.ReplaceWeapons(asset.Weapons.ToArray());
-        WeaponDatabase.SetDefault(asset);
     }
 }

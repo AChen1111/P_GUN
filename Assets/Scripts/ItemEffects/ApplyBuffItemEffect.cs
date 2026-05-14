@@ -31,6 +31,8 @@ public class ApplyBuffItemEffect : ItemEffectBase
     private Buff ResolveBuff()
     {
         if (buff != null) return buff;
-        return buffDataBase.GetById(buffId);
+
+        var database = buffDataBase != null ? buffDataBase : DataBaseManager.Instance?.Buffs;
+        return database != null && database.TryGetById(buffId, out var targetBuff) ? targetBuff : null;
     }
 }

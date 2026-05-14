@@ -19,9 +19,4 @@ public struct ItemData
         this.description = description;
         this.icon = icon;
     }
-
-    public static ItemData CreateFallback(int itemId, string fallbackName)
-    {
-        return new ItemData(itemId, string.IsNullOrEmpty(fallbackName) ? $"Item {itemId}" : fallbackName, string.Empty, null);
-    }
 }

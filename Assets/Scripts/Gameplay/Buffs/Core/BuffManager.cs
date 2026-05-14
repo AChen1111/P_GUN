@@ -39,13 +39,14 @@ public class BuffManager : MonoBehaviour
     /// <returns>Buff 运行时信息</returns>
     public BuffRuntimeInfo AddBuffById(int buffId)
     {
-        if (dataBase == null)
+        var database = dataBase != null ? dataBase : DataBaseManager.Instance?.Buffs;
+        if (database == null)
         {
             Debug.LogWarning($"{nameof(BuffManager)}: 未设置 {nameof(BuffDataBase)}，无法通过 id 添加 Buff。", this);
             return null;
         }
 
-        return AddBuff(dataBase.GetById(buffId));
+        return database.TryGetById(buffId, out var buff) ? AddBuff(buff) : null;
     }
 
     /// <summary>

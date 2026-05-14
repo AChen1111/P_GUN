@@ -107,7 +107,8 @@ public void ApplyData(WeaponData data)
 
 private void ApplyDataFromDatabase()
 {
-    if (weaponDatabase != null && weaponDatabase.TryGetById(WeaponId, out var data))
+    var database = weaponDatabase != null ? weaponDatabase : DataBaseManager.Instance?.Weapons;
+    if (database != null && database.TryGetById(WeaponId, out var data))
     {
         data.ApplyTo(this);
     }
