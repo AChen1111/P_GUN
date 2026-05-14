@@ -9,13 +9,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f91de68c422c56e4091029c51ce1a2cb, type: 3}
-  m_Name: SpeedBuff
+  m_Script: {fileID: 11500000, guid: c3a56babb83e4a0da390605bf49b5378, type: 3}
+  m_Name: SpeedUpBuff
   m_EditorClassIdentifier: 
   id: 0
-  buffName: jiasu
+  buffName: 
+  luaFile: {fileID: 4900000, guid: 648678a33bef4bec9cd2e901e934f017, type: 3}
   duration: 5
   isPermanent: 0
-  triggerType: 0
   interval: 1
-  speedUp: 5

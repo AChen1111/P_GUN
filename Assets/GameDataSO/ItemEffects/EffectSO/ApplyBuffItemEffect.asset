@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0648309ec25400c84bddd16fd583331, type: 3}
   m_Name: ApplyBuffItemEffect
   m_EditorClassIdentifier: 
-  buff: {fileID: 11400000, guid: 342c25d8a8b1f3144b13dcbedbc264e3, type: 2}
+  buff: {fileID: 11400000, guid: f38915eff32c07041803807d80a3c551, type: 2}
   buffId: 0
   buffDataBase: {fileID: 0}
   showHeadMessage: 1

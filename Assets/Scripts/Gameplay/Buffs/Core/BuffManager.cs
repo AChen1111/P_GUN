@@ -1,10 +1,9 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
 /// 玩家身上的 Buff 运行时管理器.
-/// 负责保存当前 Buff, 更新计时器, 并按触发类型执行效果.
+/// 负责保存当前 Buff, 更新计时器, 并调度 Lua 生命周期.
 /// </summary>
 public class BuffManager : MonoBehaviour
 {
@@ -16,9 +15,16 @@ public class BuffManager : MonoBehaviour
     private readonly List<BuffRuntimeInfo> buffs = new List<BuffRuntimeInfo>();
 
     /// <summary>
-    /// Buff 到运行时信息的映射, 用于快速查找和去重.
+    /// Buff id 到运行时信息的映射, 用于快速查找和去重.
     /// </summary>
-    private readonly Dictionary<Buff, BuffRuntimeInfo> buffInfoMap = new Dictionary<Buff, BuffRuntimeInfo>();
+    private readonly Dictionary<int, BuffRuntimeInfo> buffInfoMap = new Dictionary<int, BuffRuntimeInfo>();
+
+    private Player owner;
+
+    private void Awake()
+    {
+        owner = GetComponent<Player>();
+    }
 
     private void Update()
     {
@@ -30,6 +36,11 @@ public class BuffManager : MonoBehaviour
         }
     }
 
+    private void OnDestroy()
+    {
+        ClearBuffs();
+    }
+
 #region Public API
 
     /// <summary>
@@ -39,38 +50,61 @@ public class BuffManager : MonoBehaviour
     /// <returns>Buff 运行时信息</returns>
     public BuffRuntimeInfo AddBuffById(int buffId)
     {
-        var database = dataBase != null ? dataBase : DataBaseManager.Instance?.Buffs;
-        if (database == null)
-        {
-            Debug.LogWarning($"{nameof(BuffManager)}: 未设置 {nameof(BuffDataBase)}，无法通过 id 添加 Buff。", this);
-            return null;
-        }
-
-        return database.TryGetById(buffId, out var buff) ? AddBuff(buff) : null;
+        return AddBuffById(buffId, null);
     }
 
     /// <summary>
-    /// 直接添加 Buff. 如果 Buff 已存在, 只重置持续时间并触发 OnStart.
+    /// 通过 id 添加 Buff.
+    /// </summary>
+    /// <param name="buffId">Buff id.</param>
+    /// <param name="source">Buff 来源对象.</param>
+    /// <returns>Buff 运行时信息.</returns>
+    public BuffRuntimeInfo AddBuffById(int buffId, UnityEngine.Object source)
+    {
+        var database = dataBase != null ? dataBase : DataBaseManager.Instance?.Buffs;
+        if (database == null)
+        {
+            Debug.LogWarning($"{nameof(BuffManager)}: 未设置 {nameof(BuffDataBase)}, 无法通过 id 添加 Buff.", this);
+            return null;
+        }
+
+        return database.TryGetById(buffId, out var buff) ? AddBuff(buff, source) : null;
+    }
+
+    /// <summary>
+    /// 直接添加 Buff. 如果 Buff 已存在, 只重置持续时间并触发 OnAdd.
     /// </summary>
     /// <param name="buff">Buff 配置</param>
     /// <returns>Buff 运行时信息</returns>
     public BuffRuntimeInfo AddBuff(Buff buff)
     {
+        return AddBuff(buff, null);
+    }
+
+    /// <summary>
+    /// 直接添加 Buff. 如果 Buff 已存在, 只重置持续时间并触发 OnAdd.
+    /// </summary>
+    /// <param name="buff">Buff 配置.</param>
+    /// <param name="source">Buff 来源对象.</param>
+    /// <returns>Buff 运行时信息.</returns>
+    public BuffRuntimeInfo AddBuff(Buff buff, UnityEngine.Object source)
+    {
         if (buff == null) return null;
 
-        if (buffInfoMap.TryGetValue(buff, out var existing))
+        if (buffInfoMap.TryGetValue(buff.Id, out var existing))
         {
-            ResetBuffRuntimeInfo(existing, buff);
-            TriggerOnStart(existing);
+            ResetBuffRuntimeInfo(existing, buff, source);
+            TriggerOnAdd(existing);
             return existing;
         }
 
-        var info = CreateBuffRuntimeInfo(buff);
+        var info = CreateBuffRuntimeInfo(buff, source);
+        if (info == null) return null;
 
         info.Index = buffs.Count;
         buffs.Add(info);
-        buffInfoMap[buff] = info;
-        TriggerOnStart(info);
+        buffInfoMap[buff.Id] = info;
+        TriggerOnAdd(info);
         return info;
     }
 
@@ -83,14 +117,34 @@ public class BuffManager : MonoBehaviour
     {
         if (buff == null) return false;
 
-        if (buffInfoMap.TryGetValue(buff, out var info))
-        {
-            TriggerOnEnd(info);
-            RemoveAt(info.Index);
-            return true;
-        }
+        return RemoveBuffById(buff.Id);
+    }
 
-        return false;
+    /// <summary>
+    /// 通过 id 移除 Buff.
+    /// </summary>
+    /// <param name="buffId">Buff id.</param>
+    /// <returns>是否成功移除.</returns>
+    public bool RemoveBuffById(int buffId)
+    {
+        if (!buffInfoMap.TryGetValue(buffId, out var info)) return false;
+
+        TriggerOnRemove(info);
+        info.LuaInstance?.Dispose();
+        RemoveAt(info.Index);
+        return true;
+    }
+
+    /// <summary>
+    /// 主动触发指定 Buff.
+    /// </summary>
+    /// <param name="buffId">Buff id.</param>
+    public void TriggerBuffById(int buffId)
+    {
+        if (buffInfoMap.TryGetValue(buffId, out var info))
+        {
+            info.Buff.OnTrigger(info);
+        }
     }
 
     /// <summary>
@@ -100,7 +154,8 @@ public class BuffManager : MonoBehaviour
     {
         for (var i = buffs.Count - 1; i >= 0; i--)
         {
-            TriggerOnEnd(buffs[i]);
+            TriggerOnRemove(buffs[i]);
+            buffs[i].LuaInstance?.Dispose();
             RemoveAt(i);
         }
 
@@ -124,31 +179,13 @@ public class BuffManager : MonoBehaviour
 
             if (info.RemainingTime <= 0f)
             {
-                RemoveBuff(info.Buff);
+                RemoveBuffById(info.Buff.Id);
                 return;
             }
         }
 
-        TriggerDuringUpdate(info, deltaTime);
-    }
-
-    /// <summary>
-    /// 按 Buff 的持续触发类型执行效果.
-    /// </summary>
-    /// <param name="info">Buff 运行时信息</param>
-    /// <param name="deltaTime">时间增量</param>
-    private void TriggerDuringUpdate(BuffRuntimeInfo info, float deltaTime)
-    {
-        switch (info.Buff.TriggerType)
-        {
-            case BuffTriggerType.Continuous:
-                InvokeEffect(info);
-                break;
-
-            case BuffTriggerType.Interval:
-                TriggerInterval(info, deltaTime);
-                break;
-        }
+        info.Buff.OnUpdate(info, deltaTime);
+        TriggerInterval(info, deltaTime);
     }
 
     /// <summary>
@@ -162,10 +199,10 @@ public class BuffManager : MonoBehaviour
 
         info.IntervalTimer += deltaTime;
 
-        while (info.IntervalTimer >= info.Interval && buffInfoMap.ContainsKey(info.Buff))
+        while (info.IntervalTimer >= info.Interval && buffInfoMap.ContainsKey(info.Buff.Id))
         {
             info.IntervalTimer -= info.Interval;
-            InvokeEffect(info);
+            info.Buff.OnInterval(info);
         }
     }
 
@@ -178,14 +215,24 @@ public class BuffManager : MonoBehaviour
     /// </summary>
     /// <param name="buff">Buff 配置</param>
     /// <returns>Buff 运行时信息</returns>
-    private BuffRuntimeInfo CreateBuffRuntimeInfo(Buff buff)
+    private BuffRuntimeInfo CreateBuffRuntimeInfo(Buff buff, UnityEngine.Object source)
     {
+        var luaInstance = LuaManager.GetOrCreate().CreateBuffInstance(buff);
+        if (luaInstance == null)
+        {
+            Debug.LogError($"{nameof(BuffManager)}: 创建 Buff Lua 实例失败, Buff: {buff.BuffName}.", this);
+            return null;
+        }
+
         var info = new BuffRuntimeInfo
         {
-            Buff = buff
+            owner = owner != null ? owner : Global.player,
+            Source = source,
+            Buff = buff,
+            LuaInstance = luaInstance
         };
 
-        ResetBuffRuntimeInfo(info, buff);
+        ResetBuffRuntimeInfo(info, buff, source);
         return info;
     }
 
@@ -194,8 +241,9 @@ public class BuffManager : MonoBehaviour
     /// </summary>
     /// <param name="info">Buff 运行时信息</param>
     /// <param name="buff">Buff 配置</param>
-    private void ResetBuffRuntimeInfo(BuffRuntimeInfo info, Buff buff)
+    private void ResetBuffRuntimeInfo(BuffRuntimeInfo info, Buff buff, UnityEngine.Object source)
     {
+        info.Source = source;
         info.Duration = buff.Duration;
         info.RemainingTime = buff.Duration;
         info.Interval = buff.Interval;
@@ -208,30 +256,21 @@ public class BuffManager : MonoBehaviour
 #region Trigger
 
     /// <summary>
-    /// 触发 Buff 的开始回调.
+    /// 触发 Buff 的添加回调.
     /// </summary>
     /// <param name="info">Buff 运行时信息</param>
-    private static void TriggerOnStart(BuffRuntimeInfo info)
+    private static void TriggerOnAdd(BuffRuntimeInfo info)
     {
-        info.Buff.OnStart(info);
+        info.Buff.OnAdd(info);
     }
 
     /// <summary>
-    /// 触发 Buff 的结束回调.
+    /// 触发 Buff 的移除回调.
     /// </summary>
     /// <param name="info">Buff 运行时信息</param>
-    private static void TriggerOnEnd(BuffRuntimeInfo info)
+    private static void TriggerOnRemove(BuffRuntimeInfo info)
     {
-        info.Buff.OnEnd(info);
-    }
-
-    /// <summary>
-    /// 执行 Buff 的效果.
-    /// </summary>
-    /// <param name="info">Buff 运行时信息</param>
-    private static void InvokeEffect(BuffRuntimeInfo info)
-    {
-        info?.Buff?.Effect?.Invoke(info);
+        info.Buff.OnRemove(info);
     }
 
 #endregion
@@ -258,7 +297,7 @@ public class BuffManager : MonoBehaviour
         }
 
         buffs.RemoveAt(lastIndex);
-        buffInfoMap.Remove(removedInfo.Buff);
+        buffInfoMap.Remove(removedInfo.Buff.Id);
     }
 
 #endregion
