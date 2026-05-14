@@ -13,9 +13,8 @@ public class Door : ViewController
 	[Header("是否打开")]
 	public bool isOpen = true;
 	
-	[Header("开门音效")]
-	public AudioClip openDoorSound;
-	public static bool isPlayingOpenDoorSound = false;
+	[Header("音频播放组件")]
+	public AudioPlay audioPlay;
 
 
 	/// <summary>
@@ -28,7 +27,10 @@ public class Door : ViewController
 		
 		if (isOpen)
 		{
-			OpenDoor();
+			isOpen = true;
+			CloseDoorSR.gameObject.SetActive(false);
+			doorCollider.enabled = false;
+			EventCenter.Trigger(GameEvent.DoorOpened, this);
 		}
 		else
 		{
@@ -38,6 +40,7 @@ public class Door : ViewController
 	
 	private void Awake() {
 		CloseDoorSR.gameObject.SetActive(!isOpen);
+		audioPlay = GetComponent<AudioPlay>();
 	}
 
 	/// <summary>
@@ -49,21 +52,7 @@ public class Door : ViewController
 		CloseDoorSR.gameObject.SetActive(false);
 		doorCollider.enabled = false;
 		
-
-		//保证只会播放一次开门音效
-		if(playSound && !isPlayingOpenDoorSound)
-		{
-			isPlayingOpenDoorSound = true;
-			//播放开门音效,并添加回调
-			GlobalAudioPlay.Instance.PlayerAudioSourceByClip(
-				openDoorSound,
-				onComplete:
-					() => {
-						isPlayingOpenDoorSound = false;
-					}
-			);
-		}
-
+		audioPlay.Play();
 		EventCenter.Trigger(GameEvent.DoorOpened, this);
 	}
 

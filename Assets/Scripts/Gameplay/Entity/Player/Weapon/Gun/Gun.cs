@@ -10,7 +10,7 @@ public abstract class Gun : ViewController {
 [SerializeField] private string weaponId;
 
 /// <summary>
-/// 武器数据库。为空时使用 Resources/WeaponDatabase。
+/// 武器数据库。
 /// </summary>
 [SerializeField] private WeaponDatabase weaponDatabase;
 
@@ -25,6 +25,15 @@ public List<AudioClip> shootSounds = new List<AudioClip>();
 /// 子弹预制体
 /// </summary>
 public abstract PlayerBullet BulletPrefab { get; }
+
+/// <summary>
+/// 射击点,用于决定子弹出生位置和枪口特效位置.
+/// </summary>
+[SerializeField] private Transform firePoint;
+
+protected Vector2 FirePointPosition => firePoint != null ? firePoint.Position2D() : BulletPrefab.Position2D();
+
+protected Quaternion FirePointRotation => firePoint != null ? firePoint.rotation : BulletPrefab.transform.rotation;
 
 /// <summary>
 /// 音频源,所有武器公用一个
@@ -98,12 +107,13 @@ public void ApplyData(WeaponData data)
 
 private void ApplyDataFromDatabase()
 {
-    var database = weaponDatabase != null ? weaponDatabase : WeaponDatabase.Default;
-    if (database == null) return;
-
-    if (database.TryGetById(WeaponId, out var data))
+    if (weaponDatabase != null && weaponDatabase.TryGetById(WeaponId, out var data))
     {
         data.ApplyTo(this);
+    }
+    else
+    {
+        Debug.LogWarning($"Weapon {WeaponId} not found in database.");
     }
 }
 
@@ -231,10 +241,16 @@ protected virtual void TryPlaySound(bool loop = false)
 /// </summary>
 protected virtual PlayerBullet GetBullet(Vector2 dir)
 {    
+    if (BulletPrefab == null)
+    {
+        Debug.LogError($"{GetType().Name}: 子弹预制体为空,无法发射。", this);
+        return null;
+    }
+
     var obj = PlayerBulletPool.Instance.Get(
         BulletPrefab,
-        BulletPrefab.transform.position,
-        BulletPrefab.transform.rotation,
+        FirePointPosition,
+        FirePointRotation,
         dir,
         Damage,
         bulletSpeed

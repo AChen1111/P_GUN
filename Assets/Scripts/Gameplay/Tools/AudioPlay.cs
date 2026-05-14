@@ -14,8 +14,8 @@ public class AudioPlay : MonoBehaviour {
     AudioClip randomClip => clips[UnityEngine.Random.Range(0, clips.Count)];
 
 
-    [Header("音源类型")]
-    [SerializeField] private bool isSFX = true;
+    [Header("音源类型(2D/3D)")]
+    [SerializeField] private bool is3D = true;
 
     [Header("是否循环播放")]
     [SerializeField] private bool loop = false;
@@ -29,7 +29,7 @@ public class AudioPlay : MonoBehaviour {
     void Awake()
     {
         source = GetComponent<AudioSource>();
-        source.reverbZoneMix = isSFX ? 1 : 0;
+        source.reverbZoneMix = is3D ? 1 : 0;
         source.minDistance = min_distance;
         source.maxDistance = max_distance;
     }
@@ -44,7 +44,7 @@ public class AudioPlay : MonoBehaviour {
         if (source == null || clips == null || clips.Count == 0) return;
 
         // SFX 正在播放时不打断,BGM 允许打断当前播放.
-        if (isSFX && source.isPlaying) return;
+        if (is3D && source.isPlaying) return;
 
         currentClip = isRandom ? randomClip : clips[index];
 
@@ -54,6 +54,32 @@ public class AudioPlay : MonoBehaviour {
         source.clip = currentClip;
         source.loop = loop; 
         source.Play();
+        Debug.Log($"AudioPlay: Playing clip '{currentClip.name}' on '{gameObject.name}'");
 
+    }
+
+    /// <summary>
+    /// 获取下一段可播放音频,用于交给外部音源播放.
+    /// </summary>
+    public AudioClip GetNextClip()
+    {
+        if (clips == null || clips.Count == 0) return null;
+
+        var clip = isRandom ? randomClip : clips[index];
+
+        // 顺序播放时,取出后切到下一个索引.
+        if (!isRandom) index = (index + 1) % clips.Count;
+
+        currentClip = clip;
+        return clip;
+    }
+
+    public void Clear()
+    {
+        currentClip = null;
+        index  = 0;
+        if (source == null) return;
+        source.clip = null;
+        source.Stop();
     }
 }

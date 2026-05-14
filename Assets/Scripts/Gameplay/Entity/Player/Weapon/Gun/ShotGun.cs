@@ -16,7 +16,7 @@ public class ShotGun : Gun
 		if(playSound && shootSounds.Count > 0)
 		{
 			TryPlaySound(false);
-            gunFireEffect.Show(BulletPrefab.Position2D(), dir);
+            gunFireEffect.Show(FirePointPosition, dir);
 		}
 	}
 
@@ -29,7 +29,7 @@ public class ShotGun : Gun
 
         var angle = dir.ToAngle();
 		var originPos = transform.parent.Position2D();
-		var radius = (BulletPrefab.Position2D() - originPos).magnitude;
+		var radius = (FirePointPosition - originPos).magnitude;
 
 		for(int i = 0; i < 5; i++)
 		{

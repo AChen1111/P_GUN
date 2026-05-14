@@ -18,7 +18,7 @@ public class RocketGun : Gun
 		if(obj == null) return;
 
 		obj.transform.right = dir;
-		gunFireEffect.Show(BulletPrefab.Position2D(), dir);
+		gunFireEffect.Show(FirePointPosition, dir);
 		TryPlaySound(false);
 	}
 

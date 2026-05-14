@@ -13,7 +13,7 @@ public class Pistol : Gun
 	{
 		GetBullet(dir);
 		TryPlaySound(false);
-		gunFireEffect.Show(BulletPrefab.Position2D(), dir);
+		gunFireEffect.Show(FirePointPosition, dir);
 	}
 
 	public override void ShootDown(Vector2 dir)

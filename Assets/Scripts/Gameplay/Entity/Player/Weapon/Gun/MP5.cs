@@ -24,7 +24,7 @@ public class MP5 : Gun
 			shootDuration.RecordShootTime();
 			gunClip.Shoot();
 			var obj = GetBullet(dir);
-			gunFireEffect.Show(BulletPrefab.Position2D(), dir);
+			gunFireEffect.Show(FirePointPosition, dir);
 		} 
 		else if(gunClip.IsOutOfAmmo || gunClip.IsReloading) {
 			PlayerAudioSource.Stop();
