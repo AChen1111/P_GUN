@@ -89,7 +89,7 @@ namespace Game.Gameplay
 
         private void Reset()
         {
-            EnsureDetector();
+            EnsureDetector(true);
         }
 
         private void OnValidate()
@@ -99,7 +99,7 @@ namespace Game.Gameplay
                 attackDetector = GetComponentInChildren<MeleeAttackDetector>();
             }
 
-            ConfigureDetector();
+            ConfigureDetector(false);
         }
 
         private void ResolveComponents()
@@ -109,27 +109,22 @@ namespace Game.Gameplay
                 attackDetector = GetComponentInChildren<MeleeAttackDetector>();
             }
 
-            EnsureDetector();
+            EnsureDetector(false);
         }
 
         private void DoFollow()
         {
-            if (IsDead || Global.player == null)
+            if (IsDead)
             {
                 StopVelocity();
                 SetAnimatorSpeed(0f);
                 return;
             }
 
-            var dir = (Global.player.transform.position - transform.position).normalized;
-            FaceDirection(dir);
-
-            if (Rb != null)
+            if (FollowPlayerWithBodySpace(out var dir))
             {
-                Rb.velocity = dir * MoveSpeed;
+                FaceDirection(dir);
             }
-
-            SetAnimatorSpeed(MoveSpeed);
         }
 
         private void BeginAttack()
@@ -186,7 +181,7 @@ namespace Game.Gameplay
             }
         }
 
-        private void EnsureDetector()
+        private void EnsureDetector(bool applyDefaultShape)
         {
             if (attackDetector == null)
             {
@@ -199,24 +194,31 @@ namespace Game.Gameplay
                 detectorObject.transform.SetParent(transform, false);
                 detectorObject.AddComponent<BoxCollider2D>();
                 attackDetector = detectorObject.AddComponent<MeleeAttackDetector>();
+                applyDefaultShape = true;
             }
 
             attackDetector.Init(this);
-            ConfigureDetector();
+            ConfigureDetector(applyDefaultShape);
         }
 
-        private void ConfigureDetector()
+        private void ConfigureDetector(bool applyDefaultShape)
         {
             if (attackDetector == null) return;
 
-            // 检测器放在敌人前方, 美术朝向为右时默认在 X 正方向.
-            attackDetector.transform.localPosition = detectorLocalOffset;
+            if (applyDefaultShape)
+            {
+                // 新建检测器时才写入默认形状, 已配置的 prefab 保留手动调整.
+                attackDetector.transform.localPosition = detectorLocalOffset;
+            }
 
             var boxCollider = attackDetector.GetComponent<BoxCollider2D>();
             if (boxCollider != null)
             {
                 boxCollider.isTrigger = true;
-                boxCollider.size = detectorSize;
+                if (applyDefaultShape)
+                {
+                    boxCollider.size = detectorSize;
+                }
             }
             else
             {
@@ -233,9 +235,10 @@ namespace Game.Gameplay
             if (attackDetector == null || Sr == null) return;
 
             var facingSign = Sr.flipX ? -1f : 1f;
-            attackDetector.transform.localPosition = new Vector2(
-                Mathf.Abs(detectorLocalOffset.x) * facingSign,
-                detectorLocalOffset.y);
+            var localPosition = attackDetector.transform.localPosition;
+            // 翻转时只镜像当前手动配置的位置, 不再用默认偏移覆盖 prefab.
+            localPosition.x = Mathf.Abs(localPosition.x) * facingSign;
+            attackDetector.transform.localPosition = localPosition;
         }
     }
 }
