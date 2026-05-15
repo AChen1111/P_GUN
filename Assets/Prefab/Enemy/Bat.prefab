@@ -32,7 +32,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.7, y: 0.7, z: 0.7}
+  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
@@ -125,6 +125,7 @@ MonoBehaviour:
   MaxHp: 3
   CurrentHp: 3
   MoveSpeed: 2.5
+  AttackDamage: 1
   isDead: 0
   sr: {fileID: 4792806843622310623}
   animator: {fileID: 3552475572089746921}
@@ -134,6 +135,10 @@ MonoBehaviour:
   speedParameterName: Speed
   attackTriggerName: Attack
   deadTriggerName: Dead
+  idleStateName: idle
+  moveStateName: run
+  attackStateName: attack
+  deadStateName: dead
   hurtFlashColor: {r: 1, g: 0.35, b: 0.35, a: 1}
   hurtFlashInterval: 0.06
   hurtFlashLoops: 4
@@ -146,6 +151,8 @@ MonoBehaviour:
   attackShootDelay: 0.15
   attackLockDuration: 0.35
   bulletSpawnDistance: 0.5
+  bulletCount: 5
+  bulletSpreadStepAngle: 2
 --- !u!50 &557012345000001002
 Rigidbody2D:
   serializedVersion: 4

@@ -35,6 +35,19 @@ namespace Game.Gameplay
         protected virtual void OnFightAllWavesEnd() {}
 
         /// <summary>
+        /// 获取本房间初始波数, 子类可从生成表等外部数据覆盖.
+        /// </summary>
+        protected virtual int GetInitialWaveCount()
+        {
+            return waveCount;
+        }
+
+        /// <summary>
+        /// 当前即将生成的波次下标, 从 0 开始.
+        /// </summary>
+        protected int CurrentWaveIndex => Mathf.Max(0, GetInitialWaveCount() - remainWaveCount);
+
+        /// <summary>
         /// 子类负责生成一波敌人，并返回该波敌人数。
         /// </summary>
         protected abstract int SpawnWaveEnemies();
@@ -56,7 +69,7 @@ namespace Game.Gameplay
         {
             needGenerateDoors = true;
             doorStateIsOpen = true;
-            remainWaveCount = Mathf.Max(1, waveCount);
+            remainWaveCount = Mathf.Max(1, GetInitialWaveCount());
         }
 
         /// <summary>

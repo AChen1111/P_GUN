@@ -23,6 +23,8 @@ namespace Game.Gameplay
         [SerializeField] private float attackShootDelay = 0.15f;
         [SerializeField] private float attackLockDuration = 0.35f;
         [SerializeField] private float bulletSpawnDistance = 0.5f;
+        [SerializeField] private int bulletCount = 5;
+        [SerializeField] private float bulletSpreadStepAngle = 2f;
 
         private float stateTimer;
         private bool hasShot;
@@ -113,7 +115,7 @@ namespace Game.Gameplay
                 return;
             }
 
-            var direction = (Global.player.transform.position - transform.position).normalized;
+            var direction = ((Vector2)(Global.player.transform.position - transform.position)).normalized;
             FaceDirection(direction);
 
             if (Rb != null)
@@ -128,10 +130,19 @@ namespace Game.Gameplay
         {
             if (bulletPrefab == null || Global.player == null) return;
 
-            var direction = (Global.player.transform.position - transform.position).normalized;
+            var direction = ((Vector2)(Global.player.transform.position - transform.position)).normalized;
             var spawnPosition = transform.position + (Vector3)(direction * bulletSpawnDistance);
-            var bullet = EnemyBulletPool.Instance.Get(bulletPrefab, spawnPosition, Quaternion.identity, direction);
-            if (bullet == null) return;
+
+            // 参考霰弹枪散射规则, 中心一发, 其余子弹按左右交替角度偏移.
+            var baseAngle = direction.ToAngle();
+            var count = Mathf.Max(1, bulletCount);
+            for (var i = 0; i < count; i++)
+            {
+                var spreadSign = i % 2 == 0 ? 1 : -1;
+                var bulletAngle = i == 0 ? baseAngle : baseAngle + spreadSign * i * bulletSpreadStepAngle;
+                var bulletDirection = bulletAngle.AngleToDirection2D().normalized;
+                EnemyBulletPool.Instance.Get(bulletPrefab, spawnPosition, Quaternion.identity, bulletDirection, AttackDamage);
+            }
 
             PlayShootSound();
         }

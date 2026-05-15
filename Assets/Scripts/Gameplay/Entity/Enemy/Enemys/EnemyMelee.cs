@@ -12,7 +12,6 @@ namespace Game.Gameplay
         [SerializeField] private MeleeAttackDetector attackDetector;
 
         [Header("攻击参数")]
-        [SerializeField] private int attackDamage = 1;
         [SerializeField] private float attackCooldown = 1f;
         [SerializeField] private float attackLockDuration = 1.25f;
 
@@ -166,7 +165,7 @@ namespace Game.Gameplay
             if (target == null) return;
 
             var sourceDirection = (target.transform.position - transform.position).normalized;
-            target.Hurt(new DamageInfo(attackDamage, sourceDirection));
+            target.Hurt(new DamageInfo(AttackDamage, sourceDirection));
         }
 
         private void FaceDirection(Vector2 dir)

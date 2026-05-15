@@ -15,6 +15,9 @@ namespace Game.Gameplay
         [SerializeField] private EnemyDatabase enemyDatabase;
         [SerializeField] private int enemyId = 1;
 
+        [Header("敌人生成表")]
+        [SerializeField] private EnemySpawnTableSO enemySpawnTable;
+
         [Header("旧版敌人预制体")]
         [FormerlySerializedAs("enemyPrefab")]
         [SerializeField] private GameObject fallbackEnemyPrefab;
@@ -24,6 +27,16 @@ namespace Game.Gameplay
 
         [Header("每波敌人数量范围")]
         [SerializeField] private Vector2Int enemyCountRange = new Vector2Int(1, 3);
+
+        protected override int GetInitialWaveCount()
+        {
+            if (enemySpawnTable != null && enemySpawnTable.WaveCount > 0)
+            {
+                return enemySpawnTable.WaveCount;
+            }
+
+            return base.GetInitialWaveCount();
+        }
 
         /// <summary>
         /// 生成波次敌人
@@ -36,11 +49,19 @@ namespace Game.Gameplay
                 if (point != null) validPoints.Add(point);
             }
 
-            var enemyPrefab = ResolveEnemyPrefab();
-            if (enemyPrefab == null || validPoints.Count == 0)
+            if (validPoints.Count == 0)
             {
                 return 0;
             }
+
+            if (enemySpawnTable != null && enemySpawnTable.TryGetWave(CurrentWaveIndex, out var wave))
+            {
+                return SpawnFromWave(wave, validPoints);
+            }
+
+            var enemyData = ResolveEnemyData(enemyId);
+            var enemyPrefab = ResolveEnemyPrefab(enemyData);
+            if (enemyPrefab == null) return 0;
 
             //随机生成敌人数量
             var spawnCount = Random.Range(enemyCountRange.x, enemyCountRange.y + 1);
@@ -50,22 +71,74 @@ namespace Game.Gameplay
             var actualSpawnCount = 0;
             for (int i = 0; i < spawnCount; i++)
             {
-                var enemy = EnemyPool.Instance.Get(enemyPrefab, validPoints[i].position, Quaternion.identity, this);
-                if (enemy == null) continue;
-
-                RegisterSpawnedEnemy(enemy);
-                actualSpawnCount++;
+                if (SpawnEnemy(enemyPrefab, enemyData, validPoints[i].position))
+                {
+                    actualSpawnCount++;
+                }
             }
 
             return actualSpawnCount;
         }
 
-        private EnemyBase ResolveEnemyPrefab()
+        private int SpawnFromWave(EnemySpawnWave wave, List<Transform> validPoints)
+        {
+            if (wave == null || wave.enemies == null) return 0;
+
+            var pointIndex = 0;
+            var actualSpawnCount = 0;
+
+            foreach (var entry in wave.enemies)
+            {
+                if (entry.count <= 0) continue;
+
+                var enemyData = ResolveEnemyData(entry.enemyId);
+                var enemyPrefab = ResolveEnemyPrefab(enemyData);
+                if (enemyPrefab == null) continue;
+
+                for (var i = 0; i < entry.count && pointIndex < validPoints.Count; i++, pointIndex++)
+                {
+                    if (SpawnEnemy(enemyPrefab, enemyData, validPoints[pointIndex].position))
+                    {
+                        actualSpawnCount++;
+                    }
+                }
+            }
+
+            return actualSpawnCount;
+        }
+
+        private bool SpawnEnemy(EnemyBase enemyPrefab, EnemyData? enemyData, Vector3 spawnPosition)
+        {
+            var enemy = EnemyPool.Instance.Get(enemyPrefab, spawnPosition, Quaternion.identity, this);
+            if (enemy == null) return false;
+
+            // 敌人基础属性由 EnemyDatabase 控制, prefab 只负责外观和行为组件.
+            if (enemyData.HasValue)
+            {
+                enemy.ApplyConfig(enemyData.Value);
+            }
+
+            RegisterSpawnedEnemy(enemy);
+            return true;
+        }
+
+        private EnemyData? ResolveEnemyData(int targetEnemyId)
         {
             var database = enemyDatabase != null ? enemyDatabase : DataBaseManager.Instance?.Enemies;
-            if (database != null && database.TryGetById(enemyId, out var enemyData))
+            if (database != null && database.TryGetById(targetEnemyId, out var enemyData))
             {
-                return enemyData.prefab;
+                return enemyData;
+            }
+
+            Debug.LogWarning($"{nameof(NormalRoom)}: 找不到 enemyId={targetEnemyId} 对应的敌人配置.", this);
+            return null;
+        }
+
+        private EnemyBase ResolveEnemyPrefab(EnemyData? enemyData)
+        {
+            if (enemyData.HasValue && enemyData.Value.prefab != null)
+            {
+                return enemyData.Value.prefab;
             }
 
             if (fallbackEnemyPrefab != null)
@@ -74,7 +147,6 @@ namespace Game.Gameplay
                 return fallbackEnemyPrefab.GetComponent<EnemyBase>();
             }
 
-            Debug.LogWarning($"{nameof(NormalRoom)}: 找不到 enemyId={enemyId} 对应的敌人配置.", this);
             return null;
         }
 

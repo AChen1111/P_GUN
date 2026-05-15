@@ -101,7 +101,7 @@ namespace Game.Gameplay
             //Debug.Log("DoShoot");
             var dirToPlayer = (Global.player.transform.position - transform.position).normalized;
             var spawnPos = transform.position + (Vector3)(dirToPlayer * 0.5f);
-            var bullet = EnemyBulletPool.Instance.Get(bulletPrefab, spawnPos, Quaternion.identity, dirToPlayer);
+            var bullet = EnemyBulletPool.Instance.Get(bulletPrefab, spawnPos, Quaternion.identity, dirToPlayer, AttackDamage);
             if (bullet == null) return;
 
             if (AudioSource != null && shootSounds != null && shootSounds.Count > 0)
