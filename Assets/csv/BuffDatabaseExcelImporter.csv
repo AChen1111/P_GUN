@@ -1,0 +1,3 @@
+﻿id,buffName,luaFile,duration,isPermanent,interval
+0,SpeedUpBuff,Assets/Scripts/Gameplay/Buffs/Buff/SpeedBuff.lua.txt,5,FALSE,1
+1,PowerUpBuff,Assets/Scripts/Gameplay/Buffs/Buff/DamageUpBuff.lua.txt,5,FALSE,1

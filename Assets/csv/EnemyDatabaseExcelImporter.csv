@@ -1,0 +1,3 @@
+﻿enemyId,displayName,prefab,maxHp,moveSpeed,damage,itemDropChance
+1,Bat,Assets/Prefab/Enemy/Bat.prefab,10,2.5,1,1
+2,Slime,Assets/Prefab/Enemy/Slime.prefab,3,2.5,1,0.25
