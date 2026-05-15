@@ -73,9 +73,7 @@ namespace Game.Gameplay
 
         protected override void OnDead()
         {
-            if (Rb != null) Rb.velocity = Vector2.zero;
             FightRoom.NotifyEnemyDefeated(this);
-            EnemyPool.Instance.Release(this);
         }
 
         private void DoFollow()

@@ -1,6 +1,4 @@
-using System.Collections;
 using UnityEngine;
-using System.Collections.Generic;
 using QFramework;
 using DG.Tweening;
 using Game.Core;
@@ -33,11 +31,30 @@ namespace Game.Gameplay
 
         [Header("组件引用")]
         [SerializeField] SpriteRenderer sr;
+        [SerializeField] Animator animator;
         [SerializeField] Rigidbody2D rb;
         [SerializeField] Collider2D col;
         [SerializeField] AudioSource audioSource;
         Color defaultSpriteColor = Color.white;
         bool hasDefaultSpriteColor;
+        private Coroutine deathRecycleCoroutine;
+
+        [Header("动画参数")]
+        [SerializeField] private string speedParameterName = "Speed";
+        [SerializeField] private string attackTriggerName = "Attack";
+        [SerializeField] private string deadTriggerName = "Dead";
+        [SerializeField] private string idleStateName = "idle";
+        [SerializeField] private string moveStateName = "run";
+        [SerializeField] private string attackStateName = "attack";
+        [SerializeField] private string deadStateName = "dead";
+
+        [Header("受击反馈")]
+        [SerializeField] private Color hurtFlashColor = new Color(1f, 0.35f, 0.35f, 1f);
+        [SerializeField] private float hurtFlashInterval = 0.06f;
+        [SerializeField] private int hurtFlashLoops = 4;
+
+        [Header("死亡回收")]
+        [SerializeField] private float deathRecycleDelay = 3f;
 
         [Header("所属房间")]
         public FightRoom OwnerFightRoom;
@@ -50,6 +67,7 @@ namespace Game.Gameplay
         public FSM<EnemyState> FSM = new FSM<EnemyState>();
 
         protected SpriteRenderer Sr => sr;
+        protected Animator Animator => animator;
         protected Rigidbody2D Rb => rb;
         protected Collider2D Col => col;
         protected AudioSource AudioSource => audioSource;
@@ -57,12 +75,14 @@ namespace Game.Gameplay
 
         private void Reset() {
             gameObject.AddComponent<SpriteRenderer>();
+            gameObject.AddComponent<Animator>();
             gameObject.AddComponent<Rigidbody2D>();
             gameObject.AddComponent<Collider2D>();
             gameObject.AddComponent<AudioSource>();
 
 
             sr = GetComponent<SpriteRenderer>();
+            animator = GetComponent<Animator>();
             rb = GetComponent<Rigidbody2D>();
             col = GetComponent<Collider2D>();
             audioSource = GetComponent<AudioSource>();
@@ -74,6 +94,9 @@ namespace Game.Gameplay
             sr = GetComponent<SpriteRenderer>();
             if (sr == null)
                 sr = GetComponentInChildren<SpriteRenderer>();
+            animator = GetComponent<Animator>();
+            if (animator == null)
+                animator = GetComponentInChildren<Animator>();
             rb = GetComponent<Rigidbody2D>();
             col = GetComponent<Collider2D>();
             audioSource = GetComponent<AudioSource>();
@@ -89,12 +112,16 @@ namespace Game.Gameplay
 
         private void Update()
         {
+            if (isDead) return;
+
             FSM.Update();
             OnUpdate();
         }
         protected virtual void OnUpdate(){}
         private void FixedUpdate()
         {
+            if (isDead) return;
+
             FSM.FixedUpdate();
             OnFixedUpdate();
         }
@@ -120,7 +147,6 @@ namespace Game.Gameplay
             if(isDead) return;
             if(damageInfo == null) damageInfo = new DamageInfo();
 
-            //Debug.Log("Enemy Hurt");
             OnHurt(damageInfo);
             VfxPool.Instance.Play(GetBloodVfxPosition(), damageInfo.SourceDirection);
             HurtAnim();
@@ -131,8 +157,10 @@ namespace Game.Gameplay
         }
         protected virtual void HurtAnim()
         {
+            // 受击时先清理上一次闪烁, 再播放统一受击动画和闪烁.
             ResetVisualState();
             DOTweenAnimMgr.Play("Hurted", gameObject,0.5f);
+            PlayHurtFlash();
         }
 
         /// <summary>
@@ -142,7 +170,16 @@ namespace Game.Gameplay
         public void Dead(){
             if(isDead) return;
             isDead = true;
+            StopMove();
+            SetAnimatorSpeed(0f);
+
+            if(col != null) {
+                col.enabled = false;
+            }
+
+            PlayDeathAnimation();
             OnDead();
+            StartDeathRecycle();
         }
 
         /// <summary>
@@ -179,6 +216,7 @@ namespace Game.Gameplay
         /// 回收到对象池前调用，清理移动和房间引用，避免下一次复用带入旧状态。
         /// </summary>
         public void PrepareForPoolRelease() {
+            StopDeathRecycle();
             StopMove();
             ResetVisualState();
             OwnerFightRoom = null;
@@ -194,6 +232,7 @@ namespace Game.Gameplay
             FSM.Clear();
             StopMove();
             ResetVisualState();
+            ResetAnimatorState();
 
             if(col != null) {
                 col.enabled = true;
@@ -207,7 +246,7 @@ namespace Game.Gameplay
             hasDefaultSpriteColor = true;
         }
 
-        private void ResetVisualState() {
+        protected void ResetVisualState() {
             transform.DOKill(false);
 
             if(sr == null) return;
@@ -222,10 +261,110 @@ namespace Game.Gameplay
             }
         }
 
-        private void StopMove() {
+        protected void StopMove() {
             if(rb != null) {
                 rb.velocity = Vector2.zero;
             }
+        }
+
+        /// <summary>
+        /// 设置移动动画速度参数, 让所有敌人复用同一套动画机字段.
+        /// </summary>
+        protected void SetAnimatorSpeed(float speed) {
+            if(animator == null) return;
+
+            if(HasAnimatorParameter(speedParameterName, AnimatorControllerParameterType.Float)) {
+                animator.SetFloat(speedParameterName, speed);
+            }
+
+            PlayStateIfDifferent(speed > 0.1f ? moveStateName : idleStateName);
+        }
+
+        /// <summary>
+        /// 播放攻击动画, 子类只负责决定何时攻击.
+        /// </summary>
+        protected void PlayAttackAnimation() {
+            TrySetAnimatorTrigger(attackTriggerName);
+            PlayStateIfDifferent(attackStateName, true);
+        }
+
+        private void PlayDeathAnimation() {
+            TrySetAnimatorTrigger(deadTriggerName);
+            PlayStateIfDifferent(deadStateName, true);
+        }
+
+        private void PlayHurtFlash() {
+            if(sr == null) return;
+
+            sr.DOKill(false);
+            sr.color = defaultSpriteColor;
+
+            var loops = Mathf.Max(2, hurtFlashLoops * 2);
+            DOTween.To(() => sr.color, color => sr.color = color, hurtFlashColor, hurtFlashInterval)
+                .SetTarget(sr)
+                .SetLoops(loops, LoopType.Yoyo)
+                .OnComplete(() => {
+                    if(sr != null) sr.color = defaultSpriteColor;
+                });
+        }
+
+        private void StartDeathRecycle() {
+            StopDeathRecycle();
+            deathRecycleCoroutine = StartCoroutine(DeathRecycleCoroutine());
+        }
+
+        private System.Collections.IEnumerator DeathRecycleCoroutine() {
+            yield return new WaitForSeconds(deathRecycleDelay);
+            deathRecycleCoroutine = null;
+            EnemyPool.Instance.Release(this);
+        }
+
+        private void StopDeathRecycle() {
+            if(deathRecycleCoroutine == null) return;
+
+            StopCoroutine(deathRecycleCoroutine);
+            deathRecycleCoroutine = null;
+        }
+
+        private void ResetAnimatorState() {
+            if(animator == null) return;
+
+            TryResetAnimatorTrigger(attackTriggerName);
+            TryResetAnimatorTrigger(deadTriggerName);
+            SetAnimatorSpeed(0f);
+            animator.Rebind();
+            animator.Update(0f);
+        }
+
+        private void TrySetAnimatorTrigger(string triggerName) {
+            if(!HasAnimatorParameter(triggerName, AnimatorControllerParameterType.Trigger)) return;
+
+            animator.ResetTrigger(triggerName);
+            animator.SetTrigger(triggerName);
+        }
+
+        private void TryResetAnimatorTrigger(string triggerName) {
+            if(!HasAnimatorParameter(triggerName, AnimatorControllerParameterType.Trigger)) return;
+
+            animator.ResetTrigger(triggerName);
+        }
+
+        private bool HasAnimatorParameter(string parameterName, AnimatorControllerParameterType parameterType) {
+            if(animator == null || string.IsNullOrEmpty(parameterName)) return false;
+
+            foreach(var parameter in animator.parameters) {
+                if(parameter.type == parameterType && parameter.name == parameterName) return true;
+            }
+
+            return false;
+        }
+
+        private void PlayStateIfDifferent(string stateName, bool restart = false) {
+            if(animator == null || string.IsNullOrEmpty(stateName)) return;
+            if(!animator.HasState(0, Animator.StringToHash(stateName))) return;
+            if(!restart && animator.GetCurrentAnimatorStateInfo(0).shortNameHash == Animator.StringToHash(stateName)) return;
+
+            animator.Play(stateName, 0, 0f);
         }
 
         private Vector3 GetBloodVfxPosition() {

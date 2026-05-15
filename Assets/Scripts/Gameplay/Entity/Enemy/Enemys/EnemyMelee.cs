@@ -9,15 +9,12 @@ namespace Game.Gameplay
     public class EnemyMelee : EnemyBase
     {
         [Header("攻击组件")]
-        [SerializeField] private Animator animator;
         [SerializeField] private MeleeAttackDetector attackDetector;
 
         [Header("攻击参数")]
         [SerializeField] private int attackDamage = 1;
         [SerializeField] private float attackCooldown = 1f;
-        [SerializeField] private float attackHitDelay = 0.15f;
-        [SerializeField] private float attackLockDuration = 0.35f;
-        [SerializeField] private string attackTriggerName = "Attack";
+        [SerializeField] private float attackLockDuration = 1.25f;
 
         [Header("检测器默认配置")]
         [SerializeField] private Vector2 detectorLocalOffset = new Vector2(0.75f, 0f);
@@ -62,9 +59,7 @@ namespace Game.Gameplay
 
         protected override void OnDead()
         {
-            if (Rb != null) Rb.velocity = Vector2.zero;
             FightRoom.NotifyEnemyDefeated(this);
-            EnemyPool.Instance.Release(this);
         }
 
         /// <summary>
@@ -80,6 +75,17 @@ namespace Game.Gameplay
             if (Time.time < nextAttackTime) return;
 
             FSM.ChangeState(EnemyState.Attack);
+        }
+
+        /// <summary>
+        /// 攻击动画最后一帧调用, 由 Animation Event 精确结算近战伤害.
+        /// </summary>
+        public void ApplyDamageOnAttackLastFrame()
+        {
+            if (IsDead || !isAttacking || hasAppliedDamage) return;
+
+            hasAppliedDamage = true;
+            ApplyDamageToPlayer();
         }
 
         private void Reset()
@@ -99,21 +105,12 @@ namespace Game.Gameplay
 
         private void ResolveComponents()
         {
-            if (animator == null)
-            {
-                animator = GetComponentInChildren<Animator>();
-            }
-
             if (attackDetector == null)
             {
                 attackDetector = GetComponentInChildren<MeleeAttackDetector>();
             }
 
-            if (attackDetector != null)
-            {
-                attackDetector.Init(this);
-                ConfigureDetector();
-            }
+            EnsureDetector();
         }
 
         private void DoFollow()
@@ -121,6 +118,7 @@ namespace Game.Gameplay
             if (IsDead || Global.player == null)
             {
                 StopVelocity();
+                SetAnimatorSpeed(0f);
                 return;
             }
 
@@ -131,6 +129,8 @@ namespace Game.Gameplay
             {
                 Rb.velocity = dir * MoveSpeed;
             }
+
+            SetAnimatorSpeed(MoveSpeed);
         }
 
         private void BeginAttack()
@@ -140,18 +140,12 @@ namespace Game.Gameplay
             isAttacking = true;
             nextAttackTime = Time.time + attackCooldown;
             StopVelocity();
-            PlayAttackAnimation();
+            base.PlayAttackAnimation();
         }
 
         private void UpdateAttack()
         {
             attackTimer += Time.deltaTime;
-
-            if (!hasAppliedDamage && attackTimer >= attackHitDelay)
-            {
-                hasAppliedDamage = true;
-                ApplyDamageToPlayer();
-            }
 
             if (attackTimer >= attackLockDuration)
             {
@@ -168,34 +162,11 @@ namespace Game.Gameplay
 
         private void ApplyDamageToPlayer()
         {
-            var target = cachedTarget != null ? cachedTarget : Global.player;
+            if (attackDetector == null || !attackDetector.TryGetPlayerInRange(out var target)) return;
             if (target == null) return;
 
             var sourceDirection = (target.transform.position - transform.position).normalized;
             target.Hurt(new DamageInfo(attackDamage, sourceDirection));
-        }
-
-        private void PlayAttackAnimation()
-        {
-            if (animator == null || string.IsNullOrEmpty(attackTriggerName)) return;
-
-            // 只在动画器存在对应 Trigger 时播放, 避免控制器未配置时报错.
-            if (!HasTrigger(animator, attackTriggerName)) return;
-
-            animator.SetTrigger(attackTriggerName);
-        }
-
-        private static bool HasTrigger(Animator targetAnimator, string triggerName)
-        {
-            foreach (var parameter in targetAnimator.parameters)
-            {
-                if (parameter.type == AnimatorControllerParameterType.Trigger && parameter.name == triggerName)
-                {
-                    return true;
-                }
-            }
-
-            return false;
         }
 
         private void FaceDirection(Vector2 dir)
@@ -204,6 +175,8 @@ namespace Game.Gameplay
 
             if (dir.x < 0f) Sr.flipX = true;
             else if (dir.x > 0f) Sr.flipX = false;
+
+            UpdateDetectorDirection();
         }
 
         private void StopVelocity()
@@ -254,6 +227,16 @@ namespace Game.Gameplay
                     detectorCollider.isTrigger = true;
                 }
             }
+        }
+
+        private void UpdateDetectorDirection()
+        {
+            if (attackDetector == null || Sr == null) return;
+
+            var facingSign = Sr.flipX ? -1f : 1f;
+            attackDetector.transform.localPosition = new Vector2(
+                Mathf.Abs(detectorLocalOffset.x) * facingSign,
+                detectorLocalOffset.y);
         }
     }
 }
