@@ -61,6 +61,8 @@ namespace Game.Gameplay
         public int MaxHP => Mathf.Max(0, maxHp);
         public bool IsHPFull => HP >= MaxHP;
 
+        #region Unity Lifecycle
+
         void Awake()
         {
             Global.player = this;
@@ -83,36 +85,6 @@ namespace Game.Gameplay
         void Start()
         {
             gun?.OnGunUsed();
-        }
-
-        void OnDestroy()
-        {
-            if (Global.player == this)
-            {
-                Global.player = null;
-            }
-        }
-
-        private void Reset() {
-            gameObject.AddComponent<Rigidbody2D>();
-            gameObject.AddComponent<CircleCollider2D>();
-            gameObject.tag = "Player";
-        }
-
-        private void ResolveAnimator()
-        {
-            if (animator != null) return;
-
-            animator = GetComponent<Animator>();
-            if (animator == null)
-            {
-                animator = GetComponentInChildren<Animator>();
-            }
-
-            if (animator == null)
-            {
-                Debug.LogWarning("Player Animator 未绑定，动画将被跳过。");
-            }
         }
 
         void Update()
@@ -170,14 +142,65 @@ namespace Game.Gameplay
             HandleCombatInput(dir);
         }
 
-        void ExitSleepState()
+        void OnDestroy()
         {
-            if (!isSleep) return;
-            isSleep = false;
-            sleepTimer = 0f;
-            if (animator != null)
-                animator.SetBool("Sleep", false);
+            if (Global.player == this)
+            {
+                Global.player = null;
+            }
         }
+
+        private void Reset()
+        {
+            gameObject.AddComponent<Rigidbody2D>();
+            gameObject.AddComponent<CircleCollider2D>();
+            gameObject.tag = "Player";
+        }
+
+        #endregion
+
+        #region Initialize
+
+        private void ResolveAnimator()
+        {
+            if (animator != null) return;
+
+            animator = GetComponent<Animator>();
+            if (animator == null)
+            {
+                animator = GetComponentInChildren<Animator>();
+            }
+
+            if (animator == null)
+            {
+                Debug.LogWarning("Player Animator 未绑定，动画将被跳过。");
+            }
+        }
+
+        void SelectInitialGun()
+        {
+            if (guns == null || guns.Count == 0)
+            {
+                gun = null;
+                return;
+            }
+
+            currentGunIndex = Mathf.Clamp(currentGunIndex, 0, guns.Count - 1);
+            for (int i = 0; i < guns.Count; i++)
+            {
+                if (guns[i] == null) continue;
+                if (i == currentGunIndex)
+                    guns[i].Show();
+                else
+                    guns[i].Hide();
+            }
+
+            gun = guns[currentGunIndex];
+        }
+
+        #endregion
+
+        #region Input And Combat
 
         void HandleCombatInput(Vector2 dir)
         {
@@ -218,11 +241,30 @@ namespace Game.Gameplay
                 EventCenter.Trigger(GameEvent.MiniMapToggleRequested);
         }
 
-        public void Hurt() {
+        #endregion
+
+        #region Sleep
+
+        void ExitSleepState()
+        {
+            if (!isSleep) return;
+            isSleep = false;
+            sleepTimer = 0f;
+            if (animator != null)
+                animator.SetBool("Sleep", false);
+        }
+
+        #endregion
+
+        #region Health
+
+        public void Hurt()
+        {
             Hurt(new DamageInfo(1, Vector2.zero));
         }
 
-        public void Hurt(DamageInfo damageInfo) {
+        public void Hurt(DamageInfo damageInfo)
+        {
             if(!canHurt) return;
             if(damageInfo == null) damageInfo = new DamageInfo();
 
@@ -233,7 +275,8 @@ namespace Game.Gameplay
             HP = Mathf.Max(0, HP - Mathf.Max(1, damageInfo.Damage));
             PublishHPChanged();
 
-            if(HP <= 0) {
+            if(HP <= 0)
+            {
                 EventCenter.Trigger(GameEvent.PlayerDied);
                 return;
             }
@@ -246,10 +289,10 @@ namespace Game.Gameplay
                     canHurt = true;
             }
             );
-
         }
 
-        public void Restart() {
+        public void Restart()
+        {
             HP = MaxHP;
             PublishHPChanged();
         }
@@ -269,6 +312,9 @@ namespace Game.Gameplay
             EventCenter.Trigger(GameEvent.PlayerHPChanged, this);
         }
 
+        #endregion
+
+        #region Display Text
 
         ///<summary>
         ///显示头顶文字
@@ -284,7 +330,6 @@ namespace Game.Gameplay
             mDisplayTextCoroutine = null;
         }
 
-
         ///<summary>
         ///对外接口显示头顶文字
         ///</summary>
@@ -299,6 +344,10 @@ namespace Game.Gameplay
             }
             mDisplayTextCoroutine = StartCoroutine(ShowDisPlayerCoroutine(text,duration));
         }
+
+        #endregion
+
+        #region Auto Aim
 
         ///<summary>
         ///自动瞄准
@@ -339,47 +388,20 @@ namespace Game.Gameplay
             }
         }
 
-        void SelectInitialGun()
-        {
-            if (guns == null || guns.Count == 0)
-            {
-                gun = null;
-                return;
-            }
-
-            currentGunIndex = Mathf.Clamp(currentGunIndex, 0, guns.Count - 1);
-            for (int i = 0; i < guns.Count; i++)
-            {
-                if (guns[i] == null) continue;
-                if (i == currentGunIndex)
-                    guns[i].Show();
-                else
-                    guns[i].Hide();
-            }
-
-            gun = guns[currentGunIndex];
-        }
-
         ///<summary>
         ///切换自动瞄准
         ///</summary>
-        private void SwitchAutoAim() {
+        private void SwitchAutoAim()
+        {
             canAutoAim = !canAutoAim;
             ShowDisPlayer("自动瞄准: " + (canAutoAim ? "开启" : "关闭"), 1f);
         }
 
-        private Vector3 GetBloodVfxPosition() {
-            var col = GetComponent<Collider2D>();
-            if(col != null) {
-                return col.bounds.center;
-            }
+        #endregion
 
-            if(sr != null) {
-                return sr.bounds.center;
-            }
+        #region Speed
 
-            return transform.position;
-        }
+        public float GetSpeed() => moveSpeed;
 
         /// <summary>
         /// 增加速度
@@ -389,6 +411,7 @@ namespace Game.Gameplay
         {
             moveSpeed += value;
         }
+
         /// <summary>
         /// 设置速度
         /// </summary>
@@ -398,6 +421,26 @@ namespace Game.Gameplay
             moveSpeed = value;
         }
 
-        public float GetSpeed() => moveSpeed;
+        #endregion
+
+        #region Helpers
+
+        private Vector3 GetBloodVfxPosition()
+        {
+            var col = GetComponent<Collider2D>();
+            if(col != null)
+            {
+                return col.bounds.center;
+            }
+
+            if(sr != null)
+            {
+                return sr.bounds.center;
+            }
+
+            return transform.position;
+        }
+
+        #endregion
     }
 }

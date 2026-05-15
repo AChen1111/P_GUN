@@ -15,11 +15,11 @@ namespace Game.Gameplay
     public sealed class LuaBuffInstance : IDisposable
     {
         private readonly Buff ownerBuff;
-        private LuaFunction onAdd;
-        private LuaFunction onRemove;
-        private LuaFunction onUpdate;
-        private LuaFunction onInterval;
-        private LuaFunction onTrigger;
+        private Action<BuffRuntimeInfo> onAdd;
+        private Action<BuffRuntimeInfo> onRemove;
+        private Action<BuffRuntimeInfo, float> onUpdate;
+        private Action<BuffRuntimeInfo> onInterval;
+        private Action<BuffRuntimeInfo> onTrigger;
 
         private bool isDisposed;
 
@@ -33,11 +33,11 @@ namespace Game.Gameplay
                 return;
             }
 
-            onAdd = table.Get<LuaFunction>("OnAdd");
-            onRemove = table.Get<LuaFunction>("OnRemove");
-            onUpdate = table.Get<LuaFunction>("OnUpdate");
-            onInterval = table.Get<LuaFunction>("OnInterval");
-            onTrigger = table.Get<LuaFunction>("OnTrigger");
+            onAdd = table.Get<Action<BuffRuntimeInfo>>("OnAdd");
+            onRemove = table.Get<Action<BuffRuntimeInfo>>("OnRemove");
+            onUpdate = table.Get<Action<BuffRuntimeInfo, float>>("OnUpdate");
+            onInterval = table.Get<Action<BuffRuntimeInfo>>("OnInterval");
+            onTrigger = table.Get<Action<BuffRuntimeInfo>>("OnTrigger");
         }
 
         /// <summary>
@@ -65,7 +65,16 @@ namespace Game.Gameplay
         /// <param name="deltaTime">时间增量.</param>
         public void OnUpdate(BuffRuntimeInfo info, float deltaTime)
         {
-            SafeCall(onUpdate, nameof(OnUpdate), info, deltaTime);
+            if (isDisposed || onUpdate == null) return;
+
+            try
+            {
+                onUpdate.Invoke(info, deltaTime);
+            }
+            catch (Exception exception)
+            {
+                Debug.LogError($"{nameof(LuaBuffInstance)}: 调用 {nameof(OnUpdate)} 失败, Buff: {ownerBuff?.BuffName}, Error: {exception.Message}.");
+            }
         }
 
         /// <summary>
@@ -89,11 +98,6 @@ namespace Game.Gameplay
         public void Dispose()
         {
             isDisposed = true;
-            onAdd?.Dispose();
-            onRemove?.Dispose();
-            onUpdate?.Dispose();
-            onInterval?.Dispose();
-            onTrigger?.Dispose();
             onAdd = null;
             onRemove = null;
             onUpdate = null;
@@ -101,13 +105,13 @@ namespace Game.Gameplay
             onTrigger = null;
         }
 
-        private void SafeCall(LuaFunction luaFunction, string methodName, params object[] args)
+        private void SafeCall(Action<BuffRuntimeInfo> luaAction, string methodName, BuffRuntimeInfo info)
         {
-            if (isDisposed || luaFunction == null) return;
+            if (isDisposed || luaAction == null) return;
 
             try
             {
-                luaFunction.Call(args);
+                luaAction.Invoke(info);
             }
             catch (Exception exception)
             {
