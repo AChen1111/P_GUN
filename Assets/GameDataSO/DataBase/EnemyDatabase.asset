@@ -14,5 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemies:
   - enemyId: 1
-    displayName: EnemyA
-    prefab: {fileID: 3479623867071390257, guid: 5997eda64fd4b9e46ab562272521a078, type: 3}
+    displayName: Bat
+    prefab: {fileID: 557012345000001001, guid: c7689240beca890469aab85afd109862, type: 3}
+  - enemyId: 2
+    displayName: Slime
+    prefab: {fileID: 557012345000002001, guid: 62bf63f566fb06a44a78f17618a6b6cf, type: 3}

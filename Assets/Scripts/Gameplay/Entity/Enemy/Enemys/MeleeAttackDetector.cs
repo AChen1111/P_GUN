@@ -10,6 +10,7 @@ namespace Game.Gameplay
     {
         [SerializeField] private EnemyMelee owner;
 
+        private readonly Collider2D[] overlapResults = new Collider2D[8];
         private Collider2D detectorCollider;
         private Player currentPlayer;
 
@@ -49,18 +50,47 @@ namespace Game.Gameplay
         {
             if (!other.CompareTag("Player")) return;
 
-            var player = other.GetComponent<Player>();
+            var player = other.GetComponentInParent<Player>();
             if (player == currentPlayer)
             {
                 currentPlayer = null;
             }
         }
 
+        /// <summary>
+        /// 在攻击结算帧重新检测玩家是否仍在攻击范围内.
+        /// </summary>
+        /// <param name="player">检测到的玩家.</param>
+        /// <returns>玩家是否仍在检测器碰撞体内.</returns>
+        public bool TryGetPlayerInRange(out Player player)
+        {
+            player = null;
+            if (detectorCollider == null) return false;
+
+            // 最后一帧以碰撞体实时重叠结果为准, 避免玩家离开后仍被缓存目标扣血.
+            var count = detectorCollider.OverlapCollider(new ContactFilter2D().NoFilter(), overlapResults);
+            for (var i = 0; i < count; i++)
+            {
+                var result = overlapResults[i];
+                if (result == null || !result.CompareTag("Player")) continue;
+
+                player = result.GetComponentInParent<Player>();
+                if (player != null)
+                {
+                    currentPlayer = player;
+                    return true;
+                }
+            }
+
+            currentPlayer = null;
+            return false;
+        }
+
         private void TryRequestAttack(Collider2D other)
         {
             if (!other.CompareTag("Player")) return;
 
-            var player = other.GetComponent<Player>();
+            var player = other.GetComponentInParent<Player>();
             if (player == null) return;
 
             currentPlayer = player;
