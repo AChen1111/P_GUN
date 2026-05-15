@@ -14,6 +14,7 @@ namespace Game.Gameplay
         public float speed = 10f;
         public Rigidbody2D rb;
         [SerializeField] private float lifeTime = 3f;
+        [SerializeField] private int damage = 1;
         private bool hasHit;
         private Coroutine autoRecycleCoroutine;
 
@@ -33,8 +34,9 @@ namespace Game.Gameplay
         /// <summary>
         /// 每次从对象池取出敌人子弹时调用，重置方向、命中状态和生命周期。
         /// </summary>
-        public void Init(Vector2 shootDir) {
+        public void Init(Vector2 shootDir, int bulletDamage = 1) {
             dir = shootDir;
+            damage = Mathf.Max(0, bulletDamage);
             hasHit = false;
 
             StopAutoRecycleCoroutine();
@@ -90,7 +92,7 @@ namespace Game.Gameplay
             if (hasHit || target == null) return;
 
             if (target.CompareTag("Player")) {
-                target.GetComponent<Player>()?.Hurt(new DamageInfo(1, dir));
+                target.GetComponent<Player>()?.Hurt(new DamageInfo(damage, dir));
                 hasHit = true;
 
                 var audioSource = target.GetComponent<AudioSource>();

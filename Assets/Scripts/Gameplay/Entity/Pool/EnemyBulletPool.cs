@@ -26,7 +26,7 @@ namespace Game.Gameplay
         /// <summary>
         /// 兼容当前 EnemyA 使用 GameObject 字段保存子弹 prefab 的写法。
         /// </summary>
-        public EnemyBullet Get(GameObject prefabObject, Vector3 position, Quaternion rotation, Vector2 dir) {
+        public EnemyBullet Get(GameObject prefabObject, Vector3 position, Quaternion rotation, Vector2 dir, int damage = 1) {
             if(prefabObject == null) {
                 Debug.LogError("EnemyBulletPool.Get failed: prefabObject is null.", this);
                 return null;
@@ -38,17 +38,17 @@ namespace Game.Gameplay
                 return null;
             }
 
-            return Get(prefab, position, rotation, dir);
+            return Get(prefab, position, rotation, dir, damage);
         }
 
         /// <summary>
         /// 从指定 prefab 的池中取出敌人子弹，并初始化本次发射方向。
         /// </summary>
-        public EnemyBullet Get(EnemyBullet prefab, Vector3 position, Quaternion rotation, Vector2 dir) {
+        public EnemyBullet Get(EnemyBullet prefab, Vector3 position, Quaternion rotation, Vector2 dir, int damage = 1) {
             var bullet = Get(prefab, position, rotation);
             if(bullet == null) return null;
 
-            bullet.Init(dir);
+            bullet.Init(dir, damage);
             return bullet;
         }
 

@@ -26,6 +26,7 @@ namespace Game.Gameplay
         [SerializeField] protected int MaxHp = 3;
         [SerializeField] protected int CurrentHp = 3;
         [SerializeField] protected float MoveSpeed = 2.5f;
+        [SerializeField] protected int AttackDamage = 1;
         [SerializeField] bool isDead = false;
         private bool isInited = false;
 
@@ -210,6 +211,17 @@ namespace Game.Gameplay
 
         public void SetOwnerFightRoom(FightRoom ownerFightRoom) {
             OwnerFightRoom = ownerFightRoom;
+        }
+
+        /// <summary>
+        /// 应用数据库里的基础属性配置, 生成时调用以覆盖 prefab 默认值.
+        /// </summary>
+        public void ApplyConfig(EnemyData enemyData) {
+            if(enemyData.maxHp > 0) MaxHp = enemyData.maxHp;
+            if(enemyData.moveSpeed > 0f) MoveSpeed = enemyData.moveSpeed;
+            if(enemyData.damage > 0) AttackDamage = enemyData.damage;
+
+            CurrentHp = MaxHp;
         }
 
         /// <summary>
