@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using DG.Tweening;
 using UnityEngine;
 using QFramework;
 using Game.Core;
@@ -51,8 +52,25 @@ namespace Game.Gameplay
         private float sleepTimer = 0f;
         private const float SleepDuration = 3f;
 
-        //受击免疫标识
+        [Header("受击反馈")]
+        [SerializeField] private Color hurtFlashColor = new Color(1f, 0.35f, 0.35f, 1f);
+        [SerializeField] private float hurtFlashInterval = 0.06f;
+        [SerializeField] private int hurtFlashLoops = 4;
+        [SerializeField] private float hurtSlowTimeScale = 0.9f;
+        [SerializeField] private float hurtSlowDuration = 0.18f;
+        [SerializeField] private float hurtInvincibleDuration = 1f;
+        [SerializeField] private float hurtKnockbackDistance = 0.65f;
+        [SerializeField] private float hurtKnockbackDuration = 0.12f;
+
+        //受击免疫标识.
         bool canHurt = true;
+        Color defaultSpriteColor = Color.white;
+        bool hasDefaultSpriteColor;
+        Coroutine hurtSlowCoroutine;
+        Coroutine hurtInvincibleCoroutine;
+        float hurtPreviousTimeScale = 1f;
+        Vector2 hurtKnockbackVelocity;
+        float hurtKnockbackTimer;
 
         WaitForSeconds _autoAimRefreshWait;
         Transform _autoAimTarget;
@@ -74,7 +92,9 @@ namespace Game.Gameplay
             AimPrefab.SetActive(false);
 
             rb = GetComponent<Rigidbody2D>();
+            ResolveSpriteRenderer();
             ResolveAnimator();
+            CaptureDefaultVisualState();
 
             SelectInitialGun();
 
@@ -106,7 +126,17 @@ namespace Game.Gameplay
             var horizontal = Input.GetAxisRaw("Horizontal");
             var vertical = Input.GetAxisRaw("Vertical");
 
-            rb.velocity = new Vector2(horizontal, vertical).normalized * moveSpeed;
+            if (hurtKnockbackTimer > 0f)
+            {
+                // 受击后退使用真实时间计时, 避免慢动作影响后退距离.
+                hurtKnockbackTimer -= Time.unscaledDeltaTime;
+                rb.velocity = hurtKnockbackTimer > 0f ? hurtKnockbackVelocity : Vector2.zero;
+            }
+            else
+            {
+                rb.velocity = new Vector2(horizontal, vertical).normalized * moveSpeed;
+            }
+
             if (animator != null)
             {
                 animator.SetFloat("Speed", rb.velocity.magnitude);
@@ -144,6 +174,9 @@ namespace Game.Gameplay
 
         void OnDestroy()
         {
+            RestoreHurtSlowTimeScale();
+            ResetVisualState();
+
             if (Global.player == this)
             {
                 Global.player = null;
@@ -174,6 +207,22 @@ namespace Game.Gameplay
             if (animator == null)
             {
                 Debug.LogWarning("Player Animator 未绑定，动画将被跳过。");
+            }
+        }
+
+        private void ResolveSpriteRenderer()
+        {
+            if (sr != null) return;
+
+            sr = GetComponent<SpriteRenderer>();
+            if (sr == null)
+            {
+                sr = GetComponentInChildren<SpriteRenderer>();
+            }
+
+            if (sr == null)
+            {
+                Debug.LogWarning("Player SpriteRenderer 未绑定，受击闪烁将被跳过。");
             }
         }
 
@@ -270,6 +319,9 @@ namespace Game.Gameplay
 
             ExitSleepState();
             VfxPool.Instance.Play(GetBloodVfxPosition(), damageInfo.SourceDirection, BloodVfxColorMode.Green);
+            PlayHurtFeedback();
+            StartHurtSlow();
+            ApplyHurtKnockback(damageInfo.SourceDirection);
 
             //扣血判断
             HP = Mathf.Max(0, HP - Mathf.Max(1, damageInfo.Damage));
@@ -283,12 +335,7 @@ namespace Game.Gameplay
 
             //受击免疫
             canHurt = false;
-            DOTweenAnimMgr.Play(
-                "Hurted", gameObject,1f,
-                onComplete:()=>{
-                    canHurt = true;
-            }
-            );
+            StartHurtInvincible();
         }
 
         public void Restart()
@@ -310,6 +357,117 @@ namespace Game.Gameplay
         private void PublishHPChanged()
         {
             EventCenter.Trigger(GameEvent.PlayerHPChanged, this);
+        }
+
+        private void PlayHurtFeedback()
+        {
+            //受击时先清理上一次闪烁, 再播放统一受击动画和闪烁.
+            ResetVisualState();
+            DOTweenAnimMgr.Play("Hurted", gameObject, hurtInvincibleDuration);
+            PlayHurtFlash();
+        }
+
+        private void PlayHurtFlash()
+        {
+            if(sr == null) return;
+
+            sr.DOKill(false);
+            sr.color = hasDefaultSpriteColor ? defaultSpriteColor : Color.white;
+
+            var loops = Mathf.Max(2, hurtFlashLoops * 2);
+            DOTween.To(() => sr.color, color => sr.color = color, hurtFlashColor, hurtFlashInterval)
+                .SetTarget(sr)
+                .SetLoops(loops, LoopType.Yoyo)
+                .SetUpdate(true)
+                .OnComplete(() => {
+                    if(sr != null) sr.color = hasDefaultSpriteColor ? defaultSpriteColor : Color.white;
+                });
+        }
+
+        private void StartHurtInvincible()
+        {
+            if(hurtInvincibleCoroutine != null)
+                StopCoroutine(hurtInvincibleCoroutine);
+
+            hurtInvincibleCoroutine = StartCoroutine(HurtInvincibleCoroutine());
+        }
+
+        private void ApplyHurtKnockback(Vector2 sourceDirection)
+        {
+            if(rb == null) return;
+
+            var knockbackDir = sourceDirection.sqrMagnitude > 0.0001f
+                ? sourceDirection.normalized
+                : GetFallbackKnockbackDirection();
+
+            var duration = Mathf.Max(0.01f, hurtKnockbackDuration);
+            hurtKnockbackTimer = duration;
+            hurtKnockbackVelocity = knockbackDir * (Mathf.Max(0f, hurtKnockbackDistance) / duration);
+        }
+
+        private Vector2 GetFallbackKnockbackDirection()
+        {
+            // 没有伤害来源方向时, 按角色面向反方向后退.
+            if(sr == null) return Vector2.zero;
+            return sr.flipX ? Vector2.right : Vector2.left;
+        }
+
+        private IEnumerator HurtInvincibleCoroutine()
+        {
+            //受击免疫使用真实时间, 避免受 Time.timeScale 影响.
+            yield return new WaitForSecondsRealtime(Mathf.Max(0f, hurtInvincibleDuration));
+            canHurt = true;
+            hurtInvincibleCoroutine = null;
+        }
+
+        private void StartHurtSlow()
+        {
+            if(hurtSlowCoroutine != null)
+                StopCoroutine(hurtSlowCoroutine);
+
+            hurtSlowCoroutine = StartCoroutine(HurtSlowCoroutine());
+        }
+
+        private IEnumerator HurtSlowCoroutine()
+        {
+            hurtPreviousTimeScale = Time.timeScale;
+            Time.timeScale = Mathf.Clamp(hurtSlowTimeScale, 0.01f, 1f);
+            yield return new WaitForSecondsRealtime(Mathf.Max(0f, hurtSlowDuration));
+
+            RestoreHurtSlowTimeScale();
+            hurtSlowCoroutine = null;
+        }
+
+        private void RestoreHurtSlowTimeScale()
+        {
+            if(hurtSlowCoroutine == null) return;
+            if(Mathf.Approximately(Time.timeScale, Mathf.Clamp(hurtSlowTimeScale, 0.01f, 1f)))
+                Time.timeScale = hurtPreviousTimeScale;
+        }
+
+        private void CaptureDefaultVisualState()
+        {
+            if(sr == null) return;
+
+            defaultSpriteColor = sr.color;
+            hasDefaultSpriteColor = true;
+        }
+
+        private void ResetVisualState()
+        {
+            transform.DOKill(false);
+
+            if(sr == null) return;
+
+            sr.DOKill(false);
+            if(hasDefaultSpriteColor)
+                sr.color = defaultSpriteColor;
+            else
+            {
+                var color = sr.color;
+                color.a = 1f;
+                sr.color = color;
+            }
         }
 
         #endregion
