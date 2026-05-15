@@ -65,7 +65,7 @@ BoxCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 1.1163145, y: -0.07720271}
+  m_Offset: {x: -0.83267224, y: 0.14994216}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -76,7 +76,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.8, y: 0.8}
+  m_Size: {x: 3.9291437, y: 1.9880145}
   m_EdgeRadius: 0
 --- !u!114 &5509645467542371286
 MonoBehaviour:
@@ -217,7 +217,9 @@ MonoBehaviour:
   MaxHp: 5
   CurrentHp: 5
   MoveSpeed: 2
+  AttackDamage: 1
   isDead: 0
+  playerStopDistance: 0.9
   sr: {fileID: 731065397284551279}
   animator: {fileID: 7428476364107894531}
   rb: {fileID: 557012345000002002}
@@ -237,7 +239,6 @@ MonoBehaviour:
   OwnerFightRoom: {fileID: 0}
   audioPlay: {fileID: 0}
   attackDetector: {fileID: 5509645467542371286}
-  attackDamage: 1
   attackCooldown: 1
   attackLockDuration: 1.25
   detectorLocalOffset: {x: 0.75, y: 0}

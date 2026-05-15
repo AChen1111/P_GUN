@@ -30,6 +30,9 @@ namespace Game.Gameplay
         [SerializeField] bool isDead = false;
         private bool isInited = false;
 
+        [Header("碰撞间距")]
+        [SerializeField] protected float playerStopDistance = 0.9f;
+
         [Header("组件引用")]
         [SerializeField] SpriteRenderer sr;
         [SerializeField] Animator animator;
@@ -277,6 +280,42 @@ namespace Game.Gameplay
             if(rb != null) {
                 rb.velocity = Vector2.zero;
             }
+        }
+
+        /// <summary>
+        /// 追踪玩家时保留身体间距, 避免敌人持续把玩家顶进墙体.
+        /// </summary>
+        /// <param name="direction">敌人朝向玩家的方向.</param>
+        /// <returns>是否成功获得玩家并更新移动.</returns>
+        protected bool FollowPlayerWithBodySpace(out Vector2 direction) {
+            direction = Vector2.zero;
+            if(Global.player == null) {
+                StopMove();
+                SetAnimatorSpeed(0f);
+                return false;
+            }
+
+            var toPlayer = (Vector2)(Global.player.transform.position - transform.position);
+            var distance = toPlayer.magnitude;
+            if(distance <= 0.0001f) {
+                StopMove();
+                SetAnimatorSpeed(0f);
+                return true;
+            }
+
+            direction = toPlayer / distance;
+            if(distance <= Mathf.Max(0f, playerStopDistance)) {
+                StopMove();
+                SetAnimatorSpeed(0f);
+                return true;
+            }
+
+            if(rb != null) {
+                rb.velocity = direction * MoveSpeed;
+            }
+
+            SetAnimatorSpeed(MoveSpeed);
+            return true;
         }
 
         /// <summary>

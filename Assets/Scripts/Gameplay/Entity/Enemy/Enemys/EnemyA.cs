@@ -78,21 +78,17 @@ namespace Game.Gameplay
 
         private void DoFollow()
         {
-            if (IsDead || Global.player == null)
+            if (IsDead)
             {
                 if (Rb != null) Rb.velocity = Vector2.zero;
                 return;
             }
 
-            var dir = (Global.player.transform.position - transform.position).normalized;
-
-            if (Sr != null)
+            if (FollowPlayerWithBodySpace(out var dir) && Sr != null)
             {
                 if (dir.x < 0f) Sr.flipX = true;
                 else if (dir.x > 0f) Sr.flipX = false;
             }
-
-            if (Rb != null) Rb.velocity = dir * MoveSpeed;
         }
 
         private void DoShoot()

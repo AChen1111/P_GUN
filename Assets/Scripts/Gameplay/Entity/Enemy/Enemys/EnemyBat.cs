@@ -108,22 +108,14 @@ namespace Game.Gameplay
 
         private void DoFollow()
         {
-            if (Global.player == null)
+            if (!FollowPlayerWithBodySpace(out var direction))
             {
                 StopMove();
                 SetAnimatorSpeed(0f);
                 return;
             }
 
-            var direction = ((Vector2)(Global.player.transform.position - transform.position)).normalized;
             FaceDirection(direction);
-
-            if (Rb != null)
-            {
-                Rb.velocity = direction * MoveSpeed;
-            }
-
-            SetAnimatorSpeed(MoveSpeed);
         }
 
         private void ShootAtPlayer()
