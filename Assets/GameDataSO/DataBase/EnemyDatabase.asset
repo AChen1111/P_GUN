@@ -19,9 +19,11 @@ MonoBehaviour:
     maxHp: 10
     moveSpeed: 2.5
     damage: 1
+    itemDropChance: 1
   - enemyId: 2
     displayName: Slime
     prefab: {fileID: 557012345000002001, guid: 62bf63f566fb06a44a78f17618a6b6cf, type: 3}
     maxHp: 3
     moveSpeed: 2.5
     damage: 1
+    itemDropChance: 0.25

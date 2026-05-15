@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 557012345000001002}
   - component: {fileID: 557012345000001003}
   - component: {fileID: 557012345000001004}
+  - component: {fileID: 7837503422260755806}
   m_Layer: 7
   m_Name: Bat
   m_TagString: Enemy
@@ -127,6 +128,7 @@ MonoBehaviour:
   MoveSpeed: 2.5
   AttackDamage: 1
   isDead: 0
+  playerStopDistance: 0.9
   sr: {fileID: 4792806843622310623}
   animator: {fileID: 3552475572089746921}
   rb: {fileID: 557012345000001002}
@@ -143,6 +145,8 @@ MonoBehaviour:
   hurtFlashInterval: 0.06
   hurtFlashLoops: 4
   deathRecycleDelay: 3
+  itemSpawner: {fileID: 7837503422260755806}
+  itemDropAnimEffectKey: BlinkAnimEffect
   OwnerFightRoom: {fileID: 0}
   audioPlay: {fileID: 0}
   bulletPrefab: {fileID: 8813529008298550284, guid: 10e246e394d07ef4ea3fe43c6de534c0, type: 3}
@@ -161,7 +165,7 @@ Rigidbody2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 995595907604817782}
-  m_BodyType: 1
+  m_BodyType: 0
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
@@ -311,3 +315,16 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &7837503422260755806
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 995595907604817782}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b7ba8308aff449a478c441a96611108f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemTable: {fileID: 11400000, guid: 0b78e19efc2cfbe45aeaae9e06e3b46f, type: 2}

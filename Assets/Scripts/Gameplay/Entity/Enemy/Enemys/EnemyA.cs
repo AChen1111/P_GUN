@@ -65,17 +65,6 @@ namespace Game.Gameplay
             fsm.StartState(EnemyState.Follow);
         }
 
-        protected override void OnHurt(DamageInfo damageInfo)
-        {
-            var damage = damageInfo == null ? 0 : damageInfo.Damage;
-            ApplyDamage(damage);
-        }
-
-        protected override void OnDead()
-        {
-            FightRoom.NotifyEnemyDefeated(this);
-        }
-
         private void DoFollow()
         {
             if (IsDead)

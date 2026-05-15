@@ -45,7 +45,8 @@ namespace Game.Gameplay
 			{
 				LineRenderer.SetPosition(1, hit.point);
 
-				var enemy = hit.collider.GetComponent<EnemyBase>();
+				// 激光可能先命中敌人的攻击检测子物体, 需要向父级查找敌人本体.
+				var enemy = hit.collider.GetComponentInParent<EnemyBase>();
 				if(enemy != null && Time.time - mLastDamageTime >= shootInterval)
 				{
 					mLastDamageTime = Time.time;
