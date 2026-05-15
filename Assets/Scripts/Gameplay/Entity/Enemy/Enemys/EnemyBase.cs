@@ -12,11 +12,10 @@ namespace Game.Gameplay
     /// <summary>
     /// 敌人基类
     /// </summary>
+    [RequireComponent(typeof(ItemSpawner))]
     public abstract class EnemyBase : MonoBehaviour, Game.Pooling.IPoolable {
 
         #region 子类实现
-        protected abstract void OnHurt(DamageInfo damageInfo);
-        protected abstract void OnDead();
         protected abstract void OnInit();
         protected abstract WeaponType WeaponType { get; }
         protected abstract void RegisterFSM(FSM<EnemyState> fsm);
@@ -60,6 +59,11 @@ namespace Game.Gameplay
         [Header("死亡回收")]
         [SerializeField] private float deathRecycleDelay = 3f;
 
+        [Header("死亡掉落")]
+        [SerializeField] private ItemSpawner itemSpawner;
+        [SerializeField] private string itemDropAnimEffectKey = "BlinkAnimEffect";
+        private float itemDropChance;
+
         [Header("所属房间")]
         public FightRoom OwnerFightRoom;
         [Header("音频播放")]
@@ -90,6 +94,10 @@ namespace Game.Gameplay
             rb = GetComponent<Rigidbody2D>();
             col = GetComponent<Collider2D>();
             audioSource = GetComponent<AudioSource>();
+            itemSpawner = GetComponent<ItemSpawner>();
+            if(itemSpawner == null) {
+                itemSpawner = gameObject.AddComponent<ItemSpawner>();
+            }
         }
 
 
@@ -104,6 +112,7 @@ namespace Game.Gameplay
             rb = GetComponent<Rigidbody2D>();
             col = GetComponent<Collider2D>();
             audioSource = GetComponent<AudioSource>();
+            ResolveItemSpawner();
             CaptureDefaultVisualState();
             gameObject.tag = "Enemy";
             ResetRuntimeState();
@@ -187,6 +196,23 @@ namespace Game.Gameplay
         }
 
         /// <summary>
+        /// 默认受伤逻辑, 子类只在有特殊受伤行为时重写.
+        /// </summary>
+        /// <param name="damageInfo">伤害信息.</param>
+        protected virtual void OnHurt(DamageInfo damageInfo) {
+            var damage = damageInfo == null ? 0 : damageInfo.Damage;
+            ApplyDamage(damage);
+        }
+
+        /// <summary>
+        /// 默认死亡逻辑, 负责通知房间并尝试掉落物品.
+        /// </summary>
+        protected virtual void OnDead() {
+            FightRoom.NotifyEnemyDefeated(this);
+            TryDropItem();
+        }
+
+        /// <summary>
         /// 对外接口,执行初始化逻辑
         /// </summary>
         public void Init() {
@@ -223,6 +249,7 @@ namespace Game.Gameplay
             if(enemyData.maxHp > 0) MaxHp = enemyData.maxHp;
             if(enemyData.moveSpeed > 0f) MoveSpeed = enemyData.moveSpeed;
             if(enemyData.damage > 0) AttackDamage = enemyData.damage;
+            itemDropChance = Mathf.Clamp01(enemyData.itemDropChance);
 
             CurrentHp = MaxHp;
         }
@@ -280,6 +307,24 @@ namespace Game.Gameplay
             if(rb != null) {
                 rb.velocity = Vector2.zero;
             }
+        }
+
+        private void ResolveItemSpawner() {
+            if(itemSpawner != null) return;
+
+            itemSpawner = GetComponent<ItemSpawner>();
+            if(itemSpawner == null) {
+                // 敌人默认组合物品生成器, prefab 可继续手动配置掉落表.
+                itemSpawner = gameObject.AddComponent<ItemSpawner>();
+            }
+        }
+
+        private void TryDropItem() {
+            if(itemSpawner == null || itemDropChance <= 0f) return;
+            if(itemSpawner.itemTable == null || itemSpawner.itemTable.Entries.Count == 0) return;
+            if(Random.value > itemDropChance) return;
+
+            itemSpawner.SpawnItem(transform.position, itemDropAnimEffectKey);
         }
 
         /// <summary>

@@ -57,7 +57,7 @@ namespace Game.Items
                 return;
             }
 
-            DOTweenAnimMgr.Play(animEffectKey, obj, 3f, () =>
+            DOTweenAnimMgr.Play(animEffectKey, obj, 1.5f, () =>
             {
                 if(item != null && item.gameObject.activeSelf)
                 {

@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-using XLua;
 using Game.Core;
 using Game.Pooling;
 using Game.Animation;
@@ -12,7 +11,6 @@ namespace Game.Gameplay
     /// <summary>
     /// 单个 Buff 实例的运行时状态.
     /// </summary>
-    [LuaCallCSharp]
     public class BuffRuntimeInfo
     {
         public Player owner = Global.player;

@@ -50,17 +50,6 @@ namespace Game.Gameplay
             fsm.StartState(EnemyState.Follow);
         }
 
-        protected override void OnHurt(DamageInfo damageInfo)
-        {
-            var damage = damageInfo == null ? 0 : damageInfo.Damage;
-            ApplyDamage(damage);
-        }
-
-        protected override void OnDead()
-        {
-            FightRoom.NotifyEnemyDefeated(this);
-        }
-
         /// <summary>
         /// 检测器发现玩家时调用, 统一由敌人本体控制攻击节奏.
         /// </summary>

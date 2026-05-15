@@ -24,6 +24,12 @@ namespace Game.Gameplay
         [Min(0)]
         public int damage;
 
+        /// <summary>
+        /// 死亡后掉落物品的概率, 由 EnemyBase 在生成时读取.
+        /// </summary>
+        [Range(0f, 1f)]
+        public float itemDropChance;
+
         public string DisplayName => string.IsNullOrWhiteSpace(displayName) ? enemyId.ToString() : displayName;
     }
 }

@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8e4697e35077445c9010f42e9eb09bd4, type: 3}
   m_Name: NormalRoomEnemySpawnTable
   m_EditorClassIdentifier: 
+  enemyDatabase: {fileID: 11400000, guid: c42c8260bc4f449588c588d697b5211e, type: 2}
   waves:
   - displayName: Wave 1
     enemies:

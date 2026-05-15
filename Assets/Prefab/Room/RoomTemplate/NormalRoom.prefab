@@ -2725,14 +2725,11 @@ MonoBehaviour:
   itemSpawner: {fileID: 5592398116191201107}
   waveCount: 3
   hasEnter: 0
-  enemyDatabase: {fileID: 11400000, guid: c42c8260bc4f449588c588d697b5211e, type: 2}
-  enemyId: 2
-  fallbackEnemyPrefab: {fileID: 1354463150124662322, guid: 5997eda64fd4b9e46ab562272521a078, type: 3}
+  enemySpawnTable: {fileID: 11400000, guid: 530afc5dd9ac460e99c893f4a4c57130, type: 2}
   enemyPoints:
   - {fileID: 17797752623052620}
   - {fileID: 6440587675623481254}
   - {fileID: 6731053414092002247}
-  enemyCountRange: {x: 1, y: 3}
 --- !u!114 &5592398116191201107
 MonoBehaviour:
   m_ObjectHideFlags: 0

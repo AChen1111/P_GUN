@@ -106,6 +106,7 @@ GameObject:
   - component: {fileID: 557012345000002002}
   - component: {fileID: 557012345000002003}
   - component: {fileID: 557012345000002004}
+  - component: {fileID: 9154238493245401812}
   m_Layer: 7
   m_Name: Slime
   m_TagString: Enemy
@@ -236,6 +237,8 @@ MonoBehaviour:
   hurtFlashInterval: 0.06
   hurtFlashLoops: 4
   deathRecycleDelay: 3
+  itemSpawner: {fileID: 0}
+  itemDropAnimEffectKey: BlinkAnimEffect
   OwnerFightRoom: {fileID: 0}
   audioPlay: {fileID: 0}
   attackDetector: {fileID: 5509645467542371286}
@@ -251,7 +254,7 @@ Rigidbody2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6534791204601115081}
-  m_BodyType: 1
+  m_BodyType: 0
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
@@ -401,3 +404,16 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &9154238493245401812
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6534791204601115081}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b7ba8308aff449a478c441a96611108f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemTable: {fileID: 0}

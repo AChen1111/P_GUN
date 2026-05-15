@@ -374,7 +374,8 @@ namespace XLua
             {
                 foreach (var pinfo in parameters)
                 {
-                    if (pinfo.ParameterType.IsValueType() || pinfo.IsOut || pinfo.ParameterType.IsByRef)
+                    // 普通值类型可通过 PushByType 传入 Lua, 这里只排除 out/ref 参数.
+                    if (pinfo.IsOut || pinfo.ParameterType.IsByRef)
                     {
                         genericDelegateCreator = (x) => null;
                         break;

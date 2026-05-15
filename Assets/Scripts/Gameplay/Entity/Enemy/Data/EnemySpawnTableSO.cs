@@ -28,6 +28,7 @@ namespace Game.Gameplay
     [CreateAssetMenu(fileName = "EnemySpawnTable", menuName = "PG/Enemy/Enemy Spawn Table", order = 1)]
     public class EnemySpawnTableSO : ScriptableObject
     {
+        [SerializeField] private EnemyDatabase enemyDatabase;
         [SerializeField] private List<EnemySpawnWave> waves = new List<EnemySpawnWave>();
 
         public IReadOnlyList<EnemySpawnWave> Waves => waves;
@@ -41,6 +42,24 @@ namespace Game.Gameplay
 
             wave = waves[waveIndex];
             return wave != null;
+        }
+
+        /// <summary>
+        /// 通过生成表解析敌人配置, 房间只需要依赖生成表.
+        /// </summary>
+        /// <param name="enemyId">敌人配置 ID.</param>
+        /// <param name="enemyData">解析到的敌人配置.</param>
+        /// <returns>是否找到可用配置.</returns>
+        public bool TryGetEnemyData(int enemyId, out EnemyData enemyData)
+        {
+            var database = enemyDatabase != null ? enemyDatabase : DataBaseManager.Instance?.Enemies;
+            if(database != null && database.TryGetById(enemyId, out enemyData))
+            {
+                return true;
+            }
+
+            enemyData = default;
+            return false;
         }
     }
 }
