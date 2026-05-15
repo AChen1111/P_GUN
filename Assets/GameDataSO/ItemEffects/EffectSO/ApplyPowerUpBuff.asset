@@ -9,12 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c3a56babb83e4a0da390605bf49b5378, type: 3}
-  m_Name: SpeedUpBuff
+  m_Script: {fileID: 11500000, guid: a0648309ec25400c84bddd16fd583331, type: 3}
+  m_Name: ApplyPowerUpBuff
   m_EditorClassIdentifier: 
-  id: 0
-  buffName: 
-  luaFile: {fileID: 4900000, guid: 648678a33bef4bec9cd2e901e934f017, type: 3}
-  duration: 5
-  isPermanent: 0
-  interval: 1
+  buffId: 1
+  buffDataBase: {fileID: 11400000, guid: 0ba30ec915a74a50a3b00b0e798dc227, type: 2}
+  showHeadMessage: 1

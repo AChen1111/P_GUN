@@ -1,19 +1,20 @@
+using System;
 using UnityEngine;
 
 
 namespace Game.Gameplay
 {
     /// <summary>
-    /// Buff 基础配置资产, 具体效果由绑定的 Lua 文件实现.
+    /// Buff 基础配置数据, 由 BuffDataBase 统一保存并按 id 查询.
     /// </summary>
-    [CreateAssetMenu(fileName = "Buff", menuName = "PG/Buff/Buff", order = 10)]
-    public class Buff : ScriptableObject
+    [Serializable]
+    public class Buff
     {
         [Header("Basic")]
         [Tooltip("Buff 的唯一 id, 用于数据库查询和道具配置.")]
         [SerializeField] private int id = 0;
 
-        [Tooltip("Buff 的显示名称. 如果为空, 会使用资产名称.")]
+        [Tooltip("Buff 的显示名称. 如果为空, 会使用 id.")]
         [SerializeField] private string buffName = string.Empty;
 
         [Tooltip("Buff 绑定的 Lua 文件, 文件需要返回包含生命周期方法的 table.")]
@@ -32,7 +33,7 @@ namespace Game.Gameplay
         [SerializeField] private float interval = 1f;
 
         public int Id => id;
-        public string BuffName => string.IsNullOrWhiteSpace(buffName) ? name : buffName;
+        public string BuffName => string.IsNullOrWhiteSpace(buffName) ? id.ToString() : buffName;
         public TextAsset LuaFile => luaFile;
         public float Duration => Mathf.Max(0f, duration);
         public bool IsPermanent => isPermanent;
@@ -84,7 +85,10 @@ namespace Game.Gameplay
             info?.LuaInstance?.OnTrigger(info);
         }
 
-        private void OnValidate()
+        /// <summary>
+        /// 编辑器导入后修正非法参数.
+        /// </summary>
+        public void Validate()
         {
             duration = Mathf.Max(0f, duration);
             interval = Mathf.Max(0f, interval);

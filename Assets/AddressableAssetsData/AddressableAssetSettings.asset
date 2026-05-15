@@ -109,6 +109,7 @@ MonoBehaviour:
     - item_chest
     - spawn_tables
     - item_database
+    - buff_database
     - enemies_base
     - enemy_a
     - enemy_bat

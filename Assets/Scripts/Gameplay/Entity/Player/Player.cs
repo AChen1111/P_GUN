@@ -22,6 +22,9 @@ namespace Game.Gameplay
         [Header("角色移动速度")]
         public float moveSpeed = 5f;
 
+        [Header("速度增量")]
+        public float speedUp = 0f;
+
         [Header("最大血量")]
         public int maxHp = 5;
         [Header("当前血量")]
@@ -40,6 +43,9 @@ namespace Game.Gameplay
 
         [Header("自动瞄准")]
         public bool canAutoAim = false;
+
+        [Header("伤害加成")]
+        public float damageMultiplier = 1f;
 
         const float AutoAimRefreshInterval = 0.1f;
 
@@ -134,7 +140,7 @@ namespace Game.Gameplay
             }
             else
             {
-                rb.velocity = new Vector2(horizontal, vertical).normalized * moveSpeed;
+                rb.velocity = new Vector2(horizontal, vertical).normalized * CurrentMoveSpeed;
             }
 
             if (animator != null)
@@ -559,7 +565,9 @@ namespace Game.Gameplay
 
         #region Speed
 
-        public float GetSpeed() => moveSpeed;
+        public float CurrentMoveSpeed => Mathf.Max(0f, moveSpeed + speedUp);
+
+        public float GetSpeed() => CurrentMoveSpeed;
 
         /// <summary>
         /// 增加速度
@@ -577,6 +585,21 @@ namespace Game.Gameplay
         public void SetSpeed(float value)
         {
             moveSpeed = value;
+        }
+
+        #endregion
+
+        #region Damage
+
+        /// <summary>
+        /// 根据当前玩家增伤系数计算最终子弹伤害.
+        /// </summary>
+        /// <param name="baseDamage">基础伤害.</param>
+        /// <returns>最终伤害.</returns>
+        public int CalculateBulletDamage(int baseDamage)
+        {
+            var multiplier = Mathf.Max(0f, damageMultiplier);
+            return Mathf.Max(0, Mathf.RoundToInt(baseDamage * multiplier));
         }
 
         #endregion

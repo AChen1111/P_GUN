@@ -24,4 +24,8 @@ MonoBehaviour:
   - itemId: 3
     itemName: "\u52A0\u901F\u836F\u6C34"
     description: "\u52A0\u901F"
-    icon: {fileID: 21300000, guid: 3d4ced8e78980334ea3a43c06147b491, type: 3}
+    icon: {fileID: 21300000, guid: ef4b3d45684e3964f90789059691ca47, type: 3}
+  - itemId: 4
+    itemName: "\u589E\u4F24\u836F\u6C34"
+    description: "\u52A0\u901F"
+    icon: {fileID: 21300000, guid: e7febe510a529c84cae581451ea5c058, type: 3}

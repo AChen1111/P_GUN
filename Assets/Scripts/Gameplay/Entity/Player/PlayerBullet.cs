@@ -98,7 +98,8 @@ namespace Game.Gameplay
                 hasHit = true;
 
                 PlaySelfHitSound();
-                DamageInfo damageInfo = new DamageInfo(damage, dir);
+                var finalDamage = Global.player != null ? Global.player.CalculateBulletDamage(damage) : damage;
+                DamageInfo damageInfo = new DamageInfo(finalDamage, dir);
 
                 target.GetComponent<EnemyBase>()?.Hurt(damageInfo);
                 PlayerBulletPool.Instance.Release(this);

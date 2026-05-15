@@ -9,8 +9,7 @@ namespace Game.ItemEffects
     [CreateAssetMenu(fileName = "ApplyBuffItemEffect", menuName = "PG/Item/Effects/Apply Buff", order = 3)]
     public class ApplyBuffItemEffect : ItemEffectBase
     {
-        [SerializeField] private Buff buff = null;
-        [SerializeField] private int buffId = 0 ;
+        [SerializeField] private int buffId = 0;
         [SerializeField] private BuffDataBase buffDataBase = null;
         [SerializeField] private bool showHeadMessage = true;
 
@@ -36,8 +35,6 @@ namespace Game.ItemEffects
 
         private Buff ResolveBuff()
         {
-            if (buff != null) return buff;
-
             var database = buffDataBase != null ? buffDataBase : DataBaseManager.Instance?.Buffs;
             return database != null && database.TryGetById(buffId, out var targetBuff) ? targetBuff : null;
         }
