@@ -18,16 +18,19 @@ namespace Game.Gameplay
         [SerializeField] private string itemDatabaseKey = "ItemDatabase";
         [SerializeField] private string weaponDatabaseKey = "WeaponDatabase";
         [SerializeField] private string buffDataBaseKey = "BuffDataBase";
+        [SerializeField] private string enemyDatabaseKey = "EnemyDatabase";
 
         private AsyncOperationHandle<ItemDatabase> itemHandle;
         private AsyncOperationHandle<WeaponDatabase> weaponHandle;
         private AsyncOperationHandle<BuffDataBase> buffHandle;
+        private AsyncOperationHandle<EnemyDatabase> enemyHandle;
 
         public static DataBaseManager Instance { get; private set; }
 
         public ItemDatabase Items { get; private set; }
         public WeaponDatabase Weapons { get; private set; }
         public BuffDataBase Buffs { get; private set; }
+        public EnemyDatabase Enemies { get; private set; }
         public bool IsLoaded { get; private set; }
 
         private void Awake()
@@ -52,13 +55,15 @@ namespace Game.Gameplay
             itemHandle = Addressables.LoadAssetAsync<ItemDatabase>(itemDatabaseKey);
             weaponHandle = Addressables.LoadAssetAsync<WeaponDatabase>(weaponDatabaseKey);
             buffHandle = Addressables.LoadAssetAsync<BuffDataBase>(buffDataBaseKey);
+            enemyHandle = Addressables.LoadAssetAsync<EnemyDatabase>(enemyDatabaseKey);
 
-            await Task.WhenAll(itemHandle.Task, weaponHandle.Task, buffHandle.Task);
+            await Task.WhenAll(itemHandle.Task, weaponHandle.Task, buffHandle.Task, enemyHandle.Task);
 
             Items = GetLoadedAsset(itemHandle, nameof(ItemDatabase));
             Weapons = GetLoadedAsset(weaponHandle, nameof(WeaponDatabase));
             Buffs = GetLoadedAsset(buffHandle, nameof(BuffDataBase));
-            IsLoaded = Items != null && Weapons != null && Buffs != null;
+            Enemies = GetLoadedAsset(enemyHandle, nameof(EnemyDatabase));
+            IsLoaded = Items != null && Weapons != null && Buffs != null && Enemies != null;
         }
 
         private static TDatabase GetLoadedAsset<TDatabase>(AsyncOperationHandle<TDatabase> handle, string databaseName)
@@ -83,6 +88,7 @@ namespace Game.Gameplay
             ReleaseHandle(itemHandle);
             ReleaseHandle(weaponHandle);
             ReleaseHandle(buffHandle);
+            ReleaseHandle(enemyHandle);
         }
 
         private static void ReleaseHandle<TDatabase>(AsyncOperationHandle<TDatabase> handle)

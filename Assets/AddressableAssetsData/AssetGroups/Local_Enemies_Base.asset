@@ -38,6 +38,12 @@ MonoBehaviour:
     - enemies_base
     - enemy_a
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c42c8260bc4f449588c588d697b5211e
+    m_Address: EnemyDatabase
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - enemies_base
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 62bf63f566fb06a44a78f17618a6b6cf
     m_Address: enemy/slime
     m_ReadOnly: 0
