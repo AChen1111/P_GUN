@@ -1,15 +1,12 @@
 {
-  "name": "Game.UI",
-  "rootNamespace": "Game.UI",
+  "name": "ComponentAutoBindTool.Editor",
+  "rootNamespace": "",
   "references": [
-    "Game.Core",
-    "Game.Items",
-    "Game.Gameplay",
-    "ComponentAutoBindTool.Runtime",
-    "QFramework",
-    "QFramework.CoreKit"
+    "ComponentAutoBindTool.Runtime"
   ],
-  "includePlatforms": [],
+  "includePlatforms": [
+    "Editor"
+  ],
   "excludePlatforms": [],
   "allowUnsafeCode": false,
   "overrideReferences": false,
