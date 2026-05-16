@@ -1,12 +1,10 @@
 local SpeedBuff = {}
 
 function SpeedBuff.OnAdd(runtimeInfo)
-    -- 常规速度数值由 BuffDataBase 的 Modifier 统一计算.
     CS.UnityEngine.Debug.Log("SpeedBuff OnAdd")
 end
 
 function SpeedBuff.OnRemove(runtimeInfo)
-    -- 常规速度数值由 BuffDataBase 的 Modifier 统一计算.
     CS.UnityEngine.Debug.Log("SpeedBuff OnRemove")
 end
 
