@@ -98,10 +98,12 @@ namespace Game.Gameplay
         {
             if (buff == null) return null;
 
+            var previousMaxHp = GetOwnerMaxHp();
             if (buffInfoMap.TryGetValue(buff.Id, out var existing))
             {
                 ResetBuffRuntimeInfo(existing, buff, source);
                 TriggerOnAdd(existing);
+                NotifyOwnerStatsChanged(previousMaxHp);
                 return existing;
             }
 
@@ -112,6 +114,7 @@ namespace Game.Gameplay
             buffs.Add(info);
             buffInfoMap[buff.Id] = info;
             TriggerOnAdd(info);
+            NotifyOwnerStatsChanged(previousMaxHp);
             return info;
         }
 
@@ -136,9 +139,11 @@ namespace Game.Gameplay
         {
             if (!buffInfoMap.TryGetValue(buffId, out var info)) return false;
 
+            var previousMaxHp = GetOwnerMaxHp();
             TriggerOnRemove(info);
             info.LuaInstance?.Dispose();
             RemoveAt(info.Index);
+            NotifyOwnerStatsChanged(previousMaxHp);
             return true;
         }
 
@@ -159,6 +164,7 @@ namespace Game.Gameplay
         /// </summary>
         public void ClearBuffs()
         {
+            var previousMaxHp = GetOwnerMaxHp();
             for (var i = buffs.Count - 1; i >= 0; i--)
             {
                 TriggerOnRemove(buffs[i]);
@@ -167,6 +173,46 @@ namespace Game.Gameplay
             }
 
             buffInfoMap.Clear();
+            NotifyOwnerStatsChanged(previousMaxHp);
+        }
+
+        /// <summary>
+        /// 按统一公式计算指定属性的最终值.
+        /// </summary>
+        /// <param name="statType">属性类型.</param>
+        /// <param name="baseValue">基础值.</param>
+        /// <returns>计算后的最终值.</returns>
+        public float CalculateStat(StatType statType, float baseValue)
+        {
+            var flat = 0f;
+            var percentAdd = 0f;
+            var finalMul = 1f;
+
+            for (var i = 0; i < buffs.Count; i++)
+            {
+                var modifiers = buffs[i].Buff.Modifiers;
+                for (var j = 0; j < modifiers.Count; j++)
+                {
+                    var modifier = modifiers[j];
+                    if (modifier == null || modifier.StatType != statType) continue;
+
+                    // 同一属性按固定值, 百分比, 最终倍率三个分区累计.
+                    switch (modifier.ModifierType)
+                    {
+                        case ModifierType.Flat:
+                            flat += modifier.Value;
+                            break;
+                        case ModifierType.PercentAdd:
+                            percentAdd += modifier.Value;
+                            break;
+                        case ModifierType.FinalMul:
+                            finalMul *= modifier.Value;
+                            break;
+                    }
+                }
+            }
+
+            return (baseValue + flat) * (1f + percentAdd) * finalMul;
         }
 
     #endregion
@@ -256,6 +302,30 @@ namespace Game.Gameplay
             info.Interval = buff.Interval;
             info.IntervalTimer = 0f;
             info.IsPermanent = buff.IsPermanent;
+        }
+
+    #endregion
+
+    #region Stat Change
+
+        /// <summary>
+        /// 获取属性变化前的玩家最大生命, 用于变化后刷新 UI.
+        /// </summary>
+        /// <returns>玩家当前最大生命.</returns>
+        private int GetOwnerMaxHp()
+        {
+            var target = owner != null ? owner : Global.player;
+            return target != null ? target.MaxHP : 0;
+        }
+
+        /// <summary>
+        /// 通知玩家 Buff 属性已经变化.
+        /// </summary>
+        /// <param name="previousMaxHp">变化前的最大生命.</param>
+        private void NotifyOwnerStatsChanged(int previousMaxHp)
+        {
+            var target = owner != null ? owner : Global.player;
+            target?.OnBuffStatsChanged(previousMaxHp);
         }
 
     #endregion

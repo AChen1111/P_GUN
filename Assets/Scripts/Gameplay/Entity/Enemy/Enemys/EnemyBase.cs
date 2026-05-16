@@ -56,6 +56,10 @@ namespace Game.Gameplay
         [SerializeField] private float hurtFlashInterval = 0.06f;
         [SerializeField] private int hurtFlashLoops = 4;
 
+        [Header("伤害数字")]
+        [SerializeField] private DamageText damageTextPrefab;
+        [SerializeField] private Vector3 damageTextOffset = new Vector3(0f, 0.6f, 0f);
+
         [Header("死亡回收")]
         [SerializeField] private float deathRecycleDelay = 3f;
 
@@ -160,6 +164,7 @@ namespace Game.Gameplay
             if(damageInfo == null) damageInfo = new DamageInfo();
 
             OnHurt(damageInfo);
+            ShowDamageText(damageInfo.Damage);
             VfxPool.Instance.Play(GetBloodVfxPosition(), damageInfo.SourceDirection);
             HurtAnim();
 
@@ -472,6 +477,19 @@ namespace Game.Gameplay
             }
 
             return transform.position;
+        }
+
+        private void ShowDamageText(int damage) {
+            if(damage <= 0 || damageTextPrefab == null) return;
+
+            // 敌人只传递伤害值和基准位置, 具体随机字号和飘字动画交给 DamageText prefab.
+            var damageTextPool = DamageTextPool.Instance;
+            if(damageTextPool == null) {
+                Debug.LogError($"{nameof(DamageTextPool)} is missing in scene.", this);
+                return;
+            }
+
+            damageTextPool.Play(damageTextPrefab, damage, GetBloodVfxPosition() + damageTextOffset);
         }
         #endregion
     }

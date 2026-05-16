@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 
@@ -32,12 +33,33 @@ namespace Game.Gameplay
         [Min(0f)]
         [SerializeField] private float interval = 1f;
 
+        [Header("Modifiers")]
+        [Tooltip("Buff 提供的属性修正列表, 按统一公式集中计算.")]
+        [SerializeField] private List<StatModifier> modifiers = new List<StatModifier>();
+
         public int Id => id;
         public string BuffName => string.IsNullOrWhiteSpace(buffName) ? id.ToString() : buffName;
         public TextAsset LuaFile => luaFile;
         public float Duration => Mathf.Max(0f, duration);
         public bool IsPermanent => isPermanent;
         public float Interval => Mathf.Max(0f, interval);
+        public IReadOnlyList<StatModifier> Modifiers => modifiers;
+
+        /// <summary>
+        /// 替换 Buff 的属性修正配置, 供编辑器导入器写入.
+        /// </summary>
+        /// <param name="newModifiers">新的属性修正列表.</param>
+        public void ReplaceModifiers(IEnumerable<StatModifier> newModifiers)
+        {
+            modifiers.Clear();
+            if (newModifiers == null) return;
+
+            foreach (var modifier in newModifiers)
+            {
+                if (modifier == null) continue;
+                modifiers.Add(modifier);
+            }
+        }
 
         /// <summary>
         /// 调用 Lua 的添加回调.
@@ -92,6 +114,7 @@ namespace Game.Gameplay
         {
             duration = Mathf.Max(0f, duration);
             interval = Mathf.Max(0f, interval);
+            modifiers.RemoveAll(modifier => modifier == null);
         }
     }
 }

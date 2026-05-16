@@ -1,3 +1,3 @@
-﻿id,buffName,luaFile,duration,isPermanent,interval
-0,SpeedUpBuff,Assets/Scripts/Gameplay/Buffs/Buff/SpeedBuff.lua.txt,5,FALSE,1
-1,PowerUpBuff,Assets/Scripts/Gameplay/Buffs/Buff/DamageUpBuff.lua.txt,5,FALSE,1
+id,buffName,luaFile,duration,isPermanent,interval,modifiers
+0,SpeedUpBuff,Assets/Scripts/Gameplay/Buffs/Buff/SpeedBuff.lua.txt,5,FALSE,1,MoveSpeed:PercentAdd:0.3
+1,PowerUpBuff,Assets/Scripts/Gameplay/Buffs/Buff/DamageUpBuff.lua.txt,5,FALSE,1,Attack:PercentAdd:0.5

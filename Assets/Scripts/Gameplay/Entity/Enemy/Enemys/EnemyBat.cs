@@ -130,9 +130,7 @@ namespace Game.Gameplay
 
         private void PlayShootSound()
         {
-            if (AudioSource == null || shootSounds == null || shootSounds.Count == 0) return;
-
-            AudioSource.PlayOneShot(shootSounds[Random.Range(0, shootSounds.Count)]);
+            audioPlay.Play();
         }
 
         private void FaceDirection(Vector2 direction)

@@ -16,12 +16,20 @@ MonoBehaviour:
   - id: 0
     buffName: SpeedUpBuff
     luaFile: {fileID: 4900000, guid: 648678a33bef4bec9cd2e901e934f017, type: 3}
-    duration: 5
+    duration: 4
     isPermanent: 0
     interval: 1
+    modifiers:
+    - statType: 0
+      modifierType: 1
+      value: 5
   - id: 1
     buffName: PowerUpBuff
     luaFile: {fileID: 4900000, guid: bfef84428f614290a92f0716f6fd7171, type: 3}
-    duration: 5
+    duration: 3
     isPermanent: 0
     interval: 1
+    modifiers:
+    - statType: 1
+      modifierType: 1
+      value: 20

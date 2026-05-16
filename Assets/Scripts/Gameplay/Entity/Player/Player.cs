@@ -47,8 +47,6 @@ namespace Game.Gameplay
         [Header("伤害加成")]
         public float damageMultiplier = 1f;
 
-        const float AutoAimRefreshInterval = 0.1f;
-
         [Header("Buff管理器")]
         public BuffManager buffManager;
 
@@ -78,11 +76,11 @@ namespace Game.Gameplay
         Vector2 hurtKnockbackVelocity;
         float hurtKnockbackTimer;
 
-        WaitForSeconds _autoAimRefreshWait;
         Transform _autoAimTarget;
+        bool isGameEnded;
 
 
-        public int MaxHP => Mathf.Max(0, maxHp);
+        public int MaxHP => Mathf.Max(0, Mathf.RoundToInt(CalculateBuffedStat(StatType.MaxHp, maxHp)));
         public bool IsHPFull => HP >= MaxHP;
 
         #region Unity Lifecycle
@@ -90,7 +88,10 @@ namespace Game.Gameplay
         void Awake()
         {
             Global.player = this;
+            ResolveBuffManager();
             Restart();
+            EventCenter.AddListener(GameEvent.PlayerDied, HandleGameEnded);
+            EventCenter.AddListener(GameEvent.GameWin, HandleGameEnded);
 
             animator = GetComponentInChildren<Animator>();
             //默认不显示
@@ -103,9 +104,6 @@ namespace Game.Gameplay
             CaptureDefaultVisualState();
 
             SelectInitialGun();
-
-            _autoAimRefreshWait = new WaitForSeconds(AutoAimRefreshInterval);
-            StartCoroutine(AutoAimRefreshRoutine());
         }
 
         void Start()
@@ -115,6 +113,12 @@ namespace Game.Gameplay
 
         void Update()
         {
+            if (isGameEnded)
+            {
+                //游戏结束后不再检测输入和枪体转向, 避免暂停界面中武器继续跟随鼠标.
+                return;
+            }
+
             //获取鼠标位置
             var mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             //获取鼠标位置与角色位置的向量
@@ -180,6 +184,8 @@ namespace Game.Gameplay
 
         void OnDestroy()
         {
+            EventCenter.RemoveListener(GameEvent.PlayerDied, HandleGameEnded);
+            EventCenter.RemoveListener(GameEvent.GameWin, HandleGameEnded);
             RestoreHurtSlowTimeScale();
             ResetVisualState();
 
@@ -230,6 +236,14 @@ namespace Game.Gameplay
             {
                 Debug.LogWarning("Player SpriteRenderer 未绑定，受击闪烁将被跳过。");
             }
+        }
+
+        private void ResolveBuffManager()
+        {
+            if (buffManager != null) return;
+
+            // BuffManager 只从当前玩家对象查找, 不在代码里动态创建 Manager.
+            buffManager = GetComponent<BuffManager>();
         }
 
         void SelectInitialGun()
@@ -346,8 +360,18 @@ namespace Game.Gameplay
 
         public void Restart()
         {
+            isGameEnded = false;
             HP = MaxHP;
             PublishHPChanged();
+        }
+
+        private void HandleGameEnded()
+        {
+            isGameEnded = true;
+            if (AimPrefab != null)
+            {
+                AimPrefab.SetActive(false);
+            }
         }
 
         public int Heal(int amount)
@@ -363,6 +387,25 @@ namespace Game.Gameplay
         private void PublishHPChanged()
         {
             EventCenter.Trigger(GameEvent.PlayerHPChanged, this);
+        }
+
+        /// <summary>
+        /// Buff 属性变化后刷新玩家生命上限和 UI.
+        /// </summary>
+        /// <param name="previousMaxHp">变化前的最大生命.</param>
+        public void OnBuffStatsChanged(int previousMaxHp)
+        {
+            var currentMaxHp = MaxHP;
+            var hpChanged = HP > currentMaxHp;
+            if (HP > currentMaxHp)
+            {
+                HP = currentMaxHp;
+            }
+
+            if (previousMaxHp != currentMaxHp || hpChanged)
+            {
+                PublishHPChanged();
+            }
         }
 
         private void PlayHurtFeedback()
@@ -522,6 +565,8 @@ namespace Game.Gameplay
             if(!canAutoAim) return;
             if(FightRoom.currentFightRoom == null) return;
 
+            RefreshAutoAimTarget();
+
             if (_autoAimTarget != null)
             {
                 AimPrefab.SetActive(true);
@@ -534,22 +579,17 @@ namespace Game.Gameplay
             }
         }
 
-        IEnumerator AutoAimRefreshRoutine()
+        private void RefreshAutoAimTarget()
         {
-            while (true)
+            // 自动瞄准每帧刷新最近敌人, 保证目标切换和敌人死亡后的锁定状态及时更新.
+            if (canAutoAim && FightRoom.currentFightRoom != null)
             {
-                if (canAutoAim && FightRoom.currentFightRoom != null)
-                {
-                    var targetEnemy = FightRoom.GetNearestEnemy(transform);
-                    _autoAimTarget = targetEnemy != null ? targetEnemy.transform : null;
-                }
-                else
-                {
-                    _autoAimTarget = null;
-                }
-
-                yield return _autoAimRefreshWait;
+                var targetEnemy = FightRoom.GetNearestEnemy(transform);
+                _autoAimTarget = targetEnemy != null ? targetEnemy.transform : null;
+                return;
             }
+
+            _autoAimTarget = null;
         }
 
         ///<summary>
@@ -565,7 +605,7 @@ namespace Game.Gameplay
 
         #region Speed
 
-        public float CurrentMoveSpeed => Mathf.Max(0f, moveSpeed + speedUp);
+        public float CurrentMoveSpeed => Mathf.Max(0f, CalculateBuffedStat(StatType.MoveSpeed, moveSpeed));
 
         public float GetSpeed() => CurrentMoveSpeed;
 
@@ -598,13 +638,17 @@ namespace Game.Gameplay
         /// <returns>最终伤害.</returns>
         public int CalculateBulletDamage(int baseDamage)
         {
-            var multiplier = Mathf.Max(0f, damageMultiplier);
-            return Mathf.Max(0, Mathf.RoundToInt(baseDamage * multiplier));
+            return Mathf.Max(0, Mathf.RoundToInt(CalculateBuffedStat(StatType.Attack, baseDamage)));
         }
 
         #endregion
 
         #region Helpers
+
+        private float CalculateBuffedStat(StatType statType, float baseValue)
+        {
+            return buffManager != null ? buffManager.CalculateStat(statType, baseValue) : baseValue;
+        }
 
         private Vector3 GetBloodVfxPosition()
         {

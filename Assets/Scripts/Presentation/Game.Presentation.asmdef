@@ -4,6 +4,7 @@
   "references": [
     "Game.Core",
     "Game.Pooling",
+    "Unity.TextMeshPro",
     "QFramework",
     "QFramework.CoreKit"
   ],

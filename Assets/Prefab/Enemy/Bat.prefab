@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 557012345000001003}
   - component: {fileID: 557012345000001004}
   - component: {fileID: 7837503422260755806}
+  - component: {fileID: 3543157380447102985}
   m_Layer: 7
   m_Name: Bat
   m_TagString: Enemy
@@ -144,11 +145,12 @@ MonoBehaviour:
   hurtFlashColor: {r: 1, g: 0.35, b: 0.35, a: 1}
   hurtFlashInterval: 0.06
   hurtFlashLoops: 4
+  damageTextPrefab: {fileID: 5634629950418986402, guid: 08da0453f2d8d6148be646576a1ff376, type: 3}
+  damageTextOffset: {x: 0, y: 0.6, z: 0}
   deathRecycleDelay: 3
   itemSpawner: {fileID: 7837503422260755806}
-  itemDropAnimEffectKey: BlinkAnimEffect
   OwnerFightRoom: {fileID: 0}
-  audioPlay: {fileID: 0}
+  audioPlay: {fileID: 3543157380447102985}
   bulletPrefab: {fileID: 8813529008298550284, guid: 10e246e394d07ef4ea3fe43c6de534c0, type: 3}
   shootSounds: []
   followBeforeAttackTime: 1.5
@@ -216,8 +218,8 @@ CapsuleCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
-  m_Size: {x: 1, y: 1}
+  m_Offset: {x: 0.15376294, y: -0.41880214}
+  m_Size: {x: 1.8049109, y: 2.1965182}
   m_Direction: 0
 --- !u!82 &557012345000001004
 AudioSource:
@@ -228,7 +230,7 @@ AudioSource:
   m_GameObject: {fileID: 995595907604817782}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: 374010033509238546, guid: 569809b44565dc442ba3ee727965ff13, type: 2}
   m_audioClip: {fileID: 0}
   m_PlayOnAwake: 0
   m_Volume: 1
@@ -328,3 +330,27 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemTable: {fileID: 11400000, guid: 0b78e19efc2cfbe45aeaae9e06e3b46f, type: 2}
+--- !u!114 &3543157380447102985
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 995595907604817782}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 57dfb31e620e1b641a05ca43d4dcabe8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  source: {fileID: 557012345000001004}
+  clips:
+  - {fileID: 8300000, guid: d6a1e1dba80eb484386bf50f97ec2560, type: 3}
+  - {fileID: 8300000, guid: 4ce72a5102c96ac449defd59e5a058c4, type: 3}
+  - {fileID: 8300000, guid: 247c3d9a01e9b434899f18098abe4547, type: 3}
+  currentClip: {fileID: 0}
+  index: 0
+  is3D: 1
+  loop: 0
+  isRandom: 1
+  min_distance: 1
+  max_distance: 20
