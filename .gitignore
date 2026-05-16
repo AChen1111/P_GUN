@@ -6,3 +6,8 @@
 !/Packages/**
 !/ProjectSettings/
 !/ProjectSettings/**
+!/AGENTS.md
+!/.agents/
+!/.agents/skills/
+!/.agents/skills/pgun-project-context/
+!/.agents/skills/pgun-project-context/**

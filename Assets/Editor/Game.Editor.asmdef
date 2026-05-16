@@ -6,6 +6,7 @@
     "Game.Items",
     "Game.ItemEffects",
     "Game.Gameplay",
+    "Game.Animation",
     "Excel2SO.Editor",
     "Game.Presentation",
     "QFramework",
