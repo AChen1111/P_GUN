@@ -61,7 +61,6 @@ namespace Game.Gameplay
 
         [Header("死亡掉落")]
         [SerializeField] private ItemSpawner itemSpawner;
-        [SerializeField] private string itemDropAnimEffectKey = "BlinkAnimEffect";
         private float itemDropChance;
 
         [Header("所属房间")]
@@ -324,7 +323,7 @@ namespace Game.Gameplay
             if(itemSpawner.itemTable == null || itemSpawner.itemTable.Entries.Count == 0) return;
             if(Random.value > itemDropChance) return;
 
-            itemSpawner.SpawnItem(transform.position, itemDropAnimEffectKey);
+            itemSpawner.SpawnItem(transform.position);
         }
 
         /// <summary>

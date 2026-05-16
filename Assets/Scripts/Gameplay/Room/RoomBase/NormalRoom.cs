@@ -98,7 +98,7 @@ namespace Game.Gameplay
         protected override void OnFightAllWavesEnd()
         {
             if(canGenerateItems) {
-                itemSpawner.SpawnItem(transform.position,"Jump");
+                itemSpawner.SpawnItem(transform.position);
             }
         }
     }

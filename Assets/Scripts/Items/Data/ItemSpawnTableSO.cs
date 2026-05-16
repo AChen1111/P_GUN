@@ -15,6 +15,11 @@ namespace Game.Items
 
         [Min(0)]
         public int weight;
+
+        public DOTweenAnimType spawnAnimEffect;
+
+        [Min(0f)]
+        public float spawnAnimDuration;
     }
 
     /// <summary>
@@ -33,6 +38,21 @@ namespace Game.Items
         public bool TryGetRandomPrefab(out GameObject prefab)
         {
             prefab = null;
+            if (TryGetRandomEntry(out var selectedEntry))
+            {
+                prefab = selectedEntry.prefab;
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// 按权重获取一个随机物品配置，生成动画跟随被抽中的配置项。
+        /// </summary>
+        public bool TryGetRandomEntry(out ItemSpawnEntry selectedEntry)
+        {
+            selectedEntry = default;
 
             var totalWeight = 0;
             foreach (var entry in entries)
@@ -50,7 +70,7 @@ namespace Game.Items
 
                 if (roll < entry.weight)
                 {
-                    prefab = entry.prefab;
+                    selectedEntry = entry;
                     return true;
                 }
 

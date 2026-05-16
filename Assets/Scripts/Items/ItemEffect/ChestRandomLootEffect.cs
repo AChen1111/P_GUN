@@ -36,8 +36,16 @@ namespace Game.Items
                 Random.Range(-randomOffsetRange.y, randomOffsetRange.y),
                 0f);
 
-            var drop = GetRandomPrefab();
+            var dropAnimEffect = DOTweenAnimType.None;
+            var dropAnimDuration = 0f;
+            var drop = GetRandomPrefab(out dropAnimEffect, out dropAnimDuration);
             if (drop == null) return;
+
+            if (dropAnimEffect != DOTweenAnimType.None)
+            {
+                spawner.SpawnItem(drop, newItemPosition, dropAnimEffect, dropAnimDuration);
+                return;
+            }
 
             spawner.SpawnItem(drop, newItemPosition, animEffectKey);
         }
@@ -47,13 +55,18 @@ namespace Game.Items
             return ctx.SourceObject != null ? ctx.SourceObject.GetComponentInParent<ItemSpawner>() : null;
         }
 
-        private GameObject GetRandomPrefab()
+        private GameObject GetRandomPrefab(out DOTweenAnimType spawnAnimEffect, out float spawnAnimDuration)
         {
+            spawnAnimEffect = DOTweenAnimType.None;
+            spawnAnimDuration = 0f;
+
             if (spawnTable != null)
             {
-                if (spawnTable.TryGetRandomPrefab(out var prefab))
+                if (spawnTable.TryGetRandomEntry(out var entry))
                 {
-                    return prefab;
+                    spawnAnimEffect = entry.spawnAnimEffect;
+                    spawnAnimDuration = entry.spawnAnimDuration;
+                    return entry.prefab;
                 }
 
                 Debug.LogWarning($"{nameof(ChestRandomLootEffect)}: 生成表 {spawnTable.name} 没有可用物品。");

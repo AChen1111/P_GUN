@@ -31,14 +31,24 @@ namespace Game.ItemEffects
             var spawnPosition = room.GetRoomCenterPoint() + worldOffset;
 
             var selectedPrefab = prefab;
-            if (spawnTable != null && spawnTable.TryGetRandomPrefab(out var randomPrefab))
+            var selectedAnimEffect = DOTweenAnimType.None;
+            var selectedAnimDuration = 0f;
+            if (spawnTable != null && spawnTable.TryGetRandomEntry(out var randomEntry))
             {
-                selectedPrefab = randomPrefab;
+                selectedPrefab = randomEntry.prefab;
+                selectedAnimEffect = randomEntry.spawnAnimEffect;
+                selectedAnimDuration = randomEntry.spawnAnimDuration;
             }
 
             if (selectedPrefab == null)
             {
                 Debug.LogWarning($"{nameof(SpawnPrefabFightRoomEndEffectSO)}: prefab 和 spawnTable 都为空。", this);
+                return;
+            }
+
+            if (selectedAnimEffect != DOTweenAnimType.None)
+            {
+                spawner.SpawnItem(selectedPrefab, spawnPosition, selectedAnimEffect, selectedAnimDuration);
                 return;
             }
 

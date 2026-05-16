@@ -20,6 +20,7 @@ namespace Game.Items
         [Header("物品数据")]
         [SerializeField] private int itemId;
         [SerializeField] private ItemDatabase itemDatabase;
+        [SerializeField] private SpriteRenderer iconRenderer;
 
         [Header("拾取状态")]
         [SerializeField] private bool isActive = true;
@@ -65,6 +66,7 @@ namespace Game.Items
             c.isTrigger = true;
             _dotweenAnimation = GetComponent<GameDOTweenAnimation>();
             _animator = GetComponent<Animator>();
+            iconRenderer = GetComponent<SpriteRenderer>();
         }
 
         private void Update()
@@ -135,6 +137,28 @@ namespace Game.Items
         public void OnPickupAnimFinished()
         {
             ApplyEffectsAndDestroy();
+        }
+
+        [ContextMenu("编辑器/从数据库同步物品图标")]
+        public bool EditorApplyIconFromDatabase()
+        {
+            ResolveIconRenderer();
+
+            if (iconRenderer == null)
+            {
+                Debug.LogWarning($"{nameof(Item)}: 未绑定 SpriteRenderer, 无法同步物品图标.", this);
+                return false;
+            }
+
+            if (!TryResolveItemData(out var data))
+            {
+                Debug.LogWarning($"{nameof(Item)}: 未找到 itemId={itemId} 的物品数据, 无法同步物品图标.", this);
+                return false;
+            }
+
+            // 编辑器工具只负责把数据库图标写回 Prefab, 运行时不再重复覆盖.
+            iconRenderer.sprite = data.icon;
+            return true;
         }
 
         private void PickUp()
@@ -229,12 +253,26 @@ namespace Game.Items
 
         private ItemData ResolveItemData()
         {
-            if (itemDatabase != null && itemDatabase.TryGetById(itemId, out var data))
+            return TryResolveItemData(out var data) ? data : default;
+        }
+
+        private bool TryResolveItemData(out ItemData data)
+        {
+            if (itemDatabase != null && itemDatabase.TryGetById(itemId, out data))
             {
-                return data;
+                return true;
             }
 
-            return default;
+            data = default;
+            return false;
+        }
+
+        private void ResolveIconRenderer()
+        {
+            if (iconRenderer != null) return;
+
+            // 默认使用同物体上的 SpriteRenderer, 让 Prefab 不需要额外层级绑定.
+            iconRenderer = GetComponent<SpriteRenderer>();
         }
 
         private static bool IsPlayer(Collider2D other)

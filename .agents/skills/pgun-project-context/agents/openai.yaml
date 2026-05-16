@@ -1,0 +1,4 @@
+interface:
+  display_name: "P_GUN Project Context"
+  short_description: "Read P_GUN coding rules, architecture, and module APIs."
+  default_prompt: "Read the P_GUN project context skill first, then analyze or edit the project."

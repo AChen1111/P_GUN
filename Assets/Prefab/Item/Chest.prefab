@@ -93,9 +93,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemId: 2
   itemDatabase: {fileID: 11400000, guid: d7289ca60b79f7849be1a94d4f3cb4be, type: 2}
+  iconRenderer: {fileID: 4449328502507190729}
   isActive: 1
   effects:
-  - {fileID: 11400000, guid: d2d7b5215687ae04093b2f74130105a9, type: 2}
+  - {fileID: 11400000, guid: e4ce6000bf6f8664495ad3266226322a, type: 2}
   pickupAudio: {fileID: 0}
   _dotweenAnimation: {fileID: 0}
   _animator: {fileID: 0}
@@ -142,7 +143,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 408b85c36220568449ab4093f4b0dbb5, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 3d4ced8e78980334ea3a43c06147b491, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
