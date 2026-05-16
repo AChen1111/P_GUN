@@ -1,34 +1,12 @@
 local DamageUpBuff = {}
 
-local damageMultiplierBonus = 0.5
-
 function DamageUpBuff.OnAdd(runtimeInfo)
-    local player = runtimeInfo.Owner
-    if player == nil then
-        return
-    end
-
-    if runtimeInfo:GetParam("OriginDamageMultiplier") == nil then
-        -- 记录原始增伤系数, 方便 Buff 结束时恢复.
-        runtimeInfo:SetParam("OriginDamageMultiplier", player.damageMultiplier)
-        player.damageMultiplier = player.damageMultiplier + damageMultiplierBonus
-    end
-
+    -- 常规攻击数值由 BuffDataBase 的 Modifier 统一计算.
     CS.UnityEngine.Debug.Log("DamageUpBuff OnAdd")
 end
 
 function DamageUpBuff.OnRemove(runtimeInfo)
-    local player = runtimeInfo.Owner
-    if player == nil then
-        return
-    end
-
-    local originDamageMultiplier = runtimeInfo:GetParam("OriginDamageMultiplier")
-    if originDamageMultiplier ~= nil then
-        -- 恢复进入 Buff 前的增伤系数.
-        player.damageMultiplier = originDamageMultiplier
-    end
-
+    -- 常规攻击数值由 BuffDataBase 的 Modifier 统一计算.
     CS.UnityEngine.Debug.Log("DamageUpBuff OnRemove")
 end
 

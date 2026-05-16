@@ -236,9 +236,10 @@ MonoBehaviour:
   hurtFlashColor: {r: 1, g: 0.35, b: 0.35, a: 1}
   hurtFlashInterval: 0.06
   hurtFlashLoops: 4
+  damageTextPrefab: {fileID: 5634629950418986402, guid: 08da0453f2d8d6148be646576a1ff376, type: 3}
+  damageTextOffset: {x: 0, y: 0.6, z: 0}
   deathRecycleDelay: 3
   itemSpawner: {fileID: 0}
-  itemDropAnimEffectKey: BlinkAnimEffect
   OwnerFightRoom: {fileID: 0}
   audioPlay: {fileID: 0}
   attackDetector: {fileID: 5509645467542371286}

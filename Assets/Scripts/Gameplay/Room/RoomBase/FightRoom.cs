@@ -184,7 +184,6 @@ namespace Game.Gameplay
         public static EnemyBase GetNearestEnemy(Transform playerTransform)
         {
             if(enemyList.Count == 0 || playerTransform == null) return null;
-            Debug.Log("enemyList.Count: " + enemyList.Count);
             EnemyBase nearestEnemy = null;
             float nearestSqrDistance = float.MaxValue;
             List<EnemyBase> invalidEnemies = null;

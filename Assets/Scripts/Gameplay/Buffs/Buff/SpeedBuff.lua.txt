@@ -1,34 +1,12 @@
 local SpeedBuff = {}
 
-local speedUp = 5
-
 function SpeedBuff.OnAdd(runtimeInfo)
-    local player = runtimeInfo.Owner
-    if player == nil then
-        return
-    end
-
-    if runtimeInfo:GetParam("AppliedSpeedUp") == nil then
-        -- 只修改玩家速度增量, 不直接改基础移动速度.
-        runtimeInfo:SetParam("AppliedSpeedUp", speedUp)
-        player.speedUp = player.speedUp + speedUp
-    end
-
+    -- 常规速度数值由 BuffDataBase 的 Modifier 统一计算.
     CS.UnityEngine.Debug.Log("SpeedBuff OnAdd")
 end
 
 function SpeedBuff.OnRemove(runtimeInfo)
-    local player = runtimeInfo.Owner
-    if player == nil then
-        return
-    end
-
-    local appliedSpeedUp = runtimeInfo:GetParam("AppliedSpeedUp")
-    if appliedSpeedUp ~= nil then
-        -- 移除时扣回本 Buff 添加的速度增量.
-        player.speedUp = player.speedUp - appliedSpeedUp
-    end
-
+    -- 常规速度数值由 BuffDataBase 的 Modifier 统一计算.
     CS.UnityEngine.Debug.Log("SpeedBuff OnRemove")
 end
 

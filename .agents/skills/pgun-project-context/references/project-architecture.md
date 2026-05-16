@@ -121,7 +121,16 @@ Locations:
 - `Assets/Scripts/Gameplay/Buffs`
 - `Assets/Scripts/Gameplay/Managers/LuaManager.cs`
 
-`Buff` is serializable config stored inside `BuffDataBase`, not a standalone ScriptableObject. It contains id, display name, Lua file, duration, permanence, and interval.
+`Buff` is serializable config stored inside `BuffDataBase`, not a standalone ScriptableObject. It contains id, display name, Lua file, duration, permanence, interval, and stat modifiers.
+
+Regular stat changes are data-driven through `StatModifier`:
+
+- `StatType`: `MoveSpeed`, `Attack`, `Defense`, `MaxHp`.
+- `ModifierType`: `Flat`, `PercentAdd`, `FinalMul`.
+- Formula: `Final = (Base + FlatSum) * (1 + PercentAddSum) * FinalMulProduct`.
+- `MoveSpeed`, `Attack`, and `MaxHp` are currently wired into `Player`; `Defense` is reserved and does not affect `Player.Hurt()` until a damage reduction rule is defined.
+- Buff CSV `modifiers` format is `StatType:ModifierType:Value;StatType:ModifierType:Value`, for example `MoveSpeed:PercentAdd:0.3`.
+- Lua Buff scripts should handle special lifecycle behavior only; regular speed, attack, and max HP changes should stay in `Buff.Modifiers`.
 
 `BuffManager` lives on the player and manages runtime buff instances. Important APIs:
 
@@ -133,6 +142,7 @@ Locations:
 - `RemoveBuffById(int buffId)`
 - `TriggerBuffById(int buffId)`
 - `ClearBuffs()`
+- `CalculateStat(StatType statType, float baseValue)`
 
 If a buff already exists, adding it resets duration and triggers `OnAdd` again.
 
@@ -225,6 +235,12 @@ Presentation classes include:
 - `BloodVfx`
 - `VfxPool`
 - `GlobalAudioPlay`
+- `DamageText`
+- `DamageTextPool`
+
+`DamageText` is the world-space damage-number presentation component. It requires `TextMeshPro`, implements `IPoolable`, randomizes local offset and font size per play, then uses DOTween for rise, scale, and fade animation. It invokes `OnComplete` when playback ends.
+
+`DamageTextPool` is a `PoolBase<DamageText>` wrapper. Add it to the gameplay scene through Unity scene setup, assign the `DamageText` prefab in `prefabInfos`, and configure active/inactive roots like other pools. Gameplay callers should pass final damage and world position to `DamageTextPool.Play`; they should not instantiate damage text directly.
 
 ## UI
 
