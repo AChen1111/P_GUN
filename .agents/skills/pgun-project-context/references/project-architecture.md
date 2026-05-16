@@ -242,6 +242,23 @@ Presentation classes include:
 
 `DamageTextPool` is a `PoolBase<DamageText>` wrapper. Add it to the gameplay scene through Unity scene setup, assign the `DamageText` prefab in `prefabInfos`, and configure active/inactive roots like other pools. Gameplay callers should pass final damage and world position to `DamageTextPool.Play`; they should not instantiate damage text directly.
 
+Visual animation sequences live in `Assets/Scripts/DOTween/Sequence` under `Game.Animation`:
+
+- `AnimationSequenceAsset`: ScriptableObject containing ordered `AnimationStepData` entries.
+- `AnimationStepData`: target reference/path, startup active state, `AnimationEffectType`, duration, delay, Ease, and effect parameters.
+- `AnimationPlayer`: scene MonoBehaviour that references a sequence asset, appends each step into one DOTween `Sequence`, and exposes an Inspector `UnityEvent` after all steps complete.
+- `AnimationTweenFactory`: the only runtime class that builds concrete Tween logic for Fade, Slide, Shake, Scale, Move, and Rotate effects.
+- `AnimationSequenceEditorWindow`: editor-only data window in `Assets/Editor/AnimationSequence`, opened from `Tools/Animation Sequence Editor`.
+
+Rules:
+
+- Keep concrete animation behavior out of EditorWindow code.
+- Prefer assigning `AnimationPlayer.bindingRoot` when sequence steps target scene objects, because project assets cannot reliably persist scene object references.
+- `AnimationStartupActiveState` is applied once by `AnimationPlayer` during startup or first enable; each step sets its resolved target `activeSelf=true` when that step starts.
+- Fade effects require `CanvasGroup`; steps may auto-add it when configured.
+- RectTransform position effects use `anchoredPosition3D` first, normal Transform targets use `localPosition`.
+- `restoreOnComplete` restores captured position, scale, rotation, and existing CanvasGroup alpha after playback.
+
 ## UI
 
 Locations:

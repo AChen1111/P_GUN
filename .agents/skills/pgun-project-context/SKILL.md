@@ -36,6 +36,7 @@ P_GUN is a Unity 2022.3 2D top-down shooter project. Runtime code is split by as
 - For runtime cross-system notifications, prefer `Game.Core.EventCenter` and existing `GameEvent` values before adding new singleton coupling.
 - For pooled objects, implement and reset state through `IPoolable.OnSpawnFromPool()` and `IPoolable.OnRecycleToPool()`.
 - Damage number presentation belongs to `Game.Presentation`: enemies pass final damage and world position to `DamageTextPool`, while the `DamageText` prefab script owns random font size, offset, tween playback, and recycle callback.
+- Visual animation sequences belong to `Game.Animation`: runtime scripts live in `Assets/Scripts/DOTween/Sequence`, sequence assets are `AnimationSequenceAsset`, playback is handled by scene `AnimationPlayer`, and editor data editing lives in `Assets/Editor/AnimationSequence`.
 - For databases, prefer `ScriptableObjectDatabase<TDatabase, TKey, TValue>` and `TryGetById` patterns instead of ad hoc list scans.
 - For regular Buff stat changes, configure `StatModifier` data on `Buff` and calculate through `BuffManager`; do not let Lua directly mutate player speed, attack, or max HP fields.
 - For editor table import, prefer extending `Excel2SoListAssetImporter<TAsset>` or `ExcelTableImporterBase` in `Assets/Editor`.
