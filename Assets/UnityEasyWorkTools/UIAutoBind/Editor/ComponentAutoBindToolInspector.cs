@@ -763,6 +763,7 @@ public class ComponentAutoBindToolInspector : Editor
         using (StreamWriter sw = new StreamWriter($"{codePath}/{className}.BindComponent.cs"))
         {
             sw.WriteLine("using UnityEngine;");
+            sw.WriteLine("using TMPro;");
             sw.WriteLine("using UnityEngine.UI;");
             sw.WriteLine("");
             sw.WriteLine("// 自动生成于: " + DateTime.Now);

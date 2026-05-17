@@ -6,6 +6,7 @@
     "Game.Items",
     "Game.Gameplay",
     "ComponentAutoBindTool.Runtime",
+    "Unity.TextMeshPro",
     "QFramework",
     "QFramework.CoreKit"
   ],
