@@ -15,8 +15,14 @@ namespace Game.UI
                 return;
             }
 
+            UIStackManager stackManager = UIStackManager.Instance;
+            if (stackManager == null)
+            {
+                return;
+            }
+
             // 每个场景初始化时清空旧栈, 并压入当前场景主面板.
-            UIStackManager.Instance.Initialize(mainPanel);
+            stackManager.Initialize(mainPanel);
         }
     }
 }

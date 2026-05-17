@@ -36,7 +36,7 @@ public class DefaultAutoBindRuleHelper : IAutoBindRuleHelper
         {"Tog","Toggle"},
         {"Sbar","Scrollbar"},
         {"SRect","ScrollRect"},
-        {"Drop","Dropdown"},
+        {"Drop","TMP_Dropdown"},
     };
 
     public bool IsValidBind( Transform target, List<string> filedNames, List<string> componentTypeNames)

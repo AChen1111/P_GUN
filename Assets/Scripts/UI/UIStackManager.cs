@@ -31,11 +31,14 @@ namespace Game.UI
                     return null;
                 }
 
-                // 没有预制管理器时自动创建单例.
-                var managerObject = new GameObject(nameof(UIStackManager));
-                instance = managerObject.AddComponent<UIStackManager>();
-                
-                DontDestroyOnLoad(managerObject);
+                // UIStackManager必须由场景显式配置, 避免运行时动态创建管理器.
+                instance = FindObjectOfType<UIStackManager>();
+
+                if (instance == null)
+                {
+                    Debug.LogError("UIStackManager获取失败, 请在场景中添加并绑定UIStackManager.");
+                }
+
                 return instance;
             }
         }
