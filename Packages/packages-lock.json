@@ -21,12 +21,6 @@
       },
       "url": "https://package.openupm.com"
     },
-    "com.achen.excel2so": {
-      "version": "file:com.pgun.excel2so",
-      "depth": 0,
-      "source": "embedded",
-      "dependencies": {}
-    },
     "com.unity.2d.animation": {
       "version": "9.2.0",
       "depth": 1,
