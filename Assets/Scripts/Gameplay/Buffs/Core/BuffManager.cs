@@ -28,6 +28,8 @@ namespace Game.Gameplay
 
         private Player owner;
 
+        public IReadOnlyList<BuffRuntimeInfo> ActiveBuffs => buffs;
+
         private void Awake()
         {
             owner = GetComponent<Player>();
@@ -101,9 +103,21 @@ namespace Game.Gameplay
             var previousMaxHp = GetOwnerMaxHp();
             if (buffInfoMap.TryGetValue(buff.Id, out var existing))
             {
-                ResetBuffRuntimeInfo(existing, buff, source);
+                if (buff.IsPermanent)
+                {
+                    // 永久 Buff 重复获得时只增加层数, 保留 Lua 运行时状态.
+                    existing.Source = source;
+                    existing.StackCount += 1;
+                    existing.IsPermanent = true;
+                }
+                else
+                {
+                    ResetBuffRuntimeInfo(existing, buff, source);
+                }
+
                 TriggerOnAdd(existing);
                 NotifyOwnerStatsChanged(previousMaxHp);
+                NotifyBuffsChanged();
                 return existing;
             }
 
@@ -115,6 +129,7 @@ namespace Game.Gameplay
             buffInfoMap[buff.Id] = info;
             TriggerOnAdd(info);
             NotifyOwnerStatsChanged(previousMaxHp);
+            NotifyBuffsChanged();
             return info;
         }
 
@@ -144,6 +159,7 @@ namespace Game.Gameplay
             info.LuaInstance?.Dispose();
             RemoveAt(info.Index);
             NotifyOwnerStatsChanged(previousMaxHp);
+            NotifyBuffsChanged();
             return true;
         }
 
@@ -174,6 +190,7 @@ namespace Game.Gameplay
 
             buffInfoMap.Clear();
             NotifyOwnerStatsChanged(previousMaxHp);
+            NotifyBuffsChanged();
         }
 
         /// <summary>
@@ -190,6 +207,7 @@ namespace Game.Gameplay
 
             for (var i = 0; i < buffs.Count; i++)
             {
+                var stackCount = Mathf.Max(1, buffs[i].StackCount);
                 var modifiers = buffs[i].Buff.Modifiers;
                 for (var j = 0; j < modifiers.Count; j++)
                 {
@@ -200,13 +218,16 @@ namespace Game.Gameplay
                     switch (modifier.ModifierType)
                     {
                         case ModifierType.Flat:
-                            flat += modifier.Value;
+                            flat += modifier.Value * stackCount;
                             break;
                         case ModifierType.PercentAdd:
-                            percentAdd += modifier.Value;
+                            percentAdd += modifier.Value * stackCount;
                             break;
                         case ModifierType.FinalMul:
-                            finalMul *= modifier.Value;
+                            for (var stackIndex = 0; stackIndex < stackCount; stackIndex++)
+                            {
+                                finalMul *= modifier.Value;
+                            }
                             break;
                     }
                 }
@@ -302,6 +323,7 @@ namespace Game.Gameplay
             info.Interval = buff.Interval;
             info.IntervalTimer = 0f;
             info.IsPermanent = buff.IsPermanent;
+            info.StackCount = 1;
         }
 
     #endregion
@@ -326,6 +348,14 @@ namespace Game.Gameplay
         {
             var target = owner != null ? owner : Global.player;
             target?.OnBuffStatsChanged(previousMaxHp);
+        }
+
+        /// <summary>
+        /// 通知 UI 当前 Buff 列表或层数已经变化.
+        /// </summary>
+        private static void NotifyBuffsChanged()
+        {
+            EventCenter.Trigger(GameEvent.PlayerBuffsChanged);
         }
 
     #endregion

@@ -23,6 +23,7 @@ namespace Game.Gameplay
         public float Interval;
         public float IntervalTimer;
         public bool IsPermanent;
+        public int StackCount = 1;
         public int Index;
 
         /// <summary>

@@ -45,12 +45,6 @@ MonoBehaviour:
     - rooms
     - scene_level1
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 8c9cfa26abfee488c85f1582747f6a02
-    m_Address: scene/game
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - scene_level1
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: c3725d4757effc442acdafa92d4d4329
     m_Address: room/normal
     m_ReadOnly: 0

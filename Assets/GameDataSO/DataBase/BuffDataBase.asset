@@ -15,21 +15,25 @@ MonoBehaviour:
   buffs:
   - id: 0
     buffName: SpeedUpBuff
+    icon: {fileID: -19087736, guid: bf817939e9a0a3241b3cf68a375367e7, type: 3}
+    description: "\u79FB\u52A8\u901F\u5EA6\u63D0\u534730%."
     luaFile: {fileID: 4900000, guid: 648678a33bef4bec9cd2e901e934f017, type: 3}
-    duration: 4
+    duration: 5
     isPermanent: 0
     interval: 1
     modifiers:
     - statType: 0
       modifierType: 1
-      value: 5
+      value: 0.3
   - id: 1
     buffName: PowerUpBuff
+    icon: {fileID: -1427955363, guid: bf817939e9a0a3241b3cf68a375367e7, type: 3}
+    description: "\u5B50\u5F39\u4F24\u5BB3\u63D0\u534750%."
     luaFile: {fileID: 4900000, guid: bfef84428f614290a92f0716f6fd7171, type: 3}
-    duration: 3
+    duration: 5
     isPermanent: 0
     interval: 1
     modifiers:
     - statType: 1
       modifierType: 1
-      value: 20
+      value: 0.5

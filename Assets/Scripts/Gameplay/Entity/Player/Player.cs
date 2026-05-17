@@ -78,6 +78,7 @@ namespace Game.Gameplay
 
         Transform _autoAimTarget;
         bool isGameEnded;
+        bool wasMouseCombatBlocked;
 
 
         public int MaxHP => Mathf.Max(0, Mathf.RoundToInt(CalculateBuffedStat(StatType.MaxHp, maxHp)));
@@ -119,19 +120,23 @@ namespace Game.Gameplay
                 return;
             }
 
-            //获取鼠标位置
-            var mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            //获取鼠标位置与角色位置的向量
-            Vector2 dir = (mousePosition - transform.position).normalized;
+            var mouseCombatBlocked = GameplayCursorState.BlocksMouseCombat;
+            Vector2 dir = Weapon != null ? Weapon.right : Vector2.right;
 
-            //自动瞄准命中目标时，优先使用锁定目标方向
-            AutoAim(ref dir);
+            if (!mouseCombatBlocked)
+            {
+                // 获取鼠标瞄准方向, 鼠标被 UI 接管时完全跳过瞄准刷新.
+                var mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                dir = (mousePosition - transform.position).normalized;
 
-            //转成欧拉角
-            float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
-            //设置武器旋转
-            Weapon.localRotation = Quaternion.Euler(0, 0, angle);
-            Weapon.localScale = new Vector3(1, dir.x > 0 ? 1 : -1,1);
+                // 自动瞄准命中目标时, 优先使用锁定目标方向.
+                AutoAim(ref dir);
+                ApplyWeaponDirection(dir);
+            }
+            else
+            {
+                HideAutoAimIndicator();
+            }
 
             var horizontal = Input.GetAxisRaw("Horizontal");
             var vertical = Input.GetAxisRaw("Vertical");
@@ -179,7 +184,8 @@ namespace Game.Gameplay
                 sr.flipX = false;
             }
 
-            HandleCombatInput(dir);
+            HandleMouseCombatBlockTransition(mouseCombatBlocked, dir);
+            HandleCombatInput(dir, mouseCombatBlocked);
         }
 
         void OnDestroy()
@@ -271,16 +277,19 @@ namespace Game.Gameplay
 
         #region Input And Combat
 
-        void HandleCombatInput(Vector2 dir)
+        void HandleCombatInput(Vector2 dir, bool mouseCombatBlocked)
         {
-            if (Input.GetMouseButtonDown(0))
-                gun.ShootDown(dir);
+            if (!mouseCombatBlocked)
+            {
+                if (Input.GetMouseButtonDown(0))
+                    gun.ShootDown(dir);
 
-            if (Input.GetMouseButtonUp(0))
-                gun.ShootUp(dir);
+                if (Input.GetMouseButtonUp(0))
+                    gun.ShootUp(dir);
 
-            if (Input.GetMouseButton(0))
-                gun.Shooting(dir);
+                if (Input.GetMouseButton(0))
+                    gun.Shooting(dir);
+            }
 
             if (Input.GetKeyDown(KeyCode.R))
                 gun.Reload();
@@ -308,6 +317,25 @@ namespace Game.Gameplay
 
             if (Input.GetKeyDown(KeyCode.M))
                 EventCenter.Trigger(GameEvent.MiniMapToggleRequested);
+        }
+
+        private void ApplyWeaponDirection(Vector2 dir)
+        {
+            // 武器朝向只由鼠标战斗输入驱动, Ctrl 和设置面板打开时保持原方向.
+            float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+            Weapon.localRotation = Quaternion.Euler(0, 0, angle);
+            Weapon.localScale = new Vector3(1, dir.x > 0 ? 1 : -1, 1);
+        }
+
+        private void HandleMouseCombatBlockTransition(bool mouseCombatBlocked, Vector2 dir)
+        {
+            if (mouseCombatBlocked && !wasMouseCombatBlocked)
+            {
+                // 连射武器在鼠标被 UI 接管时补一次抬起, 避免保留射击状态.
+                gun?.ShootUp(dir);
+            }
+
+            wasMouseCombatBlocked = mouseCombatBlocked;
         }
 
         #endregion
@@ -599,6 +627,14 @@ namespace Game.Gameplay
         {
             canAutoAim = !canAutoAim;
             ShowDisPlayer("自动瞄准: " + (canAutoAim ? "开启" : "关闭"), 1f);
+        }
+
+        private void HideAutoAimIndicator()
+        {
+            if (AimPrefab != null)
+            {
+                AimPrefab.SetActive(false);
+            }
         }
 
         #endregion
