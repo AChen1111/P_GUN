@@ -10,7 +10,9 @@ Important external packages and conventions:
 - DOTween is used for runtime animation feedback.
 - Addressables are used for loading global databases.
 - xLua is used by the Buff system.
-- `Packages/com.pgun.excel2so` is an embedded Unity Editor package for importing `.xlsx` and `.csv` into ScriptableObject assets.
+- `Assets/UnityEasyWorkTools` is the shared editor tooling suite, currently containing visual animation sequences, UI auto binding, and table import tools.
+- `Assets/UnityEasyWorkTools/UnityEasyWorkToolsPathSettings.asset` stores editable default paths for UnityEasyWorkTools. Open it through `Tools/UnityEasyWorkTools/Settings/Open Path Settings`.
+- UnityEasyWorkTools editor UI uses UI Toolkit. `.uxml` and `.uss` files are kept in each module's `Editor/UI` folder; C# editor scripts bind serialized data and implement commands.
 
 ## Core Module
 
@@ -242,13 +244,18 @@ Presentation classes include:
 
 `DamageTextPool` is a `PoolBase<DamageText>` wrapper. Add it to the gameplay scene through Unity scene setup, assign the `DamageText` prefab in `prefabInfos`, and configure active/inactive roots like other pools. Gameplay callers should pass final damage and world position to `DamageTextPool.Play`; they should not instantiate damage text directly.
 
-Visual animation sequences live in `Assets/Scripts/DOTween/Sequence` under `Game.Animation`:
+Visual animation sequences live in `Assets/UnityEasyWorkTools/AnimationSequence` under `Game.Animation`:
+
+- Runtime scripts and `Game.AnimationSequence.asmdef`: `Assets/UnityEasyWorkTools/AnimationSequence/Scripts`.
+- Editor scripts and `Game.AnimationSequence.Editor.asmdef`: `Assets/UnityEasyWorkTools/AnimationSequence/Editor`.
+- Editor UI resources: `Assets/UnityEasyWorkTools/AnimationSequence/Editor/UI`.
 
 - `AnimationSequenceAsset`: ScriptableObject containing ordered `AnimationStepData` entries.
 - `AnimationStepData`: target reference/path, startup active state, `AnimationEffectType`, duration, delay, Ease, and effect parameters.
 - `AnimationPlayer`: scene MonoBehaviour that references a sequence asset, appends each step into one DOTween `Sequence`, and exposes an Inspector `UnityEvent` after all steps complete.
 - `AnimationTweenFactory`: the only runtime class that builds concrete Tween logic for Fade, Slide, Shake, Scale, Move, and Rotate effects.
-- `AnimationSequenceEditorWindow`: editor-only data window in `Assets/Editor/AnimationSequence`, opened from `Tools/Animation Sequence Editor`.
+- `AnimationSequenceEditorWindow`: editor-only data window opened from `Tools/UnityEasyWorkTools/Animation Sequence Editor`.
+- `UnityEasyWorkToolsPathSettings`: shared editor SO that controls animation asset output folder, UI auto-bind setting path, table importer UI paths, code-generation folders, and project table default asset paths.
 
 Rules:
 
@@ -264,6 +271,7 @@ Rules:
 Locations:
 
 - `Assets/Scripts/UI`
+- `Assets/UnityEasyWorkTools/UIAutoBind`
 
 UI uses `Game.UI` namespace. The current stack includes:
 
@@ -282,18 +290,32 @@ The item UI flow is event-driven:
 
 When adding UI, use existing event flow before adding direct scene references.
 
+UI auto binding tooling lives in `Assets/UnityEasyWorkTools/UIAutoBind`:
+
+- Runtime scripts and `ComponentAutoBindTool.Runtime.asmdef`: `Assets/UnityEasyWorkTools/UIAutoBind/Scripts`.
+- Editor scripts and `ComponentAutoBindTool.Editor.asmdef`: `Assets/UnityEasyWorkTools/UIAutoBind/Editor`.
+- Editor UI resources: `Assets/UnityEasyWorkTools/UIAutoBind/Editor/UI`.
+- `AutoBindGlobalSetting.asset`: `Assets/UnityEasyWorkTools/UIAutoBind/AutoBindGlobalSetting.asset`.
+
+Rules:
+
+- Keep the asmdef names `ComponentAutoBindTool.Runtime` and `ComponentAutoBindTool.Editor`, because generated UI code and `Game.UI.asmdef` reference them by assembly name.
+- Preserve script `.meta` files when moving or reorganizing this tooling, because scene/prefab `ComponentAutoBindTool` component references depend on script GUIDs.
+- Generated `*.BindComponent.cs` files may stay in the owning UI panel folder, such as `Assets/Scripts/UI/Panel`.
+
 ## Excel2SO
 
 Locations:
 
-- Package: `Packages/com.pgun.excel2so`
-- Project importers: `Assets/Editor/Excel2SOImporters`
+- Core editor tooling: `Assets/UnityEasyWorkTools/TableImporter/Editor`
+- Project importers: `Assets/UnityEasyWorkTools/TableImporter/Importers`
+- Editor UI resources: `Assets/UnityEasyWorkTools/TableImporter/Editor/UI`
 
-Excel2SO converts `.xlsx` and `.csv` table data into ScriptableObject assets in the Unity Editor. Open via `Tools/Excel2SO/Importer Window`.
+TableImporter converts `.xlsx` and `.csv` table data into ScriptableObject assets in the Unity Editor. Open via `Tools/UnityEasyWorkTools/Table Importer/Importer Window`.
 
 Typical importer flow:
 
-1. Create a project importer under `Assets/Editor`.
+1. Create a project importer under `Assets/UnityEasyWorkTools/TableImporter/Importers`.
 2. Inherit `Excel2SoListAssetImporter<TAsset>` for database/list assets, or `ExcelTableImporterBase` for custom table behavior.
 3. Override `Configure(Excel2SoMapping map)`.
 4. Map columns to serialized fields.
@@ -312,7 +334,7 @@ Addressable database keys are currently string fields in `DataBaseManager`:
 - `"BuffDataBase"`
 - `"EnemyDatabase"`
 
-`Assets/Editor/AddressablesLocalGroupSetup.cs` and `Assets/Editor/AddressablesLabelTableImporter.cs` support editor-side Addressables setup/import. Preserve labels and database keys when moving assets.
+`Assets/Editor/AddressablesLocalGroupSetup.cs` and `Assets/UnityEasyWorkTools/TableImporter/Importers/AddressablesLabelTableImporter.cs` support editor-side Addressables setup/import. Preserve labels and database keys when moving assets.
 
 ## Current Refactor Notes
 
