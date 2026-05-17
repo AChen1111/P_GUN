@@ -61,8 +61,6 @@ namespace Game.UI
             }
 
             instance = this;
-            // UI栈管理器跨场景存在, 场景切换时只清空面板引用.
-            DontDestroyOnLoad(gameObject);
         }
 
         private void OnEnable()

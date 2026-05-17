@@ -16,6 +16,8 @@ namespace Game.UI
         [Header("UI元素")]
         public GameObject WinPanel;
         public GameObject OverPanel;
+        [SerializeField] private UIPanelBase winStackPanel;
+        [SerializeField] private UIPanelBase overStackPanel;
         [Header("小地图")]
         public GameObject MiniMap;
         [Header("物品提示")]
@@ -64,12 +66,12 @@ namespace Game.UI
 
         public void ShowWinPanel()
         {
-            WinPanel.SetActive(true);
+            PushStackPanel(WinPanel, ref winStackPanel);
             Time.timeScale = 0;
         }
         public void ShowOverPanel()
         {
-            OverPanel.SetActive(true);
+            PushStackPanel(OverPanel, ref overStackPanel);
             Time.timeScale = 0;
         }
 
@@ -157,6 +159,33 @@ namespace Game.UI
             if (itemTipPanel == null)
             {
                 itemTipPanel = ItemTipPanel.CreateDefault(transform);
+            }
+        }
+
+        private void PushStackPanel(GameObject panelObject, ref UIPanelBase cachedPanel)
+        {
+            if (panelObject == null)
+            {
+                Debug.LogError("打开栈式面板失败, 面板对象未绑定.", this);
+                return;
+            }
+
+            if (cachedPanel == null && !panelObject.TryGetComponent(out cachedPanel))
+            {
+                Debug.LogError($"打开栈式面板失败, {panelObject.name} 缺少 UIPanelBase 组件.", panelObject);
+                return;
+            }
+
+            UIStackManager stackManager = UIStackManager.Instance;
+            if (stackManager == null)
+            {
+                return;
+            }
+
+            // 胜利和失败面板统一作为栈式弹窗打开.
+            if (stackManager.Peek() != cachedPanel)
+            {
+                stackManager.Push(cachedPanel);
             }
         }
 

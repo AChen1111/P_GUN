@@ -18,6 +18,13 @@ namespace Game.Gameplay
         [Tooltip("Buff 的显示名称. 如果为空, 会使用 id.")]
         [SerializeField] private string buffName = string.Empty;
 
+        [Tooltip("Buff 在状态栏中显示的图标.")]
+        [SerializeField] private Sprite icon = null;
+
+        [TextArea]
+        [Tooltip("Buff 的 UI 描述文本.")]
+        [SerializeField] private string description = string.Empty;
+
         [Tooltip("Buff 绑定的 Lua 文件, 文件需要返回包含生命周期方法的 table.")]
         [SerializeField] private TextAsset luaFile = null;
 
@@ -39,6 +46,8 @@ namespace Game.Gameplay
 
         public int Id => id;
         public string BuffName => string.IsNullOrWhiteSpace(buffName) ? id.ToString() : buffName;
+        public Sprite Icon => icon;
+        public string Description => description;
         public TextAsset LuaFile => luaFile;
         public float Duration => Mathf.Max(0f, duration);
         public bool IsPermanent => isPermanent;

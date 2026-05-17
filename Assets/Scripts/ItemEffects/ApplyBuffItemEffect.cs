@@ -24,10 +24,11 @@ namespace Game.ItemEffects
             var manager = player.GetComponent<BuffManager>();
             if (manager == null)
             {
-                manager = player.gameObject.AddComponent<BuffManager>();
+                Debug.LogError("ApplyBuffItemEffect生效失败, Player预制体缺少BuffManager组件.", player);
+                return;
             }
 
-            var info = manager.AddBuff(targetBuff);
+            var info = manager.AddBuff(targetBuff, ctx.SourceObject != null ? ctx.SourceObject : this);
             if (info == null || !showHeadMessage) return;
 
             EventCenter.Trigger(GameEvent.PlayerHeadMessageRequested, new PlayerHeadMessageEvent($"{info.Buff.BuffName} 生效", 1.5f));

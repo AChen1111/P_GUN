@@ -19,6 +19,8 @@ public sealed class BuffDatabaseExcelImporter : Excel2SoListAssetImporter<BuffDa
     {
         map.Column("id").To("id").AsInt();
         map.Column("buffName").To("buffName").AsString();
+        map.Column("icon").To("icon").AsAsset<Sprite>();
+        map.Column("description").To("description").AsString();
         map.Column("luaFile").To("luaFile").AsAsset<TextAsset>();
         map.Column("duration").To("duration").AsFloat();
         map.Column("isPermanent").To("isPermanent").AsBool();

@@ -5,8 +5,9 @@ namespace Game.UI
 
 	public partial class SettingPanel : UIPanelBase
 	{
-		private void Awake()
+		protected override void Awake()
 		{
+			base.Awake();
 			GetBindComponents(gameObject);
 		}
 	}

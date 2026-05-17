@@ -34,6 +34,8 @@ P_GUN is a Unity 2022.3 2D top-down shooter project. Runtime code is split by as
 - Preserve existing serialized field names where possible, because Unity scene and prefab references depend on them.
 - Do not rename or move Unity assets, `.meta` files, asmdefs, scenes, or prefabs unless the task requires it.
 - For runtime cross-system notifications, prefer `Game.Core.EventCenter` and existing `GameEvent` values before adding new singleton coupling.
+- Buff 状态栏 UI lives in `Assets/Scripts/UI/Buffs` and `Assets/Prefab/UI/Buff`; it reads `BuffManager.ActiveBuffs` after `GameEvent.PlayerBuffsChanged` and must not maintain separate Buff display data.
+- `GameScene` UI uses an explicit scene `UIStackManager` plus `UIStackInitializer`; HUD is the stack bottom and modal panels such as settings, win, and over panels are pushed through the stack.
 - For pooled objects, implement and reset state through `IPoolable.OnSpawnFromPool()` and `IPoolable.OnRecycleToPool()`.
 - Damage number presentation belongs to `Game.Presentation`: enemies pass final damage and world position to `DamageTextPool`, while the `DamageText` prefab script owns random font size, offset, tween playback, and recycle callback.
 - UnityEasyWorkTools is the shared editor tooling suite under `Assets/UnityEasyWorkTools`, currently containing `AnimationSequence`, `UIAutoBind`, and `TableImporter`.

@@ -29,7 +29,7 @@ Known subclasses:
 
 `EventCenter` is the simple static event bus. Use `AddListener`, `RemoveListener`, and `Trigger` with `GameEvent`. Payload events are generic, so listener payload types must match trigger payload types.
 
-Current `GameEvent` includes player health/death/game events, minimap show/hide/toggle, item tip show/hide, item picked, bullet clip/bag changes, door open/close, and room generation completion.
+Current `GameEvent` includes player health/death/game events, player Buff changes, minimap show/hide/toggle, item tip show/hide, item picked, bullet clip/bag changes, door open/close, and room generation completion.
 
 ## Database Loading
 
@@ -123,7 +123,7 @@ Locations:
 - `Assets/Scripts/Gameplay/Buffs`
 - `Assets/Scripts/Gameplay/Managers/LuaManager.cs`
 
-`Buff` is serializable config stored inside `BuffDataBase`, not a standalone ScriptableObject. It contains id, display name, Lua file, duration, permanence, interval, and stat modifiers.
+`Buff` is serializable config stored inside `BuffDataBase`, not a standalone ScriptableObject. It contains id, display name, icon, description, Lua file, duration, permanence, interval, and stat modifiers.
 
 Regular stat changes are data-driven through `StatModifier`:
 
@@ -145,8 +145,9 @@ Regular stat changes are data-driven through `StatModifier`:
 - `TriggerBuffById(int buffId)`
 - `ClearBuffs()`
 - `CalculateStat(StatType statType, float baseValue)`
+- `ActiveBuffs`
 
-If a buff already exists, adding it resets duration and triggers `OnAdd` again.
+If a non-permanent buff already exists, adding it resets duration and triggers `OnAdd` again. If a permanent buff already exists, adding it increments `BuffRuntimeInfo.StackCount`; stat modifiers scale by stack count, with `FinalMul` repeated once per stack. Add, remove, and clear operations trigger `GameEvent.PlayerBuffsChanged` for UI refresh.
 
 `LuaBuffInstance` caches optional Lua methods:
 
@@ -287,6 +288,20 @@ The item UI flow is event-driven:
 - `Item` triggers `GameEvent.ItemTipShown` with `ItemData`.
 - `Item` triggers `GameEvent.ItemTipHidden`.
 - UI listens and updates tip visibility/content.
+
+Buff status UI lives in `Assets/Scripts/UI/Buffs`:
+
+- `BuffStatusPanel` listens for `GameEvent.PlayerBuffsChanged`, reads `Global.player.buffManager.ActiveBuffs`, and creates one status icon per active Buff.
+- `BuffStatusIcon` displays `Buff.Icon` and either remaining seconds for non-permanent Buffs or `StackCount` for permanent Buffs.
+- `BuffTooltipPanel` shows `Buff.BuffName` and `Buff.Description` on hover.
+
+Game scene UI stack rules:
+
+- `GameScene` has an explicit scene `UIStackManager` and `UIStackInitializer`.
+- `HudPanel` is the stack bottom and contains existing HP, bullet, minimap, item tip, and Buff status UI.
+- Win, over, and game settings panels are `UIPanelBase` panels opened with `UIStackManager.Push()`.
+- `GameSceneUIInputController` belongs to the scene `GameUI` object, opens the settings panel with Esc, pauses by preserving/restoring `Time.timeScale`, and updates `GameplayCursorState`.
+- `GameplayCursorState` is in `Game.Core`; Player must check `BlocksMouseCombat` before mouse aiming, auto-aim display, and mouse shooting.
 
 When adding UI, use existing event flow before adding direct scene references.
 
