@@ -1766,12 +1766,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 57eb7c15612322c4b929a325ad4bc16a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BindDatas: []
+  BindDatas:
+  - Name: Btn_Start
+    BindCom: {fileID: 2007929160}
+  - Name: Btn_Load
+    BindCom: {fileID: 624397592}
+  - Name: Btn_Setting
+    BindCom: {fileID: 12869278}
+  - Name: Btn_Quit
+    BindCom: {fileID: 823752875}
   m_ClassName: MainPanel
   m_Namespace: Game.UI
   m_CodePath: D:/GameWorkplace/Doing/P_GUN/Assets/Scripts/UI/Panel
   m_BaseClassName: MonoBehaviour
-  m_BindComs: []
+  m_BindComs:
+  - {fileID: 2007929160}
+  - {fileID: 624397592}
+  - {fileID: 12869278}
+  - {fileID: 823752875}
 --- !u!114 &1794182715
 MonoBehaviour:
   m_ObjectHideFlags: 0
