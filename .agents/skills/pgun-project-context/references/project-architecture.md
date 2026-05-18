@@ -8,7 +8,7 @@ Important external packages and conventions:
 
 - QFramework is used for `ViewController`, FSM, UI tooling, and utility extensions.
 - DOTween is used for runtime animation feedback.
-- Addressables are used for loading global databases.
+- Addressables are used for loading hot-update databases, room data, item prefabs, enemy prefabs, and weapon prefabs.
 - xLua is used by the Buff system.
 - `Assets/UnityEasyWorkTools` is the shared editor tooling suite, currently containing visual animation sequences, UI auto binding, and table import tools.
 - `Assets/UnityEasyWorkTools/UnityEasyWorkToolsPathSettings.asset` stores editable default paths for UnityEasyWorkTools. Open it through `Tools/UnityEasyWorkTools/Settings/Open Path Settings`.
@@ -35,14 +35,14 @@ Current `GameEvent` includes player health/death/game events, player Buff change
 
 Location: `Assets/Scripts/Gameplay/Managers/DataBaseManager.cs`
 
-`DataBaseManager` is a persistent singleton that loads global databases through Addressables:
+`DataBaseManager` is a persistent singleton that lives in the `Root` scene and loads global databases through Addressables:
 
 - `ItemDatabase`
 - `WeaponDatabase`
 - `BuffDataBase`
 - `EnemyDatabase`
 
-Call `LoadAllAsync()` before gameplay that depends on data. Runtime systems typically prefer explicitly assigned database references, then fall back to `DataBaseManager.Instance`.
+Call `LoadAllAsync()` from `RootHotUpdateController` before entering gameplay. Runtime systems typically prefer explicitly assigned database references, then fall back to `DataBaseManager.Instance`; `Item` can also use `ItemDatabase.RuntimeDatabase` after `DataBaseManager` finishes loading.
 
 ## Pooling
 
@@ -87,7 +87,7 @@ Locations:
 
 `ItemDatabase` stores all `ItemData` and queries by `itemId`.
 
-`ItemSpawnTableSO` stores weighted prefab entries. It returns a prefab through `TryGetRandomPrefab(out GameObject prefab)`. It does not own display data.
+`ItemSpawnTableSO` stores weighted prefab entries. Entries may use `itemId`, Addressables address, or a legacy direct prefab reference. Runtime spawning should resolve prefabs through `TryResolvePrefab` or `TryGetRandomPrefab`, because these APIs prefer `AddressableRuntimeContent` hot-update prefabs before falling back to legacy references. It does not own display data.
 
 `Item` is the runtime pickup component. It:
 
@@ -200,6 +200,8 @@ Important `Gun` concepts:
 
 Known concrete weapons include AK, AWP, Bow, Laser, MP5, Pistol, RocketGun, and ShotGun.
 
+At runtime, the `Player` first checks `AddressableRuntimeContent` for the fixed weapon address order `weapon/pistol`, `weapon/ak`, `weapon/awp`, `weapon/bow`, `weapon/laser`, `weapon/mp5`, `weapon/rocket_gun`, `weapon/shotgun`. When the Root preload is ready, those prefabs are instantiated under the player `Weapon` node and replace the player prefab's serialized guns list. Direct GameScene play still uses the serialized fallback guns.
+
 ## Enemies And Rooms
 
 Locations:
@@ -226,6 +228,8 @@ Important behavior:
 - `OnDead()` notifies the owning fight room and attempts item drop through `ItemSpawner`.
 
 Rooms track fight progression. `FightRoom.NotifyEnemyDefeated(this)` is part of enemy death cleanup. When editing enemies, preserve room ownership cleanup to avoid stale fight-room state after pooling.
+
+`GameScene` uses `AddressableDungeonBootstrapper` on the Edgar `DungeonGeneratorGrid2D` owner. The generator should stay `GenerateOn = Manually`; the bootstrapper loads `room/level1` from `AddressableRuntimeContent`, assigns `FixedLevelGraphConfig.LevelGraph`, then calls `Generate()`. Direct GameScene play can fall back to the inspector-assigned level graph.
 
 ## Animation And Presentation
 
@@ -367,6 +371,8 @@ Addressable database keys are currently string fields in `DataBaseManager`:
 
 `Assets/Editor/AddressablesLocalGroupSetup.cs` and `Assets/UnityEasyWorkTools/TableImporter/Importers/AddressablesLabelTableImporter.cs` support editor-side Addressables setup/import. Preserve labels and database keys when moving assets.
 
+`Assets/Editor/AddressablesRemoteUploader.cs` adds `PG/Addressables/Upload ServerData To Remote`. It uploads every file under `ServerData/P_GUN/StandaloneWindows64` to `/www/wwwroot/39.97.56.180/AB/P_GUN/StandaloneWindows64` through system `ssh/scp`, without deleting old server bundles. The menu expects local SSH key or ssh-agent authentication; do not hardcode server passwords into Unity editor scripts.
+
 Current hot-update Addressables groups are:
 
 - `Room`: `Level1.asset`, room templates, and corridor prefabs.
@@ -375,7 +381,9 @@ Current hot-update Addressables groups are:
 - `Enemy`: `EnemyDatabase` and enemy prefabs.
 - `Weapon`: `WeaponDatabase` and weapon prefabs.
 
-These groups use `Remote.BuildPath` and `Remote.LoadPath`, build a remote catalog, use unique bundle ids, and keep `ContentUpdateGroupSchema.StaticContent` disabled. Do not put first-package-only scene, UI, player, bullet, or VFX assets into Addressables unless they are explicitly intended to hot update.
+These groups are Local-first hot-update groups. Their `BuildPath` and `LoadPath` use `Local.BuildPath` and `Local.LoadPath`, so the first player build includes the bundles in the package. The project still builds a remote catalog, with `Remote.BuildPath = ServerData/P_GUN/[BuildTarget]` and `Remote.LoadPath = https://achen1o1.xyz/AB/P_GUN/[BuildTarget]`. Each group keeps `ContentUpdateGroupSchema.StaticContent` enabled (`Prevent Updates` in the Inspector), so later updates should be produced with the official Addressables `Update a Previous Build` workflow and the original `addressables_content_state.bin`. Upload generated remote catalog/hash/bundles to `/www/wwwroot/39.97.56.180/AB/P_GUN/[BuildTarget]` on the Nginx server. Do not put first-package-only scene, UI, player, bullet, or VFX assets into Addressables unless they are explicitly intended to hot update.
+
+`Root` is the first Build Settings scene, followed by `StartScene` and `GameScene`. It owns the explicit scene singletons `DataBaseManager`, `LuaManager`, `AddressableRuntimeContent`, and `RootHotUpdateController`. Addressables `DisableCatalogUpdateOnStartup` is enabled so `RootHotUpdateController` owns the update UI timing. The boot flow initializes Addressables, checks and updates catalogs, downloads labels `room`, `buff`, `item`, `enemy`, and `weapon`, loads databases, preloads runtime Addressables content, then loads `StartScene`. Network/catalog/download failures may log and continue with built-in or cached content; missing databases or required runtime content are configuration errors and should fail loudly.
 
 ## Current Refactor Notes
 

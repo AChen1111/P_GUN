@@ -64,6 +64,11 @@ namespace Game.Gameplay
             Buffs = GetLoadedAsset(buffHandle, nameof(BuffDataBase));
             Enemies = GetLoadedAsset(enemyHandle, nameof(EnemyDatabase));
             IsLoaded = Items != null && Weapons != null && Buffs != null && Enemies != null;
+
+            if (IsLoaded)
+            {
+                ItemDatabase.SetRuntimeDatabase(Items);
+            }
         }
 
         private static TDatabase GetLoadedAsset<TDatabase>(AsyncOperationHandle<TDatabase> handle, string databaseName)
@@ -89,6 +94,7 @@ namespace Game.Gameplay
             ReleaseHandle(weaponHandle);
             ReleaseHandle(buffHandle);
             ReleaseHandle(enemyHandle);
+            ItemDatabase.ClearRuntimeDatabase(Items);
         }
 
         private static void ReleaseHandle<TDatabase>(AsyncOperationHandle<TDatabase> handle)

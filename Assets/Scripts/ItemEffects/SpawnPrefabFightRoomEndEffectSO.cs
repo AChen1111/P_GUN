@@ -30,12 +30,12 @@ namespace Game.ItemEffects
 
             var spawnPosition = room.GetRoomCenterPoint() + worldOffset;
 
-            var selectedPrefab = prefab;
+            var selectedPrefab = ResolveRuntimePrefab(prefab);
             var selectedAnimEffect = DOTweenAnimType.None;
             var selectedAnimDuration = 0f;
             if (spawnTable != null && spawnTable.TryGetRandomEntry(out var randomEntry))
             {
-                selectedPrefab = randomEntry.prefab;
+                selectedPrefab = spawnTable.TryResolvePrefab(randomEntry, out var resolvedPrefab) ? resolvedPrefab : null;
                 selectedAnimEffect = randomEntry.spawnAnimEffect;
                 selectedAnimDuration = randomEntry.spawnAnimDuration;
             }
@@ -59,6 +59,21 @@ namespace Game.ItemEffects
         {
             var spawner = room.GetComponent<ItemSpawner>();
             return spawner != null ? spawner : room.GetComponentInChildren<ItemSpawner>();
+        }
+
+        /// <summary>
+        /// 直连预制体作为编辑器兼容配置, Root 预加载完成后优先使用同 ID 的热更预制体.
+        /// </summary>
+        private static GameObject ResolveRuntimePrefab(GameObject configuredPrefab)
+        {
+            var item = configuredPrefab != null ? configuredPrefab.GetComponent<Item>() : null;
+            var content = AddressableRuntimeContent.Instance;
+            if (item != null && content != null && content.TryGetPrefabById("item", item.ItemId, out var runtimePrefab))
+            {
+                return runtimePrefab;
+            }
+
+            return configuredPrefab;
         }
     }
 }

@@ -30,7 +30,9 @@ namespace Game.Items
             //随机获取一个物品
             if(itemTable.TryGetRandomEntry(out var entry))
             {
-                return SpawnItem(entry.prefab, position, entry.spawnAnimEffect, entry.spawnAnimDuration);
+                return itemTable.TryResolvePrefab(entry, out var prefab)
+                    ? SpawnItem(prefab, position, entry.spawnAnimEffect, entry.spawnAnimDuration)
+                    : null;
             }
 
             //如果获取失败，则返回null

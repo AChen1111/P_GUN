@@ -319,7 +319,14 @@ namespace Game.Gameplay
         /// <returns>Buff 运行时信息</returns>
         private BuffRuntimeInfo CreateBuffRuntimeInfo(Buff buff, UnityEngine.Object source)
         {
-            var luaInstance = LuaManager.GetOrCreate().CreateBuffInstance(buff);
+            var luaManager = LuaManager.Instance;
+            if (luaManager == null)
+            {
+                Debug.LogError($"{nameof(BuffManager)}: Root 场景未挂载 {nameof(LuaManager)}, 无法创建 Buff Lua 实例.", this);
+                return null;
+            }
+
+            var luaInstance = luaManager.CreateBuffInstance(buff);
             if (luaInstance == null)
             {
                 Debug.LogError($"{nameof(BuffManager)}: 创建 Buff Lua 实例失败, Buff: {buff.BuffName}.", this);

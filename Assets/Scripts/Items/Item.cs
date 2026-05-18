@@ -297,6 +297,12 @@ namespace Game.Items
                 return true;
             }
 
+            var runtimeDatabase = ItemDatabase.RuntimeDatabase;
+            if (runtimeDatabase != null && runtimeDatabase.TryGetById(itemId, out data))
+            {
+                return true;
+            }
+
             data = default;
             return false;
         }

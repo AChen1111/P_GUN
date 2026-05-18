@@ -87,16 +87,22 @@ namespace Game.Animation
         private static Tween CreateSlideTween(AnimationStepData step, GameObject target, AnimationSequenceState state)
         {
             var snapshot = state.GetOrCapture(target);
+            var canvasGroup = ResolveCanvasGroupForSlide(step, target);
             var rectTransform = target.GetComponent<RectTransform>();
             if (rectTransform != null)
             {
                 var original = snapshot.AnchoredPosition3D;
                 var start = original + step.SlideOffset;
+                PrepareSlideStart(target, canvasGroup, () => rectTransform.anchoredPosition3D = start);
                 return CreateProgressTween(
                     target,
                     step.Duration,
                     step.Ease,
-                    () => rectTransform.anchoredPosition3D = start,
+                    () =>
+                    {
+                        rectTransform.anchoredPosition3D = start;
+                        RevealSlideTarget(canvasGroup, snapshot);
+                    },
                     value => rectTransform.anchoredPosition3D = Vector3.LerpUnclamped(start, original, value)
                 );
             }
@@ -104,13 +110,50 @@ namespace Game.Animation
             var transform = target.transform;
             var localOriginal = snapshot.LocalPosition;
             var localStart = localOriginal + step.SlideOffset;
+            PrepareSlideStart(target, canvasGroup, () => transform.localPosition = localStart);
             return CreateProgressTween(
                 target,
                 step.Duration,
                 step.Ease,
-                () => transform.localPosition = localStart,
+                () =>
+                {
+                    transform.localPosition = localStart;
+                    RevealSlideTarget(canvasGroup, snapshot);
+                },
                 value => transform.localPosition = Vector3.LerpUnclamped(localStart, localOriginal, value)
             );
+        }
+
+        private static CanvasGroup ResolveCanvasGroupForSlide(AnimationStepData step, GameObject target)
+        {
+            var canvasGroup = target.GetComponent<CanvasGroup>();
+            if (canvasGroup == null && step.AutoAddCanvasGroup)
+            {
+                canvasGroup = target.AddComponent<CanvasGroup>();
+            }
+
+            return canvasGroup;
+        }
+
+        private static void PrepareSlideStart(GameObject target, CanvasGroup canvasGroup, TweenCallback applyStartPosition)
+        {
+            // SlideUp 播放前先隐藏并移动到起点, 避免目标激活后在原位置闪一帧.
+            applyStartPosition?.Invoke();
+            if (canvasGroup != null)
+            {
+                canvasGroup.alpha = 0f;
+                return;
+            }
+
+            Debug.LogWarning($"[AnimationTweenFactory] {target.name} 没有 CanvasGroup, SlideUp 起点瞬移可能可见.", target);
+        }
+
+        private static void RevealSlideTarget(CanvasGroup canvasGroup, TargetSnapshot snapshot)
+        {
+            if (canvasGroup == null) return;
+
+            // 到达隐藏起点后恢复原始透明度, 后续位移动画才真正显示.
+            canvasGroup.alpha = snapshot.CanvasAlpha;
         }
 
         private static Tween CreateShakeTween(AnimationStepData step, GameObject target)
@@ -340,6 +383,7 @@ namespace Game.Animation
         public Vector3 AnchoredPosition3D { get; }
         public Vector3 LocalScale { get; }
         public Vector3 LocalEulerAngles { get; }
+        public float CanvasAlpha => hasCanvasGroup ? canvasAlpha : 1f;
 
         public TargetSnapshot(GameObject target)
         {

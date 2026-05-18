@@ -14,6 +14,18 @@ namespace Game.Gameplay
 {
     public class Player : ViewController
     {
+        private static readonly string[] AddressableWeaponAddresses =
+        {
+            "weapon/pistol",
+            "weapon/ak",
+            "weapon/awp",
+            "weapon/bow",
+            "weapon/laser",
+            "weapon/mp5",
+            "weapon/rocket_gun",
+            "weapon/shotgun"
+        };
+
         public UnityEngine.TextMesh DisPlayText;
         private Rigidbody2D rb;
         private Coroutine mDisplayTextCoroutine;
@@ -104,6 +116,7 @@ namespace Game.Gameplay
             ResolveAnimator();
             CaptureDefaultVisualState();
 
+            TryApplyAddressableWeaponLoadout();
             SelectInitialGun();
         }
 
@@ -271,6 +284,58 @@ namespace Game.Gameplay
             }
 
             gun = guns[currentGunIndex];
+        }
+
+        private void TryApplyAddressableWeaponLoadout()
+        {
+            var content = AddressableRuntimeContent.Instance;
+            if (content == null || !content.IsReady || Weapon == null) return;
+
+            var prefabs = new List<GameObject>(AddressableWeaponAddresses.Length);
+            foreach (var address in AddressableWeaponAddresses)
+            {
+                if (!content.TryGetAsset<GameObject>(address, out var prefab) || prefab == null)
+                {
+                    Debug.LogError($"{nameof(Player)}: Addressables 武器未预加载, Address: {address}.", this);
+                    return;
+                }
+
+                prefabs.Add(prefab);
+            }
+
+            ClearCurrentGunInstances();
+            foreach (var prefab in prefabs)
+            {
+                var instance = Instantiate(prefab, Weapon);
+                instance.name = prefab.name;
+
+                var newGun = instance.GetComponent<Gun>();
+                if (newGun == null)
+                {
+                    Debug.LogError($"{nameof(Player)}: 武器 prefab 缺少 Gun 组件, Prefab: {prefab.name}.", instance);
+                    Destroy(instance);
+                    continue;
+                }
+
+                guns.Add(newGun);
+            }
+
+            gun = null;
+            currentGunIndex = Mathf.Clamp(currentGunIndex, 0, Mathf.Max(0, guns.Count - 1));
+        }
+
+        private void ClearCurrentGunInstances()
+        {
+            // 热更武器实例化前清理 Player prefab 自带枪械, 防止旧枪仍被切换到.
+            foreach (var oldGun in guns)
+            {
+                if (oldGun != null)
+                {
+                    Destroy(oldGun.gameObject);
+                }
+            }
+
+            guns.Clear();
         }
 
         #endregion
