@@ -2018,7 +2018,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 4089169133575612640, guid: 73794882cc2db5a458f035b7ed2195f1, type: 3}
       propertyPath: m_Name
-      value: SettingPanel
+      value: SettingsPanel
       objectReference: {fileID: 0}
     - target: {fileID: 4089169133575612640, guid: 73794882cc2db5a458f035b7ed2195f1, type: 3}
       propertyPath: m_IsActive

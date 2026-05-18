@@ -12,11 +12,15 @@ namespace Game.UI
     {
         [Header("游戏场景设置面板")]
         [SerializeField] private SettingsPanel settingsPanel;
+        [Header("背包面板")]
+        [SerializeField] private InventoryPanel inventoryPanel;
         [Header("Buff调试")]
         [SerializeField] private BuffDataBase buffDebugDataBase;
 
         private bool settingsOpen;
+        private bool inventoryOpen;
         private float previousTimeScale = 1f;
+        private float inventoryPreviousTimeScale = 1f;
         private readonly BuffDebugWindow buffDebugWindow = new BuffDebugWindow();
 
         private void OnEnable()
@@ -31,6 +35,11 @@ namespace Game.UI
                 RestoreSettingsCloseState();
             }
 
+            if (inventoryOpen)
+            {
+                RestoreInventoryCloseState();
+            }
+
             buffDebugWindow.SetVisible(false);
             GameplayCursorState.Reset();
         }
@@ -40,8 +49,19 @@ namespace Game.UI
             // Ctrl 只接管鼠标战斗, 不影响移动, 换枪, 装弹和地图快捷键.
             GameplayCursorState.SetControlKeyHeld(Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl));
 
+            if (Input.GetKeyDown(KeyCode.CapsLock))
+            {
+                ToggleInventoryPanel();
+            }
+
             if (Input.GetKeyDown(KeyCode.Escape))
             {
+                if (inventoryOpen)
+                {
+                    CloseInventoryPanel();
+                    return;
+                }
+
                 ToggleSettingsPanel();
             }
 
@@ -54,6 +74,12 @@ namespace Game.UI
             {
                 // 设置面板也可能通过 Back 按钮出栈, 这里统一恢复暂停和鼠标状态.
                 RestoreSettingsCloseState();
+            }
+
+            if (inventoryOpen && inventoryPanel != null && !inventoryPanel.gameObject.activeSelf)
+            {
+                // 背包也可能被UI栈关闭, 这里统一恢复暂停和鼠标状态.
+                RestoreInventoryCloseState();
             }
         }
 
@@ -69,6 +95,11 @@ namespace Game.UI
 
         private void ToggleSettingsPanel()
         {
+            if (inventoryOpen)
+            {
+                return;
+            }
+
             if (settingsOpen)
             {
                 CloseSettingsPanel();
@@ -122,6 +153,61 @@ namespace Game.UI
             buffDebugWindow.Toggle();
             // Buff 调试窗口使用 IMGUI, 打开时需要显示鼠标并阻断玩家鼠标战斗输入.
             GameplayCursorState.SetDebugPanelOpen(buffDebugWindow.IsVisible);
+        }
+
+        private void ToggleInventoryPanel()
+        {
+            if (settingsOpen)
+            {
+                return;
+            }
+
+            if (inventoryOpen)
+            {
+                CloseInventoryPanel();
+                return;
+            }
+
+            OpenInventoryPanel();
+        }
+
+        private void OpenInventoryPanel()
+        {
+            if (inventoryPanel == null)
+            {
+                // 背包面板允许按默认结构创建, 便于场景未绑定 prefab 时仍保持功能完整.
+                inventoryPanel = InventoryPanel.CreateDefault(transform);
+            }
+
+            UIStackManager stackManager = UIStackManager.Instance;
+            if (stackManager == null)
+            {
+                return;
+            }
+
+            inventoryPreviousTimeScale = Time.timeScale;
+            inventoryOpen = true;
+            Time.timeScale = 0f;
+            GameplayCursorState.SetInventoryPanelOpen(true);
+            stackManager.Push(inventoryPanel);
+        }
+
+        private void CloseInventoryPanel()
+        {
+            UIStackManager stackManager = UIStackManager.Instance;
+            if (stackManager != null && stackManager.Peek() == inventoryPanel)
+            {
+                stackManager.Pop();
+            }
+
+            RestoreInventoryCloseState();
+        }
+
+        private void RestoreInventoryCloseState()
+        {
+            inventoryOpen = false;
+            Time.timeScale = inventoryPreviousTimeScale;
+            GameplayCursorState.SetInventoryPanelOpen(false);
         }
 
         private static bool IsBuffDebugTogglePressed()

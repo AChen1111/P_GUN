@@ -98,7 +98,7 @@ Locations:
 - Triggers `GameEvent.ItemPicked`.
 - Plays Animator trigger `OnPickup` if available.
 - Falls back to `GameDOTweenAnimation.Play(callback)` if no pickup trigger exists.
-- Executes each `ItemEffectBase.OnPick(ItemEffectContext ctx)`.
+- Adds itself to the player's `PlayerInventory`; item effects are executed later from the inventory UI.
 - Plays optional pickup audio through `GlobalAudioPlay`.
 - Releases itself through `ItemPool.Instance.Release(this)` when `isDestroy` is true.
 - Implements `IPoolable` and resets pickup state, animator state, tweens, and tips during pooling lifecycle.
@@ -109,12 +109,16 @@ Locations:
 public abstract void OnPick(ItemEffectContext ctx);
 ```
 
+`ItemEffectBase.CanUse(ItemEffectContext ctx)` defaults to `true` and lets inventory use checks block consumption when an effect cannot currently work, such as full HP healing or cleansing without negative Buffs.
+
 `ItemEffectContext` currently carries:
 
 - `GameObject SourceObject`
 - `Vector3 WorldPosition`
 
 Known item effects include healing, applying buffs, cleansing negative buffs, chest random loot, and spawning prefabs at fight-room end.
+
+`PlayerInventory` lives on the player prefab and stores runtime `InventoryItemStack` data by `itemId`. Stacks preserve display data and effect assets, but do not keep references to pooled pickup GameObjects. `AddFromItem(Item item)` stacks pickups and triggers `GameEvent.InventoryChanged`; `Use(int itemId)` executes all currently usable effects and consumes one item only when at least one effect can be used.
 
 ## Buffs
 
@@ -309,8 +313,9 @@ Game scene UI stack rules:
 - `GameScene` has an explicit scene `UIStackManager` and `UIStackInitializer`.
 - `HudPanel` is the stack bottom and contains existing HP, bullet, minimap, item tip, and Buff status UI.
 - Win, over, and game settings panels are `UIPanelBase` panels opened with `UIStackManager.Push()`.
-- `GameSceneUIInputController` belongs to the scene `GameUI` object, opens the settings panel with Esc, pauses by preserving/restoring `Time.timeScale`, and updates `GameplayCursorState`.
+- `GameSceneUIInputController` belongs to the scene `GameUI` object, opens the settings panel with Esc, opens the inventory panel with CapsLock, pauses by preserving/restoring `Time.timeScale`, and updates `GameplayCursorState`.
 - `GameplayCursorState` is in `Game.Core`; Player must check `BlocksMouseCombat` before mouse aiming, auto-aim display, and mouse shooting.
+- `InventoryPanel` and `InventorySlotView` live in `Assets/Scripts/UI/Inventory`; their prefabs live in `Assets/Prefab/UI/Inventory`. The panel listens to `GameEvent.InventoryChanged`, reads `Global.player.GetComponent<PlayerInventory>()`, displays one slot per item stack, shows the selected item description on the right, and pops a top hint when a right-click use is blocked.
 
 When adding UI, use existing event flow before adding direct scene references.
 
@@ -323,6 +328,8 @@ UI auto binding tooling lives in `Assets/UnityEasyWorkTools/UIAutoBind`:
 
 Rules:
 
+- `UIPanelBase` roots should include `ComponentAutoBindTool`, even for simple stack panels such as HUD, win, and over panels.
+- Bindable UGUI children should follow UIAutoBind prefixes, for example `Btn_Reset`, `Txt_Title`, `Img_DetailIcon`, `Trans_SlotRoot`, and `Rect_DisplayPage`.
 - Keep the asmdef names `ComponentAutoBindTool.Runtime` and `ComponentAutoBindTool.Editor`, because generated UI code and `Game.UI.asmdef` reference them by assembly name.
 - Preserve script `.meta` files when moving or reorganizing this tooling, because scene/prefab `ComponentAutoBindTool` component references depend on script GUIDs.
 - Generated `*.BindComponent.cs` files may stay in the owning UI panel folder, such as `Assets/Scripts/UI/Panel`.

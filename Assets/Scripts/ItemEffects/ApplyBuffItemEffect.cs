@@ -13,6 +13,12 @@ namespace Game.ItemEffects
         [SerializeField] private BuffDataBase buffDataBase = null;
         [SerializeField] private bool showHeadMessage = true;
 
+        public override bool CanUse(ItemEffectContext ctx)
+        {
+            var player = Global.player;
+            return player != null && ResolveBuff() != null && player.GetComponent<BuffManager>() != null;
+        }
+
         public override void OnPick(ItemEffectContext ctx)
         {
             var player = Global.player;

@@ -37,6 +37,9 @@ P_GUN is a Unity 2022.3 2D top-down shooter project. Runtime code is split by as
 - Buff 状态栏 UI lives in `Assets/Scripts/UI/Buffs` and `Assets/Prefab/UI/Buff`; it reads `BuffManager.ActiveBuffs` after `GameEvent.PlayerBuffsChanged` and must not maintain separate Buff display data.
 - Buff 调试窗口 lives in `Assets/Scripts/UI/GameSceneUIInputController.cs`; it is toggled with `Alt+Up`, and it adds/removes Buff through the player's `BuffManager` without creating scene managers.
 - `GameScene` UI uses an explicit scene `UIStackManager` plus `UIStackInitializer`; HUD is the stack bottom and modal panels such as settings, win, and over panels are pushed through the stack.
+- Inventory runtime lives in `Assets/Scripts/Items/Inventory`; `PlayerInventory` must be attached to the player prefab, stacks picked items by `itemId`, and triggers `GameEvent.InventoryChanged` after add/use/clear.
+- Inventory UI lives in `Assets/Scripts/UI/Inventory` and prefabs live in `Assets/Prefab/UI/Inventory`; `GameSceneUIInputController` toggles it with `CapsLock`, pauses through the UI stack flow, and right-clicking a slot consumes one item only when at least one effect `CanUse` returns true.
+- `UIPanelBase` roots should carry `ComponentAutoBindTool`; bindable child objects use UIAutoBind prefixes such as `Btn_`, `Txt_`, `Img_`, `Trans_`, and `Rect_`.
 - For pooled objects, implement and reset state through `IPoolable.OnSpawnFromPool()` and `IPoolable.OnRecycleToPool()`.
 - Damage number presentation belongs to `Game.Presentation`: enemies pass final damage and world position to `DamageTextPool`, while the `DamageText` prefab script owns random font size, offset, tween playback, and recycle callback.
 - UnityEasyWorkTools is the shared editor tooling suite under `Assets/UnityEasyWorkTools`, currently containing `AnimationSequence`, `UIAutoBind`, and `TableImporter`.
