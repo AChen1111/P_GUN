@@ -146,6 +146,7 @@ namespace Game.UI
         {
             GameSettingsStore.Save(currentData);
             GameSettingsStore.Apply(currentData, audioMixer, masterVolumeParameter, musicVolumeParameter, sfxVolumeParameter);
+            CloseByStack();
         }
 
         private void CloseByStack()

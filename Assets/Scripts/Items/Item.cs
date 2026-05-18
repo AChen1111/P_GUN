@@ -10,7 +10,7 @@ using Game.Presentation;
 namespace Game.Items
 {
     /// <summary>
-    /// 场景中的可交互物品：玩家靠近显示描述，按 F 后播放拾取表现并执行效果列表。
+    /// 场景中的可交互物品: 玩家靠近显示描述, 按 F 后收入背包并播放拾取表现.
     /// </summary>
     [RequireComponent(typeof(Collider2D))]
     public class Item : MonoBehaviour, Game.Pooling.IPoolable
@@ -44,8 +44,13 @@ namespace Game.Items
         private int playerColliderCount;
         private bool isPlayerInRange;
         private bool hasPicked;
-        private bool effectsApplied;
+        private bool inventoryAdded;
+        private bool pickupPresentationFinished;
+        private PlayerInventory playerInventoryInRange;
         private Coroutine animatorFallbackCoroutine;
+
+        public int ItemId => itemId;
+        public IReadOnlyList<ItemEffectBase> Effects => effects;
 
         private void Awake()
         {
@@ -120,6 +125,11 @@ namespace Game.Items
 
             playerColliderCount++;
             isPlayerInRange = true;
+            if (playerInventoryInRange == null)
+            {
+                playerInventoryInRange = other.GetComponentInParent<PlayerInventory>();
+            }
+
             ShowTip();
         }
 
@@ -131,12 +141,13 @@ namespace Game.Items
             if (playerColliderCount > 0) return;
 
             isPlayerInRange = false;
+            playerInventoryInRange = null;
             HideTip();
         }
 
         public void OnPickupAnimFinished()
         {
-            ApplyEffectsAndDestroy();
+            FinishPickupPresentation();
         }
 
         [ContextMenu("编辑器/从数据库同步物品图标")]
@@ -165,6 +176,18 @@ namespace Game.Items
         {
             if (!isActive || hasPicked) return;
 
+            var inventory = ResolvePlayerInventory();
+            if (inventory == null)
+            {
+                Debug.LogError($"{nameof(Item)}拾取失败, Player缺少{nameof(PlayerInventory)}组件.", this);
+                return;
+            }
+
+            if (!TryAddToInventory(inventory))
+            {
+                return;
+            }
+
             hasPicked = true;
             isActive = false;
             HideTip();
@@ -177,11 +200,11 @@ namespace Game.Items
 
             if (_dotweenAnimation != null)
             {
-                _dotweenAnimation.Play(ApplyEffectsAndDestroy);
+                _dotweenAnimation.Play(FinishPickupPresentation);
                 return;
             }
 
-            ApplyEffectsAndDestroy();
+            FinishPickupPresentation();
         }
 
         private bool TryPlayAnimatorPickup()
@@ -201,32 +224,32 @@ namespace Game.Items
         private IEnumerator ApplyEffectsAfterDelay(float delay)
         {
             yield return new WaitForSeconds(delay);
-            ApplyEffectsAndDestroy();
+            FinishPickupPresentation();
             animatorFallbackCoroutine = null;
         }
 
-        private void ApplyEffectsAndDestroy()
+        private bool TryAddToInventory(PlayerInventory inventory)
         {
-            if (effectsApplied) return;
-            effectsApplied = true;
+            if (inventoryAdded) return true;
+
+            inventoryAdded = inventory.AddFromItem(this);
+            return inventoryAdded;
+        }
+
+        private PlayerInventory ResolvePlayerInventory()
+        {
+            // 物品只使用当前触发范围内的玩家背包, 避免跨模块依赖全局玩家引用.
+            return playerInventoryInRange;
+        }
+
+        private void FinishPickupPresentation()
+        {
+            if (pickupPresentationFinished) return;
+            pickupPresentationFinished = true;
 
             if (animatorFallbackCoroutine != null)
             {
                 StopAnimatorFallbackCoroutine();
-            }
-
-            var ctx = new ItemEffectContext
-            {
-                SourceObject = gameObject,
-                WorldPosition = transform.position
-            };
-
-            if (effects != null)
-            {
-                foreach (var effect in effects)
-                {
-                    if (effect != null) effect.OnPick(ctx);
-                }
             }
 
             if (pickupAudio != null)
@@ -254,6 +277,17 @@ namespace Game.Items
         private ItemData ResolveItemData()
         {
             return TryResolveItemData(out var data) ? data : default;
+        }
+
+        public ItemData GetItemData()
+        {
+            return ResolveItemData();
+        }
+
+        public bool TryGetItemData(out ItemData data)
+        {
+            // 背包入库前必须解析到正式配置, 避免把默认空数据写入运行时背包.
+            return TryResolveItemData(out data);
         }
 
         private bool TryResolveItemData(out ItemData data)
@@ -299,7 +333,9 @@ namespace Game.Items
             playerColliderCount = 0;
             isPlayerInRange = false;
             hasPicked = false;
-            effectsApplied = false;
+            inventoryAdded = false;
+            pickupPresentationFinished = false;
+            playerInventoryInRange = null;
         }
 
         private void StopAnimatorFallbackCoroutine()

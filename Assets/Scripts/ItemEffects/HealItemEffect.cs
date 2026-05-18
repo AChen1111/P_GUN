@@ -7,12 +7,18 @@ using Game.Gameplay;
 namespace Game.ItemEffects
 {
     /// <summary>
-    /// 拾取后恢复玩家 HP，不超过上限；满血时提示且不增加。
+    /// 使用后恢复玩家 HP, 不超过上限; 满血时不允许消耗.
     /// </summary>
     [CreateAssetMenu(fileName = "HealItemEffect", menuName = "PG/Item/Effects/Heal Item Effect", order = 1)]
     public class HealItemEffect : ItemEffectBase
     {
         [SerializeField] private int healAmount = 1;
+
+        public override bool CanUse(ItemEffectContext ctx)
+        {
+            var player = Global.player;
+            return player != null && healAmount > 0 && !player.IsHPFull;
+        }
 
         public override void OnPick(ItemEffectContext ctx)
         {

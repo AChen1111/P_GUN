@@ -19,6 +19,7 @@ namespace Game.Core
         ItemTipShown,
         ItemTipHidden,
         ItemPicked,
+        InventoryChanged,
         PlayerBuffsChanged,
         BulletClipChanged,
         BulletBagChanged,

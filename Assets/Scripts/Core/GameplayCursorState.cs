@@ -9,9 +9,10 @@ namespace Game.Core
     {
         private static bool isControlKeyHeld;
         private static bool isSettingsPanelOpen;
+        private static bool isInventoryPanelOpen;
         private static bool isDebugPanelOpen;
 
-        public static bool BlocksMouseCombat => isControlKeyHeld || isSettingsPanelOpen || isDebugPanelOpen;
+        public static bool BlocksMouseCombat => isControlKeyHeld || isSettingsPanelOpen || isInventoryPanelOpen || isDebugPanelOpen;
 
         public static void SetControlKeyHeld(bool isHeld)
         {
@@ -46,10 +47,22 @@ namespace Game.Core
             ApplyCursorState();
         }
 
+        public static void SetInventoryPanelOpen(bool isOpen)
+        {
+            if (isInventoryPanelOpen == isOpen)
+            {
+                return;
+            }
+
+            isInventoryPanelOpen = isOpen;
+            ApplyCursorState();
+        }
+
         public static void Reset()
         {
             isControlKeyHeld = false;
             isSettingsPanelOpen = false;
+            isInventoryPanelOpen = false;
             isDebugPanelOpen = false;
             ApplyCursorState();
         }

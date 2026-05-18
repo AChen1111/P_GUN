@@ -22,6 +22,11 @@ namespace Game.Items
         [SerializeField] private string animEffectKey = "Jump";
         [SerializeField] private Vector2 randomOffsetRange = new Vector2(0.5f, 0.5f);
 
+        public override bool CanUse(ItemEffectContext ctx)
+        {
+            return ResolveSpawner(ctx) != null && HasAvailableLoot();
+        }
+
         public override void OnPick(ItemEffectContext ctx)
         {
             var spawner = ResolveSpawner(ctx);
@@ -92,6 +97,29 @@ namespace Game.Items
             }
 
             return validPrefabs[Random.Range(0, validPrefabs.Count)];
+        }
+
+        private bool HasAvailableLoot()
+        {
+            if (spawnTable != null)
+            {
+                return spawnTable.TryGetRandomEntry(out _);
+            }
+
+            if (lootTable == null)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < lootTable.Count; i++)
+            {
+                if (lootTable[i] != null)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }

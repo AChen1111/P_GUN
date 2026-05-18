@@ -209,18 +209,18 @@ namespace Game.UI
 
         private void AddButtonListeners()
         {
-            WinPanel.transform.Find("BtnReset").GetComponent<Button>().onClick.AddListener(ResetGame);
-            OverPanel.transform.Find("BtnReset").GetComponent<Button>().onClick.AddListener(ResetGame);
-            WinPanel.transform.Find("BtnMainMenu").GetComponent<Button>().onClick.AddListener(ReturnToMainMenu);
-            OverPanel.transform.Find("BtnMainMenu").GetComponent<Button>().onClick.AddListener(ReturnToMainMenu);
+            WinPanel.transform.Find("Btn_Reset").GetComponent<Button>().onClick.AddListener(ResetGame);
+            OverPanel.transform.Find("Btn_Reset").GetComponent<Button>().onClick.AddListener(ResetGame);
+            WinPanel.transform.Find("Btn_MainMenu").GetComponent<Button>().onClick.AddListener(ReturnToMainMenu);
+            OverPanel.transform.Find("Btn_MainMenu").GetComponent<Button>().onClick.AddListener(ReturnToMainMenu);
         }
 
         private void RemoveButtonListeners()
         {
-            WinPanel.transform.Find("BtnReset").GetComponent<Button>().onClick.RemoveListener(ResetGame);
-            OverPanel.transform.Find("BtnReset").GetComponent<Button>().onClick.RemoveListener(ResetGame);
-            WinPanel.transform.Find("BtnMainMenu").GetComponent<Button>().onClick.RemoveListener(ReturnToMainMenu);
-            OverPanel.transform.Find("BtnMainMenu").GetComponent<Button>().onClick.RemoveListener(ReturnToMainMenu);
+            WinPanel.transform.Find("Btn_Reset").GetComponent<Button>().onClick.RemoveListener(ResetGame);
+            OverPanel.transform.Find("Btn_Reset").GetComponent<Button>().onClick.RemoveListener(ResetGame);
+            WinPanel.transform.Find("Btn_MainMenu").GetComponent<Button>().onClick.RemoveListener(ReturnToMainMenu);
+            OverPanel.transform.Find("Btn_MainMenu").GetComponent<Button>().onClick.RemoveListener(ReturnToMainMenu);
         }
 
         private void AddEventListeners()
