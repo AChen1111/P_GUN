@@ -23,9 +23,27 @@ namespace Game.Core
         BulletClipChanged,
         BulletBagChanged,
         PlayerHeadMessageRequested,
+        RoomWaveDisplayChanged,
         DoorOpened,
         DoorClosed,
         AllRoomsGenerated
+    }
+
+    public struct RoomWaveDisplayEvent
+    {
+        // 当前显示的波次, 从 1 开始.
+        public int CurrentWave;
+        // 当前房间总波数, 用于显示 x/xx.
+        public int TotalWave;
+        // 战斗结束时隐藏波数文本.
+        public bool IsVisible;
+
+        public RoomWaveDisplayEvent(int currentWave, int totalWave, bool isVisible)
+        {
+            CurrentWave = currentWave;
+            TotalWave = totalWave;
+            IsVisible = isVisible;
+        }
     }
 
     public struct PlayerHeadMessageEvent

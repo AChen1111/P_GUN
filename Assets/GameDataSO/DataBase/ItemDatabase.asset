@@ -29,3 +29,7 @@ MonoBehaviour:
     itemName: "\u589E\u4F24\u836F\u6C34"
     description: "\u589E\u52A0\u4F24\u5BB3"
     icon: {fileID: -1427955363, guid: bf817939e9a0a3241b3cf68a375367e7, type: 3}
+  - itemId: 5
+    itemName: "\u51C0\u5316\u836F\u6C34"
+    description: "\u79FB\u9664\u6240\u6709\u8D1F\u9762Buff"
+    icon: {fileID: 235883239, guid: bf817939e9a0a3241b3cf68a375367e7, type: 3}

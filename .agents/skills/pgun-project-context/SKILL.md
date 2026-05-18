@@ -35,6 +35,7 @@ P_GUN is a Unity 2022.3 2D top-down shooter project. Runtime code is split by as
 - Do not rename or move Unity assets, `.meta` files, asmdefs, scenes, or prefabs unless the task requires it.
 - For runtime cross-system notifications, prefer `Game.Core.EventCenter` and existing `GameEvent` values before adding new singleton coupling.
 - Buff 状态栏 UI lives in `Assets/Scripts/UI/Buffs` and `Assets/Prefab/UI/Buff`; it reads `BuffManager.ActiveBuffs` after `GameEvent.PlayerBuffsChanged` and must not maintain separate Buff display data.
+- Buff 调试窗口 lives in `Assets/Scripts/UI/GameSceneUIInputController.cs`; it is toggled with `Alt+Up`, and it adds/removes Buff through the player's `BuffManager` without creating scene managers.
 - `GameScene` UI uses an explicit scene `UIStackManager` plus `UIStackInitializer`; HUD is the stack bottom and modal panels such as settings, win, and over panels are pushed through the stack.
 - For pooled objects, implement and reset state through `IPoolable.OnSpawnFromPool()` and `IPoolable.OnRecycleToPool()`.
 - Damage number presentation belongs to `Game.Presentation`: enemies pass final damage and world position to `DamageTextPool`, while the `DamageText` prefab script owns random font size, offset, tween playback, and recycle callback.
@@ -44,6 +45,7 @@ P_GUN is a Unity 2022.3 2D top-down shooter project. Runtime code is split by as
 - Visual animation sequences belong to `Game.Animation`: runtime scripts live in `Assets/UnityEasyWorkTools/AnimationSequence/Scripts`, editor code lives in `Assets/UnityEasyWorkTools/AnimationSequence/Editor`, sequence assets are `AnimationSequenceAsset`, and playback is handled by scene `AnimationPlayer`.
 - UI auto binding tooling lives in `Assets/UnityEasyWorkTools/UIAutoBind`: runtime binding component and rules are in `Scripts`, editor inspector/code generation is in `Editor`, and the global setting asset stays beside them at the feature root.
 - For databases, prefer `ScriptableObjectDatabase<TDatabase, TKey, TValue>` and `TryGetById` patterns instead of ad hoc list scans.
+- Buff 配置包含 `BuffTag` 正负面标签; 净化类效果应通过 `BuffManager.RemoveBuffsByTag(BuffTag.Negative)` 批量移除负面 Buff.
 - For regular Buff stat changes, configure `StatModifier` data on `Buff` and calculate through `BuffManager`; do not let Lua directly mutate player speed, attack, or max HP fields.
 - For editor table import, prefer extending `Excel2SoListAssetImporter<TAsset>` or `ExcelTableImporterBase` in `Assets/UnityEasyWorkTools/TableImporter/Importers`.
 - Keep generated/bulk assets and Unity cache folders out of manual edits unless explicitly requested.

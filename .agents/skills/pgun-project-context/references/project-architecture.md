@@ -114,7 +114,7 @@ public abstract void OnPick(ItemEffectContext ctx);
 - `GameObject SourceObject`
 - `Vector3 WorldPosition`
 
-Known item effects include healing, applying buffs, chest random loot, and spawning prefabs at fight-room end.
+Known item effects include healing, applying buffs, cleansing negative buffs, chest random loot, and spawning prefabs at fight-room end.
 
 ## Buffs
 
@@ -123,7 +123,7 @@ Locations:
 - `Assets/Scripts/Gameplay/Buffs`
 - `Assets/Scripts/Gameplay/Managers/LuaManager.cs`
 
-`Buff` is serializable config stored inside `BuffDataBase`, not a standalone ScriptableObject. It contains id, display name, icon, description, Lua file, duration, permanence, interval, and stat modifiers.
+`Buff` is serializable config stored inside `BuffDataBase`, not a standalone ScriptableObject. It contains id, display name, icon, description, positive/negative tag, Lua file, duration, permanence, interval, and stat modifiers.
 
 Regular stat changes are data-driven through `StatModifier`:
 
@@ -144,10 +144,13 @@ Regular stat changes are data-driven through `StatModifier`:
 - `RemoveBuffById(int buffId)`
 - `TriggerBuffById(int buffId)`
 - `ClearBuffs()`
+- `RemoveBuffsByTag(BuffTag tag)`
 - `CalculateStat(StatType statType, float baseValue)`
 - `ActiveBuffs`
 
 If a non-permanent buff already exists, adding it resets duration and triggers `OnAdd` again. If a permanent buff already exists, adding it increments `BuffRuntimeInfo.StackCount`; stat modifiers scale by stack count, with `FinalMul` repeated once per stack. Add, remove, and clear operations trigger `GameEvent.PlayerBuffsChanged` for UI refresh.
+
+`BuffTag` has `Positive` and `Negative`. Buff CSV uses a `tag` column with those enum names. Purge/cleanse item effects should call `RemoveBuffsByTag(BuffTag.Negative)` instead of scanning UI state.
 
 `LuaBuffInstance` caches optional Lua methods:
 
@@ -294,6 +297,12 @@ Buff status UI lives in `Assets/Scripts/UI/Buffs`:
 - `BuffStatusPanel` listens for `GameEvent.PlayerBuffsChanged`, reads `Global.player.buffManager.ActiveBuffs`, and creates one status icon per active Buff.
 - `BuffStatusIcon` displays `Buff.Icon` and either remaining seconds for non-permanent Buffs or `StackCount` for permanent Buffs.
 - `BuffTooltipPanel` shows `Buff.BuffName` and `Buff.Description` on hover.
+
+Buff debug UI lives in `Assets/Scripts/UI/GameSceneUIInputController.cs`:
+
+- `BuffDebugWindow` is an IMGUI runtime debug helper for adding, removing, and clearing player Buffs.
+- `GameSceneUIInputController` toggles the window with `Alt+Up` and reports the debug panel state to `GameplayCursorState`.
+- The debug window reads a serialized `BuffDataBase` when provided, otherwise uses `DataBaseManager.Instance.Buffs`, and applies Buffs through `Global.player`'s `BuffManager`.
 
 Game scene UI stack rules:
 

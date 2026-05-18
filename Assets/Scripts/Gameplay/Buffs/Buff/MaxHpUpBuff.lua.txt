@@ -1,0 +1,22 @@
+local MaxHpUpBuff = {}
+
+function MaxHpUpBuff.OnAdd(runtimeInfo)
+    -- 常规最大生命值由 BuffDataBase 的 Modifier 统一计算.
+    CS.UnityEngine.Debug.Log("MaxHpUpBuff OnAdd")
+end
+
+function MaxHpUpBuff.OnRemove(runtimeInfo)
+    -- 常规最大生命值由 BuffDataBase 的 Modifier 统一计算.
+    CS.UnityEngine.Debug.Log("MaxHpUpBuff OnRemove")
+end
+
+function MaxHpUpBuff.OnUpdate(runtimeInfo, deltaTime)
+end
+
+function MaxHpUpBuff.OnInterval(runtimeInfo)
+end
+
+function MaxHpUpBuff.OnTrigger(runtimeInfo)
+end
+
+return MaxHpUpBuff

@@ -590,8 +590,11 @@ namespace Game.Gameplay
         ///<param name="dir">瞄准方向</param>
         public void AutoAim(ref Vector2 dir)
         {
-            if(!canAutoAim) return;
-            if(FightRoom.currentFightRoom == null) return;
+            if(!canAutoAim || FightRoom.currentFightRoom == null)
+            {
+                ClearAutoAimTarget();
+                return;
+            }
 
             RefreshAutoAimTarget();
 
@@ -626,7 +629,19 @@ namespace Game.Gameplay
         private void SwitchAutoAim()
         {
             canAutoAim = !canAutoAim;
+            if (!canAutoAim)
+            {
+                ClearAutoAimTarget();
+            }
+
             ShowDisPlayer("自动瞄准: " + (canAutoAim ? "开启" : "关闭"), 1f);
+        }
+
+        private void ClearAutoAimTarget()
+        {
+            // 自动瞄准关闭或脱离战斗时, 同步清理锁定目标和准星显示.
+            _autoAimTarget = null;
+            HideAutoAimIndicator();
         }
 
         private void HideAutoAimIndicator()

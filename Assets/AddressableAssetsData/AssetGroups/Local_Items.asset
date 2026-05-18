@@ -38,13 +38,6 @@ MonoBehaviour:
     - item_chest
     - items
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 0ba30ec915a74a50a3b00b0e798dc227
-    m_Address: BuffDataBase
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - buff_database
-    - items
-    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 63af2ccf367b1c745b05c3dc480c23af, type: 2}
   m_SchemaSet:

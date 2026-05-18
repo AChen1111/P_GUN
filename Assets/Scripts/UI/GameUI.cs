@@ -11,6 +11,7 @@ namespace Game.UI
     public class GameUI : ViewController {
         public UnityEngine.UI.Text BulletBagText;
         public UnityEngine.UI.Text BulletText;
+        public UnityEngine.UI.Text WaveText;
 
         public static GameUI Instance;
         [Header("UI元素")]
@@ -32,6 +33,7 @@ namespace Game.UI
             }
             Instance = this;
             ResolveItemTipPanel();
+            SetWaveTextVisible(false);
         }
 
         //订阅事件
@@ -62,6 +64,13 @@ namespace Game.UI
             Global.player?.Restart();
             SceneManager.LoadScene(SceneManager.GetActiveScene().name);
             Time.timeScale = 1;
+        }
+
+        public void ReturnToMainMenu()
+        {
+            // 返回主菜单前恢复时间流速, 避免主菜单继承游戏结束暂停状态.
+            Time.timeScale = 1;
+            SceneManager.LoadScene("StartScene");
         }
 
         public void ShowWinPanel()
@@ -132,6 +141,15 @@ namespace Game.UI
             BulletBagText.text = text;
         }
 
+        public void UpdateWaveText(RoomWaveDisplayEvent payload)
+        {
+            SetWaveTextVisible(payload.IsVisible);
+            if (!payload.IsVisible || WaveText == null) return;
+
+            // 文案集中在 UI 层, 房间系统只负责提供波数数据.
+            WaveText.text = $"当前波数 {payload.CurrentWave}/{payload.TotalWave}";
+        }
+
         public void ShowMessageOnPlayerHead(string message,float duration)
         {
             Global.player?.ShowDisPlayer(message, duration);
@@ -193,12 +211,16 @@ namespace Game.UI
         {
             WinPanel.transform.Find("BtnReset").GetComponent<Button>().onClick.AddListener(ResetGame);
             OverPanel.transform.Find("BtnReset").GetComponent<Button>().onClick.AddListener(ResetGame);
+            WinPanel.transform.Find("BtnMainMenu").GetComponent<Button>().onClick.AddListener(ReturnToMainMenu);
+            OverPanel.transform.Find("BtnMainMenu").GetComponent<Button>().onClick.AddListener(ReturnToMainMenu);
         }
 
         private void RemoveButtonListeners()
         {
             WinPanel.transform.Find("BtnReset").GetComponent<Button>().onClick.RemoveListener(ResetGame);
             OverPanel.transform.Find("BtnReset").GetComponent<Button>().onClick.RemoveListener(ResetGame);
+            WinPanel.transform.Find("BtnMainMenu").GetComponent<Button>().onClick.RemoveListener(ReturnToMainMenu);
+            OverPanel.transform.Find("BtnMainMenu").GetComponent<Button>().onClick.RemoveListener(ReturnToMainMenu);
         }
 
         private void AddEventListeners()
@@ -210,6 +232,7 @@ namespace Game.UI
             EventCenter.AddListener(GameEvent.ItemTipHidden, HideItemTip);
             EventCenter.AddListener<GunClip>(GameEvent.BulletClipChanged, UpdateBulletText);
             EventCenter.AddListener<BulletBag>(GameEvent.BulletBagChanged, UpdateBulletBagText);
+            EventCenter.AddListener<RoomWaveDisplayEvent>(GameEvent.RoomWaveDisplayChanged, UpdateWaveText);
             EventCenter.AddListener<PlayerHeadMessageEvent>(GameEvent.PlayerHeadMessageRequested, OnPlayerHeadMessageRequested);
         }
 
@@ -222,7 +245,16 @@ namespace Game.UI
             EventCenter.RemoveListener(GameEvent.ItemTipHidden, HideItemTip);
             EventCenter.RemoveListener<GunClip>(GameEvent.BulletClipChanged, UpdateBulletText);
             EventCenter.RemoveListener<BulletBag>(GameEvent.BulletBagChanged, UpdateBulletBagText);
+            EventCenter.RemoveListener<RoomWaveDisplayEvent>(GameEvent.RoomWaveDisplayChanged, UpdateWaveText);
             EventCenter.RemoveListener<PlayerHeadMessageEvent>(GameEvent.PlayerHeadMessageRequested, OnPlayerHeadMessageRequested);
+        }
+
+        private void SetWaveTextVisible(bool isVisible)
+        {
+            if (WaveText != null)
+            {
+                WaveText.gameObject.SetActive(isVisible);
+            }
         }
 
         private void OnPlayerHeadMessageRequested(PlayerHeadMessageEvent payload)

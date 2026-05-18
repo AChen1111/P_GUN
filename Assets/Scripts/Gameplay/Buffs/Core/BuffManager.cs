@@ -164,6 +164,34 @@ namespace Game.Gameplay
         }
 
         /// <summary>
+        /// 移除指定标签的所有 Buff, 用于净化等一次性批量效果.
+        /// </summary>
+        /// <param name="tag">目标 Buff 标签.</param>
+        /// <returns>被移除的 Buff 数量.</returns>
+        public int RemoveBuffsByTag(BuffTag tag)
+        {
+            var previousMaxHp = GetOwnerMaxHp();
+            var removedCount = 0;
+
+            for (var i = buffs.Count - 1; i >= 0; i--)
+            {
+                var info = buffs[i];
+                if (info.Buff.Tag != tag) continue;
+
+                TriggerOnRemove(info);
+                info.LuaInstance?.Dispose();
+                RemoveAt(info.Index);
+                removedCount++;
+            }
+
+            if (removedCount <= 0) return 0;
+
+            NotifyOwnerStatsChanged(previousMaxHp);
+            NotifyBuffsChanged();
+            return removedCount;
+        }
+
+        /// <summary>
         /// 主动触发指定 Buff.
         /// </summary>
         /// <param name="buffId">Buff id.</param>

@@ -1,3 +1,5 @@
-id,buffName,icon,description,luaFile,duration,isPermanent,interval,modifiers
-0,SpeedUpBuff,Assets/Assets/Items/Potion Asset.png,移动速度提升30%.,Assets/Scripts/Gameplay/Buffs/Buff/SpeedBuff.lua.txt,5,FALSE,1,MoveSpeed:PercentAdd:0.3
-1,PowerUpBuff,Assets/Assets/Items/Potion Asset.png,子弹伤害提升50%.,Assets/Scripts/Gameplay/Buffs/Buff/DamageUpBuff.lua.txt,5,FALSE,1,Attack:PercentAdd:0.5
+id,buffName,icon,description,tag,luaFile,duration,isPermanent,interval,modifiers
+0,SpeedUpBuff,Assets/Assets/Items/Potion Asset.png,移动速度提升30%.,Positive,Assets/Scripts/Gameplay/Buffs/Buff/SpeedBuff.lua.txt,5,FALSE,1,MoveSpeed:PercentAdd:0.3
+1,PowerUpBuff,Assets/Assets/Items/Potion Asset.png,子弹伤害提升50%.,Positive,Assets/Scripts/Gameplay/Buffs/Buff/DamageUpBuff.lua.txt,5,FALSE,1,Attack:PercentAdd:0.5
+2,MaxHpUpBuff,Assets/Assets/Items/Potion Asset.png,最大生命值提升2点.,Positive,Assets/Scripts/Gameplay/Buffs/Buff/MaxHpUpBuff.lua.txt,5,FALSE,1,MaxHp:Flat:2
+3,PoisonBuff,Assets/Assets/Items/Potion Asset.png,永久中毒: 每隔5秒每层受到1点伤害.,Negative,Assets/Scripts/Gameplay/Buffs/Buff/PoisonBuff.lua.txt,0,TRUE,5,
