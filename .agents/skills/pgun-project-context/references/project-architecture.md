@@ -367,6 +367,16 @@ Addressable database keys are currently string fields in `DataBaseManager`:
 
 `Assets/Editor/AddressablesLocalGroupSetup.cs` and `Assets/UnityEasyWorkTools/TableImporter/Importers/AddressablesLabelTableImporter.cs` support editor-side Addressables setup/import. Preserve labels and database keys when moving assets.
 
+Current hot-update Addressables groups are:
+
+- `Room`: `Level1.asset`, room templates, and corridor prefabs.
+- `Buff`: `BuffDataBase` and Buff Lua text assets.
+- `Item`: `ItemDatabase` and item prefabs.
+- `Enemy`: `EnemyDatabase` and enemy prefabs.
+- `Weapon`: `WeaponDatabase` and weapon prefabs.
+
+These groups use `Remote.BuildPath` and `Remote.LoadPath`, build a remote catalog, use unique bundle ids, and keep `ContentUpdateGroupSchema.StaticContent` disabled. Do not put first-package-only scene, UI, player, bullet, or VFX assets into Addressables unless they are explicitly intended to hot update.
+
 ## Current Refactor Notes
 
 The item system has been refactored toward:

@@ -48,6 +48,7 @@ P_GUN is a Unity 2022.3 2D top-down shooter project. Runtime code is split by as
 - Visual animation sequences belong to `Game.Animation`: runtime scripts live in `Assets/UnityEasyWorkTools/AnimationSequence/Scripts`, editor code lives in `Assets/UnityEasyWorkTools/AnimationSequence/Editor`, sequence assets are `AnimationSequenceAsset`, and playback is handled by scene `AnimationPlayer`.
 - UI auto binding tooling lives in `Assets/UnityEasyWorkTools/UIAutoBind`: runtime binding component and rules are in `Scripts`, editor inspector/code generation is in `Editor`, and the global setting asset stays beside them at the feature root.
 - For databases, prefer `ScriptableObjectDatabase<TDatabase, TKey, TValue>` and `TryGetById` patterns instead of ad hoc list scans.
+- Addressables hot-update groups are limited to `Room`, `Buff`, `Item`, `Enemy`, and `Weapon`; keep first-package-only content out of Addressables unless the hot-update scope changes.
 - Buff 配置包含 `BuffTag` 正负面标签; 净化类效果应通过 `BuffManager.RemoveBuffsByTag(BuffTag.Negative)` 批量移除负面 Buff.
 - For regular Buff stat changes, configure `StatModifier` data on `Buff` and calculate through `BuffManager`; do not let Lua directly mutate player speed, attack, or max HP fields.
 - For editor table import, prefer extending `Excel2SoListAssetImporter<TAsset>` or `ExcelTableImporterBase` in `Assets/UnityEasyWorkTools/TableImporter/Importers`.

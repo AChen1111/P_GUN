@@ -1,0 +1,88 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: Weapon
+  m_EditorClassIdentifier: 
+  m_GroupName: Weapon
+  m_Data:
+    m_SerializedData: []
+  m_GUID: e9c19588f9e08b745be60d74fa750ef2
+  m_SerializeEntries:
+  - m_GUID: 0146e2e603c9931498cfa221d222fa9a
+    m_Address: weapon/bow
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - prefab
+    - weapon
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0a94435d9287e2b4b966018256ec5194
+    m_Address: weapon/rocket_gun
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - prefab
+    - weapon
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4ea89973311c6f94da169560abf23ef9
+    m_Address: weapon/shotgun
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - prefab
+    - weapon
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6468ba96de52d3a48ab7649bf7a8f5ca
+    m_Address: weapon/mp5
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - prefab
+    - weapon
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6d6e0a3a98503714c899e24a2384c459
+    m_Address: WeaponDatabase
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - database
+    - weapon
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 78d6bb99e24c4a94fa86f5dd50caddd6
+    m_Address: weapon/pistol
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - prefab
+    - weapon
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8b4f120b8e657e54eaab0c7e3e76abc3
+    m_Address: weapon/awp
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - prefab
+    - weapon
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: dd7733526380a19439e58ed60e12c1ad
+    m_Address: weapon/ak
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - prefab
+    - weapon
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e03681111fe9cdb4b9482d45fab56849
+    m_Address: weapon/laser
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - prefab
+    - weapon
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 63af2ccf367b1c745b05c3dc480c23af, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 906ce5e06bc81ff4f8a294ca0d001ad3, type: 2}
+    - {fileID: 11400000, guid: c5a8604e09477c44db8dea098cfc8c89, type: 2}
