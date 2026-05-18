@@ -219,7 +219,13 @@ namespace Game.UI
                 return;
             }
 
-            var slot = slotPrefab != null ? Instantiate(slotPrefab, slotRoot) : InventorySlotView.CreateDefault(slotRoot);
+            if (slotPrefab == null)
+            {
+                Debug.LogError("背包刷新失败, SlotPrefab未绑定.", this);
+                return;
+            }
+
+            var slot = Instantiate(slotPrefab, slotRoot);
             slot.Configure(stack, this);
             activeSlots.Add(slot);
         }
