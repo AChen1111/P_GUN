@@ -3,3 +3,4 @@
 2,宝箱,获得随机道具,Assets/Assets/Chests/Chest_Gold/Chest_Gold_Empty.png
 3,加速药水,加速,Assets/Assets/Items/Potion Asset.png
 4,增伤药水,增加伤害,Assets/Assets/Items/Potion Asset.png
+5,净化药水,移除所有负面Buff,Assets/Assets/Items/Potion Asset.png

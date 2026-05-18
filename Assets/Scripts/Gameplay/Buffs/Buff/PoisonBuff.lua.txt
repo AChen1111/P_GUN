@@ -1,0 +1,33 @@
+local PoisonBuff = {}
+local PoisonDamagePerStack = 1
+
+function PoisonBuff.OnAdd(runtimeInfo)
+    -- 中毒伤害由 Lua 配置, Buff 数据只负责永久和间隔配置.
+    CS.UnityEngine.Debug.Log("PoisonBuff OnAdd")
+end
+
+function PoisonBuff.OnRemove(runtimeInfo)
+    CS.UnityEngine.Debug.Log("PoisonBuff OnRemove")
+end
+
+function PoisonBuff.OnUpdate(runtimeInfo, deltaTime)
+end
+
+function PoisonBuff.OnInterval(runtimeInfo)
+    local owner = runtimeInfo.Owner
+    if owner == nil then
+        error("PoisonBuff Owner is nil.")
+    end
+
+    -- 每层中毒独立贡献伤害, 例如两层每次间隔扣 2 点.
+    local damage = PoisonDamagePerStack * math.max(1, runtimeInfo.StackCount)
+
+    -- 使用玩家统一受伤流程, 保持受击反馈, 无敌帧和死亡事件一致.
+    local damageInfo = CS.Game.Gameplay.DamageInfo(damage, CS.UnityEngine.Vector2(0, 0))
+    owner:Hurt(damageInfo)
+end
+
+function PoisonBuff.OnTrigger(runtimeInfo)
+end
+
+return PoisonBuff

@@ -23,6 +23,8 @@ namespace Game.Gameplay
         private int enemyCount = 0;
         // 房间剩余波数
         private int remainWaveCount = 0;
+        // 房间总波数缓存, 保证 UI 显示的分母在战斗过程中稳定.
+        private int totalWaveCount = 1;
 
         // 当前正在进行战斗流程的房间（给 Enemy 死亡回调使用）
         public static FightRoom currentFightRoom;
@@ -69,7 +71,8 @@ namespace Game.Gameplay
         {
             needGenerateDoors = true;
             doorStateIsOpen = true;
-            remainWaveCount = Mathf.Max(1, GetInitialWaveCount());
+            totalWaveCount = Mathf.Max(1, GetInitialWaveCount());
+            remainWaveCount = totalWaveCount;
         }
 
         /// <summary>
@@ -109,6 +112,7 @@ namespace Game.Gameplay
         public void ResetWaveCount(int count)
         {
             remainWaveCount = Mathf.Max(0, count);
+            totalWaveCount = Mathf.Max(totalWaveCount, remainWaveCount);
         }
 
         /// <summary>
@@ -139,6 +143,7 @@ namespace Game.Gameplay
         {
             if (remainWaveCount <= 0) return;
 
+            TriggerWaveDisplayChanged(true);
             ResetEnemyCount(SpawnWaveEnemies());
         }
 
@@ -157,13 +162,12 @@ namespace Game.Gameplay
         private void CompleteCurrentWave()
         {
             remainWaveCount--;
-            //Debug.Log("波次结束, 剩余波数: " + remainWaveCount);
-            //todo:把这个显示交给UI处理
 
             //如果剩余波数为0，则打开门
             if (remainWaveCount <= 0)
             {
                 remainWaveCount = 0;
+                TriggerWaveDisplayChanged(false);
                 OnFightAllWavesEnd();
                 FightEnded?.Invoke(this);
                 foreach (var door in doorsList)
@@ -174,6 +178,13 @@ namespace Game.Gameplay
             }
 
             StartNextWave();
+        }
+
+        private void TriggerWaveDisplayChanged(bool isVisible)
+        {
+            var currentWave = Mathf.Clamp(totalWaveCount - remainWaveCount + 1, 1, totalWaveCount);
+            // 波数显示只推送数据, 具体文本和显隐由 UI 层处理.
+            EventCenter.Trigger(GameEvent.RoomWaveDisplayChanged, new RoomWaveDisplayEvent(currentWave, totalWaveCount, isVisible));
         }
 
         /// <summary>

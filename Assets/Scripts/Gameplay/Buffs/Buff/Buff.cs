@@ -6,6 +6,15 @@ using UnityEngine;
 namespace Game.Gameplay
 {
     /// <summary>
+    /// Buff 阵营标签, 用于净化等按类别处理的效果.
+    /// </summary>
+    public enum BuffTag
+    {
+        Positive,
+        Negative
+    }
+
+    /// <summary>
     /// Buff 基础配置数据, 由 BuffDataBase 统一保存并按 id 查询.
     /// </summary>
     [Serializable]
@@ -24,6 +33,9 @@ namespace Game.Gameplay
         [TextArea]
         [Tooltip("Buff 的 UI 描述文本.")]
         [SerializeField] private string description = string.Empty;
+
+        [Tooltip("Buff 的正负面标签, 用于净化等分类效果.")]
+        [SerializeField] private BuffTag tag = BuffTag.Positive;
 
         [Tooltip("Buff 绑定的 Lua 文件, 文件需要返回包含生命周期方法的 table.")]
         [SerializeField] private TextAsset luaFile = null;
@@ -48,6 +60,7 @@ namespace Game.Gameplay
         public string BuffName => string.IsNullOrWhiteSpace(buffName) ? id.ToString() : buffName;
         public Sprite Icon => icon;
         public string Description => description;
+        public BuffTag Tag => tag;
         public TextAsset LuaFile => luaFile;
         public float Duration => Mathf.Max(0f, duration);
         public bool IsPermanent => isPermanent;
@@ -123,6 +136,11 @@ namespace Game.Gameplay
         {
             duration = Mathf.Max(0f, duration);
             interval = Mathf.Max(0f, interval);
+            if (!Enum.IsDefined(typeof(BuffTag), tag))
+            {
+                tag = BuffTag.Positive;
+            }
+
             modifiers.RemoveAll(modifier => modifier == null);
         }
     }
