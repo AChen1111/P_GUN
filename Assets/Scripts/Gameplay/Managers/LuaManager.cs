@@ -21,18 +21,6 @@ namespace Game.Gameplay
 
         public static LuaManager Instance { get; private set; }
 
-        /// <summary>
-        /// 获取或创建 Lua 管理器, 避免场景漏挂组件导致 Buff 无法运行.
-        /// </summary>
-        /// <returns>Lua 管理器实例.</returns>
-        public static LuaManager GetOrCreate()
-        {
-            if (Instance != null) return Instance;
-
-            var managerObject = new GameObject(nameof(LuaManager));
-            return managerObject.AddComponent<LuaManager>();
-        }
-
         private void Awake()
         {
             if (Instance != null && Instance != this)

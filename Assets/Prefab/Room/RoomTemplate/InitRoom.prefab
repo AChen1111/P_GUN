@@ -742,7 +742,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 92f1dce4686c87b4e97533920e9b48c3, type: 3}
   currentClip: {fileID: 0}
   index: 0
-  isSFX: 1
+  is3D: 1
   loop: 0
   isRandom: 1
   min_distance: 1
@@ -2550,20 +2550,20 @@ MonoBehaviour:
   DistanceFromCorners: 1
   DoorLength: 1
   DoorsList:
-  - From: {x: 4, y: -1, z: 0}
+  - From: {x: 4, y: 0, z: 0}
     To: {x: 4, y: -1, z: 0}
     Direction: 0
     Socket: {fileID: 0}
+  - From: {x: -7, y: 0, z: 0}
+    To: {x: -7, y: -1, z: 0}
+    Direction: 0
+    Socket: {fileID: 0}
   - From: {x: -2, y: 4, z: 0}
-    To: {x: -2, y: 4, z: 0}
+    To: {x: -1, y: 4, z: 0}
     Direction: 0
     Socket: {fileID: 0}
   - From: {x: -2, y: -5, z: 0}
-    To: {x: -2, y: -5, z: 0}
-    Direction: 0
-    Socket: {fileID: 0}
-  - From: {x: -7, y: -1, z: 0}
-    To: {x: -7, y: -1, z: 0}
+    To: {x: -1, y: -5, z: 0}
     Direction: 0
     Socket: {fileID: 0}
   Socket: {fileID: 0}

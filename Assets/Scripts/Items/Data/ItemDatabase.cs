@@ -12,7 +12,23 @@ namespace Game.Items
     {
         [SerializeField] private List<ItemData> items = new List<ItemData>();
 
+        public static ItemDatabase RuntimeDatabase { get; private set; }
+
         public IReadOnlyList<ItemData> Items => items;
+
+        public static void SetRuntimeDatabase(ItemDatabase database)
+        {
+            // DataBaseManager 加载 Addressables 后写入当前数据库, Item 模块无需反向依赖 Gameplay.
+            RuntimeDatabase = database;
+        }
+
+        public static void ClearRuntimeDatabase(ItemDatabase database)
+        {
+            if (RuntimeDatabase == database)
+            {
+                RuntimeDatabase = null;
+            }
+        }
 
         public void ReplaceItems(IEnumerable<ItemData> newItems)
         {

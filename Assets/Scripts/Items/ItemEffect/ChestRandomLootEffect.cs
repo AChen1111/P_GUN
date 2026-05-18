@@ -71,7 +71,7 @@ namespace Game.Items
                 {
                     spawnAnimEffect = entry.spawnAnimEffect;
                     spawnAnimDuration = entry.spawnAnimDuration;
-                    return entry.prefab;
+                    return spawnTable.TryResolvePrefab(entry, out var prefab) ? prefab : null;
                 }
 
                 Debug.LogWarning($"{nameof(ChestRandomLootEffect)}: 生成表 {spawnTable.name} 没有可用物品。");
@@ -85,9 +85,12 @@ namespace Game.Items
             }
 
             var validPrefabs = new List<GameObject>();
-            foreach (var prefab in lootTable)
+            foreach (var configuredPrefab in lootTable)
             {
-                if (prefab != null) validPrefabs.Add(prefab);
+                if (configuredPrefab != null)
+                {
+                    validPrefabs.Add(ResolveRuntimePrefab(configuredPrefab));
+                }
             }
 
             if (validPrefabs.Count == 0)
@@ -97,6 +100,21 @@ namespace Game.Items
             }
 
             return validPrefabs[Random.Range(0, validPrefabs.Count)];
+        }
+
+        /// <summary>
+        /// 旧掉落表只保存直连预制体, 运行时优先替换为已热更的同 ID 预制体.
+        /// </summary>
+        private static GameObject ResolveRuntimePrefab(GameObject configuredPrefab)
+        {
+            var item = configuredPrefab != null ? configuredPrefab.GetComponent<Item>() : null;
+            var content = AddressableRuntimeContent.Instance;
+            if (item != null && content != null && content.TryGetPrefabById("item", item.ItemId, out var runtimePrefab))
+            {
+                return runtimePrefab;
+            }
+
+            return configuredPrefab;
         }
 
         private bool HasAvailableLoot()

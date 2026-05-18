@@ -66,20 +66,6 @@ MonoBehaviour:
     - enemy
     - prefab
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: c42c8260bc4f449588c588d697b5211e
-    m_Address: EnemyDatabase
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - database
-    - enemy
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: c7689240beca890469aab85afd109862
-    m_Address: enemy/bat
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - enemy
-    - prefab
-    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 63af2ccf367b1c745b05c3dc480c23af, type: 2}
   m_SchemaSet:

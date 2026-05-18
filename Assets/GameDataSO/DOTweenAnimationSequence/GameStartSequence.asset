@@ -15,7 +15,7 @@ MonoBehaviour:
   steps:
   - target: {fileID: 0}
     targetPath: MainPanel
-    startupActiveState: 0
+    startupActiveState: 2
     effectType: 2
     duration: 3
     delay: 1

@@ -11,6 +11,8 @@ namespace Game.Items
     [Serializable]
     public struct ItemSpawnEntry
     {
+        public int itemId;
+        public string address;
         public GameObject prefab;
 
         [Min(0)]
@@ -40,11 +42,21 @@ namespace Game.Items
             prefab = null;
             if (TryGetRandomEntry(out var selectedEntry))
             {
-                prefab = selectedEntry.prefab;
-                return true;
+                return TryResolvePrefab(selectedEntry, out prefab);
             }
 
             return false;
+        }
+
+        public bool TryResolvePrefab(ItemSpawnEntry entry, out GameObject prefab)
+        {
+            if (TryResolveAddressablePrefab(entry, out prefab))
+            {
+                return true;
+            }
+
+            prefab = entry.prefab;
+            return prefab != null;
         }
 
         /// <summary>
@@ -57,7 +69,7 @@ namespace Game.Items
             var totalWeight = 0;
             foreach (var entry in entries)
             {
-                if (entry.prefab == null || entry.weight <= 0) continue;
+                if (!HasResolvablePrefab(entry) || entry.weight <= 0) continue;
                 totalWeight += entry.weight;
             }
 
@@ -66,7 +78,7 @@ namespace Game.Items
             var roll = UnityEngine.Random.Range(0, totalWeight);
             foreach (var entry in entries)
             {
-                if (entry.prefab == null || entry.weight <= 0) continue;
+                if (!HasResolvablePrefab(entry) || entry.weight <= 0) continue;
 
                 if (roll < entry.weight)
                 {
@@ -78,6 +90,32 @@ namespace Game.Items
             }
 
             return false;
+        }
+
+        private static bool HasResolvablePrefab(ItemSpawnEntry entry)
+        {
+            return TryResolveAddressablePrefab(entry, out _) || entry.prefab != null;
+        }
+
+        private static bool TryResolveAddressablePrefab(ItemSpawnEntry entry, out GameObject prefab)
+        {
+            prefab = null;
+            var content = AddressableRuntimeContent.Instance;
+            if (content == null) return false;
+
+            if (!string.IsNullOrWhiteSpace(entry.address)
+                && content.TryGetAsset<GameObject>(entry.address, out prefab))
+            {
+                return true;
+            }
+
+            if (entry.itemId > 0 && content.TryGetPrefabById("item", entry.itemId, out prefab))
+            {
+                return true;
+            }
+
+            var item = entry.prefab != null ? entry.prefab.GetComponent<Item>() : null;
+            return item != null && content.TryGetPrefabById("item", item.ItemId, out prefab);
         }
     }
 }

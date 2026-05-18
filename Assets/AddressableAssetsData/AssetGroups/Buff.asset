@@ -17,13 +17,6 @@ MonoBehaviour:
     m_SerializedData: []
   m_GUID: 4de99d2d7748c3a4092527ae6ee96f74
   m_SerializeEntries:
-  - m_GUID: 0ba30ec915a74a50a3b00b0e798dc227
-    m_Address: BuffDataBase
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - buff
-    - database
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 648678a33bef4bec9cd2e901e934f017
     m_Address: buff/lua/speed
     m_ReadOnly: 0
