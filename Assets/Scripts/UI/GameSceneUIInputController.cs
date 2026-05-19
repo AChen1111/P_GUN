@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Game.Core;
 using Game.Gameplay;
+using Game.UI.Save;
 using UnityEngine;
 
 namespace Game.UI
@@ -14,13 +15,17 @@ namespace Game.UI
         [SerializeField] private SettingsPanel settingsPanel;
         [Header("背包面板")]
         [SerializeField] private InventoryPanel inventoryPanel;
+        [Header("存档槽位面板")]
+        [SerializeField] private SaveSlotPanel saveSlotPanel;
         [Header("Buff调试")]
         [SerializeField] private BuffDataBase buffDebugDataBase;
 
         private bool settingsOpen;
         private bool inventoryOpen;
+        private bool saveSlotOpen;
         private float previousTimeScale = 1f;
         private float inventoryPreviousTimeScale = 1f;
+        private float saveSlotPreviousTimeScale = 1f;
         private readonly BuffDebugWindow buffDebugWindow = new BuffDebugWindow();
 
         private void OnEnable()
@@ -40,6 +45,11 @@ namespace Game.UI
                 RestoreInventoryCloseState();
             }
 
+            if (saveSlotOpen)
+            {
+                RestoreSaveSlotCloseState();
+            }
+
             buffDebugWindow.SetVisible(false);
             GameplayCursorState.Reset();
         }
@@ -54,8 +64,19 @@ namespace Game.UI
                 ToggleInventoryPanel();
             }
 
+            if (Input.GetKeyDown(KeyCode.F5))
+            {
+                ToggleSaveSlotPanel();
+            }
+
             if (Input.GetKeyDown(KeyCode.Escape))
             {
+                if (saveSlotOpen)
+                {
+                    CloseSaveSlotPanel();
+                    return;
+                }
+
                 if (inventoryOpen)
                 {
                     CloseInventoryPanel();
@@ -81,6 +102,12 @@ namespace Game.UI
                 // 背包也可能被UI栈关闭, 这里统一恢复暂停和鼠标状态.
                 RestoreInventoryCloseState();
             }
+
+            if (saveSlotOpen && saveSlotPanel != null && !saveSlotPanel.gameObject.activeSelf)
+            {
+                // 存档面板也可能被返回按钮出栈, 这里统一恢复暂停和鼠标状态.
+                RestoreSaveSlotCloseState();
+            }
         }
 
         private void OnGUI()
@@ -95,7 +122,7 @@ namespace Game.UI
 
         private void ToggleSettingsPanel()
         {
-            if (inventoryOpen)
+            if (inventoryOpen || saveSlotOpen)
             {
                 return;
             }
@@ -157,7 +184,7 @@ namespace Game.UI
 
         private void ToggleInventoryPanel()
         {
-            if (settingsOpen)
+            if (settingsOpen || saveSlotOpen)
             {
                 return;
             }
@@ -208,6 +235,55 @@ namespace Game.UI
             inventoryOpen = false;
             Time.timeScale = inventoryPreviousTimeScale;
             GameplayCursorState.SetInventoryPanelOpen(false);
+        }
+
+        private void ToggleSaveSlotPanel()
+        {
+            if (settingsOpen || inventoryOpen)
+            {
+                return;
+            }
+
+            if (saveSlotOpen)
+            {
+                CloseSaveSlotPanel();
+                return;
+            }
+
+            OpenSaveSlotPanel();
+        }
+
+        private void OpenSaveSlotPanel()
+        {
+            if (saveSlotPanel == null)
+            {
+                Debug.LogError("打开存档面板失败, SaveSlotPanel未绑定.", this);
+                return;
+            }
+
+            saveSlotPreviousTimeScale = Time.timeScale;
+            saveSlotOpen = true;
+            Time.timeScale = 0f;
+            GameplayCursorState.SetSaveSlotPanelOpen(true);
+            saveSlotPanel.OpenForSafeHouse();
+        }
+
+        private void CloseSaveSlotPanel()
+        {
+            UIStackManager stackManager = UIStackManager.Instance;
+            if (stackManager != null && stackManager.Peek() == saveSlotPanel)
+            {
+                stackManager.Pop();
+            }
+
+            RestoreSaveSlotCloseState();
+        }
+
+        private void RestoreSaveSlotCloseState()
+        {
+            saveSlotOpen = false;
+            Time.timeScale = saveSlotPreviousTimeScale;
+            GameplayCursorState.SetSaveSlotPanelOpen(false);
         }
 
         private static bool IsBuffDebugTogglePressed()

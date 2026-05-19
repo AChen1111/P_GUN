@@ -1,5 +1,7 @@
+using System.Collections;
 using Edgar.Unity;
 using Game.Core;
+using Game.Gameplay.Save;
 using UnityEngine;
 
 namespace Game.Gameplay
@@ -14,6 +16,10 @@ namespace Game.Gameplay
         [SerializeField] private bool generateOnStart = true;
 
         private bool generated;
+        private int lastGeneratedSeed;
+
+        public string LevelGraphAddress => levelGraphAddress;
+        public int LastGeneratedSeed => lastGeneratedSeed;
 
         private void Awake()
         {
@@ -45,6 +51,7 @@ namespace Game.Gameplay
                 return;
             }
 
+            SaveGameService.ApplyPendingGenerationSettings(this, dungeonGenerator);
             ApplyAddressableLevelGraph();
             if (dungeonGenerator.FixedLevelGraphConfig.LevelGraph == null)
             {
@@ -53,7 +60,17 @@ namespace Game.Gameplay
             }
 
             generated = true;
-            dungeonGenerator.Generate();
+            var payload = dungeonGenerator.Generate() as DungeonGeneratorPayloadGrid2D;
+            // 保存 Edgar 实际使用的 seed, 读档时用它重建同一张地图.
+            lastGeneratedSeed = payload?.GeneratedLevel != null ? payload.GeneratedLevel.Seed : dungeonGenerator.RandomGeneratorSeed;
+            StartCoroutine(RestorePendingSaveNextFrame());
+        }
+
+        public void OverrideLevelGraphAddress(string address)
+        {
+            if (string.IsNullOrWhiteSpace(address)) return;
+
+            levelGraphAddress = address;
         }
 
         private void ResolveGenerator()
@@ -81,6 +98,13 @@ namespace Game.Gameplay
             }
 
             Debug.LogError($"{nameof(AddressableDungeonBootstrapper)}: 找不到已预加载的 LevelGraph, Address: {levelGraphAddress}.", this);
+        }
+
+        private IEnumerator RestorePendingSaveNextFrame()
+        {
+            // 房间实例的 Start 会在生成后一帧执行, 等门和房间初始化完成后再覆盖存档状态.
+            yield return null;
+            SaveGameService.TryRestorePendingSave();
         }
     }
 }

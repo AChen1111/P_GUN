@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Game.UI.Save;
 
 namespace Game.UI
 {
@@ -8,6 +9,7 @@ namespace Game.UI
 	{
         [Header("主菜单面板")]
         [SerializeField] private SettingsPanel settingsPanel;
+        [SerializeField] private SaveSlotPanel saveSlotPanel;
 
 		protected override void Awake()
 		{
@@ -18,6 +20,7 @@ namespace Game.UI
         void OnEnable()
         {
             m_Btn_Start.onClick.AddListener(StartGame);
+            m_Btn_Load.onClick.AddListener(OpenLoadPanel);
             m_Btn_Setting.onClick.AddListener(OpenSettingPanel);
 			m_Btn_Quit.onClick.AddListener(ExitGame);
         }
@@ -25,6 +28,7 @@ namespace Game.UI
         void OnDisable()
         {
             m_Btn_Start.onClick.RemoveListener(StartGame);
+            m_Btn_Load.onClick.RemoveListener(OpenLoadPanel);
             m_Btn_Setting.onClick.RemoveListener(OpenSettingPanel);
 			m_Btn_Quit.onClick.RemoveListener(ExitGame);
         }
@@ -54,6 +58,18 @@ namespace Game.UI
             // 设置界面作为主菜单上的栈式弹窗打开.
             stackManager.Push(settingsPanel);
 		}
+
+        public void OpenLoadPanel()
+        {
+            if (saveSlotPanel == null)
+            {
+                Debug.LogError("打开读档面板失败, SaveSlotPanel未绑定.");
+                return;
+            }
+
+            // 主菜单只开放读档和删除, 不允许保存空进度.
+            saveSlotPanel.OpenForMainMenu();
+        }
 		
 	}
 }

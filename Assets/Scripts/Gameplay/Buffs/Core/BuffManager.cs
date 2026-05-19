@@ -5,6 +5,7 @@ using Game.Pooling;
 using Game.Animation;
 using Game.Presentation;
 using Game.Items;
+using Game.Gameplay.Save;
 
 namespace Game.Gameplay
 {
@@ -218,6 +219,27 @@ namespace Game.Gameplay
 
             buffInfoMap.Clear();
             NotifyOwnerStatsChanged(previousMaxHp);
+            NotifyBuffsChanged();
+        }
+
+        public void RestoreSaveData(IEnumerable<BuffSaveData> savedBuffs, UnityEngine.Object source)
+        {
+            ClearBuffs();
+            if (savedBuffs == null) return;
+
+            foreach (var savedBuff in savedBuffs)
+            {
+                if (savedBuff == null) continue;
+
+                var info = AddBuffById(savedBuff.buffId, source);
+                if (info == null) continue;
+
+                // 添加后覆盖计时和层数, 保留 Lua 实例初始化流程.
+                info.RemainingTime = Mathf.Max(0f, savedBuff.remainingTime);
+                info.StackCount = Mathf.Max(1, savedBuff.stackCount);
+                info.IsPermanent = savedBuff.isPermanent;
+            }
+
             NotifyBuffsChanged();
         }
 
