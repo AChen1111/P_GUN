@@ -11,6 +11,7 @@ public static class AddressablesLocalGroupSetup
 {
     private const string RemoteBuildPath = "ServerData/P_GUN/[BuildTarget]";
     private const string RemoteLoadPath = "https://achen1o1.xyz/AB/P_GUN/[BuildTarget]";
+    private const string ContentUpdateGroupNamePrefix = "Content Update";
 
     private static readonly HotUpdateGroupDefinition[] HotUpdateGroups =
     {
@@ -76,18 +77,6 @@ public static class AddressablesLocalGroupSetup
             })
     };
 
-    [MenuItem("PG/Addressables/Create Hot Update Groups")]
-    public static void CreateHotUpdateGroupsFromMenu()
-    {
-        CreateHotUpdateGroups();
-    }
-
-    [MenuItem("PG/Addressables/Create Local Groups")]
-    public static void CreateLocalGroupsFromMenu()
-    {
-        CreateHotUpdateGroups();
-    }
-
     public static void CreateLocalGroups()
     {
         CreateHotUpdateGroups();
@@ -139,6 +128,38 @@ public static class AddressablesLocalGroupSetup
         AssetDatabase.Refresh();
 
         Debug.Log($"Addressables hot update groups ready. Groups: {string.Join(", ", HotUpdateGroups.Select(group => group.GroupName))}.");
+    }
+
+    public static void ConfigureContentUpdateGroupsForRemote()
+    {
+        var settings = AddressableAssetSettingsDefaultObject.Settings;
+        if (settings == null)
+        {
+            Debug.LogError("Addressables settings not found. Open Window > Asset Management > Addressables > Groups and click Create Addressables Settings first.");
+            return;
+        }
+
+        ConfigureRemoteProfile(settings);
+
+        var changedGroups = 0;
+        foreach (var group in settings.groups.Where(IsGeneratedContentUpdateGroup))
+        {
+            ConfigureAsRemotePackedGroup(settings, group);
+            changedGroups++;
+        }
+
+        if (changedGroups <= 0)
+        {
+            Debug.Log("No generated Content Update groups found.");
+            return;
+        }
+
+        settings.SetDirty(AddressableAssetSettings.ModificationEvent.BatchModification, null, true, true);
+        EditorUtility.SetDirty(settings);
+        AssetDatabase.SaveAssets();
+        AssetDatabase.Refresh();
+
+        Debug.Log($"Configured {changedGroups} generated Content Update group(s) for remote Addressables bundles.");
     }
 
     private static void RemoveNonHotUpdateGroups(AddressableAssetSettings settings)
@@ -198,6 +219,37 @@ public static class AddressablesLocalGroupSetup
         EditorUtility.SetDirty(group);
         EditorUtility.SetDirty(bundledSchema);
         EditorUtility.SetDirty(contentUpdateSchema);
+    }
+
+    private static void ConfigureAsRemotePackedGroup(AddressableAssetSettings settings, AddressableAssetGroup group)
+    {
+        var bundledSchema = group.GetSchema<BundledAssetGroupSchema>() ?? group.AddSchema<BundledAssetGroupSchema>();
+        var contentUpdateSchema = group.GetSchema<ContentUpdateGroupSchema>() ?? group.AddSchema<ContentUpdateGroupSchema>();
+
+        // 内容更新组只给已发布首包使用, Bundle 必须输出到 ServerData 并通过远程 URL 加载.
+        bundledSchema.BuildPath.SetVariableByName(settings, AddressableAssetSettings.kRemoteBuildPath);
+        bundledSchema.LoadPath.SetVariableByName(settings, AddressableAssetSettings.kRemoteLoadPath);
+        bundledSchema.IncludeInBuild = true;
+        bundledSchema.BundleMode = BundledAssetGroupSchema.BundlePackingMode.PackTogether;
+        bundledSchema.Compression = BundledAssetGroupSchema.BundleCompressionMode.LZ4;
+        bundledSchema.BundleNaming = BundledAssetGroupSchema.BundleNamingStyle.AppendHash;
+        bundledSchema.UseAssetBundleCache = true;
+        bundledSchema.UseAssetBundleCrc = true;
+        bundledSchema.UseUnityWebRequestForLocalBundles = false;
+
+        // 生成的内容更新组本身就是增量包, 不能再标记为 Prevent Updates.
+        contentUpdateSchema.StaticContent = false;
+
+        EditorUtility.SetDirty(group);
+        EditorUtility.SetDirty(bundledSchema);
+        EditorUtility.SetDirty(contentUpdateSchema);
+    }
+
+    private static bool IsGeneratedContentUpdateGroup(AddressableAssetGroup group)
+    {
+        return group != null
+            && group.Name.StartsWith(ContentUpdateGroupNamePrefix, StringComparison.Ordinal)
+            && group.GetSchema<ContentUpdateGroupSchema>() != null;
     }
 
     private static void ClearGroupEntries(AddressableAssetSettings settings, AddressableAssetGroup group)
