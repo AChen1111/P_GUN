@@ -2,47 +2,50 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
+using System.Security.Cryptography;
 using UnityEditor;
+using UnityEditor.AddressableAssets;
+using UnityEditor.AddressableAssets.Build;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
 public static class AddressablesRemoteUploader
 {
-    private const string MenuPath = "PG/Addressables/Upload ServerData To Remote";
+    private const string MenuPath = "PG/Addressables/一键保存上传";
     private const string LocalRelativeDirectory = "ServerData/P_GUN/StandaloneWindows64";
+    private const string ContentStateRelativePath = "Assets/AddressableAssetsData/Windows/addressables_content_state.bin";
     private const string RemoteHost = "39.97.56.180";
     private const string RemoteUser = "root";
     private const string RemoteDirectory = "/www/wwwroot/39.97.56.180/AB/P_GUN/StandaloneWindows64";
 
     [MenuItem(MenuPath)]
-    public static void UploadServerDataToRemote()
+    public static void SaveBuildAndUpload()
     {
-        var localDirectory = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), LocalRelativeDirectory));
-        if (!Directory.Exists(localDirectory))
-        {
-            EditorUtility.DisplayDialog("上传失败", $"找不到本地目录: {localDirectory}", "OK");
-            return;
-        }
-
-        var files = Directory.GetFiles(localDirectory, "*", SearchOption.AllDirectories);
-        if (files.Length == 0)
-        {
-            EditorUtility.DisplayDialog("上传失败", $"本地目录没有可上传文件: {localDirectory}", "OK");
-            return;
-        }
-
         try
         {
+            SaveEditorChanges();
+            AddressablesLocalGroupSetup.ConfigureContentUpdateGroupsForRemote();
+            BuildContentUpdate();
+
+            var localDirectory = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), LocalRelativeDirectory));
+            ValidateLocalUploadDirectory(localDirectory);
+            UpdateCatalogHashFiles(localDirectory);
+            ValidateCatalogForRemoteUpload(localDirectory);
+
+            var files = Directory.GetFiles(localDirectory, "*", SearchOption.AllDirectories);
             EnsureRemoteDirectory();
             UploadFiles(localDirectory, files);
-            EditorUtility.DisplayDialog("上传完成", $"已上传 {files.Length} 个文件到:\n{RemoteUser}@{RemoteHost}:{RemoteDirectory}", "OK");
+
+            EditorUtility.DisplayDialog("一键保存上传完成", $"已构建并上传 {files.Length} 个文件到:\n{RemoteUser}@{RemoteHost}:{RemoteDirectory}", "OK");
         }
         catch (Exception exception)
         {
-            Debug.LogError($"{nameof(AddressablesRemoteUploader)}: 上传失败, Error: {exception.Message}");
+            Debug.LogError($"{nameof(AddressablesRemoteUploader)}: 一键保存上传失败, Error: {exception.Message}");
             EditorUtility.DisplayDialog(
-                "上传失败",
-                "Unity 菜单使用系统 ssh/scp 上传, 需要本机已配置 SSH key 或 ssh-agent.\n\n" +
+                "一键保存上传失败",
+                "请检查 Addressables Content State, ServerData 输出目录, 以及本机 SSH key 或 ssh-agent.\n\n" +
                 $"错误: {exception.Message}",
                 "OK");
         }
@@ -52,14 +55,145 @@ public static class AddressablesRemoteUploader
         }
     }
 
-    [MenuItem(MenuPath, true)]
-    private static bool ValidateUploadServerDataToRemote()
+    public static void UploadServerDataToRemote()
     {
-        return Directory.Exists(Path.Combine(Directory.GetCurrentDirectory(), LocalRelativeDirectory));
+        SaveBuildAndUpload();
+    }
+
+    private static void SaveEditorChanges()
+    {
+        EditorUtility.DisplayProgressBar("Addressables 一键保存上传", "保存场景和资源...", 0.05f);
+
+        // 先保存当前编辑器改动, 避免构建到旧的序列化内容.
+        EditorSceneManager.SaveOpenScenes();
+        AssetDatabase.SaveAssets();
+        AssetDatabase.Refresh();
+    }
+
+    private static void BuildContentUpdate()
+    {
+        EditorUtility.DisplayProgressBar("Addressables 一键保存上传", "构建内容更新包...", 0.25f);
+
+        var settings = AddressableAssetSettingsDefaultObject.Settings;
+        if (settings == null)
+        {
+            throw new InvalidOperationException("Addressables settings not found.");
+        }
+
+        var contentStatePath = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), ContentStateRelativePath));
+        if (!File.Exists(contentStatePath))
+        {
+            throw new FileNotFoundException("找不到首包 content state, 无法执行 Update a Previous Build.", contentStatePath);
+        }
+
+        // 使用首包 content state 构建增量包, 保持已发布客户端的 catalog 版本兼容.
+        var result = ContentUpdateScript.BuildContentUpdate(settings, contentStatePath);
+        if (result == null)
+        {
+            throw new InvalidOperationException("Addressables content update build returned null.");
+        }
+
+        if (!string.IsNullOrEmpty(result.Error))
+        {
+            throw new InvalidOperationException(result.Error);
+        }
+
+        AssetDatabase.Refresh();
+    }
+
+    private static void ValidateLocalUploadDirectory(string localDirectory)
+    {
+        if (!Directory.Exists(localDirectory))
+        {
+            throw new DirectoryNotFoundException($"找不到本地上传目录: {localDirectory}");
+        }
+
+        if (!Directory.EnumerateFiles(localDirectory, "*", SearchOption.AllDirectories).Any())
+        {
+            throw new InvalidOperationException($"本地上传目录没有可上传文件: {localDirectory}");
+        }
+    }
+
+    private static void UpdateCatalogHashFiles(string localDirectory)
+    {
+        EditorUtility.DisplayProgressBar("Addressables 一键保存上传", "更新 Catalog Hash...", 0.55f);
+
+        foreach (var catalogFile in Directory.GetFiles(localDirectory, "catalog_*.json", SearchOption.TopDirectoryOnly))
+        {
+            var hashFile = Path.ChangeExtension(catalogFile, ".hash");
+            File.WriteAllText(hashFile, CalculateMd5(catalogFile));
+        }
+    }
+
+    private static string CalculateMd5(string filePath)
+    {
+        using (var md5 = MD5.Create())
+        using (var stream = File.OpenRead(filePath))
+        {
+            return string.Concat(md5.ComputeHash(stream).Select(value => value.ToString("x2")));
+        }
+    }
+
+    private static void ValidateCatalogForRemoteUpload(string localDirectory)
+    {
+        var catalogFiles = Directory.GetFiles(localDirectory, "catalog_*.json", SearchOption.TopDirectoryOnly);
+        foreach (var catalogFile in catalogFiles)
+        {
+            var catalogText = File.ReadAllText(catalogFile);
+            if (catalogText.IndexOf("contentupdate__", StringComparison.OrdinalIgnoreCase) < 0)
+            {
+                continue;
+            }
+
+            if (!HasLocalContentUpdateBundlePath(catalogText))
+            {
+                continue;
+            }
+
+            // 这里直接阻止上传, 否则玩家会下载到指向本地 StreamingAssets 的 catalog.
+            throw new InvalidOperationException(
+                $"Catalog still references local Content Update bundles: {catalogFile}. " +
+                "Run PG/Addressables/一键保存上传 after Unity creates the Content Update group.");
+        }
+    }
+
+    private static bool HasLocalContentUpdateBundlePath(string catalogText)
+    {
+        var searchIndex = 0;
+        while (searchIndex < catalogText.Length)
+        {
+            var contentUpdateIndex = catalogText.IndexOf("contentupdate__", searchIndex, StringComparison.OrdinalIgnoreCase);
+            if (contentUpdateIndex < 0) return false;
+
+            var pathStart = catalogText.LastIndexOf('"', contentUpdateIndex);
+            var pathEnd = catalogText.IndexOf('"', contentUpdateIndex);
+            if (pathStart >= 0 && pathEnd > pathStart)
+            {
+                var path = catalogText.Substring(pathStart + 1, pathEnd - pathStart - 1);
+                var isLocalPath = path.IndexOf("{UnityEngine.AddressableAssets.Addressables.RuntimePath}", StringComparison.Ordinal) >= 0
+                    || path.IndexOf("StreamingAssets", StringComparison.OrdinalIgnoreCase) >= 0;
+                if (isLocalPath)
+                {
+                    return true;
+                }
+            }
+
+            searchIndex = contentUpdateIndex + "contentupdate__".Length;
+        }
+
+        return false;
+    }
+
+    [MenuItem(MenuPath, true)]
+    private static bool ValidateSaveBuildAndUpload()
+    {
+        return File.Exists(Path.Combine(Directory.GetCurrentDirectory(), ContentStateRelativePath));
     }
 
     private static void EnsureRemoteDirectory()
     {
+        EditorUtility.DisplayProgressBar("Addressables 一键保存上传", "准备远端目录...", 0.7f);
+
         // 远端目录不存在时先创建, 但不清理任何旧 bundle.
         RunProcess(
             ResolveExecutable("ssh"),
@@ -75,7 +209,7 @@ public static class AddressablesRemoteUploader
             var remotePath = $"{RemoteDirectory}/{relativePath}";
             var progress = files.Count > 0 ? (float)index / files.Count : 1f;
 
-            EditorUtility.DisplayProgressBar("上传 Addressables 热更文件", relativePath, progress);
+            EditorUtility.DisplayProgressBar("Addressables 一键保存上传", $"上传 {relativePath}", Mathf.Lerp(0.75f, 0.98f, progress));
 
             // 每个文件单独上传, 这样可以保留服务器旧文件并明确失败点.
             RunProcess(

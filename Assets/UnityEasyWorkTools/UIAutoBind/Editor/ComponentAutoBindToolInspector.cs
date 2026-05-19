@@ -496,6 +496,7 @@ public class ComponentAutoBindToolInspector : Editor
         List<string> typeNames = new List<string>();
         foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
         {
+            // 只扫描指定程序集, 避免不必要的性能开销和潜在的类型冲突.
             if (assembly == null || Array.IndexOf(assemblyNames, assembly.GetName().Name) < 0)
             {
                 continue;

@@ -157,6 +157,8 @@ namespace Game.Gameplay
 
         private async Task UpdateCatalogsIfNeededAsync()
         {
+
+            //返回:需要更新的 Catalog 列表, 如果没有更新则返回空列表. 
             var checkHandle = Addressables.CheckForCatalogUpdates(false);
             await checkHandle.Task;
 
@@ -167,6 +169,7 @@ namespace Game.Gameplay
                     throw new InvalidOperationException("CheckForCatalogUpdates failed.");
                 }
 
+                /// 只有当确实有新的 Catalog 可用时才调用 UpdateCatalogs, 避免不必要的网络请求和资源重载.
                 var catalogs = checkHandle.Result;
                 if (catalogs == null || catalogs.Count == 0)
                 {
@@ -174,6 +177,7 @@ namespace Game.Gameplay
                 }
 
                 SetStatus("更新资源目录...");
+                //这里只更新资源索引,没有发生资源的替换
                 var updateHandle = Addressables.UpdateCatalogs(catalogs, false);
                 await updateHandle.Task;
 
@@ -194,7 +198,15 @@ namespace Game.Gameplay
                 Addressables.Release(checkHandle);
             }
         }
-
+        
+        /// <summary>
+        /// 获取需要下载的资源总大小, 用于在 UI 上显示下载进度. 这个方法会检查 DownloadLabels 标签下的所有资源, 包括它们的依赖项, 并返回需要下载的总字节数.
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="InvalidOperationException"></exception> <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         private static async Task<long> GetDownloadSizeAsync()
         {
             var handle = Addressables.GetDownloadSizeAsync((IEnumerable)DownloadLabels);
@@ -214,7 +226,12 @@ namespace Game.Gameplay
                 Addressables.Release(handle);
             }
         }
-
+        
+        /// <summary>
+        /// 下载依赖资源
+        /// </summary>
+        /// <param name="downloadSize"></param>
+        /// <returns></returns>
         private async Task DownloadDependenciesAsync(long downloadSize)
         {
             var handle = Addressables.DownloadDependenciesAsync((IEnumerable)DownloadLabels, Addressables.MergeMode.Union, false);
@@ -243,10 +260,12 @@ namespace Game.Gameplay
             }
         }
 
+        //加载资源
         private async Task LoadRuntimeContentAsync()
         {
             await runtimeContent.LoadAssetAsync<LevelGraph>("room/level1");
 
+            //预加载物品资源
             foreach (var address in ItemAddresses)
             {
                 var prefab = await runtimeContent.LoadAssetAsync<GameObject>(address);

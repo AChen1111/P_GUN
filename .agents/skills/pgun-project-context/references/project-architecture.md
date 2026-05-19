@@ -371,7 +371,7 @@ Addressable database keys are currently string fields in `DataBaseManager`:
 
 `Assets/Editor/AddressablesLocalGroupSetup.cs` and `Assets/UnityEasyWorkTools/TableImporter/Importers/AddressablesLabelTableImporter.cs` support editor-side Addressables setup/import. Preserve labels and database keys when moving assets.
 
-`Assets/Editor/AddressablesRemoteUploader.cs` adds `PG/Addressables/Upload ServerData To Remote`. It uploads every file under `ServerData/P_GUN/StandaloneWindows64` to `/www/wwwroot/39.97.56.180/AB/P_GUN/StandaloneWindows64` through system `ssh/scp`, without deleting old server bundles. The menu expects local SSH key or ssh-agent authentication; do not hardcode server passwords into Unity editor scripts.
+`Assets/Editor/AddressablesRemoteUploader.cs` adds `PG/Addressables/一键保存上传`. It saves open scenes/assets, configures generated `Content Update*` groups for remote build/load paths, builds content update bundles from `Assets/AddressableAssetsData/Windows/addressables_content_state.bin`, refreshes catalog hash files, validates the catalog, and uploads every file under `ServerData/P_GUN/StandaloneWindows64` to `/www/wwwroot/39.97.56.180/AB/P_GUN/StandaloneWindows64` through system `ssh/scp`, without deleting old server bundles. The menu expects local SSH key or ssh-agent authentication; do not hardcode server passwords into Unity editor scripts.
 
 Current hot-update Addressables groups are:
 
@@ -382,6 +382,8 @@ Current hot-update Addressables groups are:
 - `Weapon`: `WeaponDatabase` and weapon prefabs.
 
 These groups are Local-first hot-update groups. Their `BuildPath` and `LoadPath` use `Local.BuildPath` and `Local.LoadPath`, so the first player build includes the bundles in the package. The project still builds a remote catalog, with `Remote.BuildPath = ServerData/P_GUN/[BuildTarget]` and `Remote.LoadPath = https://achen1o1.xyz/AB/P_GUN/[BuildTarget]`. Each group keeps `ContentUpdateGroupSchema.StaticContent` enabled (`Prevent Updates` in the Inspector), so later updates should be produced with the official Addressables `Update a Previous Build` workflow and the original `addressables_content_state.bin`. Upload generated remote catalog/hash/bundles to `/www/wwwroot/39.97.56.180/AB/P_GUN/[BuildTarget]` on the Nginx server. Do not put first-package-only scene, UI, player, bullet, or VFX assets into Addressables unless they are explicitly intended to hot update.
+
+Generated `Content Update*` groups must use `Remote.BuildPath` and `Remote.LoadPath` before building/uploading update bundles. Use `PG/Addressables/一键保存上传` for routine hot-update publishing; it also validates the catalog and blocks uploads when a `contentupdate__*.bundle` still points to `Addressables.RuntimePath` or `StreamingAssets`.
 
 `Root` is the first Build Settings scene, followed by `StartScene` and `GameScene`. It owns the explicit scene singletons `DataBaseManager`, `LuaManager`, `AddressableRuntimeContent`, and `RootHotUpdateController`. Addressables `DisableCatalogUpdateOnStartup` is enabled so `RootHotUpdateController` owns the update UI timing. The boot flow initializes Addressables, checks and updates catalogs, downloads labels `room`, `buff`, `item`, `enemy`, and `weapon`, loads databases, preloads runtime Addressables content, then loads `StartScene`. Network/catalog/download failures may log and continue with built-in or cached content; missing databases or required runtime content are configuration errors and should fail loudly.
 
