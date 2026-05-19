@@ -55,5 +55,13 @@ namespace Game.Gameplay
             gunClip.Reload(reloadSound);
         }
 
+        public void RestoreAmmo(int currentBullet, int maxBullet)
+        {
+            // 读档恢复备弹时直接覆盖数量, 无限弹药保持 -1.
+            this.maxBullet = maxBullet;
+            this.currentBullet = maxBullet < 0 ? -1 : Mathf.Clamp(currentBullet, 0, Mathf.Max(0, maxBullet));
+            EventCenter.Trigger(GameEvent.BulletBagChanged, this);
+        }
+
     }
 }

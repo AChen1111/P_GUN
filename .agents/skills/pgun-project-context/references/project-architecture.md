@@ -120,6 +120,32 @@ Known item effects include healing, applying buffs, cleansing negative buffs, ch
 
 `PlayerInventory` lives on the player prefab and stores runtime `InventoryItemStack` data by `itemId`. Stacks preserve display data and effect assets, but do not keep references to pooled pickup GameObjects. `AddFromItem(Item item)` stacks pickups and triggers `GameEvent.InventoryChanged`; `Use(int itemId)` executes all currently usable effects and consumes one item only when at least one effect can be used.
 
+## Save System
+
+Locations:
+
+- `Assets/Scripts/Gameplay/Save`
+- `Assets/Scripts/UI/Save`
+- `Assets/Prefab/UI/Save`
+
+The v1 save system is a JSON safe-point framework with 3 fixed slots:
+
+- Slot files: `Application.persistentDataPath/Saves/slot_1.json` through `slot_3.json`.
+- `SaveGameService` is the UI-facing API for `SaveToSlot`, `LoadFromSlot`, `DeleteSlot`, and `GetSlotSummaries`.
+- `SaveSlotStorage` owns JSON file path, read, write, delete, and summary extraction only.
+- `GameSaveData` stores version, saved time, scene name, LevelGraph address, map seed, current room id, player snapshot, and room snapshot list.
+- `LoadFromSlot` reads JSON, stores it as pending data, reloads `GameScene`, injects the saved LevelGraph address and Edgar seed before generation, then restores room progress and player state after generated rooms initialize.
+
+Rules:
+
+- Safe-point saves are only allowed in `GameScene`.
+- Saving fails while `FightRoom.currentFightRoom` is not null.
+- Ground drop items are not saved in v1; only inventory stacks are saved.
+- Loading a slot always reloads `GameScene` to clear unsaved enemies, bullets, and ground drops before restoration.
+- The system uses ordinary static services for file IO and must not dynamically create manager GameObjects.
+- `SaveSlotPanel` opens in main-menu mode for load/delete and safe-house mode for save/load/delete.
+- `GameSceneUIInputController` uses `F5` as the temporary safe-house test shortcut until a real safe-house interaction is defined.
+
 ## Buffs
 
 Locations:

@@ -76,6 +76,20 @@ namespace Game.Gameplay
     protected GunFire gunFireEffect = new GunFire();
 
     public virtual BulletBag BulletBag => bulletBag;
+    public GunClip GunClip => gunClip;
+
+    public void RestoreAmmo(int clipAmmo, int clipMaxAmmo, int bagAmmo, int bagMaxAmmo)
+    {
+        if (gunClip != null)
+        {
+            gunClip.RestoreAmmo(clipAmmo, clipMaxAmmo);
+        }
+
+        if (bulletBag != null)
+        {
+            bulletBag.RestoreAmmo(bagAmmo, bagMaxAmmo);
+        }
+    }
 
     protected virtual void Awake()
     {

@@ -87,6 +87,29 @@ namespace Game.Items
             EventCenter.Trigger(GameEvent.InventoryChanged);
         }
 
+        public bool RestoreStack(int itemId, int count, ItemDatabase database, IEnumerable<ItemEffectBase> effects)
+        {
+            if (count <= 0) return false;
+
+            var sourceDatabase = database != null ? database : ItemDatabase.RuntimeDatabase;
+            if (sourceDatabase == null || !sourceDatabase.TryGetById(itemId, out var data))
+            {
+                Debug.LogError($"背包恢复失败, ItemDatabase缺少 itemId={itemId} 的物品数据.", this);
+                return false;
+            }
+
+            var stack = new InventoryItemStack(itemId, data, effects);
+            for (var i = 0; i < count; i++)
+            {
+                stack.Add(data, effects);
+            }
+
+            stacksById[itemId] = stack;
+            orderedStacks.Add(stack);
+            EventCenter.Trigger(GameEvent.InventoryChanged);
+            return true;
+        }
+
         private ItemEffectContext BuildUseContext()
         {
             // 背包使用时以玩家自身作为效果来源, 避免引用已回收的拾取物对象.

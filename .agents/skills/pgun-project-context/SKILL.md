@@ -39,6 +39,9 @@ P_GUN is a Unity 2022.3 2D top-down shooter project. Runtime code is split by as
 - `GameScene` UI uses an explicit scene `UIStackManager` plus `UIStackInitializer`; HUD is the stack bottom and modal panels such as settings, win, and over panels are pushed through the stack.
 - Inventory runtime lives in `Assets/Scripts/Items/Inventory`; `PlayerInventory` must be attached to the player prefab, stacks picked items by `itemId`, and triggers `GameEvent.InventoryChanged` after add/use/clear.
 - Inventory UI lives in `Assets/Scripts/UI/Inventory` and prefabs live in `Assets/Prefab/UI/Inventory`; `GameSceneUIInputController` toggles it with `CapsLock`, pauses through the UI stack flow, and right-clicking a slot consumes one item only when at least one effect `CanUse` returns true.
+- Save system lives in `Assets/Scripts/Gameplay/Save`; it stores 3 JSON slots under `Application.persistentDataPath/Saves`, uses `SaveGameService` as the UI-facing API, and does not save ground drop items in v1.
+- Save slot UI lives in `Assets/Scripts/UI/Save` and `Assets/Prefab/UI/Save`; `SaveSlotPanel` opens in main-menu load/delete mode or safe-house save/load/delete mode, with `F5` as the temporary GameScene safe-house test shortcut.
+- Safe-point saves must fail clearly while `FightRoom.currentFightRoom` is not null; do not silently save mid-combat wave/enemy state in the v1 framework.
 - `UIPanelBase` roots should carry `ComponentAutoBindTool`; bindable child objects use UIAutoBind prefixes such as `Btn_`, `Txt_`, `Img_`, `Trans_`, and `Rect_`.
 - For pooled objects, implement and reset state through `IPoolable.OnSpawnFromPool()` and `IPoolable.OnRecycleToPool()`.
 - Damage number presentation belongs to `Game.Presentation`: enemies pass final damage and world position to `DamageTextPool`, while the `DamageText` prefab script owns random font size, offset, tween playback, and recycle callback.

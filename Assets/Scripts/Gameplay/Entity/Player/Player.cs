@@ -9,6 +9,7 @@ using Game.Pooling;
 using Game.Animation;
 using Game.Presentation;
 using Game.Items;
+using Game.Gameplay.Save;
 
 namespace Game.Gameplay
 {
@@ -475,6 +476,72 @@ namespace Game.Gameplay
             HP = Mathf.Min(MaxHP, HP + amount);
             PublishHPChanged();
             return HP - oldHp;
+        }
+
+        public void RestoreSaveData(PlayerSaveData data)
+        {
+            if (data == null) return;
+
+            transform.position = data.position.ToVector3();
+
+            RestoreBuffs(data);
+            RestoreInventory(data);
+            RestoreWeapons(data);
+
+            currentGunIndex = Mathf.Clamp(data.currentGunIndex, 0, Mathf.Max(0, guns.Count - 1));
+            SelectInitialGun();
+            HP = Mathf.Clamp(data.hp, 0, MaxHP);
+            PublishHPChanged();
+            gun?.OnGunUsed();
+        }
+
+        private void RestoreInventory(PlayerSaveData data)
+        {
+            var inventory = GetComponent<PlayerInventory>();
+            if (inventory == null) return;
+
+            inventory.Clear();
+            var database = DataBaseManager.Instance != null ? DataBaseManager.Instance.Items : ItemDatabase.RuntimeDatabase;
+            for (var i = 0; i < data.inventory.Count; i++)
+            {
+                var stack = data.inventory[i];
+                if (stack == null) continue;
+
+                inventory.RestoreStack(stack.itemId, stack.count, database, ResolveItemEffects(stack.itemId));
+            }
+        }
+
+        private static IReadOnlyList<ItemEffectBase> ResolveItemEffects(int itemId)
+        {
+            var content = AddressableRuntimeContent.Instance;
+            if (content != null && content.TryGetPrefabById("item", itemId, out var prefab) && prefab != null)
+            {
+                var item = prefab.GetComponent<Item>();
+                if (item != null)
+                {
+                    return item.Effects;
+                }
+            }
+
+            return null;
+        }
+
+        private void RestoreBuffs(PlayerSaveData data)
+        {
+            var manager = buffManager != null ? buffManager : GetComponent<BuffManager>();
+            manager?.RestoreSaveData(data.buffs, this);
+        }
+
+        private void RestoreWeapons(PlayerSaveData data)
+        {
+            for (var i = 0; i < data.weapons.Count; i++)
+            {
+                var weaponData = data.weapons[i];
+                if (weaponData == null) continue;
+
+                var targetGun = guns.Find(candidate => candidate != null && candidate.WeaponId == weaponData.weaponId);
+                targetGun?.RestoreAmmo(weaponData.clipAmmo, weaponData.clipMaxAmmo, weaponData.bagAmmo, weaponData.bagMaxAmmo);
+            }
         }
 
         private void PublishHPChanged()

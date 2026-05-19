@@ -10,9 +10,10 @@ namespace Game.Core
         private static bool isControlKeyHeld;
         private static bool isSettingsPanelOpen;
         private static bool isInventoryPanelOpen;
+        private static bool isSaveSlotPanelOpen;
         private static bool isDebugPanelOpen;
 
-        public static bool BlocksMouseCombat => isControlKeyHeld || isSettingsPanelOpen || isInventoryPanelOpen || isDebugPanelOpen;
+        public static bool BlocksMouseCombat => isControlKeyHeld || isSettingsPanelOpen || isInventoryPanelOpen || isSaveSlotPanelOpen || isDebugPanelOpen;
 
         public static void SetControlKeyHeld(bool isHeld)
         {
@@ -58,11 +59,23 @@ namespace Game.Core
             ApplyCursorState();
         }
 
+        public static void SetSaveSlotPanelOpen(bool isOpen)
+        {
+            if (isSaveSlotPanelOpen == isOpen)
+            {
+                return;
+            }
+
+            isSaveSlotPanelOpen = isOpen;
+            ApplyCursorState();
+        }
+
         public static void Reset()
         {
             isControlKeyHeld = false;
             isSettingsPanelOpen = false;
             isInventoryPanelOpen = false;
+            isSaveSlotPanelOpen = false;
             isDebugPanelOpen = false;
             ApplyCursorState();
         }

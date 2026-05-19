@@ -6,6 +6,7 @@ using Game.Pooling;
 using Game.Animation;
 using Game.Presentation;
 using Game.Items;
+using Game.Gameplay.Save;
 
 namespace Game.Gameplay
 {
@@ -25,11 +26,13 @@ namespace Game.Gameplay
         private int remainWaveCount = 0;
         // 房间总波数缓存, 保证 UI 显示的分母在战斗过程中稳定.
         private int totalWaveCount = 1;
+        private bool isCleared;
 
         // 当前正在进行战斗流程的房间（给 Enemy 死亡回调使用）
         public static FightRoom currentFightRoom;
 
         public event Action<FightRoom> FightEnded;
+        public override bool Cleared => isCleared;
 
         /// <summary>
         /// 所有波次结束回调，给子类扩展
@@ -81,6 +84,7 @@ namespace Game.Gameplay
         protected override void OnPlayerEnteredRoom(Collider2D other)
         {
             if (hasEnter) return;
+            if (isCleared) return;
 
             hasEnter = true;
             currentFightRoom = this;
@@ -167,6 +171,8 @@ namespace Game.Gameplay
             if (remainWaveCount <= 0)
             {
                 remainWaveCount = 0;
+                isCleared = true;
+                if (currentFightRoom == this) currentFightRoom = null;
                 TriggerWaveDisplayChanged(false);
                 OnFightAllWavesEnd();
                 FightEnded?.Invoke(this);
@@ -233,6 +239,28 @@ namespace Game.Gameplay
         private void OnDisable()
         {
             if (currentFightRoom == this) currentFightRoom = null;
+        }
+
+        public override void RestoreSaveData(RoomSaveData data)
+        {
+            base.RestoreSaveData(data);
+
+            if (data == null || !data.cleared)
+            {
+                return;
+            }
+
+            // 已清空房间读档后不再生成敌人或结算掉落.
+            hasEnter = true;
+            isCleared = true;
+            enemyCount = 0;
+            remainWaveCount = 0;
+            SetDoorsOpen(true);
+
+            if (currentFightRoom == this)
+            {
+                currentFightRoom = null;
+            }
         }
     }
 }

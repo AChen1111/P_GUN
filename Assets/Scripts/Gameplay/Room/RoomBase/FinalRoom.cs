@@ -4,6 +4,7 @@ using Game.Pooling;
 using Game.Animation;
 using Game.Presentation;
 using Game.Items;
+using Game.Gameplay.Save;
 
 namespace Game.Gameplay
 {
@@ -22,6 +23,17 @@ namespace Game.Gameplay
         protected override void OnPlayerEnteredRoom(Collider2D other)
         {
             finalSR.gameObject.SetActive(true);
+        }
+
+        public override void RestoreSaveData(RoomSaveData data)
+        {
+            base.RestoreSaveData(data);
+
+            if (finalSR != null)
+            {
+                // 最终房间贴图只依赖是否到访.
+                finalSR.gameObject.SetActive(data != null && data.visited);
+            }
         }
     }
 }

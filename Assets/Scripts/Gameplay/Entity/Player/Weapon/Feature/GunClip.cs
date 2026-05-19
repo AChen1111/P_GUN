@@ -101,5 +101,14 @@ namespace Game.Gameplay
         {
             UpdateUI();
         }
+
+        public void RestoreAmmo(int currentAmmo, int maxAmmo)
+        {
+            // 读档恢复弹夹时直接覆盖数量, 并清理换弹状态.
+            this.maxAmmo = maxAmmo;
+            this.currentAmmo = IsInfinite ? -1 : Mathf.Clamp(currentAmmo, 0, Mathf.Max(0, maxAmmo));
+            isReloading = false;
+            UpdateUI();
+        }
     }
 }

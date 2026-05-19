@@ -8,6 +8,7 @@ using Game.Pooling;
 using Game.Animation;
 using Game.Presentation;
 using Game.Items;
+using Game.Gameplay.Save;
 
 namespace Game.Gameplay
 {
@@ -31,11 +32,17 @@ namespace Game.Gameplay
 
 		private bool doorsGenerated;
 		protected List<Door> doorsList = new List<Door>();
+		private string cachedSaveRoomId;
 
 		public event Action<Room> RoomInitialized;
 		public event Action<Room, Collider2D> PlayerEnteredRoom;
 		public event Action<Room, Collider2D> PlayerExitedRoom;
 
+		public static Room CurrentPlayerRoom { get; private set; }
+		public string SaveRoomId => ResolveSaveRoomId();
+		public bool Visited { get; private set; }
+		public virtual bool Cleared => false;
+		public IReadOnlyList<Door> Doors => doorsList;
 
 		/// <summary>
 		/// 玩家进入房间处理
@@ -153,6 +160,10 @@ namespace Game.Gameplay
 		{
 			if(other.CompareTag("Player"))
 			{
+				// 玩家当前房间只记录安全点存档需要的稳定进度.
+				Visited = true;
+				CurrentPlayerRoom = this;
+
 				if (TryGetComponent<MinimapRoomData>(out var minimapData))
 					minimapData.Highlight();
 
@@ -174,10 +185,63 @@ namespace Game.Gameplay
 			}
 		}
 
+		private string ResolveSaveRoomId()
+		{
+			if (!string.IsNullOrWhiteSpace(cachedSaveRoomId))
+			{
+				return cachedSaveRoomId;
+			}
+
+			if (TryGetComponent<RoomInfoGrid2D>(out var roomInfo) && roomInfo.RoomInstance != null)
+			{
+				var position = roomInfo.RoomInstance.Position;
+				var template = roomInfo.RoomInstance.RoomTemplatePrefab;
+				var templateName = template != null ? template.name : gameObject.name;
+				cachedSaveRoomId = $"{GetType().Name}_{position.x}_{position.y}_{templateName}";
+				return cachedSaveRoomId;
+			}
+
+			// 直接运行场景时可能没有 Edgar 房间信息, 使用场景位置生成调试用 id.
+			var roundedX = Mathf.RoundToInt(transform.position.x);
+			var roundedY = Mathf.RoundToInt(transform.position.y);
+			cachedSaveRoomId = $"{GetType().Name}_{roundedX}_{roundedY}_{gameObject.name}";
+			return cachedSaveRoomId;
+		}
+
 		public Vector3 GetRoomCenterPoint()
 		{
 			if(roomCenterPoint == null) return transform.position;
 			return roomCenterPoint.position;
+		}
+
+		public static void SetCurrentPlayerRoom(Room room)
+		{
+			CurrentPlayerRoom = room;
+		}
+
+		public void MarkVisited()
+		{
+			Visited = true;
+			CurrentPlayerRoom = this;
+		}
+
+		public virtual void RestoreSaveData(RoomSaveData data)
+		{
+			if (data == null) return;
+
+			// 读档只覆盖安全点状态, 不重放房间生成或掉落逻辑.
+			Visited = data.visited;
+		}
+
+		protected void SetDoorsOpen(bool isOpen)
+		{
+			for (var i = 0; i < doorsList.Count; i++)
+			{
+				if (doorsList[i] != null)
+				{
+					doorsList[i].SetDoorState(isOpen);
+				}
+			}
 		}
 
 
