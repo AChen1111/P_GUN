@@ -36,9 +36,12 @@ public static class AddressablesRemoteUploader
 
             var files = Directory.GetFiles(localDirectory, "*", SearchOption.AllDirectories);
             EnsureRemoteDirectory();
-            UploadFiles(localDirectory, files);
+            var uploadResult = UploadFiles(localDirectory, files);
 
-            EditorUtility.DisplayDialog("一键保存上传完成", $"已构建并上传 {files.Length} 个文件到:\n{RemoteUser}@{RemoteHost}:{RemoteDirectory}", "OK");
+            EditorUtility.DisplayDialog(
+                "一键保存上传完成",
+                $"已上传 {uploadResult.UploadedCount} 个变更文件, 跳过 {uploadResult.SkippedCount} 个相同文件:\n{RemoteUser}@{RemoteHost}:{RemoteDirectory}",
+                "OK");
         }
         catch (Exception exception)
         {
@@ -200,22 +203,76 @@ public static class AddressablesRemoteUploader
             $"-o BatchMode=yes -o StrictHostKeyChecking=accept-new {RemoteUser}@{RemoteHost} \"mkdir -p '{RemoteDirectory}'\"");
     }
 
-    private static void UploadFiles(string localDirectory, IReadOnlyList<string> files)
+    private static UploadResult UploadFiles(string localDirectory, IReadOnlyList<string> files)
     {
+        var remoteHashes = GetRemoteFileHashes();
+        var uploadedCount = 0;
+        var skippedCount = 0;
+
         for (var index = 0; index < files.Count; index++)
         {
             var localPath = files[index];
             var relativePath = MakeRelativePath(localDirectory, localPath).Replace('\\', '/');
             var remotePath = $"{RemoteDirectory}/{relativePath}";
             var progress = files.Count > 0 ? (float)index / files.Count : 1f;
+            var localHash = CalculateMd5(localPath);
+
+            if (remoteHashes.TryGetValue(relativePath, out var remoteHash)
+                && string.Equals(localHash, remoteHash, StringComparison.OrdinalIgnoreCase))
+            {
+                skippedCount++;
+                EditorUtility.DisplayProgressBar("Addressables 一键保存上传", $"跳过未变化文件 {relativePath}", Mathf.Lerp(0.75f, 0.98f, progress));
+                continue;
+            }
 
             EditorUtility.DisplayProgressBar("Addressables 一键保存上传", $"上传 {relativePath}", Mathf.Lerp(0.75f, 0.98f, progress));
 
-            // 每个文件单独上传, 这样可以保留服务器旧文件并明确失败点.
+            // 每个变更文件单独上传, 这样可以保留服务器旧文件并明确失败点.
             RunProcess(
                 ResolveExecutable("scp"),
                 $"-o BatchMode=yes -o StrictHostKeyChecking=accept-new -p \"{localPath}\" \"{RemoteUser}@{RemoteHost}:{remotePath}\"");
+            uploadedCount++;
         }
+
+        Debug.Log($"{nameof(AddressablesRemoteUploader)}: 上传完成, Changed: {uploadedCount}, Skipped: {skippedCount}.");
+        return new UploadResult(uploadedCount, skippedCount);
+    }
+
+    private static Dictionary<string, string> GetRemoteFileHashes()
+    {
+        EditorUtility.DisplayProgressBar("Addressables 一键保存上传", "比对远端文件...", 0.72f);
+
+        var output = RunProcessWithOutput(
+            ResolveExecutable("ssh"),
+            $"-o BatchMode=yes -o StrictHostKeyChecking=accept-new {RemoteUser}@{RemoteHost} \"cd '{RemoteDirectory}' && find . -type f -exec md5sum {{}} +\"",
+            false);
+
+        var result = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        using (var reader = new StringReader(output))
+        {
+            while (reader.ReadLine() is { } line)
+            {
+                if (string.IsNullOrWhiteSpace(line) || line.Length < 35)
+                {
+                    continue;
+                }
+
+                var hash = line.Substring(0, 32);
+                var path = line.Substring(34).Trim();
+                if (path.StartsWith("./", StringComparison.Ordinal))
+                {
+                    path = path.Substring(2);
+                }
+
+                path = path.Replace('\\', '/');
+                if (!string.IsNullOrWhiteSpace(path))
+                {
+                    result[path] = hash;
+                }
+            }
+        }
+
+        return result;
     }
 
     private static string ResolveExecutable(string executableName)
@@ -228,6 +285,11 @@ public static class AddressablesRemoteUploader
     }
 
     private static void RunProcess(string executable, string arguments)
+    {
+        RunProcessWithOutput(executable, arguments);
+    }
+
+    private static string RunProcessWithOutput(string executable, string arguments, bool logOutput = true)
     {
         var startInfo = new ProcessStartInfo
         {
@@ -252,12 +314,12 @@ public static class AddressablesRemoteUploader
 
             if (process.ExitCode == 0)
             {
-                if (!string.IsNullOrWhiteSpace(stdout))
+                if (logOutput && !string.IsNullOrWhiteSpace(stdout))
                 {
                     Debug.Log(stdout.Trim());
                 }
 
-                return;
+                return stdout;
             }
 
             var message = string.IsNullOrWhiteSpace(stderr) ? stdout : stderr;
@@ -278,5 +340,17 @@ public static class AddressablesRemoteUploader
         return path.EndsWith(Path.DirectorySeparatorChar.ToString(), StringComparison.Ordinal)
             ? path
             : path + Path.DirectorySeparatorChar;
+    }
+
+    private readonly struct UploadResult
+    {
+        public UploadResult(int uploadedCount, int skippedCount)
+        {
+            UploadedCount = uploadedCount;
+            SkippedCount = skippedCount;
+        }
+
+        public int UploadedCount { get; }
+        public int SkippedCount { get; }
     }
 }
