@@ -21,6 +21,9 @@ namespace Game.Core
         /// </summary>
         protected virtual IEqualityComparer<TKey> KeyComparer => EqualityComparer<TKey>.Default;
 
+        /// <summary>
+        /// 执行 TryGetById 逻辑.
+        /// </summary>
         public bool TryGetById(TKey id, out TValue data)
         {
             return IndexMap.TryGetValue(id, out data);
@@ -59,6 +62,9 @@ namespace Game.Core
             }
         }
 
+        /// <summary>
+        /// 执行 RebuildIndex 逻辑.
+        /// </summary>
         private void RebuildIndex()
         {
             if (indexMap == null)

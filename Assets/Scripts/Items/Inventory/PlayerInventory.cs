@@ -15,6 +15,9 @@ namespace Game.Items
 
         public IReadOnlyList<InventoryItemStack> Items => orderedStacks;
 
+        /// <summary>
+        /// 执行 AddFromItem 逻辑.
+        /// </summary>
         public bool AddFromItem(Item item)
         {
             if (item == null)
@@ -44,11 +47,17 @@ namespace Game.Items
             return true;
         }
 
+        /// <summary>
+        /// 执行 TryGetStack 逻辑.
+        /// </summary>
         public bool TryGetStack(int itemId, out InventoryItemStack stack)
         {
             return stacksById.TryGetValue(itemId, out stack);
         }
 
+        /// <summary>
+        /// 执行 Use 逻辑.
+        /// </summary>
         public bool Use(int itemId)
         {
             if (!stacksById.TryGetValue(itemId, out var stack) || stack.Count <= 0)
@@ -78,8 +87,21 @@ namespace Game.Items
 
             EventCenter.Trigger(GameEvent.InventoryChanged);
             return true;
-        }
 
+            ItemEffectContext BuildUseContext()
+            {
+                // 背包使用时以玩家自身作为效果来源, 避免引用已回收的拾取物对象.
+                return new ItemEffectContext
+                {
+                    SourceObject = gameObject,
+                    WorldPosition = transform.position
+                };
+            }
+}
+
+        /// <summary>
+        /// 执行 Clear 逻辑.
+        /// </summary>
         public void Clear()
         {
             stacksById.Clear();
@@ -87,6 +109,9 @@ namespace Game.Items
             EventCenter.Trigger(GameEvent.InventoryChanged);
         }
 
+        /// <summary>
+        /// 执行 RestoreStack 逻辑.
+        /// </summary>
         public bool RestoreStack(int itemId, int count, ItemDatabase database, IEnumerable<ItemEffectBase> effects)
         {
             if (count <= 0) return false;
@@ -108,16 +133,6 @@ namespace Game.Items
             orderedStacks.Add(stack);
             EventCenter.Trigger(GameEvent.InventoryChanged);
             return true;
-        }
-
-        private ItemEffectContext BuildUseContext()
-        {
-            // 背包使用时以玩家自身作为效果来源, 避免引用已回收的拾取物对象.
-            return new ItemEffectContext
-            {
-                SourceObject = gameObject,
-                WorldPosition = transform.position
-            };
         }
     }
 }

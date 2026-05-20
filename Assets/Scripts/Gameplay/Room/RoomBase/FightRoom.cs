@@ -158,34 +158,35 @@ namespace Game.Gameplay
         {
             if (enemyCount > 0) return;
             CompleteCurrentWave();
-        }
+
+            void CompleteCurrentWave()
+            {
+                remainWaveCount--;
+                //如果剩余波数为0，则打开门
+                if (remainWaveCount <= 0)
+                {
+                    remainWaveCount = 0;
+                    isCleared = true;
+                    if (currentFightRoom == this)
+                        currentFightRoom = null;
+                    TriggerWaveDisplayChanged(false);
+                    OnFightAllWavesEnd();
+                    FightEnded?.Invoke(this);
+                    foreach (var door in doorsList)
+                    {
+                        door.OpenDoor(true);
+                    }
+
+                    return;
+                }
+
+                StartNextWave();
+            }
+}
 
         /// <summary>
-        /// 波次结算：若还有波次则继续，否则结束战斗。
+        /// 执行 TriggerWaveDisplayChanged 逻辑.
         /// </summary>
-        private void CompleteCurrentWave()
-        {
-            remainWaveCount--;
-
-            //如果剩余波数为0，则打开门
-            if (remainWaveCount <= 0)
-            {
-                remainWaveCount = 0;
-                isCleared = true;
-                if (currentFightRoom == this) currentFightRoom = null;
-                TriggerWaveDisplayChanged(false);
-                OnFightAllWavesEnd();
-                FightEnded?.Invoke(this);
-                foreach (var door in doorsList)
-                {
-                    door.OpenDoor(true);
-                }
-                return;
-            }
-
-            StartNextWave();
-        }
-
         private void TriggerWaveDisplayChanged(bool isVisible)
         {
             var currentWave = Mathf.Clamp(totalWaveCount - remainWaveCount + 1, 1, totalWaveCount);
@@ -236,11 +237,17 @@ namespace Game.Gameplay
 
 
 
+        /// <summary>
+        /// 注销禁用时需要的监听.
+        /// </summary>
         private void OnDisable()
         {
             if (currentFightRoom == this) currentFightRoom = null;
         }
 
+        /// <summary>
+        /// 执行 RestoreSaveData 逻辑.
+        /// </summary>
         public override void RestoreSaveData(RoomSaveData data)
         {
             base.RestoreSaveData(data);

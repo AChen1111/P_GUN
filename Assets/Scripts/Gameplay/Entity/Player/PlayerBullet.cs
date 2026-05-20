@@ -18,6 +18,9 @@ namespace Game.Gameplay
         [SerializeField]private AudioPlay _audioPlay;
         private Coroutine autoRecycleCoroutine;
 
+        /// <summary>
+        /// 初始化运行时依赖.
+        /// </summary>
         private void Awake() {
             rb = GetComponent<Rigidbody2D>();
             _audioPlay = GetComponent<AudioPlay>();
@@ -40,7 +43,18 @@ namespace Game.Gameplay
             hasHit = false;
             _audioPlay?.Clear();
             autoRecycleCoroutine = StartCoroutine(AutoRecycleIfNotHit());
-        }
+
+            IEnumerator AutoRecycleIfNotHit()
+            {
+                yield return new WaitForSeconds(lifeTime);
+                autoRecycleCoroutine = null;
+                if (!hasHit)
+                {
+                    hasHit = true;
+                    PlayerBulletPool.Instance.Release(this);
+                }
+            }
+}
 
         /// <summary>
         /// 回收子弹时调用
@@ -49,7 +63,20 @@ namespace Game.Gameplay
             hasHit = true;
             StopAutoRecycleCoroutine();
             StopMove();
-        }
+
+            void StopAutoRecycleCoroutine()
+            {
+                if (autoRecycleCoroutine == null)
+                    return;
+                StopCoroutine(autoRecycleCoroutine);
+                autoRecycleCoroutine = null;
+            }
+
+            void StopMove()
+            {
+                rb.velocity = Vector2.zero;
+            }
+}
 
         ///<summary>
         ///碰撞检测
@@ -59,6 +86,9 @@ namespace Game.Gameplay
             HandleHit(other.gameObject);
         }
 
+        /// <summary>
+        /// 处理 2D 触发进入事件.
+        /// </summary>
         private void OnTriggerEnter2D(Collider2D other) {
             HandleHit(other.gameObject);
         }
@@ -70,20 +100,6 @@ namespace Game.Gameplay
         ///</summary>
         private void FixedUpdate() {
             rb.velocity = dir * speed;
-        }
-
-        /// <summary>
-        /// 自动回收协程
-        /// </summary>
-        /// <returns></returns>
-        private IEnumerator AutoRecycleIfNotHit() {
-            yield return new WaitForSeconds(lifeTime);
-            autoRecycleCoroutine = null;
-
-            if(!hasHit) {
-                hasHit = true;
-                PlayerBulletPool.Instance.Release(this);
-            }
         }
 
 
@@ -114,41 +130,27 @@ namespace Game.Gameplay
                 target.GetComponent<AudioPlay>()?.Play();
                 PlayerBulletPool.Instance.Release(this);
             }
-        }
 
-        /// <summary>
-        /// 播放子弹命中音效,缺少音效组件时跳过避免空引用.
-        /// </summary>
-        private void PlaySelfHitSound() {
-            if(_audioPlay == null) {
-                _audioPlay = GetComponent<AudioPlay>();
+            void PlaySelfHitSound()
+            {
+                if (_audioPlay == null)
+                {
+                    _audioPlay = GetComponent<AudioPlay>();
+                }
+
+                var clip = _audioPlay?.GetNextClip();
+                if (clip == null)
+                    return;
+                // 子弹会立刻回收到对象池,命中音效交给全局音源播放.
+                if (GlobalAudioPlay.Instance != null)
+                {
+                    GlobalAudioPlay.Instance.PlayOneShot(clip);
+                    return;
+                }
+
+                AudioSource.PlayClipAtPoint(clip, transform.position);
             }
-
-            var clip = _audioPlay?.GetNextClip();
-            if(clip == null) return;
-
-            // 子弹会立刻回收到对象池,命中音效交给全局音源播放.
-            if(GlobalAudioPlay.Instance != null) {
-                GlobalAudioPlay.Instance.PlayOneShot(clip);
-                return;
-            }
-
-            AudioSource.PlayClipAtPoint(clip, transform.position);
-        }
-
-        /// <summary>
-        /// 回收到池中前清掉速度，避免下次启用时继承上一颗子弹的物理状态。
-        /// </summary>
-        private void StopMove() {
-            rb.velocity = Vector2.zero;
-        }
-
-        private void StopAutoRecycleCoroutine() {
-            if(autoRecycleCoroutine == null) return;
-
-            StopCoroutine(autoRecycleCoroutine);
-            autoRecycleCoroutine = null;
-        }
+}
 
     }
 }

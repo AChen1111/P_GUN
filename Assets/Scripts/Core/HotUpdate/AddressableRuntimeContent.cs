@@ -20,6 +20,9 @@ namespace Game.Core
 
         public bool IsReady { get; private set; }
 
+        /// <summary>
+        /// 初始化运行时依赖.
+        /// </summary>
         private void Awake()
         {
             if (Instance != null && Instance != this)
@@ -72,6 +75,9 @@ namespace Game.Core
             IsReady = true;
         }
 
+        /// <summary>
+        /// 执行 TryGetAsset 逻辑.
+        /// </summary>
         public bool TryGetAsset<TAsset>(string address, out TAsset asset)
             where TAsset : UnityEngine.Object
         {
@@ -85,6 +91,9 @@ namespace Game.Core
             return false;
         }
 
+        /// <summary>
+        /// 执行 RegisterPrefabById 逻辑.
+        /// </summary>
         public void RegisterPrefabById(string category, int id, GameObject prefab)
         {
             if (string.IsNullOrWhiteSpace(category) || id <= 0 || prefab == null) return;
@@ -98,6 +107,9 @@ namespace Game.Core
             prefabsById[id] = prefab;
         }
 
+        /// <summary>
+        /// 执行 TryGetPrefabById 逻辑.
+        /// </summary>
         public bool TryGetPrefabById(string category, int id, out GameObject prefab)
         {
             if (prefabsByCategoryAndId.TryGetValue(category, out var prefabsById)
@@ -111,6 +123,9 @@ namespace Game.Core
             return false;
         }
 
+        /// <summary>
+        /// 释放销毁时持有的运行时状态.
+        /// </summary>
         private void OnDestroy()
         {
             if (Instance == this)

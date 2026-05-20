@@ -21,6 +21,9 @@ namespace Game.Gameplay.Save
         private const int SnapshotHeight = 180;
         private static GameSaveData pendingLoadData;
 
+        /// <summary>
+        /// 执行 GetSlotSummaries 逻辑.
+        /// </summary>
         public static IReadOnlyList<SaveSlotSummary> GetSlotSummaries()
         {
             var summaries = new List<SaveSlotSummary>(SlotCount);
@@ -32,6 +35,9 @@ namespace Game.Gameplay.Save
             return summaries;
         }
 
+        /// <summary>
+        /// 执行 SaveToSlot 逻辑.
+        /// </summary>
         public static SaveOperationResult SaveToSlot(int slotIndex)
         {
             if (SceneManager.GetActiveScene().name != GameplaySceneName)
@@ -55,8 +61,162 @@ namespace Game.Gameplay.Save
             CaptureSlotSnapshot(slotIndex);
             Debug.Log($"存档完成, Slot: {slotIndex}, Path: {SaveSlotStorage.GetSlotPath(slotIndex)}.");
             return SaveOperationResult.Ok("保存成功.", data);
+
+            static void CaptureSlotSnapshot(int slotIndex)
+            {
+                var camera = Camera.main;
+                if (camera == null)
+                {
+                    Debug.LogWarning("存档快照失败, 场景中没有 MainCamera.");
+                    return;
+                }
+
+                Directory.CreateDirectory(SaveSlotStorage.SaveFolderPath);
+                var previousTarget = camera.targetTexture;
+                var previousActive = RenderTexture.active;
+                var renderTexture = RenderTexture.GetTemporary(SnapshotWidth, SnapshotHeight, 24);
+                Texture2D texture = null;
+                try
+                {
+                    // 使用相机直接渲染缩略图, 避免把 Screen Space Overlay 的存档面板截进去.
+                    camera.targetTexture = renderTexture;
+                    RenderTexture.active = renderTexture;
+                    camera.Render();
+                    texture = new Texture2D(SnapshotWidth, SnapshotHeight, TextureFormat.RGB24, false);
+                    texture.ReadPixels(new Rect(0f, 0f, SnapshotWidth, SnapshotHeight), 0, 0);
+                    texture.Apply();
+                    File.WriteAllBytes(SaveSlotStorage.GetSnapshotPath(slotIndex), texture.EncodeToPNG());
+                }
+                finally
+                {
+                    camera.targetTexture = previousTarget;
+                    RenderTexture.active = previousActive;
+                    RenderTexture.ReleaseTemporary(renderTexture);
+                    if (texture != null)
+                    {
+                        UnityEngine.Object.Destroy(texture);
+                    }
+                }
+            }
+
+            static GameSaveData BuildSaveData(Player player)
+            {
+                var bootstrapper = AddressableDungeonBootstrapper.Active;
+                var currentRoom = ResolveCurrentRoom(player);
+                var data = new GameSaveData
+                {
+                    version = SaveVersion,
+                    savedAtUtc = DateTime.UtcNow.ToString("o"),
+                    sceneName = SceneManager.GetActiveScene().name,
+                    levelGraphAddress = bootstrapper != null ? bootstrapper.LevelGraphAddress : string.Empty,
+                    mapSeed = bootstrapper != null ? bootstrapper.LastGeneratedSeed : 0,
+                    currentRoomId = currentRoom != null ? currentRoom.SaveRoomId : string.Empty,
+                    player = CapturePlayer(player),
+                    rooms = CaptureRooms()
+                };
+                return data;
+            }
+
+    static List<RoomSaveData> CaptureRooms()
+    {
+        var rooms = Room.ActiveRooms;
+        var result = new List<RoomSaveData>(rooms.Count);
+        for (var i = 0; i < rooms.Count; i++)
+        {
+            var room = rooms[i];
+            if (room == null)
+                continue;
+            result.Add(new RoomSaveData { roomId = room.SaveRoomId, roomType = room.GetType().Name, position = Vector3Data.FromVector3(room.transform.position), visited = room.Visited, cleared = room.Cleared });
         }
 
+        return result;
+    }
+
+    static PlayerSaveData CapturePlayer(Player player)
+    {
+        var data = new PlayerSaveData
+        {
+            position = Vector3Data.FromVector3(player.transform.position),
+            hp = player.HP,
+            maxHp = player.MaxHP,
+            currentGunIndex = player.currentGunIndex
+        };
+        CaptureInventory(player, data);
+        CaptureBuffs(player, data);
+        CaptureWeapons(player, data);
+        return data;
+    }
+
+    static Room ResolveCurrentRoom(Player player)
+    {
+        if (Room.CurrentPlayerRoom != null)
+        {
+            return Room.CurrentPlayerRoom;
+        }
+
+        var rooms = Room.ActiveRooms;
+        var playerPosition = player.transform.position;
+        for (var i = 0; i < rooms.Count; i++)
+        {
+            var room = rooms[i];
+            if (room == null || room.SelfBoxCollider2D == null)
+                continue;
+            if (room.SelfBoxCollider2D.bounds.Contains(playerPosition))
+            {
+                room.MarkVisited();
+                return room;
+            }
+        }
+
+        return null;
+    }
+
+    static void CaptureWeapons(Player player, PlayerSaveData data)
+    {
+        for (var i = 0; i < player.guns.Count; i++)
+        {
+            var gun = player.guns[i];
+            if (gun == null)
+                continue;
+            var clip = gun.GunClip;
+            var bag = gun.BulletBag;
+            data.weapons.Add(new WeaponSaveData { weaponId = gun.WeaponId, isCurrent = i == player.currentGunIndex, clipAmmo = clip != null ? clip.currentAmmo : -1, clipMaxAmmo = clip != null ? clip.maxAmmo : -1, bagAmmo = bag != null ? bag.currentBullet : -1, bagMaxAmmo = bag != null ? bag.maxBullet : -1 });
+        }
+    }
+
+    static void CaptureBuffs(Player player, PlayerSaveData data)
+    {
+        var manager = player.buffManager != null ? player.buffManager : player.GetComponent<BuffManager>();
+        if (manager == null)
+            return;
+        var activeBuffs = manager.ActiveBuffs;
+        for (var i = 0; i < activeBuffs.Count; i++)
+        {
+            var info = activeBuffs[i];
+            if (info?.Buff == null)
+                continue;
+            data.buffs.Add(new BuffSaveData { buffId = info.Buff.Id, remainingTime = info.RemainingTime, stackCount = info.StackCount, isPermanent = info.IsPermanent });
+        }
+    }
+
+    static void CaptureInventory(Player player, PlayerSaveData data)
+    {
+        var inventory = player.GetComponent<PlayerInventory>();
+        if (inventory == null)
+            return;
+        for (var i = 0; i < inventory.Items.Count; i++)
+        {
+            var stack = inventory.Items[i];
+            if (stack == null || stack.Count <= 0)
+                continue;
+            data.inventory.Add(new InventoryStackSaveData { itemId = stack.ItemId, count = stack.Count });
+        }
+    }
+}
+
+        /// <summary>
+        /// 执行 LoadFromSlot 逻辑.
+        /// </summary>
         public static SaveOperationResult LoadFromSlot(int slotIndex)
         {
             var data = SaveSlotStorage.ReadSlot(slotIndex);
@@ -71,6 +231,9 @@ namespace Game.Gameplay.Save
             return SaveOperationResult.Ok("正在进入游戏场景并恢复存档.", data);
         }
 
+        /// <summary>
+        /// 执行 DeleteSlot 逻辑.
+        /// </summary>
         public static SaveOperationResult DeleteSlot(int slotIndex)
         {
             var deleted = SaveSlotStorage.DeleteSlot(slotIndex);
@@ -79,88 +242,9 @@ namespace Game.Gameplay.Save
                 : SaveOperationResult.Fail("删除失败, 槽位为空.");
         }
 
-        private static GameSaveData BuildSaveData(Player player)
-        {
-            var bootstrapper = UnityEngine.Object.FindObjectOfType<AddressableDungeonBootstrapper>();
-            var currentRoom = ResolveCurrentRoom(player);
-            var data = new GameSaveData
-            {
-                version = SaveVersion,
-                savedAtUtc = DateTime.UtcNow.ToString("o"),
-                sceneName = SceneManager.GetActiveScene().name,
-                levelGraphAddress = bootstrapper != null ? bootstrapper.LevelGraphAddress : string.Empty,
-                mapSeed = bootstrapper != null ? bootstrapper.LastGeneratedSeed : 0,
-                currentRoomId = currentRoom != null ? currentRoom.SaveRoomId : string.Empty,
-                player = CapturePlayer(player),
-                rooms = CaptureRooms()
-            };
-
-            return data;
-        }
-
-        private static void CaptureSlotSnapshot(int slotIndex)
-        {
-            var camera = Camera.main;
-            if (camera == null)
-            {
-                Debug.LogWarning("存档快照失败, 场景中没有 MainCamera.");
-                return;
-            }
-
-            Directory.CreateDirectory(SaveSlotStorage.SaveFolderPath);
-            var previousTarget = camera.targetTexture;
-            var previousActive = RenderTexture.active;
-            var renderTexture = RenderTexture.GetTemporary(SnapshotWidth, SnapshotHeight, 24);
-            Texture2D texture = null;
-
-            try
-            {
-                // 使用相机直接渲染缩略图, 避免把 Screen Space Overlay 的存档面板截进去.
-                camera.targetTexture = renderTexture;
-                RenderTexture.active = renderTexture;
-                camera.Render();
-
-                texture = new Texture2D(SnapshotWidth, SnapshotHeight, TextureFormat.RGB24, false);
-                texture.ReadPixels(new Rect(0f, 0f, SnapshotWidth, SnapshotHeight), 0, 0);
-                texture.Apply();
-                File.WriteAllBytes(SaveSlotStorage.GetSnapshotPath(slotIndex), texture.EncodeToPNG());
-            }
-            finally
-            {
-                camera.targetTexture = previousTarget;
-                RenderTexture.active = previousActive;
-                RenderTexture.ReleaseTemporary(renderTexture);
-                if (texture != null)
-                {
-                    UnityEngine.Object.Destroy(texture);
-                }
-            }
-        }
-
-        private static Room ResolveCurrentRoom(Player player)
-        {
-            if (Room.CurrentPlayerRoom != null)
-            {
-                return Room.CurrentPlayerRoom;
-            }
-
-            var rooms = UnityEngine.Object.FindObjectsOfType<Room>(true);
-            var playerPosition = player.transform.position;
-            for (var i = 0; i < rooms.Length; i++)
-            {
-                var room = rooms[i];
-                if (room == null || room.SelfBoxCollider2D == null) continue;
-
-                if (room.SelfBoxCollider2D.bounds.Contains(playerPosition))
-                {
-                    room.MarkVisited();
-                    return room;
-                }
-            }
-
-            return null;
-        }
-
+        /// <summary>
+        /// 执行 ApplyPendingGenerationSettings 逻辑.
+        /// </summary>
         public static void ApplyPendingGenerationSettings(AddressableDungeonBootstrapper bootstrapper, DungeonGeneratorGrid2D dungeonGenerator)
         {
             if (pendingLoadData == null || dungeonGenerator == null)
@@ -174,6 +258,9 @@ namespace Game.Gameplay.Save
             dungeonGenerator.RandomGeneratorSeed = pendingLoadData.mapSeed;
         }
 
+        /// <summary>
+        /// 执行 TryRestorePendingSave 逻辑.
+        /// </summary>
         public static bool TryRestorePendingSave()
         {
             if (pendingLoadData == null)
@@ -190,6 +277,9 @@ namespace Game.Gameplay.Save
             return result.Success;
         }
 
+        /// <summary>
+        /// 执行 RestoreSaveData 逻辑.
+        /// </summary>
         private static SaveOperationResult RestoreSaveData(GameSaveData data)
         {
             if (data == null)
@@ -216,154 +306,56 @@ namespace Game.Gameplay.Save
             RestoreCurrentRoom(data.currentRoomId);
             Debug.Log($"读档完成, Scene: {data.sceneName}, Room: {data.currentRoomId}.");
             return SaveOperationResult.Ok("读档完成.", data);
-        }
 
-        private static void RestoreRooms(GameSaveData data)
-        {
-            if (data.rooms == null || data.rooms.Count == 0) return;
-
-            var roomsById = new Dictionary<string, Room>();
-            var rooms = UnityEngine.Object.FindObjectsOfType<Room>(true);
-            for (var i = 0; i < rooms.Length; i++)
+            static void RestoreCurrentRoom(string currentRoomId)
             {
-                var room = rooms[i];
-                if (room == null || string.IsNullOrWhiteSpace(room.SaveRoomId)) continue;
-
-                roomsById[room.SaveRoomId] = room;
-            }
-
-            for (var i = 0; i < data.rooms.Count; i++)
-            {
-                var roomData = data.rooms[i];
-                if (roomData == null || string.IsNullOrWhiteSpace(roomData.roomId)) continue;
-
-                if (roomsById.TryGetValue(roomData.roomId, out var room))
+                if (string.IsNullOrWhiteSpace(currentRoomId))
+                    return;
+                var rooms = Room.ActiveRooms;
+                for (var i = 0; i < rooms.Count; i++)
                 {
-                    room.RestoreSaveData(roomData);
-                }
-                else
-                {
-                    Debug.LogWarning($"读档时找不到房间, RoomId: {roomData.roomId}.");
+                    var room = rooms[i];
+                    if (room == null || room.SaveRoomId != currentRoomId)
+                        continue;
+                    Room.SetCurrentPlayerRoom(room);
+                    if (room.TryGetComponent<MinimapRoomData>(out var minimapData))
+                    {
+                        minimapData.Highlight();
+                    }
+
+                    return;
                 }
             }
-        }
 
-        private static void RestoreCurrentRoom(string currentRoomId)
-        {
-            if (string.IsNullOrWhiteSpace(currentRoomId)) return;
-
-            var rooms = UnityEngine.Object.FindObjectsOfType<Room>(true);
-            for (var i = 0; i < rooms.Length; i++)
+            static void RestoreRooms(GameSaveData data)
             {
-                var room = rooms[i];
-                if (room == null || room.SaveRoomId != currentRoomId) continue;
-
-                Room.SetCurrentPlayerRoom(room);
-                if (room.TryGetComponent<MinimapRoomData>(out var minimapData))
+                if (data.rooms == null || data.rooms.Count == 0)
+                    return;
+                var roomsById = new Dictionary<string, Room>();
+                var rooms = Room.ActiveRooms;
+                for (var i = 0; i < rooms.Count; i++)
                 {
-                    minimapData.Highlight();
+                    var room = rooms[i];
+                    if (room == null || string.IsNullOrWhiteSpace(room.SaveRoomId))
+                        continue;
+                    roomsById[room.SaveRoomId] = room;
                 }
 
-                return;
-            }
-        }
-
-        private static PlayerSaveData CapturePlayer(Player player)
-        {
-            var data = new PlayerSaveData
-            {
-                position = Vector3Data.FromVector3(player.transform.position),
-                hp = player.HP,
-                maxHp = player.MaxHP,
-                currentGunIndex = player.currentGunIndex
-            };
-
-            CaptureInventory(player, data);
-            CaptureBuffs(player, data);
-            CaptureWeapons(player, data);
-            return data;
-        }
-
-        private static void CaptureInventory(Player player, PlayerSaveData data)
-        {
-            var inventory = player.GetComponent<PlayerInventory>();
-            if (inventory == null) return;
-
-            for (var i = 0; i < inventory.Items.Count; i++)
-            {
-                var stack = inventory.Items[i];
-                if (stack == null || stack.Count <= 0) continue;
-
-                data.inventory.Add(new InventoryStackSaveData
+                for (var i = 0; i < data.rooms.Count; i++)
                 {
-                    itemId = stack.ItemId,
-                    count = stack.Count
-                });
+                    var roomData = data.rooms[i];
+                    if (roomData == null || string.IsNullOrWhiteSpace(roomData.roomId))
+                        continue;
+                    if (roomsById.TryGetValue(roomData.roomId, out var room))
+                    {
+                        room.RestoreSaveData(roomData);
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"读档时找不到房间, RoomId: {roomData.roomId}.");
+                    }
+                }
             }
-        }
-
-        private static void CaptureBuffs(Player player, PlayerSaveData data)
-        {
-            var manager = player.buffManager != null ? player.buffManager : player.GetComponent<BuffManager>();
-            if (manager == null) return;
-
-            var activeBuffs = manager.ActiveBuffs;
-            for (var i = 0; i < activeBuffs.Count; i++)
-            {
-                var info = activeBuffs[i];
-                if (info?.Buff == null) continue;
-
-                data.buffs.Add(new BuffSaveData
-                {
-                    buffId = info.Buff.Id,
-                    remainingTime = info.RemainingTime,
-                    stackCount = info.StackCount,
-                    isPermanent = info.IsPermanent
-                });
-            }
-        }
-
-        private static void CaptureWeapons(Player player, PlayerSaveData data)
-        {
-            for (var i = 0; i < player.guns.Count; i++)
-            {
-                var gun = player.guns[i];
-                if (gun == null) continue;
-
-                var clip = gun.GunClip;
-                var bag = gun.BulletBag;
-                data.weapons.Add(new WeaponSaveData
-                {
-                    weaponId = gun.WeaponId,
-                    isCurrent = i == player.currentGunIndex,
-                    clipAmmo = clip != null ? clip.currentAmmo : -1,
-                    clipMaxAmmo = clip != null ? clip.maxAmmo : -1,
-                    bagAmmo = bag != null ? bag.currentBullet : -1,
-                    bagMaxAmmo = bag != null ? bag.maxBullet : -1
-                });
-            }
-        }
-
-        private static List<RoomSaveData> CaptureRooms()
-        {
-            var rooms = UnityEngine.Object.FindObjectsOfType<Room>(true);
-            var result = new List<RoomSaveData>(rooms.Length);
-            for (var i = 0; i < rooms.Length; i++)
-            {
-                var room = rooms[i];
-                if (room == null) continue;
-
-                result.Add(new RoomSaveData
-                {
-                    roomId = room.SaveRoomId,
-                    roomType = room.GetType().Name,
-                    position = Vector3Data.FromVector3(room.transform.position),
-                    visited = room.Visited,
-                    cleared = room.Cleared
-                });
-            }
-
-            return result;
-        }
+}
     }
 }

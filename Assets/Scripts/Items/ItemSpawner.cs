@@ -1,5 +1,4 @@
 using UnityEngine;
-using Game.Core;
 using Game.Pooling;
 using Game.Animation;
 using Game.Presentation;
@@ -14,22 +13,23 @@ namespace Game.Items
         private const float DefaultSpawnAnimDuration = 1.5f;
 
         public ItemSpawnTableSO itemTable;
-        [SerializeField] private string itemTableAddress = "item/spawn_table/normal_room";
 
         /// <summary>
         /// 生成物品，并播放抽中配置项的动画。
         /// </summary>
         public GameObject SpawnItem(Vector3 position)
         {
-            if(!TryGetItemTable(out var table))
+            // 检查物品生成表是否设置.
+            if(itemTable == null || itemTable.Entries.Count == 0)
             {
+                Debug.LogWarning("Item table is not set");
                 return null;
             }
 
             //随机获取一个物品
-            if(table.TryGetRandomEntry(out var entry))
+            if(itemTable.TryGetRandomEntry(out var entry))
             {
-                return table.TryResolvePrefab(entry, out var prefab)
+                return itemTable.TryResolvePrefab(entry, out var prefab)
                     ? SpawnItem(prefab, position, entry.spawnAnimEffect, entry.spawnAnimDuration)
                     : null;
             }
@@ -44,13 +44,15 @@ namespace Game.Items
         /// </summary>
         public GameObject SpawnItem(Vector3 position, DOTweenAnimType animEffect)
         {
-            if(!TryGetItemTable(out var table))
+            // 检查物品生成表是否设置.
+            if(itemTable == null || itemTable.Entries.Count == 0)
             {
+                Debug.LogWarning("Item table is not set");
                 return null;
             }
 
             //随机获取一个物品，外部传入动画时覆盖配置项动画。
-            if(table.TryGetRandomPrefab(out GameObject prefab))
+            if(itemTable.TryGetRandomPrefab(out GameObject prefab))
             {
                 return SpawnItem(prefab, position, animEffect, DefaultSpawnAnimDuration);
             }
@@ -65,13 +67,15 @@ namespace Game.Items
         /// </summary>
         public GameObject SpawnItem(Vector3 position, string animEffectKey)
         {
-            if(!TryGetItemTable(out var table))
+            // 检查物品生成表是否设置.
+            if(itemTable == null || itemTable.Entries.Count == 0)
             {
+                Debug.LogWarning("Item table is not set");
                 return null;
             }
 
             //随机获取一个物品
-            if(table.TryGetRandomPrefab(out GameObject prefab))
+            if(itemTable.TryGetRandomPrefab(out GameObject prefab))
             {
                 return SpawnItem(prefab, position, animEffectKey);
             }
@@ -79,48 +83,6 @@ namespace Game.Items
             //如果获取失败，则返回null
             Debug.LogWarning("No prefab found in item table");
             return null;
-        }
-
-        public bool HasAvailableTable()
-        {
-            var table = ResolveItemTable();
-            return table != null && table.Entries.Count > 0;
-        }
-
-        public ItemSpawnTableSO ResolveItemTable()
-        {
-            var content = AddressableRuntimeContent.Instance;
-            if(content == null)
-            {
-                // 允许直接从 GameScene Play, 此时使用 Inspector 中的本地生成表.
-                return itemTable;
-            }
-
-            if(string.IsNullOrWhiteSpace(itemTableAddress))
-            {
-                Debug.LogError($"{nameof(ItemSpawner)}: 物品生成表 Address 未配置.", this);
-                return null;
-            }
-
-            if(content.TryGetAsset<ItemSpawnTableSO>(itemTableAddress, out var runtimeItemTable))
-            {
-                return runtimeItemTable;
-            }
-
-            Debug.LogError($"{nameof(ItemSpawner)}: 找不到已预加载的物品生成表, Address: {itemTableAddress}.", this);
-            return null;
-        }
-
-        private bool TryGetItemTable(out ItemSpawnTableSO table)
-        {
-            table = ResolveItemTable();
-            if(table != null && table.Entries.Count > 0)
-            {
-                return true;
-            }
-
-            Debug.LogWarning("Item table is not set");
-            return false;
         }
 
         /// <summary>
@@ -136,7 +98,13 @@ namespace Game.Items
         /// </summary>
         public GameObject SpawnItem(GameObject prefab, Vector3 position, DOTweenAnimType animEffect, float animDuration)
         {
-            var item = ItemPool.Instance.Spawn(prefab, position, Quaternion.identity);
+            var pool = ItemPool.Instance;
+            if(pool == null)
+            {
+                throw new System.InvalidOperationException($"{nameof(ItemPool)} must exist in scene before spawning items.");
+            }
+
+            var item = pool.Spawn(prefab, position, Quaternion.identity);
             if(item == null) return null;
 
             var obj = item.gameObject;
@@ -151,7 +119,13 @@ namespace Game.Items
         /// </summary>
         public GameObject SpawnItem(GameObject prefab, Vector3 position, string animEffectKey)
         {
-            var item = ItemPool.Instance.Spawn(prefab, position, Quaternion.identity);
+            var pool = ItemPool.Instance;
+            if(pool == null)
+            {
+                throw new System.InvalidOperationException($"{nameof(ItemPool)} must exist in scene before spawning items.");
+            }
+
+            var item = pool.Spawn(prefab, position, Quaternion.identity);
             if(item == null) return null;
 
             var obj = item.gameObject;
@@ -161,6 +135,9 @@ namespace Game.Items
             return obj;
         }
 
+        /// <summary>
+        /// 执行 PlaySpawnAnimation 逻辑.
+        /// </summary>
         private static void PlaySpawnAnimation(DOTweenAnimType animEffect, float animDuration, GameObject obj, Item item)
         {
             if(animEffect == DOTweenAnimType.None || DOTweenAnimMgr.Instance == null)
@@ -178,6 +155,9 @@ namespace Game.Items
             });
         }
 
+        /// <summary>
+        /// 执行 PlaySpawnAnimation 逻辑.
+        /// </summary>
         private static void PlaySpawnAnimation(string animEffectKey, float animDuration, GameObject obj, Item item)
         {
             if(string.IsNullOrEmpty(animEffectKey) || DOTweenAnimMgr.Instance == null)

@@ -45,6 +45,9 @@ namespace Game.Gameplay
 			}
 		}
 
+		/// <summary>
+		/// 初始化运行时依赖.
+		/// </summary>
 		private void Awake() {
 			CloseDoorSR.gameObject.SetActive(!isOpen);
 			audioPlay = GetComponent<AudioPlay>();

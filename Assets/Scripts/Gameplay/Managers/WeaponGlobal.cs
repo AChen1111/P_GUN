@@ -14,6 +14,9 @@ namespace Game.Gameplay
         public SpriteRenderer GunFire;
 
 		public static WeaponGlobal Instance { get; private set; }
+		/// <summary>
+		/// 初始化运行时依赖.
+		/// </summary>
 		private void Awake() {
 			Instance = this;
 		}

@@ -14,14 +14,32 @@ namespace Game.UI
         private BuffRuntimeInfo runtimeInfo;
         private BuffTooltipPanel tooltipPanel;
 
+        /// <summary>
+        /// 执行 Configure 逻辑.
+        /// </summary>
         public void Configure(BuffRuntimeInfo info, BuffTooltipPanel tooltip)
         {
             runtimeInfo = info;
             tooltipPanel = tooltip;
             RefreshIcon();
             RefreshLabel();
-        }
 
+            void RefreshIcon()
+            {
+                if (runtimeInfo == null || iconImage == null)
+                {
+                    return;
+                }
+
+                // 图标来自 Buff 数据库, 空图标直接暴露配置缺失.
+                iconImage.sprite = runtimeInfo.Buff.Icon;
+                iconImage.enabled = runtimeInfo.Buff.Icon != null;
+            }
+}
+
+        /// <summary>
+        /// 执行 RefreshLabel 逻辑.
+        /// </summary>
         public void RefreshLabel()
         {
             if (runtimeInfo == null || stackOrTimeText == null)
@@ -34,6 +52,9 @@ namespace Game.UI
                 : Mathf.CeilToInt(Mathf.Max(0f, runtimeInfo.RemainingTime)).ToString();
         }
 
+        /// <summary>
+        /// 执行 OnPointerEnter 逻辑.
+        /// </summary>
         public void OnPointerEnter(PointerEventData eventData)
         {
             if (tooltipPanel == null || runtimeInfo == null)
@@ -44,21 +65,12 @@ namespace Game.UI
             tooltipPanel.Show(runtimeInfo, eventData.position);
         }
 
+        /// <summary>
+        /// 执行 OnPointerExit 逻辑.
+        /// </summary>
         public void OnPointerExit(PointerEventData eventData)
         {
             tooltipPanel?.Hide();
-        }
-
-        private void RefreshIcon()
-        {
-            if (runtimeInfo == null || iconImage == null)
-            {
-                return;
-            }
-
-            // 图标来自 Buff 数据库, 空图标直接暴露配置缺失.
-            iconImage.sprite = runtimeInfo.Buff.Icon;
-            iconImage.enabled = runtimeInfo.Buff.Icon != null;
         }
     }
 }

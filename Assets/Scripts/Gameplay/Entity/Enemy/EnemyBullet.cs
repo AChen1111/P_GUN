@@ -9,6 +9,7 @@ using Game.Items;
 
 namespace Game.Gameplay
 {
+    [RequireComponent(typeof(Rigidbody2D), typeof(CircleCollider2D))]
     public class EnemyBullet : MonoBehaviour, Game.Pooling.IPoolable {
         public Vector2 dir;
         public float speed = 10f;
@@ -25,6 +26,9 @@ namespace Game.Gameplay
         public List<AudioClip> hitSoundsOnWall = new List<AudioClip>();
         private AudioClip hitSoundOnWall => hitSoundsOnWall[Random.Range(0, hitSoundsOnWall.Count)];
 
+        /// <summary>
+        /// 初始化运行时依赖.
+        /// </summary>
         private void Awake() {
             rb = GetComponent<Rigidbody2D>();
             rb.bodyType = RigidbodyType2D.Kinematic;
@@ -45,8 +49,21 @@ namespace Game.Gameplay
             if (rb == null) {
                 rb = GetComponent<Rigidbody2D>();
             }
-        }
 
+            IEnumerator AutoRecycleIfNotHit()
+            {
+                yield return new WaitForSeconds(lifeTime);
+                autoRecycleCoroutine = null;
+                if (!hasHit && gameObject != null)
+                {
+                    Recycle();
+                }
+            }
+}
+
+        /// <summary>
+        /// 执行 OnSpawnFromPool 逻辑.
+        /// </summary>
         public void OnSpawnFromPool() {
             hasHit = false;
 
@@ -55,39 +72,57 @@ namespace Game.Gameplay
             }
         }
 
+        /// <summary>
+        /// 执行 OnRecycleToPool 逻辑.
+        /// </summary>
         public void OnRecycleToPool() {
             hasHit = true;
             StopAutoRecycleCoroutine();
             StopMove();
         }
 
+        /// <summary>
+        /// 处理 2D 碰撞进入事件.
+        /// </summary>
         private void OnCollisionEnter2D(Collision2D other) {
             HandleHit(other.gameObject);
         }
 
+        /// <summary>
+        /// 处理 2D 触发进入事件.
+        /// </summary>
         private void OnTriggerEnter2D(Collider2D other) {
             LogHit("Trigger", other.gameObject);
             HandleHit(other.gameObject);
-        }
 
+            void LogHit(string hitType, GameObject target)
+            {
+                if (target == null)
+                    return;
+                var layerName = LayerMask.LayerToName(target.layer);
+                var parentName = target.transform.parent != null ? target.transform.parent.name : "null";
+                Debug.Log($"[EnemyBullet] {hitType} hit name={target.name}, tag={target.tag}, layer={target.layer}({layerName}), parent={parentName}");
+            }
+}
+
+        /// <summary>
+        /// 重置编辑器默认配置.
+        /// </summary>
         private void Reset() {
-            gameObject.AddComponent<CircleCollider2D>();
+            gameObject.layer = LayerMask.NameToLayer("EnemyBullet");
         }
 
+        /// <summary>
+        /// 执行固定帧物理更新逻辑.
+        /// </summary>
         private void FixedUpdate() {
             if (rb == null) return;
             rb.velocity = dir * speed;
         }
 
-        private IEnumerator AutoRecycleIfNotHit() {
-            yield return new WaitForSeconds(lifeTime);
-            autoRecycleCoroutine = null;
-
-            if (!hasHit && gameObject != null) {
-                Recycle();
-            }
-        }
-
+        /// <summary>
+        /// 执行 HandleHit 逻辑.
+        /// </summary>
         private void HandleHit(GameObject target) {
             if (hasHit || target == null) return;
 
@@ -134,24 +169,22 @@ namespace Game.Gameplay
             }
         }
 
+        /// <summary>
+        /// 注销禁用时需要的监听.
+        /// </summary>
         private void OnDisable() {
             StopAutoRecycleCoroutine();
             StopMove();
         }
 
+        /// <summary>
+        /// 执行 StopAutoRecycleCoroutine 逻辑.
+        /// </summary>
         private void StopAutoRecycleCoroutine() {
             if (autoRecycleCoroutine == null) return;
 
             StopCoroutine(autoRecycleCoroutine);
             autoRecycleCoroutine = null;
-        }
-
-        private void LogHit(string hitType, GameObject target) {
-            if (target == null) return;
-
-            var layerName = LayerMask.LayerToName(target.layer);
-            var parentName = target.transform.parent != null ? target.transform.parent.name : "null";
-            Debug.Log($"[EnemyBullet] {hitType} hit name={target.name}, tag={target.tag}, layer={target.layer}({layerName}), parent={parentName}");
         }
     }
 }

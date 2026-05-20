@@ -5,6 +5,9 @@ namespace Game.Gameplay.Save
     /// </summary>
     public interface ISaveDataProvider<TSaveData>
     {
+        /// <summary>
+        /// 执行 CaptureSaveData 逻辑.
+        /// </summary>
         TSaveData CaptureSaveData();
     }
 }

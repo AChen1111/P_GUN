@@ -13,6 +13,9 @@ namespace Game.Gameplay
     /// </summary>
     public abstract class FightRoomEndEffectSO : ScriptableObject
     {
+        /// <summary>
+        /// 执行 Execute 逻辑.
+        /// </summary>
         public abstract void Execute(FightRoom room);
     }
 }

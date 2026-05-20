@@ -20,13 +20,37 @@ namespace Game.UI
         private GameSettingsData currentData;
         private bool isRefreshingView;
 
+        /// <summary>
+        /// 初始化运行时依赖.
+        /// </summary>
         protected override void Awake()
         {
             base.Awake();
             GetBindComponents(gameObject);
             BuildDropdownOptions();
-        }
 
+            void BuildDropdownOptions()
+            {
+                availableResolutions.Clear();
+                m_Drop_Resolution.ClearOptions();
+                List<string> resolutionOptions = new List<string>();
+                Resolution[] resolutions = Screen.resolutions;
+                for (int i = 0; i < resolutions.Length; i++)
+                {
+                    Resolution resolution = resolutions[i];
+                    availableResolutions.Add(resolution);
+                    resolutionOptions.Add($"{resolution.width} x {resolution.height} @ {GetRefreshRateHz(resolution)}Hz");
+                }
+
+                m_Drop_Resolution.AddOptions(resolutionOptions);
+                m_Drop_FrameRate.ClearOptions();
+                m_Drop_FrameRate.AddOptions(new List<string> { "30", "60", "120", "144", "不限制" });
+            }
+}
+
+        /// <summary>
+        /// 注册启用时需要的监听.
+        /// </summary>
         private void OnEnable()
         {
             m_Tog_Display.onValueChanged.AddListener(OnDisplayTabChanged);
@@ -42,6 +66,9 @@ namespace Game.UI
             m_Btn_Back.onClick.AddListener(CloseByStack);
         }
 
+        /// <summary>
+        /// 注销禁用时需要的监听.
+        /// </summary>
         private void OnDisable()
         {
             m_Tog_Display.onValueChanged.RemoveListener(OnDisplayTabChanged);
@@ -57,79 +84,59 @@ namespace Game.UI
             m_Btn_Back.onClick.RemoveListener(CloseByStack);
         }
 
+        /// <summary>
+        /// 执行 OnOpen 逻辑.
+        /// </summary>
         protected override void OnOpen()
         {
             currentData = GameSettingsStore.Load();
             RefreshView();
             ShowPage(SettingsPage.Display);
-        }
 
-        private void BuildDropdownOptions()
-        {
-            availableResolutions.Clear();
-            m_Drop_Resolution.ClearOptions();
-
-            List<string> resolutionOptions = new List<string>();
-            Resolution[] resolutions = Screen.resolutions;
-
-            for (int i = 0; i < resolutions.Length; i++)
+            void RefreshView()
             {
-                Resolution resolution = resolutions[i];
-                availableResolutions.Add(resolution);
-                resolutionOptions.Add($"{resolution.width} x {resolution.height} @ {GetRefreshRateHz(resolution)}Hz");
+                isRefreshingView = true;
+                m_Drop_Resolution.value = FindResolutionIndex(currentData);
+                m_Tog_FullScreen.isOn = currentData.FullScreen;
+                m_Tog_VSync.isOn = currentData.VSync;
+                m_Drop_FrameRate.value = FindFrameRateIndex(currentData.FrameRateLimit);
+                m_Slider_MasterVolume.value = currentData.MasterVolume;
+                m_Slider_MusicVolume.value = currentData.MusicVolume;
+                m_Slider_SfxVolume.value = currentData.SfxVolume;
+                isRefreshingView = false;
             }
 
-            m_Drop_Resolution.AddOptions(resolutionOptions);
-
-            m_Drop_FrameRate.ClearOptions();
-            m_Drop_FrameRate.AddOptions(new List<string> { "30", "60", "120", "144", "不限制" });
-        }
-
-        private void RefreshView()
+    int FindFrameRateIndex(int frameRateLimit)
+    {
+        for (int i = 0; i < frameRateOptions.Length; i++)
         {
-            isRefreshingView = true;
-
-            m_Drop_Resolution.value = FindResolutionIndex(currentData);
-            m_Tog_FullScreen.isOn = currentData.FullScreen;
-            m_Tog_VSync.isOn = currentData.VSync;
-            m_Drop_FrameRate.value = FindFrameRateIndex(currentData.FrameRateLimit);
-            m_Slider_MasterVolume.value = currentData.MasterVolume;
-            m_Slider_MusicVolume.value = currentData.MusicVolume;
-            m_Slider_SfxVolume.value = currentData.SfxVolume;
-
-            isRefreshingView = false;
-        }
-
-        private int FindResolutionIndex(GameSettingsData data)
-        {
-            for (int i = 0; i < availableResolutions.Count; i++)
+            if (frameRateOptions[i] == frameRateLimit)
             {
-                Resolution resolution = availableResolutions[i];
-
-                if (resolution.width == data.ResolutionWidth &&
-                    resolution.height == data.ResolutionHeight &&
-                    GetRefreshRateHz(resolution) == data.RefreshRate)
-                {
-                    return i;
-                }
+                return i;
             }
-
-            return Mathf.Max(0, availableResolutions.Count - 1);
         }
 
-        private int FindFrameRateIndex(int frameRateLimit)
+        return 1;
+    }
+
+    int FindResolutionIndex(GameSettingsData data)
+    {
+        for (int i = 0; i < availableResolutions.Count; i++)
         {
-            for (int i = 0; i < frameRateOptions.Length; i++)
+            Resolution resolution = availableResolutions[i];
+            if (resolution.width == data.ResolutionWidth && resolution.height == data.ResolutionHeight && GetRefreshRateHz(resolution) == data.RefreshRate)
             {
-                if (frameRateOptions[i] == frameRateLimit)
-                {
-                    return i;
-                }
+                return i;
             }
-
-            return 1;
         }
 
+        return Mathf.Max(0, availableResolutions.Count - 1);
+    }
+}
+
+        /// <summary>
+        /// 执行 ShowPage 逻辑.
+        /// </summary>
         private void ShowPage(SettingsPage page)
         {
             // 分页只切换内容容器, 不参与UIStackManager的面板栈.
@@ -142,6 +149,9 @@ namespace Game.UI
             isRefreshingView = false;
         }
 
+        /// <summary>
+        /// 执行 ApplyAndSave 逻辑.
+        /// </summary>
         private void ApplyAndSave()
         {
             GameSettingsStore.Save(currentData);
@@ -149,6 +159,9 @@ namespace Game.UI
             CloseByStack();
         }
 
+        /// <summary>
+        /// 执行 CloseByStack 逻辑.
+        /// </summary>
         private void CloseByStack()
         {
             UIStackManager stackManager = UIStackManager.Instance;
@@ -158,6 +171,9 @@ namespace Game.UI
             }
         }
 
+        /// <summary>
+        /// 执行 OnDisplayTabChanged 逻辑.
+        /// </summary>
         private void OnDisplayTabChanged(bool isOn)
         {
             if (isRefreshingView || !isOn)
@@ -168,6 +184,9 @@ namespace Game.UI
             ShowPage(SettingsPage.Display);
         }
 
+        /// <summary>
+        /// 执行 OnAudioTabChanged 逻辑.
+        /// </summary>
         private void OnAudioTabChanged(bool isOn)
         {
             if (isRefreshingView || !isOn)
@@ -178,6 +197,9 @@ namespace Game.UI
             ShowPage(SettingsPage.Audio);
         }
 
+        /// <summary>
+        /// 执行 OnResolutionChanged 逻辑.
+        /// </summary>
         private void OnResolutionChanged(int index)
         {
             if (isRefreshingView)
@@ -191,6 +213,9 @@ namespace Game.UI
             currentData.RefreshRate = GetRefreshRateHz(resolution);
         }
 
+        /// <summary>
+        /// 执行 OnFullScreenChanged 逻辑.
+        /// </summary>
         private void OnFullScreenChanged(bool isOn)
         {
             if (!isRefreshingView)
@@ -199,6 +224,9 @@ namespace Game.UI
             }
         }
 
+        /// <summary>
+        /// 执行 OnVSyncChanged 逻辑.
+        /// </summary>
         private void OnVSyncChanged(bool isOn)
         {
             if (!isRefreshingView)
@@ -207,6 +235,9 @@ namespace Game.UI
             }
         }
 
+        /// <summary>
+        /// 执行 OnFrameRateChanged 逻辑.
+        /// </summary>
         private void OnFrameRateChanged(int index)
         {
             if (!isRefreshingView)
@@ -215,6 +246,9 @@ namespace Game.UI
             }
         }
 
+        /// <summary>
+        /// 执行 OnMasterVolumeChanged 逻辑.
+        /// </summary>
         private void OnMasterVolumeChanged(float value)
         {
             if (!isRefreshingView)
@@ -223,6 +257,9 @@ namespace Game.UI
             }
         }
 
+        /// <summary>
+        /// 执行 OnMusicVolumeChanged 逻辑.
+        /// </summary>
         private void OnMusicVolumeChanged(float value)
         {
             if (!isRefreshingView)
@@ -231,6 +268,9 @@ namespace Game.UI
             }
         }
 
+        /// <summary>
+        /// 执行 OnSfxVolumeChanged 逻辑.
+        /// </summary>
         private void OnSfxVolumeChanged(float value)
         {
             if (!isRefreshingView)
@@ -245,6 +285,9 @@ namespace Game.UI
             Audio
         }
 
+        /// <summary>
+        /// 执行 GetRefreshRateHz 逻辑.
+        /// </summary>
         private static int GetRefreshRateHz(Resolution resolution)
         {
             // Unity 2022.3推荐使用refreshRateRatio, UI中只展示整数Hz方便玩家选择.

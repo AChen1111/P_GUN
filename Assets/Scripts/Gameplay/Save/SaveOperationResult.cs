@@ -16,11 +16,17 @@ namespace Game.Gameplay.Save
             Data = data;
         }
 
+        /// <summary>
+        /// 执行 Ok 逻辑.
+        /// </summary>
         public static SaveOperationResult Ok(string message, GameSaveData data = null)
         {
             return new SaveOperationResult(true, message, data);
         }
 
+        /// <summary>
+        /// 执行 Fail 逻辑.
+        /// </summary>
         public static SaveOperationResult Fail(string message)
         {
             return new SaveOperationResult(false, message, null);

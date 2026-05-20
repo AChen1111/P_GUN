@@ -67,18 +67,49 @@ namespace Game.Core
         private static readonly Dictionary<GameEvent, HashSet<Delegate>> eventMapWithPayload =
             new Dictionary<GameEvent, HashSet<Delegate>>();
 
+        /// <summary>
+        /// 执行 AddListener 逻辑.
+        /// </summary>
         public static void AddListener(GameEvent eventType, Action listener)
         {
             if (listener == null) return;
             GetListeners(eventType).Add(listener);
-        }
 
+            static HashSet<Action> GetListeners(GameEvent eventType)
+            {
+                if (!eventMap.TryGetValue(eventType, out var listeners))
+                {
+                    listeners = new HashSet<Action>();
+                    eventMap[eventType] = listeners;
+                }
+
+                return listeners;
+            }
+}
+
+        /// <summary>
+        /// 执行 AddListener 逻辑.
+        /// </summary>
         public static void AddListener<T>(GameEvent eventType, Action<T> listener)
         {
             if (listener == null) return;
             GetPayloadListeners(eventType).Add(listener);
-        }
 
+            static HashSet<Delegate> GetPayloadListeners(GameEvent eventType)
+            {
+                if (!eventMapWithPayload.TryGetValue(eventType, out var listeners))
+                {
+                    listeners = new HashSet<Delegate>();
+                    eventMapWithPayload[eventType] = listeners;
+                }
+
+                return listeners;
+            }
+}
+
+        /// <summary>
+        /// 执行 RemoveListener 逻辑.
+        /// </summary>
         public static void RemoveListener(GameEvent eventType, Action listener)
         {
             if (listener == null) return;
@@ -92,6 +123,9 @@ namespace Game.Core
             }
         }
 
+        /// <summary>
+        /// 执行 RemoveListener 逻辑.
+        /// </summary>
         public static void RemoveListener<T>(GameEvent eventType, Action<T> listener)
         {
             if (listener == null) return;
@@ -105,6 +139,9 @@ namespace Game.Core
             }
         }
 
+        /// <summary>
+        /// 执行 Trigger 逻辑.
+        /// </summary>
         public static void Trigger(GameEvent eventType)
         {
             if (!eventMap.TryGetValue(eventType, out var listeners)) return;
@@ -115,6 +152,9 @@ namespace Game.Core
             }
         }
 
+        /// <summary>
+        /// 执行 Trigger 逻辑.
+        /// </summary>
         public static void Trigger<T>(GameEvent eventType, T payload)
         {
             if (!eventMapWithPayload.TryGetValue(eventType, out var listeners)) return;
@@ -131,45 +171,35 @@ namespace Game.Core
             }
         }
 
+        /// <summary>
+        /// 执行 Clear 逻辑.
+        /// </summary>
         public static void Clear(GameEvent eventType)
         {
             eventMap.Remove(eventType);
             eventMapWithPayload.Remove(eventType);
         }
 
+        /// <summary>
+        /// 执行 ClearAll 逻辑.
+        /// </summary>
         public static void ClearAll()
         {
             eventMap.Clear();
             eventMapWithPayload.Clear();
         }
 
-        private static HashSet<Action> GetListeners(GameEvent eventType)
-        {
-            if (!eventMap.TryGetValue(eventType, out var listeners))
-            {
-                listeners = new HashSet<Action>();
-                eventMap[eventType] = listeners;
-            }
-
-            return listeners;
-        }
-
-        private static HashSet<Delegate> GetPayloadListeners(GameEvent eventType)
-        {
-            if (!eventMapWithPayload.TryGetValue(eventType, out var listeners))
-            {
-                listeners = new HashSet<Delegate>();
-                eventMapWithPayload[eventType] = listeners;
-            }
-
-            return listeners;
-        }
-
+        /// <summary>
+        /// 执行 CopyListeners 逻辑.
+        /// </summary>
         private static List<Action> CopyListeners(HashSet<Action> listeners)
         {
             return new List<Action>(listeners);
         }
 
+        /// <summary>
+        /// 执行 CopyListeners 逻辑.
+        /// </summary>
         private static List<Delegate> CopyListeners(HashSet<Delegate> listeners)
         {
             return new List<Delegate>(listeners);

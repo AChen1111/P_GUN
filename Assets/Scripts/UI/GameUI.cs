@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -25,6 +26,9 @@ namespace Game.UI
         [SerializeField] private ItemTipPanel itemTipPanel;
 
 
+        /// <summary>
+        /// 初始化运行时依赖.
+        /// </summary>
         private void Awake() {
             if (Instance != null && Instance != this)
             {
@@ -37,17 +41,47 @@ namespace Game.UI
         }
 
         //订阅事件
+        /// <summary>
+        /// 注册启用时需要的监听.
+        /// </summary>
         private void OnEnable() {
             AddButtonListeners();
             AddEventListeners();
-        }
+
+            void AddEventListeners()
+            {
+                EventCenter.AddListener(GameEvent.GameWin, ShowWinPanel);
+                EventCenter.AddListener(GameEvent.PlayerDied, ShowOverPanel);
+                EventCenter.AddListener(GameEvent.MiniMapToggleRequested, SwicthMinMapState);
+                EventCenter.AddListener<ItemData>(GameEvent.ItemTipShown, ShowItemTip);
+                EventCenter.AddListener(GameEvent.ItemTipHidden, HideItemTip);
+                EventCenter.AddListener<GunClip>(GameEvent.BulletClipChanged, UpdateBulletText);
+                EventCenter.AddListener<BulletBag>(GameEvent.BulletBagChanged, UpdateBulletBagText);
+                EventCenter.AddListener<RoomWaveDisplayEvent>(GameEvent.RoomWaveDisplayChanged, UpdateWaveText);
+                EventCenter.AddListener<PlayerHeadMessageEvent>(GameEvent.PlayerHeadMessageRequested, OnPlayerHeadMessageRequested);
+            }
+
+            void AddButtonListeners()
+            {
+                WinPanel.transform.Find("Btn_Reset").GetComponent<Button>().onClick.AddListener(ResetGame);
+                OverPanel.transform.Find("Btn_Reset").GetComponent<Button>().onClick.AddListener(ResetGame);
+                WinPanel.transform.Find("Btn_MainMenu").GetComponent<Button>().onClick.AddListener(ReturnToMainMenu);
+                OverPanel.transform.Find("Btn_MainMenu").GetComponent<Button>().onClick.AddListener(ReturnToMainMenu);
+            }
+}
 
         //取消订阅事件
+        /// <summary>
+        /// 注销禁用时需要的监听.
+        /// </summary>
         private void OnDisable() {
             RemoveButtonListeners();
             RemoveEventListeners();
         }
 
+        /// <summary>
+        /// 释放销毁时持有的运行时状态.
+        /// </summary>
         private void OnDestroy()
         {
             RemoveButtonListeners();
@@ -59,6 +93,9 @@ namespace Game.UI
             }
         }
 
+        /// <summary>
+        /// 执行 ResetGame 逻辑.
+        /// </summary>
         public void ResetGame()
         {
             Global.player?.Restart();
@@ -66,6 +103,9 @@ namespace Game.UI
             Time.timeScale = 1;
         }
 
+        /// <summary>
+        /// 执行 ReturnToMainMenu 逻辑.
+        /// </summary>
         public void ReturnToMainMenu()
         {
             // 返回主菜单前恢复时间流速, 避免主菜单继承游戏结束暂停状态.
@@ -73,28 +113,43 @@ namespace Game.UI
             SceneManager.LoadScene("StartScene");
         }
 
+        /// <summary>
+        /// 执行 ShowWinPanel 逻辑.
+        /// </summary>
         public void ShowWinPanel()
         {
             PushStackPanel(WinPanel, ref winStackPanel);
             Time.timeScale = 0;
         }
+        /// <summary>
+        /// 执行 ShowOverPanel 逻辑.
+        /// </summary>
         public void ShowOverPanel()
         {
             PushStackPanel(OverPanel, ref overStackPanel);
             Time.timeScale = 0;
         }
 
+        /// <summary>
+        /// 执行 ShowMiniMap 逻辑.
+        /// </summary>
         public void ShowMiniMap()
         {
             MiniMap.SetActive(true);
             EventCenter.Trigger(GameEvent.MiniMapShown);
         }
+        /// <summary>
+        /// 执行 HideMiniMap 逻辑.
+        /// </summary>
         public void HideMiniMap()
         {
             MiniMap.SetActive(false);
             EventCenter.Trigger(GameEvent.MiniMapHidden);
         }
 
+        /// <summary>
+        /// 执行 SwicthMinMapState 逻辑.
+        /// </summary>
         public void SwicthMinMapState()
         {
             if(MiniMap.activeSelf)
@@ -141,6 +196,9 @@ namespace Game.UI
             BulletBagText.text = text;
         }
 
+        /// <summary>
+        /// 执行 UpdateWaveText 逻辑.
+        /// </summary>
         public void UpdateWaveText(RoomWaveDisplayEvent payload)
         {
             SetWaveTextVisible(payload.IsVisible);
@@ -150,23 +208,35 @@ namespace Game.UI
             WaveText.text = $"当前波数 {payload.CurrentWave}/{payload.TotalWave}";
         }
 
+        /// <summary>
+        /// 执行 ShowMessageOnPlayerHead 逻辑.
+        /// </summary>
         public void ShowMessageOnPlayerHead(string message,float duration)
         {
             Global.player?.ShowDisPlayer(message, duration);
         }
 
+        /// <summary>
+        /// 执行 ShowItemTip 逻辑.
+        /// </summary>
         public void ShowItemTip(ItemData data)
         {
             ResolveItemTipPanel();
             itemTipPanel?.Show(data);
         }
 
+        /// <summary>
+        /// 执行 HideItemTip 逻辑.
+        /// </summary>
         public void HideItemTip()
         {
             ResolveItemTipPanel();
             itemTipPanel?.Hide();
         }
 
+        /// <summary>
+        /// 执行 ResolveItemTipPanel 逻辑.
+        /// </summary>
         private void ResolveItemTipPanel()
         {
             if (itemTipPanel == null)
@@ -176,10 +246,13 @@ namespace Game.UI
 
             if (itemTipPanel == null)
             {
-                itemTipPanel = ItemTipPanel.CreateDefault(transform);
+                throw new InvalidOperationException($"{nameof(GameUI)} requires {nameof(ItemTipPanel)} binding.");
             }
         }
 
+        /// <summary>
+        /// 执行 PushStackPanel 逻辑.
+        /// </summary>
         private void PushStackPanel(GameObject panelObject, ref UIPanelBase cachedPanel)
         {
             if (panelObject == null)
@@ -207,14 +280,9 @@ namespace Game.UI
             }
         }
 
-        private void AddButtonListeners()
-        {
-            WinPanel.transform.Find("Btn_Reset").GetComponent<Button>().onClick.AddListener(ResetGame);
-            OverPanel.transform.Find("Btn_Reset").GetComponent<Button>().onClick.AddListener(ResetGame);
-            WinPanel.transform.Find("Btn_MainMenu").GetComponent<Button>().onClick.AddListener(ReturnToMainMenu);
-            OverPanel.transform.Find("Btn_MainMenu").GetComponent<Button>().onClick.AddListener(ReturnToMainMenu);
-        }
-
+        /// <summary>
+        /// 执行 RemoveButtonListeners 逻辑.
+        /// </summary>
         private void RemoveButtonListeners()
         {
             WinPanel.transform.Find("Btn_Reset").GetComponent<Button>().onClick.RemoveListener(ResetGame);
@@ -223,19 +291,9 @@ namespace Game.UI
             OverPanel.transform.Find("Btn_MainMenu").GetComponent<Button>().onClick.RemoveListener(ReturnToMainMenu);
         }
 
-        private void AddEventListeners()
-        {
-            EventCenter.AddListener(GameEvent.GameWin, ShowWinPanel);
-            EventCenter.AddListener(GameEvent.PlayerDied, ShowOverPanel);
-            EventCenter.AddListener(GameEvent.MiniMapToggleRequested, SwicthMinMapState);
-            EventCenter.AddListener<ItemData>(GameEvent.ItemTipShown, ShowItemTip);
-            EventCenter.AddListener(GameEvent.ItemTipHidden, HideItemTip);
-            EventCenter.AddListener<GunClip>(GameEvent.BulletClipChanged, UpdateBulletText);
-            EventCenter.AddListener<BulletBag>(GameEvent.BulletBagChanged, UpdateBulletBagText);
-            EventCenter.AddListener<RoomWaveDisplayEvent>(GameEvent.RoomWaveDisplayChanged, UpdateWaveText);
-            EventCenter.AddListener<PlayerHeadMessageEvent>(GameEvent.PlayerHeadMessageRequested, OnPlayerHeadMessageRequested);
-        }
-
+        /// <summary>
+        /// 执行 RemoveEventListeners 逻辑.
+        /// </summary>
         private void RemoveEventListeners()
         {
             EventCenter.RemoveListener(GameEvent.GameWin, ShowWinPanel);
@@ -249,6 +307,9 @@ namespace Game.UI
             EventCenter.RemoveListener<PlayerHeadMessageEvent>(GameEvent.PlayerHeadMessageRequested, OnPlayerHeadMessageRequested);
         }
 
+        /// <summary>
+        /// 执行 SetWaveTextVisible 逻辑.
+        /// </summary>
         private void SetWaveTextVisible(bool isVisible)
         {
             if (WaveText != null)
@@ -257,6 +318,9 @@ namespace Game.UI
             }
         }
 
+        /// <summary>
+        /// 执行 OnPlayerHeadMessageRequested 逻辑.
+        /// </summary>
         private void OnPlayerHeadMessageRequested(PlayerHeadMessageEvent payload)
         {
             ShowMessageOnPlayerHead(payload.Message, payload.Duration);

@@ -33,6 +33,9 @@ namespace Game.Gameplay
         [SerializeField] private float min_distance = 1f;
         [SerializeField] private float max_distance = 20f;
 
+        /// <summary>
+        /// 初始化运行时依赖.
+        /// </summary>
         void Awake()
         {
             source = GetComponent<AudioSource>();
@@ -81,6 +84,9 @@ namespace Game.Gameplay
             return clip;
         }
 
+        /// <summary>
+        /// 执行 Clear 逻辑.
+        /// </summary>
         public void Clear()
         {
             currentClip = null;

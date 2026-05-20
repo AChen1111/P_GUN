@@ -17,6 +17,9 @@ namespace Game.Presentation
 		private Coroutine mWaitPlayCompleteCoroutine;
 		//播放令牌
 		private int mPlayToken;
+		/// <summary>
+		/// 初始化运行时依赖.
+		/// </summary>
 		private void Awake() {
 			Instance = this;
 			DontDestroyOnLoad(gameObject);
@@ -27,6 +30,9 @@ namespace Game.Presentation
 		/// 音频列表
 		/// </summary>
 		private Dictionary<string, AudioClip> AudioClips = new Dictionary<string, AudioClip>();
+		/// <summary>
+		/// 执行 PlayerAudioSourceByPath 逻辑.
+		/// </summary>
 		public void PlayerAudioSourceByPath(string name, bool loop = false, Action onComplete = null)
 		{
 			if (SelfAudioSource.isPlaying) return;
@@ -102,26 +108,21 @@ namespace Game.Presentation
 
 			int currentToken = mPlayToken;
 			mWaitPlayCompleteCoroutine = StartCoroutine(WaitPlayComplete(currentToken, onComplete));
-		}
 
-		/// <summary>
-		/// 等待音频播放完成
-		/// </summary>
-		/// <param name="playToken">播放令牌</param>
-		/// <param name="onComplete">完成回调</param>
-		private IEnumerator WaitPlayComplete(int playToken, Action onComplete)
-		{
-			while(playToken == mPlayToken && SelfAudioSource != null && SelfAudioSource.isPlaying)
-			{
-				yield return null;
-			}
+		    IEnumerator WaitPlayComplete(int playToken, Action onComplete)
+		    {
+		        while (playToken == mPlayToken && SelfAudioSource != null && SelfAudioSource.isPlaying)
+		        {
+		            yield return null;
+		        }
 
-			if(playToken == mPlayToken)
-			{
-				mWaitPlayCompleteCoroutine = null;
-				onComplete?.Invoke();
-			}
-		}
+		        if (playToken == mPlayToken)
+		        {
+		            mWaitPlayCompleteCoroutine = null;
+		            onComplete?.Invoke();
+		        }
+		    }
+}
 
     }
 }

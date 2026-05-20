@@ -14,12 +14,18 @@ namespace Game.ItemEffects
     {
         [SerializeField] private int healAmount = 1;
 
+        /// <summary>
+        /// 执行 CanUse 逻辑.
+        /// </summary>
         public override bool CanUse(ItemEffectContext ctx)
         {
             var player = Global.player;
             return player != null && healAmount > 0 && !player.IsHPFull;
         }
 
+        /// <summary>
+        /// 执行 OnPick 逻辑.
+        /// </summary>
         public override void OnPick(ItemEffectContext ctx)
         {
             var player = Global.player;

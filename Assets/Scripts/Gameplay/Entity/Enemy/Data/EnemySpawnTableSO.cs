@@ -35,6 +35,9 @@ namespace Game.Gameplay
 
         public int WaveCount => waves == null ? 0 : waves.Count;
 
+        /// <summary>
+        /// 执行 TryGetWave 逻辑.
+        /// </summary>
         public bool TryGetWave(int waveIndex, out EnemySpawnWave wave)
         {
             wave = null;

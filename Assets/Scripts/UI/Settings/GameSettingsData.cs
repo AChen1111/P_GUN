@@ -16,6 +16,9 @@ namespace Game.UI.Settings
         public float MusicVolume;
         public float SfxVolume;
 
+        /// <summary>
+        /// 执行 CreateDefault 逻辑.
+        /// </summary>
         public static GameSettingsData CreateDefault()
         {
             // 默认配置保持接近当前设备状态, 首次启动时避免强行切换显示模式.

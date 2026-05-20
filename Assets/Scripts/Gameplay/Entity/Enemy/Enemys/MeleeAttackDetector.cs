@@ -16,6 +16,9 @@ namespace Game.Gameplay
 
         public bool HasPlayer => currentPlayer != null;
 
+        /// <summary>
+        /// 初始化运行时依赖.
+        /// </summary>
         private void Awake()
         {
             detectorCollider = GetComponent<Collider2D>();
@@ -36,16 +39,25 @@ namespace Game.Gameplay
             owner = enemy;
         }
 
+        /// <summary>
+        /// 处理 2D 触发进入事件.
+        /// </summary>
         private void OnTriggerEnter2D(Collider2D other)
         {
             TryRequestAttack(other);
         }
 
+        /// <summary>
+        /// 执行 OnTriggerStay2D 逻辑.
+        /// </summary>
         private void OnTriggerStay2D(Collider2D other)
         {
             TryRequestAttack(other);
         }
 
+        /// <summary>
+        /// 处理 2D 触发离开事件.
+        /// </summary>
         private void OnTriggerExit2D(Collider2D other)
         {
             if (!other.CompareTag("Player")) return;
@@ -86,6 +98,9 @@ namespace Game.Gameplay
             return false;
         }
 
+        /// <summary>
+        /// 执行 TryRequestAttack 逻辑.
+        /// </summary>
         private void TryRequestAttack(Collider2D other)
         {
             if (!other.CompareTag("Player")) return;

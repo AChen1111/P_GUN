@@ -11,12 +11,18 @@ namespace Game.UI
         [SerializeField] private SettingsPanel settingsPanel;
         [SerializeField] private SaveSlotPanel saveSlotPanel;
 
+		/// <summary>
+		/// 初始化运行时依赖.
+		/// </summary>
 		protected override void Awake()
 		{
             base.Awake();
 			GetBindComponents(gameObject);
 		}
 
+        /// <summary>
+        /// 注册启用时需要的监听.
+        /// </summary>
         void OnEnable()
         {
             m_Btn_Start.onClick.AddListener(StartGame);
@@ -25,6 +31,9 @@ namespace Game.UI
 			m_Btn_Quit.onClick.AddListener(ExitGame);
         }
 
+        /// <summary>
+        /// 注销禁用时需要的监听.
+        /// </summary>
         void OnDisable()
         {
             m_Btn_Start.onClick.RemoveListener(StartGame);
@@ -33,14 +42,23 @@ namespace Game.UI
 			m_Btn_Quit.onClick.RemoveListener(ExitGame);
         }
 
+        /// <summary>
+        /// 执行 StartGame 逻辑.
+        /// </summary>
         public void StartGame()
 		{
 			SceneManager.LoadScene("GameScene");
 		}
+		/// <summary>
+		/// 执行 ExitGame 逻辑.
+		/// </summary>
 		public void ExitGame()
 		{
 			Application.Quit();
 		}
+		/// <summary>
+		/// 执行 OpenSettingPanel 逻辑.
+		/// </summary>
 		public void OpenSettingPanel()
 		{
             if (settingsPanel == null)
@@ -59,6 +77,9 @@ namespace Game.UI
             stackManager.Push(settingsPanel);
 		}
 
+        /// <summary>
+        /// 执行 OpenLoadPanel 逻辑.
+        /// </summary>
         public void OpenLoadPanel()
         {
             if (saveSlotPanel == null)
@@ -70,6 +91,6 @@ namespace Game.UI
             // 主菜单只开放读档和删除, 不允许保存空进度.
             saveSlotPanel.OpenForMainMenu();
         }
-		
+
 	}
 }

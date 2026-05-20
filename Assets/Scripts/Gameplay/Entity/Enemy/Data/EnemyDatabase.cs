@@ -15,6 +15,9 @@ namespace Game.Gameplay
 
         public IReadOnlyList<EnemyData> Enemies => enemies;
 
+        /// <summary>
+        /// 执行 ReplaceEnemies 逻辑.
+        /// </summary>
         public void ReplaceEnemies(IEnumerable<EnemyData> newEnemies)
         {
             ReplaceData(enemies, newEnemies);
@@ -22,6 +25,9 @@ namespace Game.Gameplay
 
         protected override List<EnemyData> DataValues => enemies;
 
+        /// <summary>
+        /// 执行 TryGetKey 逻辑.
+        /// </summary>
         protected override bool TryGetKey(EnemyData data, out int key)
         {
             key = data.enemyId;

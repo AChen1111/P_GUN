@@ -7,13 +7,7 @@ namespace Game.Presentation
     public class VfxPool : PoolBase<BloodVfx> {
         public new static VfxPool Instance {
             get {
-                var instance = PoolBase<BloodVfx>.Instance as VfxPool;
-                if (instance == null) {
-                    var go = new GameObject("[VfxPool]");
-                    instance = go.AddComponent<VfxPool>();
-                }
-
-                return instance;
+                return PoolBase<BloodVfx>.Instance as VfxPool;
             }
         }
 
@@ -29,18 +23,30 @@ namespace Game.Presentation
         }
 
 
+        /// <summary>
+        /// 执行 Play 逻辑.
+        /// </summary>
         public BloodVfx Play(Vector3 position, Vector2 direction, BloodVfxColorMode colorMode) {
             return Play(DefaultPrefab, position, direction, colorMode);
         }
 
+        /// <summary>
+        /// 执行 Play 逻辑.
+        /// </summary>
         public BloodVfx Play(Vector3 position, Vector2 direction) {
             return Play(position, direction, BloodVfxColorMode.Red);
         }
 
+        /// <summary>
+        /// 执行 OnCreate 逻辑.
+        /// </summary>
         protected override void OnCreate(BloodVfx item, BloodVfx prefab) {
             item.OnComplete = Release;
         }
 
+        /// <summary>
+        /// 执行 OnDestroyItem 逻辑.
+        /// </summary>
         protected override void OnDestroyItem(BloodVfx item) {
             item.OnComplete = null;
         }

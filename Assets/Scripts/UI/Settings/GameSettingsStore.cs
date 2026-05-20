@@ -15,6 +15,9 @@ namespace Game.UI.Settings
         private const string MusicVolumeKey = "Settings.MusicVolume";
         private const string SfxVolumeKey = "Settings.SfxVolume";
 
+        /// <summary>
+        /// 执行 Load 逻辑.
+        /// </summary>
         public static GameSettingsData Load()
         {
             GameSettingsData defaultData = GameSettingsData.CreateDefault();
@@ -34,6 +37,9 @@ namespace Game.UI.Settings
             };
         }
 
+        /// <summary>
+        /// 执行 Save 逻辑.
+        /// </summary>
         public static void Save(GameSettingsData data)
         {
             PlayerPrefs.SetInt(ResolutionWidthKey, data.ResolutionWidth);
@@ -48,6 +54,9 @@ namespace Game.UI.Settings
             PlayerPrefs.Save();
         }
 
+        /// <summary>
+        /// 执行 Apply 逻辑.
+        /// </summary>
         public static void Apply(GameSettingsData data, AudioMixer audioMixer, string masterVolumeParameter, string musicVolumeParameter, string sfxVolumeParameter)
         {
             QualitySettings.vSyncCount = data.VSync ? 1 : 0;
@@ -73,6 +82,9 @@ namespace Game.UI.Settings
             SetMixerVolume(audioMixer, sfxVolumeParameter, data.SfxVolume);
         }
 
+        /// <summary>
+        /// 执行 SetMixerVolume 逻辑.
+        /// </summary>
         private static void SetMixerVolume(AudioMixer audioMixer, string parameterName, float normalizedVolume)
         {
             if (string.IsNullOrEmpty(parameterName))

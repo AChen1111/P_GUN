@@ -48,6 +48,9 @@ namespace Game.Items
             return false;
         }
 
+        /// <summary>
+        /// 执行 TryResolvePrefab 逻辑.
+        /// </summary>
         public bool TryResolvePrefab(ItemSpawnEntry entry, out GameObject prefab)
         {
             if (TryResolveAddressablePrefab(entry, out prefab))
@@ -92,11 +95,17 @@ namespace Game.Items
             return false;
         }
 
+        /// <summary>
+        /// 执行 HasResolvablePrefab 逻辑.
+        /// </summary>
         private static bool HasResolvablePrefab(ItemSpawnEntry entry)
         {
             return TryResolveAddressablePrefab(entry, out _) || entry.prefab != null;
         }
 
+        /// <summary>
+        /// 执行 TryResolveAddressablePrefab 逻辑.
+        /// </summary>
         private static bool TryResolveAddressablePrefab(ItemSpawnEntry entry, out GameObject prefab)
         {
             prefab = null;

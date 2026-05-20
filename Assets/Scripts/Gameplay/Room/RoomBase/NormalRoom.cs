@@ -12,17 +12,18 @@ namespace Game.Gameplay
     {
         [Header("敌人生成表")]
         [SerializeField] private EnemySpawnTableSO enemySpawnTable;
-        [SerializeField] private string enemySpawnTableAddress = "enemy/spawn_table/normal_room";
 
         [Header("敌人可能出现的位置坐标点")]
         [SerializeField] private List<Transform> enemyPoints = new List<Transform>();
 
+        /// <summary>
+        /// 执行 GetInitialWaveCount 逻辑.
+        /// </summary>
         protected override int GetInitialWaveCount()
         {
-            var spawnTable = ResolveEnemySpawnTable();
-            if (spawnTable != null && spawnTable.WaveCount > 0)
+            if (enemySpawnTable != null && enemySpawnTable.WaveCount > 0)
             {
-                return spawnTable.WaveCount;
+                return enemySpawnTable.WaveCount;
             }
 
             return base.GetInitialWaveCount();
@@ -44,84 +45,66 @@ namespace Game.Gameplay
                 return 0;
             }
 
-            var spawnTable = ResolveEnemySpawnTable();
-            if (spawnTable == null || !spawnTable.TryGetWave(CurrentWaveIndex, out var wave)) return 0;
+            if (enemySpawnTable == null || !enemySpawnTable.TryGetWave(CurrentWaveIndex, out var wave)) return 0;
 
-            return SpawnFromWave(spawnTable, wave, validPoints);
-        }
+            return SpawnFromWave(enemySpawnTable, wave, validPoints);
 
-        private int SpawnFromWave(EnemySpawnTableSO spawnTable, EnemySpawnWave wave, List<Transform> validPoints)
-        {
-            if (wave == null || wave.enemies == null) return 0;
-
-            var pointIndex = 0;
-            var actualSpawnCount = 0;
-
-            foreach (var entry in wave.enemies)
+            int SpawnFromWave(EnemySpawnTableSO spawnTable, EnemySpawnWave wave, List<Transform> validPoints)
             {
-                if (entry.count <= 0) continue;
-
-                if (!spawnTable.TryGetEnemyData(entry.enemyId, out var enemyData))
+                if (wave == null || wave.enemies == null)
+                    return 0;
+                var pointIndex = 0;
+                var actualSpawnCount = 0;
+                foreach (var entry in wave.enemies)
                 {
-                    Debug.LogWarning($"{nameof(NormalRoom)}: 生成表找不到 enemyId={entry.enemyId} 对应的敌人配置.", this);
-                    continue;
-                }
-
-                var enemyPrefab = enemyData.prefab;
-                if (enemyPrefab == null)
-                {
-                    Debug.LogWarning($"{nameof(NormalRoom)}: enemyId={entry.enemyId} 的敌人 prefab 未配置.", this);
-                    continue;
-                }
-
-                for (var i = 0; i < entry.count && pointIndex < validPoints.Count; i++, pointIndex++)
-                {
-                    if (SpawnEnemy(enemyPrefab, enemyData, validPoints[pointIndex].position))
+                    if (entry.count <= 0)
+                        continue;
+                    if (!spawnTable.TryGetEnemyData(entry.enemyId, out var enemyData))
                     {
-                        actualSpawnCount++;
+                        Debug.LogWarning($"{nameof(NormalRoom)}: 生成表找不到 enemyId={entry.enemyId} 对应的敌人配置.", this);
+                        continue;
+                    }
+
+                    var enemyPrefab = enemyData.prefab;
+                    if (enemyPrefab == null)
+                    {
+                        Debug.LogWarning($"{nameof(NormalRoom)}: enemyId={entry.enemyId} 的敌人 prefab 未配置.", this);
+                        continue;
+                    }
+
+                    for (var i = 0; i < entry.count && pointIndex < validPoints.Count; i++, pointIndex++)
+                    {
+                        if (SpawnEnemy(enemyPrefab, enemyData, validPoints[pointIndex].position))
+                        {
+                            actualSpawnCount++;
+                        }
                     }
                 }
+
+                return actualSpawnCount;
             }
 
-            return actualSpawnCount;
-        }
-
-        private EnemySpawnTableSO ResolveEnemySpawnTable()
+    bool SpawnEnemy(EnemyBase enemyPrefab, EnemyData enemyData, Vector3 spawnPosition)
+    {
+        var pool = EnemyPool.Instance;
+        if (pool == null)
         {
-            var content = AddressableRuntimeContent.Instance;
-            if (content == null)
-            {
-                // 允许直接从 GameScene Play, 此时使用 Inspector 中的本地生成表.
-                return enemySpawnTable;
-            }
-
-            if (string.IsNullOrWhiteSpace(enemySpawnTableAddress))
-            {
-                Debug.LogError($"{nameof(NormalRoom)}: 敌人生成表 Address 未配置.", this);
-                return null;
-            }
-
-            if (content.TryGetAsset<EnemySpawnTableSO>(enemySpawnTableAddress, out var runtimeSpawnTable))
-            {
-                return runtimeSpawnTable;
-            }
-
-            Debug.LogError($"{nameof(NormalRoom)}: 找不到已预加载的敌人生成表, Address: {enemySpawnTableAddress}.", this);
-            return null;
+            throw new System.InvalidOperationException($"{nameof(EnemyPool)} must exist in scene before spawning enemies.");
         }
 
-        private bool SpawnEnemy(EnemyBase enemyPrefab, EnemyData enemyData, Vector3 spawnPosition)
-        {
-            var enemy = EnemyPool.Instance.Get(enemyPrefab, spawnPosition, Quaternion.identity, this);
-            if (enemy == null) return false;
+        var enemy = pool.Get(enemyPrefab, spawnPosition, Quaternion.identity, this);
+        if (enemy == null)
+            return false;
+        // 敌人基础属性由 EnemyDatabase 控制, prefab 只负责外观和行为组件.
+        enemy.ApplyConfig(enemyData);
+        RegisterSpawnedEnemy(enemy);
+        return true;
+    }
+}
 
-            // 敌人基础属性由 EnemyDatabase 控制, prefab 只负责外观和行为组件.
-            enemy.ApplyConfig(enemyData);
-
-            RegisterSpawnedEnemy(enemy);
-            return true;
-        }
-
+        /// <summary>
+        /// 执行 OnFightAllWavesEnd 逻辑.
+        /// </summary>
         protected override void OnFightAllWavesEnd()
         {
             if(canGenerateItems) {

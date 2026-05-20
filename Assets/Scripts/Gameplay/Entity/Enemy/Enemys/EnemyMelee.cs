@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using QFramework;
 
@@ -27,6 +28,9 @@ namespace Game.Gameplay
 
         protected override WeaponType WeaponType => WeaponType.Melee;
 
+        /// <summary>
+        /// 执行 OnInit 逻辑.
+        /// </summary>
         protected override void OnInit()
         {
             ResolveComponents();
@@ -35,8 +39,27 @@ namespace Game.Gameplay
             cachedTarget = null;
             hasAppliedDamage = false;
             isAttacking = false;
-        }
 
+            void ResolveComponents()
+            {
+                if (attackDetector == null)
+                {
+                    attackDetector = GetComponentInChildren<MeleeAttackDetector>();
+                }
+
+                if (attackDetector == null)
+                {
+                    throw new InvalidOperationException($"{nameof(EnemyMelee)} requires {nameof(MeleeAttackDetector)} on prefab.");
+                }
+
+                attackDetector.Init(this);
+                ConfigureDetector(false);
+            }
+}
+
+        /// <summary>
+        /// 执行 RegisterFSM 逻辑.
+        /// </summary>
         protected override void RegisterFSM(FSM<EnemyState> fsm)
         {
             fsm.State(EnemyState.Follow)
@@ -48,7 +71,70 @@ namespace Game.Gameplay
                 .OnExit(EndAttack);
 
             fsm.StartState(EnemyState.Follow);
-        }
+
+            void EndAttack()
+            {
+                attackTimer = 0f;
+                hasAppliedDamage = false;
+                isAttacking = false;
+            }
+
+            void UpdateAttack()
+            {
+                attackTimer += Time.deltaTime;
+                if (attackTimer >= attackLockDuration)
+                {
+                    FSM.ChangeState(EnemyState.Follow);
+                }
+            }
+
+            void BeginAttack()
+            {
+                attackTimer = 0f;
+                hasAppliedDamage = false;
+                isAttacking = true;
+                nextAttackTime = Time.time + attackCooldown;
+                StopVelocity();
+                base.PlayAttackAnimation();
+            }
+
+            void DoFollow()
+            {
+                if (IsDead)
+                {
+                    StopVelocity();
+                    SetAnimatorSpeed(0f);
+                    return;
+                }
+
+                if (FollowPlayerWithBodySpace(out var dir))
+                {
+                    FaceDirection(dir);
+                }
+            }
+
+    void FaceDirection(Vector2 dir)
+    {
+        if (Sr == null)
+            return;
+        if (dir.x < 0f)
+            Sr.flipX = true;
+        else if (dir.x > 0f)
+            Sr.flipX = false;
+        UpdateDetectorDirection();
+    }
+
+    void UpdateDetectorDirection()
+    {
+        if (attackDetector == null || Sr == null)
+            return;
+        var facingSign = Sr.flipX ? -1f : 1f;
+        var localPosition = attackDetector.transform.localPosition;
+        // 翻转时只镜像当前手动配置的位置, 不再用默认偏移覆盖 prefab.
+        localPosition.x = Mathf.Abs(localPosition.x) * facingSign;
+        attackDetector.transform.localPosition = localPosition;
+    }
+}
 
         /// <summary>
         /// 检测器发现玩家时调用, 统一由敌人本体控制攻击节奏.
@@ -74,13 +160,45 @@ namespace Game.Gameplay
 
             hasAppliedDamage = true;
             ApplyDamageToPlayer();
-        }
 
+            void ApplyDamageToPlayer()
+            {
+                if (attackDetector == null || !attackDetector.TryGetPlayerInRange(out var target))
+                    return;
+                if (target == null)
+                    return;
+                var sourceDirection = (target.transform.position - transform.position).normalized;
+                target.Hurt(new DamageInfo(AttackDamage, sourceDirection));
+            }
+}
+
+        /// <summary>
+        /// 重置编辑器默认配置.
+        /// </summary>
         private void Reset()
         {
             EnsureDetector(true);
-        }
 
+            void EnsureDetector(bool applyDefaultShape)
+            {
+                if (attackDetector == null)
+                {
+                    attackDetector = GetComponentInChildren<MeleeAttackDetector>();
+                }
+
+                if (attackDetector == null)
+                {
+                    return;
+                }
+
+                attackDetector.Init(this);
+                ConfigureDetector(applyDefaultShape);
+            }
+}
+
+        /// <summary>
+        /// 校验编辑器配置变化.
+        /// </summary>
         private void OnValidate()
         {
             if (attackDetector == null)
@@ -91,77 +209,9 @@ namespace Game.Gameplay
             ConfigureDetector(false);
         }
 
-        private void ResolveComponents()
-        {
-            if (attackDetector == null)
-            {
-                attackDetector = GetComponentInChildren<MeleeAttackDetector>();
-            }
-
-            EnsureDetector(false);
-        }
-
-        private void DoFollow()
-        {
-            if (IsDead)
-            {
-                StopVelocity();
-                SetAnimatorSpeed(0f);
-                return;
-            }
-
-            if (FollowPlayerWithBodySpace(out var dir))
-            {
-                FaceDirection(dir);
-            }
-        }
-
-        private void BeginAttack()
-        {
-            attackTimer = 0f;
-            hasAppliedDamage = false;
-            isAttacking = true;
-            nextAttackTime = Time.time + attackCooldown;
-            StopVelocity();
-            base.PlayAttackAnimation();
-        }
-
-        private void UpdateAttack()
-        {
-            attackTimer += Time.deltaTime;
-
-            if (attackTimer >= attackLockDuration)
-            {
-                FSM.ChangeState(EnemyState.Follow);
-            }
-        }
-
-        private void EndAttack()
-        {
-            attackTimer = 0f;
-            hasAppliedDamage = false;
-            isAttacking = false;
-        }
-
-        private void ApplyDamageToPlayer()
-        {
-            if (attackDetector == null || !attackDetector.TryGetPlayerInRange(out var target)) return;
-            if (target == null) return;
-
-            var sourceDirection = (target.transform.position - transform.position).normalized;
-            target.Hurt(new DamageInfo(AttackDamage, sourceDirection));
-        }
-
-        private void FaceDirection(Vector2 dir)
-        {
-            if (Sr == null) return;
-
-            if (dir.x < 0f) Sr.flipX = true;
-            else if (dir.x > 0f) Sr.flipX = false;
-
-            UpdateDetectorDirection();
-        }
-
+        /// <summary>
+        /// 执行 StopVelocity 逻辑.
+        /// </summary>
         private void StopVelocity()
         {
             if (Rb != null)
@@ -170,26 +220,9 @@ namespace Game.Gameplay
             }
         }
 
-        private void EnsureDetector(bool applyDefaultShape)
-        {
-            if (attackDetector == null)
-            {
-                attackDetector = GetComponentInChildren<MeleeAttackDetector>();
-            }
-
-            if (attackDetector == null)
-            {
-                var detectorObject = new GameObject("MeleeAttackDetector");
-                detectorObject.transform.SetParent(transform, false);
-                detectorObject.AddComponent<BoxCollider2D>();
-                attackDetector = detectorObject.AddComponent<MeleeAttackDetector>();
-                applyDefaultShape = true;
-            }
-
-            attackDetector.Init(this);
-            ConfigureDetector(applyDefaultShape);
-        }
-
+        /// <summary>
+        /// 执行 ConfigureDetector 逻辑.
+        /// </summary>
         private void ConfigureDetector(bool applyDefaultShape)
         {
             if (attackDetector == null) return;
@@ -217,17 +250,6 @@ namespace Game.Gameplay
                     detectorCollider.isTrigger = true;
                 }
             }
-        }
-
-        private void UpdateDetectorDirection()
-        {
-            if (attackDetector == null || Sr == null) return;
-
-            var facingSign = Sr.flipX ? -1f : 1f;
-            var localPosition = attackDetector.transform.localPosition;
-            // 翻转时只镜像当前手动配置的位置, 不再用默认偏移覆盖 prefab.
-            localPosition.x = Mathf.Abs(localPosition.x) * facingSign;
-            attackDetector.transform.localPosition = localPosition;
         }
     }
 }

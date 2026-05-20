@@ -18,10 +18,16 @@ namespace Game.Animation
 
         [SerializeField] private bool isPlaying;
 
+        /// <summary>
+        /// 重置编辑器默认配置.
+        /// </summary>
         private void Reset() {
             spriteRenderer = GetComponent<SpriteRenderer>();
         }
 
+        /// <summary>
+        /// 初始化运行时依赖.
+        /// </summary>
         private void Awake() {
             if (spriteRenderer == null) {
                 spriteRenderer = GetComponent<SpriteRenderer>();
@@ -29,6 +35,9 @@ namespace Game.Animation
         }
 
 
+        /// <summary>
+        /// 执行 Play 逻辑.
+        /// </summary>
         public void Play(Action OnComplete)
         {
             if (isPlaying)
@@ -88,6 +97,9 @@ namespace Game.Animation
                 });
         }
 
+        /// <summary>
+        /// 执行 PreviewAnimation 逻辑.
+        /// </summary>
         [ContextMenu("预览动画")]
         public void PreviewAnimation()
         {
@@ -98,11 +110,17 @@ namespace Game.Animation
             });
         }
 
+        /// <summary>
+        /// 执行 ResetSprite 逻辑.
+        /// </summary>
         [ContextMenu("重置精灵图")]
         public void ResetSprite()
         {
             spriteRenderer.sprite = sprites[0];
         }
+        /// <summary>
+        /// 注销禁用时需要的监听.
+        /// </summary>
         private void OnDisable()
         {
             if (playingTween != null && playingTween.IsActive())

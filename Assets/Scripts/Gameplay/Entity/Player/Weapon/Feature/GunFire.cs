@@ -10,6 +10,9 @@ namespace Game.Gameplay
 {
     public class GunFire
     {
+        /// <summary>
+        /// 执行 Show 逻辑.
+        /// </summary>
         public void Show(Vector2 pos,Vector2 dir)
         {
             WeaponGlobal.Instance.GunFire.Position2D(pos);

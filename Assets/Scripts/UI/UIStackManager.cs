@@ -31,9 +31,6 @@ namespace Game.UI
                     return null;
                 }
 
-                // UIStackManager必须由场景显式配置, 避免运行时动态创建管理器.
-                instance = FindObjectOfType<UIStackManager>();
-
                 if (instance == null)
                 {
                     Debug.LogError("UIStackManager获取失败, 请在场景中添加并绑定UIStackManager.");
@@ -51,6 +48,9 @@ namespace Game.UI
             }
         }
 
+        /// <summary>
+        /// 初始化运行时依赖.
+        /// </summary>
         private void Awake()
         {
             if (instance != null && instance != this)
@@ -63,23 +63,35 @@ namespace Game.UI
             instance = this;
         }
 
+        /// <summary>
+        /// 注册启用时需要的监听.
+        /// </summary>
         private void OnEnable()
         {
             // 监听场景切换, 避免栈中保留旧场景UI对象.
             SceneManager.activeSceneChanged += OnActiveSceneChanged;
         }
 
+        /// <summary>
+        /// 注销禁用时需要的监听.
+        /// </summary>
         private void OnDisable()
         {
             SceneManager.activeSceneChanged -= OnActiveSceneChanged;
         }
 
+        /// <summary>
+        /// 执行 OnApplicationQuit 逻辑.
+        /// </summary>
         private void OnApplicationQuit()
         {
             // 应用退出时阻止Instance再次自动创建新对象.
             isQuitting = true;
         }
 
+        /// <summary>
+        /// 释放销毁时持有的运行时状态.
+        /// </summary>
         private void OnDestroy()
         {
             if (instance == this)
@@ -88,6 +100,9 @@ namespace Game.UI
             }
         }
 
+        /// <summary>
+        /// 执行 Initialize 逻辑.
+        /// </summary>
         public void Initialize(UIPanelBase mainPanel)
         {
             if (mainPanel == null)
@@ -101,6 +116,9 @@ namespace Game.UI
             PushInternal(mainPanel, false);
         }
 
+        /// <summary>
+        /// 执行 Push 逻辑.
+        /// </summary>
         public void Push(UIPanelBase panel)
         {
             if (panel == null)
@@ -112,6 +130,9 @@ namespace Game.UI
             PushInternal(panel, true);
         }
 
+        /// <summary>
+        /// 执行 Pop 逻辑.
+        /// </summary>
         public bool Pop()
         {
             if (panelStack.Count <= 1)
@@ -138,6 +159,9 @@ namespace Game.UI
             return true;
         }
 
+        /// <summary>
+        /// 执行 Clear 逻辑.
+        /// </summary>
         public void Clear()
         {
             while (panelStack.Count > 0)
@@ -153,11 +177,17 @@ namespace Game.UI
             nextSortingOrder = 0;
         }
 
+        /// <summary>
+        /// 执行 Peek 逻辑.
+        /// </summary>
         public UIPanelBase Peek()
         {
             return panelStack.Count > 0 ? panelStack.Peek() : null;
         }
 
+        /// <summary>
+        /// 执行 PushInternal 逻辑.
+        /// </summary>
         private void PushInternal(UIPanelBase panel, bool pauseCurrentPanel)
         {
             if (pauseCurrentPanel && panelStack.Count > 0)
@@ -175,12 +205,18 @@ namespace Game.UI
             panelStack.Push(panel);
         }
 
+        /// <summary>
+        /// 执行 HidePanel 逻辑.
+        /// </summary>
         private void HidePanel(UIPanelBase panel)
         {
             // 面板退出栈时只隐藏和禁用交互, 不销毁GameObject.
             panel.Close();
         }
 
+        /// <summary>
+        /// 执行 OnActiveSceneChanged 逻辑.
+        /// </summary>
         private void OnActiveSceneChanged(Scene previousScene, Scene nextScene)
         {
             // 场景切换时清空旧面板引用, 防止持有已销毁对象.

@@ -10,6 +10,9 @@ namespace Game.Animation
         [SerializeField] private float minAlpha = 0.35f;
         [SerializeField] private int blinkSteps = 4;
 
+        /// <summary>
+        /// 执行 Play 逻辑.
+        /// </summary>
         public override void Play(GameObject target, float duration, Action onComplete)
         {
             var sr = target.GetComponentInChildren<SpriteRenderer>();

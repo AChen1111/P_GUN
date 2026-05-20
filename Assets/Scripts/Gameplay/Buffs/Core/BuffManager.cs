@@ -31,11 +31,17 @@ namespace Game.Gameplay
 
         public IReadOnlyList<BuffRuntimeInfo> ActiveBuffs => buffs;
 
+        /// <summary>
+        /// 初始化运行时依赖.
+        /// </summary>
         private void Awake()
         {
             owner = GetComponent<Player>();
         }
 
+        /// <summary>
+        /// 执行每帧更新逻辑.
+        /// </summary>
         private void Update()
         {
             var deltaTime = Time.deltaTime;
@@ -44,8 +50,41 @@ namespace Game.Gameplay
             {
                 UpdateBuff(buffs[i], deltaTime);
             }
+
+            void UpdateBuff(BuffRuntimeInfo info, float frameDeltaTime)
+            {
+                if (!info.IsPermanent)
+                {
+                    info.RemainingTime -= frameDeltaTime;
+
+                    if (info.RemainingTime <= 0f)
+                    {
+                        RemoveBuffById(info.Buff.Id);
+                        return;
+                    }
+                }
+
+                info.Buff.OnUpdate(info, frameDeltaTime);
+                TriggerInterval(info, frameDeltaTime);
+            }
+
+            void TriggerInterval(BuffRuntimeInfo info, float frameDeltaTime)
+            {
+                if (info.Interval <= 0f) return;
+
+                info.IntervalTimer += frameDeltaTime;
+
+                while (info.IntervalTimer >= info.Interval && buffInfoMap.ContainsKey(info.Buff.Id))
+                {
+                    info.IntervalTimer -= info.Interval;
+                    info.Buff.OnInterval(info);
+                }
+            }
         }
 
+        /// <summary>
+        /// 释放销毁时持有的运行时状态.
+        /// </summary>
         private void OnDestroy()
         {
             ClearBuffs();
@@ -132,6 +171,34 @@ namespace Game.Gameplay
             NotifyOwnerStatsChanged(previousMaxHp);
             NotifyBuffsChanged();
             return info;
+
+            BuffRuntimeInfo CreateBuffRuntimeInfo(Buff targetBuff, UnityEngine.Object buffSource)
+            {
+                var luaManager = LuaManager.Instance;
+                if (luaManager == null)
+                {
+                    Debug.LogError($"{nameof(BuffManager)}: Root 场景未挂载 {nameof(LuaManager)}, 无法创建 Buff Lua 实例.", this);
+                    return null;
+                }
+
+                var luaInstance = luaManager.CreateBuffInstance(targetBuff);
+                if (luaInstance == null)
+                {
+                    Debug.LogError($"{nameof(BuffManager)}: 创建 Buff Lua 实例失败, Buff: {targetBuff.BuffName}.", this);
+                    return null;
+                }
+
+                var runtimeInfo = new BuffRuntimeInfo
+                {
+                    owner = owner != null ? owner : Global.player,
+                    Source = buffSource,
+                    Buff = targetBuff,
+                    LuaInstance = luaInstance
+                };
+
+                ResetBuffRuntimeInfo(runtimeInfo, targetBuff, buffSource);
+                return runtimeInfo;
+            }
         }
 
         /// <summary>
@@ -222,6 +289,9 @@ namespace Game.Gameplay
             NotifyBuffsChanged();
         }
 
+        /// <summary>
+        /// 执行 RestoreSaveData 逻辑.
+        /// </summary>
         public void RestoreSaveData(IEnumerable<BuffSaveData> savedBuffs, UnityEngine.Object source)
         {
             ClearBuffs();
@@ -288,84 +358,7 @@ namespace Game.Gameplay
 
     #endregion
 
-    #region Runtime
-
-        /// <summary>
-        /// 更新 Buff 的计时器和状态.
-        /// </summary>
-        /// <param name="info">Buff 运行时信息</param>
-        /// <param name="deltaTime">时间增量</param>
-        private void UpdateBuff(BuffRuntimeInfo info, float deltaTime)
-        {
-            if (!info.IsPermanent)
-            {
-                info.RemainingTime -= deltaTime;
-
-                if (info.RemainingTime <= 0f)
-                {
-                    RemoveBuffById(info.Buff.Id);
-                    return;
-                }
-            }
-
-            info.Buff.OnUpdate(info, deltaTime);
-            TriggerInterval(info, deltaTime);
-        }
-
-        /// <summary>
-        /// 按固定间隔触发 Buff 效果.
-        /// </summary>
-        /// <param name="info">Buff 运行时信息</param>
-        /// <param name="deltaTime">时间增量</param>
-        private void TriggerInterval(BuffRuntimeInfo info, float deltaTime)
-        {
-            if (info.Interval <= 0f) return;
-
-            info.IntervalTimer += deltaTime;
-
-            while (info.IntervalTimer >= info.Interval && buffInfoMap.ContainsKey(info.Buff.Id))
-            {
-                info.IntervalTimer -= info.Interval;
-                info.Buff.OnInterval(info);
-            }
-        }
-
-    #endregion
-
     #region Create And Reset
-
-        /// <summary>
-        /// 创建 Buff 运行时信息.
-        /// </summary>
-        /// <param name="buff">Buff 配置</param>
-        /// <returns>Buff 运行时信息</returns>
-        private BuffRuntimeInfo CreateBuffRuntimeInfo(Buff buff, UnityEngine.Object source)
-        {
-            var luaManager = LuaManager.Instance;
-            if (luaManager == null)
-            {
-                Debug.LogError($"{nameof(BuffManager)}: Root 场景未挂载 {nameof(LuaManager)}, 无法创建 Buff Lua 实例.", this);
-                return null;
-            }
-
-            var luaInstance = luaManager.CreateBuffInstance(buff);
-            if (luaInstance == null)
-            {
-                Debug.LogError($"{nameof(BuffManager)}: 创建 Buff Lua 实例失败, Buff: {buff.BuffName}.", this);
-                return null;
-            }
-
-            var info = new BuffRuntimeInfo
-            {
-                owner = owner != null ? owner : Global.player,
-                Source = source,
-                Buff = buff,
-                LuaInstance = luaInstance
-            };
-
-            ResetBuffRuntimeInfo(info, buff, source);
-            return info;
-        }
 
         /// <summary>
         /// 重置 Buff 运行时计时数据.

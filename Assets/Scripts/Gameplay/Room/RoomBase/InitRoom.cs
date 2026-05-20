@@ -15,28 +15,29 @@ namespace Game.Gameplay
         [Header("玩家预制体")]
         [SerializeField] private Player playerPrefab;
 
+        /// <summary>
+        /// 执行 OnRoomInitialized 逻辑.
+        /// </summary>
         protected override void OnRoomInitialized()
         {
             needGenerateDoors = false;
             PlacePlayerAtSpawn();
-        }
 
-
-        private void PlacePlayerAtSpawn()
-        {
-            var spawnPosition = playerSpawnPoint != null ? playerSpawnPoint.position : transform.position;
-
-            if (Global.player != null)
+            void PlacePlayerAtSpawn()
             {
-                Global.player.transform.position = spawnPosition;
-                return;
-            }
+                var spawnPosition = playerSpawnPoint != null ? playerSpawnPoint.position : transform.position;
+                if (Global.player != null)
+                {
+                    Global.player.transform.position = spawnPosition;
+                    return;
+                }
 
-            if (playerPrefab != null)
-            {
-                var player = Instantiate(playerPrefab, spawnPosition, Quaternion.identity);
-                player.gameObject.SetActive(true);
+                if (playerPrefab != null)
+                {
+                    var player = Instantiate(playerPrefab, spawnPosition, Quaternion.identity);
+                    player.gameObject.SetActive(true);
+                }
             }
-        }
+}
     }
 }

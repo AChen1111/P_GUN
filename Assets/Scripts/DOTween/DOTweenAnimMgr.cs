@@ -34,33 +34,36 @@ namespace Game.Animation
 
         private const float DefaultDuration = 3f;
 
+        /// <summary>
+        /// 初始化运行时依赖.
+        /// </summary>
         private void Awake()
         {
             Instance = this;
             RebuildEffectMap();
-        }
 
-        private void RebuildEffectMap()
-        {
-            effectMap.Clear();
-            foreach (var effect in registeredEffects)
+            void RebuildEffectMap()
             {
-                if (effect == null) continue;
-                RegisterEffect(effect);
+                effectMap.Clear();
+                foreach (var effect in registeredEffects)
+                {
+                    if (effect == null)
+                        continue;
+                    RegisterEffect(effect);
+                }
             }
-        }
 
-        private void RegisterEffect(AnimEffectSO effect)
+    void RegisterEffect(AnimEffectSO effect)
+    {
+        effectMap[effect.name] = effect;
+        // 兼容旧代码中的短 key，例如 Jump 和 Hurted。
+        const string suffix = "AnimEffect";
+        if (effect.name.EndsWith(suffix, StringComparison.Ordinal))
         {
-            effectMap[effect.name] = effect;
-
-            // 兼容旧代码中的短 key，例如 Jump 和 Hurted。
-            const string suffix = "AnimEffect";
-            if (effect.name.EndsWith(suffix, StringComparison.Ordinal))
-            {
-                effectMap[effect.name.Substring(0, effect.name.Length - suffix.Length)] = effect;
-            }
+            effectMap[effect.name.Substring(0, effect.name.Length - suffix.Length)] = effect;
         }
+    }
+}
 
 
         /// <summary>
@@ -90,7 +93,27 @@ namespace Game.Animation
             }
 
             Play(GetEffectKey(animType), target, duration, onComplete);
-        }
+
+            static string GetEffectKey(DOTweenAnimType animType)
+            {
+                // 枚举名和 SO 资产名分离，避免 Inspector 显示名被资源命名细节污染。
+                switch (animType)
+                {
+                    case DOTweenAnimType.Blink:
+                        return "BlinkAnimEffect";
+                    case DOTweenAnimType.Jump:
+                        return "JumpAnimEffect";
+                    case DOTweenAnimType.Shake:
+                        return "ShakeAnimEffect";
+                    case DOTweenAnimType.Hurted:
+                        return "HurtedAnimEffect";
+                    case DOTweenAnimType.Scale0To1:
+                        return "Scale0To1AnimEffect";
+                    default:
+                        return string.Empty;
+                }
+            }
+}
 
         /// <summary>
         /// 通过 string key 播放。
@@ -119,26 +142,6 @@ namespace Game.Animation
 
             Debug.LogWarning($"[DOTweenAnimMgr] 未找到 key=\"{key}\" 对应的动画 SO。");
             onComplete?.Invoke();
-        }
-
-        private static string GetEffectKey(DOTweenAnimType animType)
-        {
-            // 枚举名和 SO 资产名分离，避免 Inspector 显示名被资源命名细节污染。
-            switch (animType)
-            {
-                case DOTweenAnimType.Blink:
-                    return "BlinkAnimEffect";
-                case DOTweenAnimType.Jump:
-                    return "JumpAnimEffect";
-                case DOTweenAnimType.Shake:
-                    return "ShakeAnimEffect";
-                case DOTweenAnimType.Hurted:
-                    return "HurtedAnimEffect";
-                case DOTweenAnimType.Scale0To1:
-                    return "Scale0To1AnimEffect";
-                default:
-                    return string.Empty;
-            }
         }
     }
 

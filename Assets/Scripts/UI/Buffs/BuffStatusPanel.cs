@@ -14,6 +14,9 @@ namespace Game.UI
 
         private readonly List<BuffStatusIcon> activeIcons = new List<BuffStatusIcon>();
 
+        /// <summary>
+        /// 初始化运行时依赖.
+        /// </summary>
         private void Awake()
         {
             if (iconRoot == null)
@@ -23,18 +26,27 @@ namespace Game.UI
             }
         }
 
+        /// <summary>
+        /// 注册启用时需要的监听.
+        /// </summary>
         private void OnEnable()
         {
             EventCenter.AddListener(GameEvent.PlayerBuffsChanged, Refresh);
             Refresh();
         }
 
+        /// <summary>
+        /// 注销禁用时需要的监听.
+        /// </summary>
         private void OnDisable()
         {
             EventCenter.RemoveListener(GameEvent.PlayerBuffsChanged, Refresh);
             ClearIcons();
         }
 
+        /// <summary>
+        /// 执行每帧更新逻辑.
+        /// </summary>
         private void Update()
         {
             for (var i = 0; i < activeIcons.Count; i++)
@@ -43,6 +55,9 @@ namespace Game.UI
             }
         }
 
+        /// <summary>
+        /// 执行 Refresh 逻辑.
+        /// </summary>
         private void Refresh()
         {
             ClearIcons();
@@ -57,21 +72,29 @@ namespace Game.UI
             {
                 CreateIcon(buffManager.ActiveBuffs[i]);
             }
-        }
 
-        private void CreateIcon(BuffRuntimeInfo info)
-        {
-            if (iconPrefab == null)
+            static BuffManager ResolveBuffManager()
             {
-                Debug.LogError("BuffStatusPanel刷新失败, BuffStatusIcon预制体未绑定.", this);
-                return;
+                return Global.player != null ? Global.player.buffManager : null;
             }
 
-            var icon = Instantiate(iconPrefab, iconRoot);
-            icon.Configure(info, tooltipPanel);
-            activeIcons.Add(icon);
-        }
+            void CreateIcon(BuffRuntimeInfo info)
+            {
+                if (iconPrefab == null)
+                {
+                    Debug.LogError("BuffStatusPanel刷新失败, BuffStatusIcon预制体未绑定.", this);
+                    return;
+                }
 
+                var icon = Instantiate(iconPrefab, iconRoot);
+                icon.Configure(info, tooltipPanel);
+                activeIcons.Add(icon);
+            }
+}
+
+        /// <summary>
+        /// 执行 ClearIcons 逻辑.
+        /// </summary>
         private void ClearIcons()
         {
             tooltipPanel?.Hide();
@@ -85,11 +108,6 @@ namespace Game.UI
             }
 
             activeIcons.Clear();
-        }
-
-        private static BuffManager ResolveBuffManager()
-        {
-            return Global.player != null ? Global.player.buffManager : null;
         }
     }
 }

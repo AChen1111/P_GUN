@@ -15,17 +15,13 @@ namespace Game.Items
         {
             get
             {
-                var instance = PoolBase<Item>.Instance as ItemPool;
-                if (instance == null)
-                {
-                    var go = new GameObject("[ItemPool]");
-                    instance = go.AddComponent<ItemPool>();
-                }
-
-                return instance;
+                return PoolBase<Item>.Instance as ItemPool;
             }
         }
 
+        /// <summary>
+        /// 执行 Spawn 逻辑.
+        /// </summary>
         public Item Spawn(GameObject prefabObject, Vector3 position, Quaternion rotation)
         {
             if (prefabObject == null)
@@ -44,6 +40,9 @@ namespace Game.Items
             return Spawn(prefab, position, rotation);
         }
 
+        /// <summary>
+        /// 执行 Spawn 逻辑.
+        /// </summary>
         public Item Spawn(Item prefab, Vector3 position, Quaternion rotation)
         {
             return Get(prefab, position, rotation);

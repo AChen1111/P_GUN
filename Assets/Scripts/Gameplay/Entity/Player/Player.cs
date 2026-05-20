@@ -13,6 +13,7 @@ using Game.Gameplay.Save;
 
 namespace Game.Gameplay
 {
+    [RequireComponent(typeof(Rigidbody2D), typeof(CircleCollider2D))]
     public class Player : ViewController
     {
         private static readonly string[] AddressableWeaponAddresses =
@@ -99,6 +100,9 @@ namespace Game.Gameplay
 
         #region Unity Lifecycle
 
+        /// <summary>
+        /// 初始化运行时依赖.
+        /// </summary>
         void Awake()
         {
             Global.player = this;
@@ -119,13 +123,123 @@ namespace Game.Gameplay
 
             TryApplyAddressableWeaponLoadout();
             SelectInitialGun();
+
+            void CaptureDefaultVisualState()
+            {
+                if (sr == null)
+                    return;
+                defaultSpriteColor = sr.color;
+                hasDefaultSpriteColor = true;
+            }
+
+            void ResolveAnimator()
+            {
+                if (animator != null) return;
+
+                animator = GetComponent<Animator>();
+                if (animator == null)
+                {
+                    animator = GetComponentInChildren<Animator>();
+                }
+
+                if (animator == null)
+                {
+                    Debug.LogWarning("Player Animator 未绑定，动画将被跳过。");
+                }
+            }
+
+            void TryApplyAddressableWeaponLoadout()
+            {
+                var content = AddressableRuntimeContent.Instance;
+                if (content == null || !content.IsReady)
+                {
+                    throw new InvalidOperationException($"{nameof(Player)} requires ready {nameof(AddressableRuntimeContent)} before weapon loadout.");
+                }
+
+                if (Weapon == null)
+                {
+                    throw new InvalidOperationException($"{nameof(Player)} requires Weapon transform.");
+                }
+
+                var prefabs = new List<GameObject>(AddressableWeaponAddresses.Length);
+                foreach (var address in AddressableWeaponAddresses)
+                {
+                    if (!content.TryGetAsset<GameObject>(address, out var prefab) || prefab == null)
+                    {
+                        throw new InvalidOperationException($"{nameof(Player)} missing preloaded weapon prefab, Address: {address}.");
+                    }
+
+                    prefabs.Add(prefab);
+                }
+
+                ClearCurrentGunInstances();
+                foreach (var prefab in prefabs)
+                {
+                    var instance = Instantiate(prefab, Weapon);
+                    instance.name = prefab.name;
+                    var newGun = instance.GetComponent<Gun>();
+                    if (newGun == null)
+                    {
+                        throw new InvalidOperationException($"{nameof(Player)} weapon prefab missing {nameof(Gun)} component, Prefab: {prefab.name}.");
+                    }
+
+                    guns.Add(newGun);
+                }
+
+                gun = null;
+                currentGunIndex = Mathf.Clamp(currentGunIndex, 0, Mathf.Max(0, guns.Count - 1));
+            }
+
+            void ResolveBuffManager()
+            {
+                if (buffManager != null)
+                    return;
+                // BuffManager 只从当前玩家对象查找, 不在代码里动态创建 Manager.
+                buffManager = GetComponent<BuffManager>();
+            }
+
+            void ResolveSpriteRenderer()
+            {
+                if (sr != null)
+                    return;
+                sr = GetComponent<SpriteRenderer>();
+                if (sr == null)
+                {
+                    sr = GetComponentInChildren<SpriteRenderer>();
+                }
+
+                if (sr == null)
+                {
+                    Debug.LogWarning("Player SpriteRenderer 未绑定，受击闪烁将被跳过。");
+                }
+            }
+
+    void ClearCurrentGunInstances()
+    {
+        // 热更武器实例化前清理 Player prefab 自带枪械, 防止旧枪仍被切换到.
+        foreach (var oldGun in guns)
+        {
+            if (oldGun != null)
+            {
+                Destroy(oldGun.gameObject);
+            }
         }
 
+        guns.Clear();
+    }
+}
+
+        /// <summary>
+        /// 执行启动后的初始化逻辑.
+        /// </summary>
         void Start()
         {
             gun?.OnGunUsed();
         }
 
+        /// <summary>
+        /// 执行每帧更新逻辑.
+        /// </summary>
         void Update()
         {
             if (isGameEnded)
@@ -200,8 +314,30 @@ namespace Game.Gameplay
 
             HandleMouseCombatBlockTransition(mouseCombatBlocked, dir);
             HandleCombatInput(dir, mouseCombatBlocked);
-        }
 
+            void HandleMouseCombatBlockTransition(bool mouseCombatBlocked, Vector2 dir)
+            {
+                if (mouseCombatBlocked && !wasMouseCombatBlocked)
+                {
+                    // 连射武器在鼠标被 UI 接管时补一次抬起, 避免保留射击状态.
+                    gun?.ShootUp(dir);
+                }
+
+                wasMouseCombatBlocked = mouseCombatBlocked;
+            }
+
+            void ApplyWeaponDirection(Vector2 dir)
+            {
+                // 武器朝向只由鼠标战斗输入驱动, Ctrl 和设置面板打开时保持原方向.
+                float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+                Weapon.localRotation = Quaternion.Euler(0, 0, angle);
+                Weapon.localScale = new Vector3(1, dir.x > 0 ? 1 : -1, 1);
+            }
+}
+
+        /// <summary>
+        /// 释放销毁时持有的运行时状态.
+        /// </summary>
         void OnDestroy()
         {
             EventCenter.RemoveListener(GameEvent.PlayerDied, HandleGameEnded);
@@ -215,10 +351,11 @@ namespace Game.Gameplay
             }
         }
 
+        /// <summary>
+        /// 重置编辑器默认配置.
+        /// </summary>
         private void Reset()
         {
-            gameObject.AddComponent<Rigidbody2D>();
-            gameObject.AddComponent<CircleCollider2D>();
             gameObject.tag = "Player";
         }
 
@@ -226,46 +363,9 @@ namespace Game.Gameplay
 
         #region Initialize
 
-        private void ResolveAnimator()
-        {
-            if (animator != null) return;
-
-            animator = GetComponent<Animator>();
-            if (animator == null)
-            {
-                animator = GetComponentInChildren<Animator>();
-            }
-
-            if (animator == null)
-            {
-                Debug.LogWarning("Player Animator 未绑定，动画将被跳过。");
-            }
-        }
-
-        private void ResolveSpriteRenderer()
-        {
-            if (sr != null) return;
-
-            sr = GetComponent<SpriteRenderer>();
-            if (sr == null)
-            {
-                sr = GetComponentInChildren<SpriteRenderer>();
-            }
-
-            if (sr == null)
-            {
-                Debug.LogWarning("Player SpriteRenderer 未绑定，受击闪烁将被跳过。");
-            }
-        }
-
-        private void ResolveBuffManager()
-        {
-            if (buffManager != null) return;
-
-            // BuffManager 只从当前玩家对象查找, 不在代码里动态创建 Manager.
-            buffManager = GetComponent<BuffManager>();
-        }
-
+        /// <summary>
+        /// 执行 SelectInitialGun 逻辑.
+        /// </summary>
         void SelectInitialGun()
         {
             if (guns == null || guns.Count == 0)
@@ -287,62 +387,13 @@ namespace Game.Gameplay
             gun = guns[currentGunIndex];
         }
 
-        private void TryApplyAddressableWeaponLoadout()
-        {
-            var content = AddressableRuntimeContent.Instance;
-            if (content == null || !content.IsReady || Weapon == null) return;
-
-            var prefabs = new List<GameObject>(AddressableWeaponAddresses.Length);
-            foreach (var address in AddressableWeaponAddresses)
-            {
-                if (!content.TryGetAsset<GameObject>(address, out var prefab) || prefab == null)
-                {
-                    Debug.LogError($"{nameof(Player)}: Addressables 武器未预加载, Address: {address}.", this);
-                    return;
-                }
-
-                prefabs.Add(prefab);
-            }
-
-            ClearCurrentGunInstances();
-            foreach (var prefab in prefabs)
-            {
-                var instance = Instantiate(prefab, Weapon);
-                instance.name = prefab.name;
-
-                var newGun = instance.GetComponent<Gun>();
-                if (newGun == null)
-                {
-                    Debug.LogError($"{nameof(Player)}: 武器 prefab 缺少 Gun 组件, Prefab: {prefab.name}.", instance);
-                    Destroy(instance);
-                    continue;
-                }
-
-                guns.Add(newGun);
-            }
-
-            gun = null;
-            currentGunIndex = Mathf.Clamp(currentGunIndex, 0, Mathf.Max(0, guns.Count - 1));
-        }
-
-        private void ClearCurrentGunInstances()
-        {
-            // 热更武器实例化前清理 Player prefab 自带枪械, 防止旧枪仍被切换到.
-            foreach (var oldGun in guns)
-            {
-                if (oldGun != null)
-                {
-                    Destroy(oldGun.gameObject);
-                }
-            }
-
-            guns.Clear();
-        }
-
         #endregion
 
         #region Input And Combat
 
+        /// <summary>
+        /// 执行 HandleCombatInput 逻辑.
+        /// </summary>
         void HandleCombatInput(Vector2 dir, bool mouseCombatBlocked)
         {
             if (!mouseCombatBlocked)
@@ -383,31 +434,26 @@ namespace Game.Gameplay
 
             if (Input.GetKeyDown(KeyCode.M))
                 EventCenter.Trigger(GameEvent.MiniMapToggleRequested);
-        }
 
-        private void ApplyWeaponDirection(Vector2 dir)
-        {
-            // 武器朝向只由鼠标战斗输入驱动, Ctrl 和设置面板打开时保持原方向.
-            float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
-            Weapon.localRotation = Quaternion.Euler(0, 0, angle);
-            Weapon.localScale = new Vector3(1, dir.x > 0 ? 1 : -1, 1);
-        }
-
-        private void HandleMouseCombatBlockTransition(bool mouseCombatBlocked, Vector2 dir)
-        {
-            if (mouseCombatBlocked && !wasMouseCombatBlocked)
+            void SwitchAutoAim()
             {
-                // 连射武器在鼠标被 UI 接管时补一次抬起, 避免保留射击状态.
-                gun?.ShootUp(dir);
-            }
+                canAutoAim = !canAutoAim;
+                if (!canAutoAim)
+                {
+                    ClearAutoAimTarget();
+                }
 
-            wasMouseCombatBlocked = mouseCombatBlocked;
-        }
+                ShowDisPlayer("自动瞄准: " + (canAutoAim ? "开启" : "关闭"), 1f);
+            }
+}
 
         #endregion
 
         #region Sleep
 
+        /// <summary>
+        /// 执行 ExitSleepState 逻辑.
+        /// </summary>
         void ExitSleepState()
         {
             if (!isSleep) return;
@@ -421,11 +467,17 @@ namespace Game.Gameplay
 
         #region Health
 
+        /// <summary>
+        /// 执行 Hurt 逻辑.
+        /// </summary>
         public void Hurt()
         {
             Hurt(new DamageInfo(1, Vector2.zero));
         }
 
+        /// <summary>
+        /// 执行 Hurt 逻辑.
+        /// </summary>
         public void Hurt(DamageInfo damageInfo)
         {
             if(!canHurt) return;
@@ -450,8 +502,98 @@ namespace Game.Gameplay
             //受击免疫
             canHurt = false;
             StartHurtInvincible();
-        }
 
+            Vector3 GetBloodVfxPosition()
+            {
+                var col = GetComponent<Collider2D>();
+                if (col != null)
+                {
+                    return col.bounds.center;
+                }
+
+                if (sr != null)
+                {
+                    return sr.bounds.center;
+                }
+
+                return transform.position;
+            }
+
+            void StartHurtSlow()
+            {
+                if (hurtSlowCoroutine != null)
+                    StopCoroutine(hurtSlowCoroutine);
+                hurtSlowCoroutine = StartCoroutine(HurtSlowCoroutine());
+            }
+
+            void ApplyHurtKnockback(Vector2 sourceDirection)
+            {
+                if (rb == null)
+                    return;
+                var knockbackDir = sourceDirection.sqrMagnitude > 0.0001f ? sourceDirection.normalized : GetFallbackKnockbackDirection();
+                var duration = Mathf.Max(0.01f, hurtKnockbackDuration);
+                hurtKnockbackTimer = duration;
+                hurtKnockbackVelocity = knockbackDir * (Mathf.Max(0f, hurtKnockbackDistance) / duration);
+            }
+
+            void StartHurtInvincible()
+            {
+                if (hurtInvincibleCoroutine != null)
+                    StopCoroutine(hurtInvincibleCoroutine);
+                hurtInvincibleCoroutine = StartCoroutine(HurtInvincibleCoroutine());
+            }
+
+            void PlayHurtFeedback()
+            {
+                //受击时先清理上一次闪烁, 再播放统一受击动画和闪烁.
+                ResetVisualState();
+                DOTweenAnimMgr.Play("Hurted", gameObject, hurtInvincibleDuration);
+                PlayHurtFlash();
+            }
+
+    IEnumerator HurtSlowCoroutine()
+    {
+        hurtPreviousTimeScale = Time.timeScale;
+        Time.timeScale = Mathf.Clamp(hurtSlowTimeScale, 0.01f, 1f);
+        yield return new WaitForSecondsRealtime(Mathf.Max(0f, hurtSlowDuration));
+        RestoreHurtSlowTimeScale();
+        hurtSlowCoroutine = null;
+    }
+
+    IEnumerator HurtInvincibleCoroutine()
+    {
+        //受击免疫使用真实时间, 避免受 Time.timeScale 影响.
+        yield return new WaitForSecondsRealtime(Mathf.Max(0f, hurtInvincibleDuration));
+        canHurt = true;
+        hurtInvincibleCoroutine = null;
+    }
+
+    Vector2 GetFallbackKnockbackDirection()
+    {
+        // 没有伤害来源方向时, 按角色面向反方向后退.
+        if (sr == null)
+            return Vector2.zero;
+        return sr.flipX ? Vector2.right : Vector2.left;
+    }
+
+    void PlayHurtFlash()
+    {
+        if (sr == null)
+            return;
+        sr.DOKill(false);
+        sr.color = hasDefaultSpriteColor ? defaultSpriteColor : Color.white;
+        var loops = Mathf.Max(2, hurtFlashLoops * 2);
+        DOTween.To(() => sr.color, color => sr.color = color, hurtFlashColor, hurtFlashInterval).SetTarget(sr).SetLoops(loops, LoopType.Yoyo).SetUpdate(true).OnComplete(() =>
+        {
+            if (sr != null)
+                sr.color = hasDefaultSpriteColor ? defaultSpriteColor : Color.white;
+        });
+    }
+}
+
+        /// <summary>
+        /// 执行 Restart 逻辑.
+        /// </summary>
         public void Restart()
         {
             isGameEnded = false;
@@ -459,6 +601,9 @@ namespace Game.Gameplay
             PublishHPChanged();
         }
 
+        /// <summary>
+        /// 执行 HandleGameEnded 逻辑.
+        /// </summary>
         private void HandleGameEnded()
         {
             isGameEnded = true;
@@ -468,6 +613,9 @@ namespace Game.Gameplay
             }
         }
 
+        /// <summary>
+        /// 执行 Heal 逻辑.
+        /// </summary>
         public int Heal(int amount)
         {
             if (amount <= 0 || IsHPFull) return 0;
@@ -478,6 +626,9 @@ namespace Game.Gameplay
             return HP - oldHp;
         }
 
+        /// <summary>
+        /// 执行 RestoreSaveData 逻辑.
+        /// </summary>
         public void RestoreSaveData(PlayerSaveData data)
         {
             if (data == null) return;
@@ -493,57 +644,60 @@ namespace Game.Gameplay
             HP = Mathf.Clamp(data.hp, 0, MaxHP);
             PublishHPChanged();
             gun?.OnGunUsed();
-        }
 
-        private void RestoreInventory(PlayerSaveData data)
-        {
-            var inventory = GetComponent<PlayerInventory>();
-            if (inventory == null) return;
-
-            inventory.Clear();
-            var database = DataBaseManager.Instance != null ? DataBaseManager.Instance.Items : ItemDatabase.RuntimeDatabase;
-            for (var i = 0; i < data.inventory.Count; i++)
+            void RestoreWeapons(PlayerSaveData data)
             {
-                var stack = data.inventory[i];
-                if (stack == null) continue;
-
-                inventory.RestoreStack(stack.itemId, stack.count, database, ResolveItemEffects(stack.itemId));
-            }
-        }
-
-        private static IReadOnlyList<ItemEffectBase> ResolveItemEffects(int itemId)
-        {
-            var content = AddressableRuntimeContent.Instance;
-            if (content != null && content.TryGetPrefabById("item", itemId, out var prefab) && prefab != null)
-            {
-                var item = prefab.GetComponent<Item>();
-                if (item != null)
+                for (var i = 0; i < data.weapons.Count; i++)
                 {
-                    return item.Effects;
+                    var weaponData = data.weapons[i];
+                    if (weaponData == null)
+                        continue;
+                    var targetGun = guns.Find(candidate => candidate != null && candidate.WeaponId == weaponData.weaponId);
+                    targetGun?.RestoreAmmo(weaponData.clipAmmo, weaponData.clipMaxAmmo, weaponData.bagAmmo, weaponData.bagMaxAmmo);
                 }
             }
 
-            return null;
-        }
-
-        private void RestoreBuffs(PlayerSaveData data)
-        {
-            var manager = buffManager != null ? buffManager : GetComponent<BuffManager>();
-            manager?.RestoreSaveData(data.buffs, this);
-        }
-
-        private void RestoreWeapons(PlayerSaveData data)
-        {
-            for (var i = 0; i < data.weapons.Count; i++)
+            void RestoreBuffs(PlayerSaveData data)
             {
-                var weaponData = data.weapons[i];
-                if (weaponData == null) continue;
+                var manager = buffManager != null ? buffManager : GetComponent<BuffManager>();
+                manager?.RestoreSaveData(data.buffs, this);
+            }
 
-                var targetGun = guns.Find(candidate => candidate != null && candidate.WeaponId == weaponData.weaponId);
-                targetGun?.RestoreAmmo(weaponData.clipAmmo, weaponData.clipMaxAmmo, weaponData.bagAmmo, weaponData.bagMaxAmmo);
+            void RestoreInventory(PlayerSaveData data)
+            {
+                var inventory = GetComponent<PlayerInventory>();
+                if (inventory == null)
+                    return;
+                inventory.Clear();
+                var database = DataBaseManager.Instance != null ? DataBaseManager.Instance.Items : ItemDatabase.RuntimeDatabase;
+                for (var i = 0; i < data.inventory.Count; i++)
+                {
+                    var stack = data.inventory[i];
+                    if (stack == null)
+                        continue;
+                    inventory.RestoreStack(stack.itemId, stack.count, database, ResolveItemEffects(stack.itemId));
+                }
+            }
+
+    static IReadOnlyList<ItemEffectBase> ResolveItemEffects(int itemId)
+    {
+        var content = AddressableRuntimeContent.Instance;
+        if (content != null && content.TryGetPrefabById("item", itemId, out var prefab) && prefab != null)
+        {
+            var item = prefab.GetComponent<Item>();
+            if (item != null)
+            {
+                return item.Effects;
             }
         }
 
+        return null;
+    }
+}
+
+        /// <summary>
+        /// 执行 PublishHPChanged 逻辑.
+        /// </summary>
         private void PublishHPChanged()
         {
             EventCenter.Trigger(GameEvent.PlayerHPChanged, this);
@@ -568,85 +722,9 @@ namespace Game.Gameplay
             }
         }
 
-        private void PlayHurtFeedback()
-        {
-            //受击时先清理上一次闪烁, 再播放统一受击动画和闪烁.
-            ResetVisualState();
-            DOTweenAnimMgr.Play("Hurted", gameObject, hurtInvincibleDuration);
-            PlayHurtFlash();
-        }
-
-        private void PlayHurtFlash()
-        {
-            if(sr == null) return;
-
-            sr.DOKill(false);
-            sr.color = hasDefaultSpriteColor ? defaultSpriteColor : Color.white;
-
-            var loops = Mathf.Max(2, hurtFlashLoops * 2);
-            DOTween.To(() => sr.color, color => sr.color = color, hurtFlashColor, hurtFlashInterval)
-                .SetTarget(sr)
-                .SetLoops(loops, LoopType.Yoyo)
-                .SetUpdate(true)
-                .OnComplete(() => {
-                    if(sr != null) sr.color = hasDefaultSpriteColor ? defaultSpriteColor : Color.white;
-                });
-        }
-
-        private void StartHurtInvincible()
-        {
-            if(hurtInvincibleCoroutine != null)
-                StopCoroutine(hurtInvincibleCoroutine);
-
-            hurtInvincibleCoroutine = StartCoroutine(HurtInvincibleCoroutine());
-        }
-
-        private void ApplyHurtKnockback(Vector2 sourceDirection)
-        {
-            if(rb == null) return;
-
-            var knockbackDir = sourceDirection.sqrMagnitude > 0.0001f
-                ? sourceDirection.normalized
-                : GetFallbackKnockbackDirection();
-
-            var duration = Mathf.Max(0.01f, hurtKnockbackDuration);
-            hurtKnockbackTimer = duration;
-            hurtKnockbackVelocity = knockbackDir * (Mathf.Max(0f, hurtKnockbackDistance) / duration);
-        }
-
-        private Vector2 GetFallbackKnockbackDirection()
-        {
-            // 没有伤害来源方向时, 按角色面向反方向后退.
-            if(sr == null) return Vector2.zero;
-            return sr.flipX ? Vector2.right : Vector2.left;
-        }
-
-        private IEnumerator HurtInvincibleCoroutine()
-        {
-            //受击免疫使用真实时间, 避免受 Time.timeScale 影响.
-            yield return new WaitForSecondsRealtime(Mathf.Max(0f, hurtInvincibleDuration));
-            canHurt = true;
-            hurtInvincibleCoroutine = null;
-        }
-
-        private void StartHurtSlow()
-        {
-            if(hurtSlowCoroutine != null)
-                StopCoroutine(hurtSlowCoroutine);
-
-            hurtSlowCoroutine = StartCoroutine(HurtSlowCoroutine());
-        }
-
-        private IEnumerator HurtSlowCoroutine()
-        {
-            hurtPreviousTimeScale = Time.timeScale;
-            Time.timeScale = Mathf.Clamp(hurtSlowTimeScale, 0.01f, 1f);
-            yield return new WaitForSecondsRealtime(Mathf.Max(0f, hurtSlowDuration));
-
-            RestoreHurtSlowTimeScale();
-            hurtSlowCoroutine = null;
-        }
-
+        /// <summary>
+        /// 执行 RestoreHurtSlowTimeScale 逻辑.
+        /// </summary>
         private void RestoreHurtSlowTimeScale()
         {
             if(hurtSlowCoroutine == null) return;
@@ -654,14 +732,9 @@ namespace Game.Gameplay
                 Time.timeScale = hurtPreviousTimeScale;
         }
 
-        private void CaptureDefaultVisualState()
-        {
-            if(sr == null) return;
-
-            defaultSpriteColor = sr.color;
-            hasDefaultSpriteColor = true;
-        }
-
+        /// <summary>
+        /// 执行 ResetVisualState 逻辑.
+        /// </summary>
         private void ResetVisualState()
         {
             transform.DOKill(false);
@@ -740,35 +813,24 @@ namespace Game.Gameplay
             {
                 AimPrefab.SetActive(false);
             }
-        }
 
-        private void RefreshAutoAimTarget()
-        {
-            // 自动瞄准每帧刷新最近敌人, 保证目标切换和敌人死亡后的锁定状态及时更新.
-            if (canAutoAim && FightRoom.currentFightRoom != null)
+            void RefreshAutoAimTarget()
             {
-                var targetEnemy = FightRoom.GetNearestEnemy(transform);
-                _autoAimTarget = targetEnemy != null ? targetEnemy.transform : null;
-                return;
+                // 自动瞄准每帧刷新最近敌人, 保证目标切换和敌人死亡后的锁定状态及时更新.
+                if (canAutoAim && FightRoom.currentFightRoom != null)
+                {
+                    var targetEnemy = FightRoom.GetNearestEnemy(transform);
+                    _autoAimTarget = targetEnemy != null ? targetEnemy.transform : null;
+                    return;
+                }
+
+                _autoAimTarget = null;
             }
+}
 
-            _autoAimTarget = null;
-        }
-
-        ///<summary>
-        ///切换自动瞄准
-        ///</summary>
-        private void SwitchAutoAim()
-        {
-            canAutoAim = !canAutoAim;
-            if (!canAutoAim)
-            {
-                ClearAutoAimTarget();
-            }
-
-            ShowDisPlayer("自动瞄准: " + (canAutoAim ? "开启" : "关闭"), 1f);
-        }
-
+        /// <summary>
+        /// 执行 ClearAutoAimTarget 逻辑.
+        /// </summary>
         private void ClearAutoAimTarget()
         {
             // 自动瞄准关闭或脱离战斗时, 同步清理锁定目标和准星显示.
@@ -776,6 +838,9 @@ namespace Game.Gameplay
             HideAutoAimIndicator();
         }
 
+        /// <summary>
+        /// 执行 HideAutoAimIndicator 逻辑.
+        /// </summary>
         private void HideAutoAimIndicator()
         {
             if (AimPrefab != null)
@@ -790,6 +855,9 @@ namespace Game.Gameplay
 
         public float CurrentMoveSpeed => Mathf.Max(0f, CalculateBuffedStat(StatType.MoveSpeed, moveSpeed));
 
+        /// <summary>
+        /// 执行 GetSpeed 逻辑.
+        /// </summary>
         public float GetSpeed() => CurrentMoveSpeed;
 
         /// <summary>
@@ -828,25 +896,12 @@ namespace Game.Gameplay
 
         #region Helpers
 
+        /// <summary>
+        /// 执行 CalculateBuffedStat 逻辑.
+        /// </summary>
         private float CalculateBuffedStat(StatType statType, float baseValue)
         {
             return buffManager != null ? buffManager.CalculateStat(statType, baseValue) : baseValue;
-        }
-
-        private Vector3 GetBloodVfxPosition()
-        {
-            var col = GetComponent<Collider2D>();
-            if(col != null)
-            {
-                return col.bounds.center;
-            }
-
-            if(sr != null)
-            {
-                return sr.bounds.center;
-            }
-
-            return transform.position;
         }
 
         #endregion

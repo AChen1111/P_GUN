@@ -14,10 +14,12 @@ namespace Game.ItemEffects
     {
         [SerializeField] private GameObject prefab;
         [SerializeField] private ItemSpawnTableSO spawnTable;
-        [SerializeField] private string spawnTableAddress;
         [SerializeField] private Vector3 worldOffset = Vector3.zero;
         [SerializeField] private string animEffectKey = "Scale0To1";
 
+        /// <summary>
+        /// 执行 Execute 逻辑.
+        /// </summary>
         public override void Execute(FightRoom room)
         {
             if (room == null) return;
@@ -34,10 +36,9 @@ namespace Game.ItemEffects
             var selectedPrefab = ResolveRuntimePrefab(prefab);
             var selectedAnimEffect = DOTweenAnimType.None;
             var selectedAnimDuration = 0f;
-            var activeSpawnTable = ResolveSpawnTable();
-            if (activeSpawnTable != null && activeSpawnTable.TryGetRandomEntry(out var randomEntry))
+            if (spawnTable != null && spawnTable.TryGetRandomEntry(out var randomEntry))
             {
-                selectedPrefab = activeSpawnTable.TryResolvePrefab(randomEntry, out var resolvedPrefab) ? resolvedPrefab : null;
+                selectedPrefab = spawnTable.TryResolvePrefab(randomEntry, out var resolvedPrefab) ? resolvedPrefab : null;
                 selectedAnimEffect = randomEntry.spawnAnimEffect;
                 selectedAnimDuration = randomEntry.spawnAnimDuration;
             }
@@ -55,50 +56,34 @@ namespace Game.ItemEffects
             }
 
             spawner.SpawnItem(selectedPrefab, spawnPosition, animEffectKey);
-        }
 
-        private ItemSpawner ResolveSpawner(FightRoom room)
-        {
-            var spawner = room.GetComponent<ItemSpawner>();
-            return spawner != null ? spawner : room.GetComponentInChildren<ItemSpawner>();
-        }
-
-        private ItemSpawnTableSO ResolveSpawnTable()
-        {
-            if (string.IsNullOrWhiteSpace(spawnTableAddress))
+            static GameObject ResolveRuntimePrefab(GameObject configuredPrefab)
             {
-                return spawnTable;
+                var item = configuredPrefab != null ? configuredPrefab.GetComponent<Item>() : null;
+                var content = AddressableRuntimeContent.Instance;
+                if (item != null && content == null)
+                {
+                    throw new System.InvalidOperationException($"{nameof(SpawnPrefabFightRoomEndEffectSO)} requires {nameof(AddressableRuntimeContent)} for item prefab replacement.");
+                }
+
+                if (item != null && content != null && content.TryGetPrefabById("item", item.ItemId, out var runtimePrefab))
+                {
+                    return runtimePrefab;
+                }
+
+                if (item != null)
+                {
+                    throw new System.InvalidOperationException($"{nameof(SpawnPrefabFightRoomEndEffectSO)} missing runtime item prefab, ItemId: {item.ItemId}.");
+                }
+
+                return configuredPrefab;
             }
 
-            var content = AddressableRuntimeContent.Instance;
-            if (content == null)
+            ItemSpawner ResolveSpawner(FightRoom room)
             {
-                // 允许直接从 GameScene Play, 此时使用 Inspector 中的本地生成表.
-                return spawnTable;
+                var spawner = room.GetComponent<ItemSpawner>();
+                return spawner != null ? spawner : room.GetComponentInChildren<ItemSpawner>();
             }
-
-            if (content.TryGetAsset<ItemSpawnTableSO>(spawnTableAddress, out var runtimeSpawnTable))
-            {
-                return runtimeSpawnTable;
-            }
-
-            Debug.LogError($"{nameof(SpawnPrefabFightRoomEndEffectSO)}: 找不到已预加载的物品生成表, Address: {spawnTableAddress}.", this);
-            return null;
-        }
-
-        /// <summary>
-        /// 直连预制体作为编辑器兼容配置, Root 预加载完成后优先使用同 ID 的热更预制体.
-        /// </summary>
-        private static GameObject ResolveRuntimePrefab(GameObject configuredPrefab)
-        {
-            var item = configuredPrefab != null ? configuredPrefab.GetComponent<Item>() : null;
-            var content = AddressableRuntimeContent.Instance;
-            if (item != null && content != null && content.TryGetPrefabById("item", item.ItemId, out var runtimePrefab))
-            {
-                return runtimePrefab;
-            }
-
-            return configuredPrefab;
-        }
+}
     }
 }
