@@ -109,7 +109,16 @@ public static class AddressablesLocalGroupSetup
         foreach (var definition in HotUpdateGroups)
         {
             var group = GetOrCreateGroup(settings, definition.GroupName);
-            ConfigureAsLocalPackedGroup(settings, group);
+            // Room 关卡图和模板需要整体远程更新, 避免 Content Update 拆分强引用资源.
+            if (definition.GroupName == "Room")
+            {
+                ConfigureAsRemotePackedGroup(settings, group);
+            }
+            else
+            {
+                ConfigureAsLocalPackedGroup(settings, group);
+            }
+
             ClearGroupEntries(settings, group);
             AddEntries(settings, group, definition.Entries);
             firstGroup ??= group;

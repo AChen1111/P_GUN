@@ -31,12 +31,33 @@ MonoBehaviour:
     - item
     - prefab
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: bedc99d1d01a09b47a4db6c1717c43d1
+    m_Address: item/power_up
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - item
+    - prefab
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: d7289ca60b79f7849be1a94d4f3cb4be
     m_Address: ItemDatabase
     m_ReadOnly: 0
     m_SerializedLabels:
     - database
     - item
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: dacb677e2179264459e62d814f35a5f8
+    m_Address: item/chest
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - item
+    - prefab
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ec55b4f84b4c70f4e958efa2efb7d253
+    m_Address: item/speed_up
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - item
+    - prefab
     FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 63af2ccf367b1c745b05c3dc480c23af, type: 2}

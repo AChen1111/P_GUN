@@ -45,12 +45,12 @@ MonoBehaviour:
   m_overridePlayerVersion: '[UnityEditor.PlayerSettings.bundleVersion]'
   m_GroupAssets:
   - {fileID: 11400000, guid: 6ed4ea5299d9cb8439f9ea5da8c25982, type: 2}
-  - {fileID: 11400000, guid: a016f4add0906f64ca176c98f7cc018f, type: 2}
   - {fileID: 11400000, guid: 0929a3429589efd4e8c3698144b475d8, type: 2}
   - {fileID: 11400000, guid: a5119a4ea8213274bb34c9a3a3c0657b, type: 2}
   - {fileID: 11400000, guid: 639c36c931294274e8030a60b090431e, type: 2}
   - {fileID: 11400000, guid: 213694761bfdf9e43bac2f5f842e4a47, type: 2}
   - {fileID: 11400000, guid: 58af224d5a5c605459b3ff2da560303b, type: 2}
+  - {fileID: 11400000, guid: bf0290e7e01dbee4f92035041c8d4240, type: 2}
   m_BuildSettings:
     m_CompileScriptsInVirtualMode: 0
     m_CleanupStreamingAssetsAfterBuilds: 1
@@ -102,7 +102,6 @@ MonoBehaviour:
     - prefab
     - enemy
     - weapon
-    - spawn_table
   m_SchemaTemplates: []
   m_GroupTemplateObjects:
   - {fileID: 11400000, guid: ab6d296da78c83f4c8faef95920bc66c, type: 2}

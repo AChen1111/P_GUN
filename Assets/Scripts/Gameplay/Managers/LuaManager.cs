@@ -11,11 +11,13 @@ using Game.Items;
 namespace Game.Gameplay
 {
     /// <summary>
-    /// Lua 全局管理器, 负责创建 Lua 环境并缓存 Buff 脚本 table.
+    /// Lua 全局管理器, 负责创建 Lua 环境并缓存脚本 table.
     /// </summary>
     public sealed class LuaManager : MonoBehaviour
     {
         private readonly Dictionary<TextAsset, LuaTable> buffTableCache = new Dictionary<TextAsset, LuaTable>();
+        private readonly Dictionary<TextAsset, LuaTable> itemEffectTableCache = new Dictionary<TextAsset, LuaTable>();
+        private readonly Dictionary<TextAsset, Dictionary<string, Action<ItemEffectContext>>> itemEffectMethodCache = new Dictionary<TextAsset, Dictionary<string, Action<ItemEffectContext>>>();
 
         private LuaEnv luaEnv;
 
@@ -90,7 +92,54 @@ namespace Game.Gameplay
                     return null;
                 }
             }
-}
+        }
+
+        /// <summary>
+        /// 调用道具 Lua 效果上的指定方法.
+        /// </summary>
+        public void InvokeItemEffectMethod(TextAsset luaFile, string methodName, ItemEffectContext ctx)
+        {
+            var action = GetItemEffectMethod(luaFile, methodName);
+            action.Invoke(ctx);
+        }
+
+        /// <summary>
+        /// 获取并缓存道具 Lua 效果方法.
+        /// </summary>
+        private Action<ItemEffectContext> GetItemEffectMethod(TextAsset luaFile, string methodName)
+        {
+            if (!itemEffectMethodCache.TryGetValue(luaFile, out var methodCache))
+            {
+                methodCache = new Dictionary<string, Action<ItemEffectContext>>();
+                itemEffectMethodCache[luaFile] = methodCache;
+            }
+
+            if (methodCache.TryGetValue(methodName, out var cachedMethod))
+            {
+                return cachedMethod;
+            }
+
+            var table = GetItemEffectTable(luaFile);
+            var method = table.Get<Action<ItemEffectContext>>(methodName);
+            methodCache[methodName] = method;
+            return method;
+        }
+
+        /// <summary>
+        /// 获取并缓存道具 Lua 效果 table.
+        /// </summary>
+        private LuaTable GetItemEffectTable(TextAsset luaFile)
+        {
+            if (itemEffectTableCache.TryGetValue(luaFile, out var cachedTable))
+            {
+                return cachedTable;
+            }
+
+            var results = luaEnv.DoString(luaFile.text, luaFile.name);
+            var table = results[0] as LuaTable;
+            itemEffectTableCache[luaFile] = table;
+            return table;
+        }
 
         /// <summary>
         /// 释放销毁时持有的运行时状态.
@@ -107,7 +156,14 @@ namespace Game.Gameplay
                 table?.Dispose();
             }
 
+            foreach (var table in itemEffectTableCache.Values)
+            {
+                table?.Dispose();
+            }
+
             buffTableCache.Clear();
+            itemEffectTableCache.Clear();
+            itemEffectMethodCache.Clear();
             luaEnv?.Dispose();
             luaEnv = null;
         }

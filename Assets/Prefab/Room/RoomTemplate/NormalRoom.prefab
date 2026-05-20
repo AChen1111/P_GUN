@@ -379,6 +379,46 @@ Tilemap:
       m_TileObjectToInstantiateIndex: 65535
       dummyAlignment: 0
       m_AllTileFlags: 1073741827
+  - first: {x: -4, y: 2, z: 0}
+    second:
+      serializedVersion: 2
+      m_TileIndex: 1
+      m_TileSpriteIndex: 2
+      m_TileMatrixIndex: 0
+      m_TileColorIndex: 0
+      m_TileObjectToInstantiateIndex: 65535
+      dummyAlignment: 0
+      m_AllTileFlags: 1073741827
+  - first: {x: -3, y: 2, z: 0}
+    second:
+      serializedVersion: 2
+      m_TileIndex: 1
+      m_TileSpriteIndex: 3
+      m_TileMatrixIndex: 0
+      m_TileColorIndex: 0
+      m_TileObjectToInstantiateIndex: 65535
+      dummyAlignment: 0
+      m_AllTileFlags: 1073741827
+  - first: {x: -2, y: 2, z: 0}
+    second:
+      serializedVersion: 2
+      m_TileIndex: 1
+      m_TileSpriteIndex: 4
+      m_TileMatrixIndex: 0
+      m_TileColorIndex: 0
+      m_TileObjectToInstantiateIndex: 65535
+      dummyAlignment: 0
+      m_AllTileFlags: 1073741827
+  - first: {x: -1, y: 2, z: 0}
+    second:
+      serializedVersion: 2
+      m_TileIndex: 1
+      m_TileSpriteIndex: 1
+      m_TileMatrixIndex: 0
+      m_TileColorIndex: 0
+      m_TileObjectToInstantiateIndex: 65535
+      dummyAlignment: 0
+      m_AllTileFlags: 1073741827
   - first: {x: 4, y: 2, z: 0}
     second:
       serializedVersion: 2
@@ -533,21 +573,21 @@ Tilemap:
   m_TileAssetArray:
   - m_RefCount: 0
     m_Data: {fileID: 0}
-  - m_RefCount: 40
+  - m_RefCount: 44
     m_Data: {fileID: 11400000, guid: 1859b6cb331157048b337f962196f1c4, type: 2}
   m_TileSpriteArray:
   - m_RefCount: 0
     m_Data: {fileID: 0}
-  - m_RefCount: 11
+  - m_RefCount: 12
     m_Data: {fileID: 1756050813, guid: 0dac1d55b884f74438f44deeb3f05191, type: 3}
-  - m_RefCount: 10
+  - m_RefCount: 11
     m_Data: {fileID: 335232649, guid: 0dac1d55b884f74438f44deeb3f05191, type: 3}
-  - m_RefCount: 9
-    m_Data: {fileID: -609536639, guid: 0dac1d55b884f74438f44deeb3f05191, type: 3}
   - m_RefCount: 10
+    m_Data: {fileID: -609536639, guid: 0dac1d55b884f74438f44deeb3f05191, type: 3}
+  - m_RefCount: 11
     m_Data: {fileID: 1758070663, guid: 0dac1d55b884f74438f44deeb3f05191, type: 3}
   m_TileMatrixArray:
-  - m_RefCount: 40
+  - m_RefCount: 44
     m_Data:
       e00: 1
       e01: 0
@@ -566,7 +606,7 @@ Tilemap:
       e32: 0
       e33: 1
   m_TileColorArray:
-  - m_RefCount: 40
+  - m_RefCount: 44
     m_Data: {r: 1, g: 1, b: 1, a: 1}
   m_TileObjectToInstantiateArray: []
   m_AnimationFrameRate: 1
@@ -759,6 +799,14 @@ CompositeCollider2D:
         Y: 40000000
       - X: 40000000
         Y: -40000000
+    - - X: 0
+        Y: 30000000
+      - X: -40000000
+        Y: 30000000
+      - X: -40000000
+        Y: 20000000
+      - X: 0
+        Y: 20000000
   m_CompositePaths:
     m_Paths:
     - - {x: 4.999971, y: -5}
@@ -769,6 +817,10 @@ CompositeCollider2D:
       - {x: -6, y: -3.9999704}
       - {x: -5.9999704, y: 4}
       - {x: 4, y: 3.9999704}
+    - - {x: -0.000029300001, y: 2}
+      - {x: -0.000029300001, y: 3}
+      - {x: -4, y: 2.999971}
+      - {x: -3.999971, y: 2}
   m_VertexDistance: 0.0005
   m_OffsetDistance: 0.00005
   m_UseDelaunayMesh: 0
@@ -2596,6 +2648,7 @@ GameObject:
   - component: {fileID: 8490760209731694276}
   - component: {fileID: 5592398116191201107}
   - component: {fileID: 78627306088376484}
+  - component: {fileID: 2080456263480866831}
   m_Layer: 9
   m_Name: NormalRoom
   m_TagString: Untagged
@@ -2788,6 +2841,21 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 8.811616, y: 7.07393}
   m_EdgeRadius: 0
+--- !u!114 &2080456263480866831
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7403787295593108228}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 79183b63f248aa94e86567dd22126157, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Positions: []
+  HighlightTilemap: {fileID: 0}
+  HighlightColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
 --- !u!1 &7818928285003524333
 GameObject:
   m_ObjectHideFlags: 0
