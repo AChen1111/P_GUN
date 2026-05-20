@@ -25,12 +25,14 @@ namespace Game.Pooling
         [SerializeField] private List<PrefabInfo> prefabInfos;
 
     #region 池中物体信息
+#pragma warning disable CS0649 // Unity 序列化字段由 Inspector 赋值.
         [System.Serializable]
         private struct PrefabInfo
         {
             public T prefab; //预制体
             public int prewarmCount; //预热数量
         }
+#pragma warning restore CS0649
     #endregion
 
         [SerializeField] private bool collectionChecks = true;
@@ -103,6 +105,9 @@ namespace Game.Pooling
         }
     #endregion
 
+        /// <summary>
+        /// 初始化运行时依赖.
+        /// </summary>
         protected virtual void Awake() {
             // 同一个 T 类型只允许存在一个 PoolBase 实例.
             // 如果场景里重复放了池组件, 后创建的会被销毁.
@@ -252,62 +257,49 @@ namespace Game.Pooling
 
             _prefab2Pool.Add(prefab, pool);
             return pool;
-        }
 
-        /// <summary>
-        /// 创建指定 prefab 的新实例.
-        /// </summary>
-        private T CreateItem(T prefab) {
-
-            //把物体创建到inactiveRoot下，并保持未激活
-            var item = Instantiate(prefab, inactiveRoot);
-            item.gameObject.SetActive(false);
-
-            _instance2Prefab[item] = prefab;
-
-            OnCreate(item, prefab);
-            return item;
-        }
-
-        /// <summary>
-        /// ObjectPool 取出对象时调用.
-        /// 这里负责恢复实例到池的映射, 移动到 activeRoot, 激活对象, 然后通知对象进入使用状态.
-        /// </summary>
-        private void OnTakeFromPool(T item) {
-            if(_instance2Prefab.TryGetValue(item, out var prefab) && _prefab2Pool.TryGetValue(prefab, out var pool)) {
-                _instance2Pool[item] = pool;
+            void DestroyItem(T item)
+            {
+                OnDestroyItem(item);
+                if (item != null)
+                {
+                    _instance2Pool.Remove(item);
+                    _instance2Prefab.Remove(item);
+                    Destroy(item.gameObject);
+                }
             }
 
-            item.transform.SetParent(activeRoot, false);
-            item.gameObject.SetActive(true);
-
-            item.OnSpawnFromPool();//重置内部状态
-            OnGet(item);
-        }
-
-        /// <summary>
-        /// ObjectPool 回收对象时调用.
-        /// 这里先通知对象清理自身状态, 再执行子类回收扩展点, 最后隐藏对象并移到 inactiveRoot.
-        /// </summary>
-        private void OnReturnedToPool(T item) {
-            item.OnRecycleToPool();//重置内部状态
-            OnRelease(item);
-            item.gameObject.SetActive(false);
-            item.transform.SetParent(inactiveRoot, false);
-        }
-
-        /// <summary>
-        /// ObjectPool 真正销毁对象时调用.
-        /// 需要同步清除实例映射, 避免字典保留已经销毁的对象引用.
-        /// </summary>
-        private void DestroyItem(T item) {
-            OnDestroyItem(item);
-            if (item != null) {
-                _instance2Pool.Remove(item);
-                _instance2Prefab.Remove(item);
-                Destroy(item.gameObject);
+            void OnReturnedToPool(T item)
+            {
+                item.OnRecycleToPool(); //重置内部状态
+                OnRelease(item);
+                item.gameObject.SetActive(false);
+                item.transform.SetParent(inactiveRoot, false);
             }
-        }
+
+            void OnTakeFromPool(T item)
+            {
+                if (_instance2Prefab.TryGetValue(item, out var prefab) && _prefab2Pool.TryGetValue(prefab, out var pool))
+                {
+                    _instance2Pool[item] = pool;
+                }
+
+                item.transform.SetParent(activeRoot, false);
+                item.gameObject.SetActive(true);
+                item.OnSpawnFromPool(); //重置内部状态
+                OnGet(item);
+            }
+
+            T CreateItem(T prefab)
+            {
+                //把物体创建到inactiveRoot下，并保持未激活
+                var item = Instantiate(prefab, inactiveRoot);
+                item.gameObject.SetActive(false);
+                _instance2Prefab[item] = prefab;
+                OnCreate(item, prefab);
+                return item;
+            }
+}
 
     }
 

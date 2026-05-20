@@ -18,13 +18,38 @@ namespace Game.UI
         private InventoryPanel owner;
         private InventoryItemStack stack;
 
+        /// <summary>
+        /// 执行 Configure 逻辑.
+        /// </summary>
         public void Configure(InventoryItemStack itemStack, InventoryPanel panel)
         {
             stack = itemStack;
             owner = panel;
             Refresh();
-        }
 
+            void Refresh()
+            {
+                if (stack == null)
+                {
+                    return;
+                }
+
+                if (iconImage != null)
+                {
+                    iconImage.sprite = stack.Data.icon;
+                    iconImage.enabled = stack.Data.icon != null;
+                }
+
+                if (countText != null)
+                {
+                    countText.text = Mathf.Max(0, stack.Count).ToString();
+                }
+            }
+}
+
+        /// <summary>
+        /// 执行 SetSelected 逻辑.
+        /// </summary>
         public void SetSelected(bool selected)
         {
             if (selectedFrame != null)
@@ -33,6 +58,9 @@ namespace Game.UI
             }
         }
 
+        /// <summary>
+        /// 执行 OnPointerEnter 逻辑.
+        /// </summary>
         public void OnPointerEnter(PointerEventData eventData)
         {
             if (stack != null)
@@ -41,6 +69,9 @@ namespace Game.UI
             }
         }
 
+        /// <summary>
+        /// 执行 OnPointerClick 逻辑.
+        /// </summary>
         public void OnPointerClick(PointerEventData eventData)
         {
             if (stack == null)
@@ -57,25 +88,6 @@ namespace Game.UI
             if (eventData.button == PointerEventData.InputButton.Left)
             {
                 owner?.SelectStack(stack);
-            }
-        }
-
-        private void Refresh()
-        {
-            if (stack == null)
-            {
-                return;
-            }
-
-            if (iconImage != null)
-            {
-                iconImage.sprite = stack.Data.icon;
-                iconImage.enabled = stack.Data.icon != null;
-            }
-
-            if (countText != null)
-            {
-                countText.text = Mathf.Max(0, stack.Count).ToString();
             }
         }
     }

@@ -101,11 +101,17 @@ namespace Game.Gameplay.Save
             this.z = z;
         }
 
+        /// <summary>
+        /// 执行 FromVector3 逻辑.
+        /// </summary>
         public static Vector3Data FromVector3(Vector3 value)
         {
             return new Vector3Data(value.x, value.y, value.z);
         }
 
+        /// <summary>
+        /// 执行 ToVector3 逻辑.
+        /// </summary>
         public Vector3 ToVector3()
         {
             return new Vector3(x, y, z);

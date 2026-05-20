@@ -6,6 +6,7 @@ using UnityEngine.UI;
 namespace Game.UI
 {
     [DisallowMultipleComponent]
+    [RequireComponent(typeof(CanvasGroup))]
     // 所有栈式UI面板的基类, 统一处理显示状态, 交互状态和默认焦点.
     public class UIPanelBase : MonoBehaviour
     {
@@ -16,18 +17,27 @@ namespace Game.UI
         public CanvasGroup CanvasGroup => canvasGroup;
         public Button DefaultSelectedButton => defaultSelectedButton;
 
+        /// <summary>
+        /// 初始化运行时依赖.
+        /// </summary>
         protected virtual void Awake()
         {
             // 运行时确保面板具备CanvasGroup, 后续才能统一控制显示和交互.
             ResolveCanvasGroup();
         }
 
+        /// <summary>
+        /// 重置编辑器默认配置.
+        /// </summary>
         protected virtual void Reset()
         {
             // 编辑器中重置组件时自动补全CanvasGroup引用.
             ResolveCanvasGroup();
         }
 
+        /// <summary>
+        /// 执行 Open 逻辑.
+        /// </summary>
         public void Open()
         {
             // 公共打开流程, 先显示并恢复交互, 再执行子类打开逻辑.
@@ -36,6 +46,9 @@ namespace Game.UI
             FocusDefaultButton();
         }
 
+        /// <summary>
+        /// 执行 Close 逻辑.
+        /// </summary>
         public void Close()
         {
             // 公共关闭流程, 先执行子类清理逻辑, 再隐藏并停止交互.
@@ -43,6 +56,9 @@ namespace Game.UI
             SetVisible(false, false);
         }
 
+        /// <summary>
+        /// 执行 Pause 逻辑.
+        /// </summary>
         public void Pause()
         {
             // 公共暂停流程, 保留显示, 但禁止交互和射线.
@@ -50,6 +66,9 @@ namespace Game.UI
             OnPause();
         }
 
+        /// <summary>
+        /// 执行 Resume 逻辑.
+        /// </summary>
         public void Resume()
         {
             // 公共恢复流程, 重新启用交互, 再执行子类恢复逻辑.
@@ -58,26 +77,41 @@ namespace Game.UI
             FocusDefaultButton();
         }
 
+        /// <summary>
+        /// 执行 OnOpen 逻辑.
+        /// </summary>
         protected virtual void OnOpen()
         {
             // 子类可重写此方法, 添加面板打开后的业务逻辑.
         }
 
+        /// <summary>
+        /// 执行 OnClose 逻辑.
+        /// </summary>
         protected virtual void OnClose()
         {
             // 子类可重写此方法, 添加面板关闭前的清理逻辑.
         }
 
+        /// <summary>
+        /// 执行 OnPause 逻辑.
+        /// </summary>
         protected virtual void OnPause()
         {
             // 子类可重写此方法, 添加面板暂停后的业务逻辑.
         }
 
+        /// <summary>
+        /// 执行 OnResume 逻辑.
+        /// </summary>
         protected virtual void OnResume()
         {
             // 子类可重写此方法, 添加面板恢复后的业务逻辑.
         }
 
+        /// <summary>
+        /// 执行 BringToTop 逻辑.
+        /// </summary>
         internal void BringToTop(int sortingOrder)
         {
             // 先调整同级顺序, 保证普通UI节点显示在兄弟节点上方.
@@ -91,12 +125,18 @@ namespace Game.UI
             }
         }
 
+        /// <summary>
+        /// 执行 SetDefaultSelectedButton 逻辑.
+        /// </summary>
         protected void SetDefaultSelectedButton(Button button)
         {
             // 允许子类在运行时指定默认选中的按钮.
             defaultSelectedButton = button;
         }
 
+        /// <summary>
+        /// 执行 FocusDefaultButton 逻辑.
+        /// </summary>
         protected void FocusDefaultButton()
         {
             if (defaultSelectedButton == null || EventSystem.current == null)
@@ -106,8 +146,24 @@ namespace Game.UI
 
             // 等待一帧后设置焦点, 避免刚显示时UI对象状态尚未刷新.
             StartCoroutine(FocusDefaultButtonNextFrame());
-        }
 
+            IEnumerator FocusDefaultButtonNextFrame()
+            {
+                yield return null;
+                if (defaultSelectedButton == null || EventSystem.current == null || !defaultSelectedButton.gameObject.activeInHierarchy)
+                {
+                    yield break;
+                }
+
+                // 先清空再设置, 确保EventSystem触发新的选中状态.
+                EventSystem.current.SetSelectedGameObject(null);
+                EventSystem.current.SetSelectedGameObject(defaultSelectedButton.gameObject);
+            }
+}
+
+        /// <summary>
+        /// 执行 SetVisible 逻辑.
+        /// </summary>
         protected void SetVisible(bool visible, bool interactable)
         {
             // 所有面板统一通过CanvasGroup控制可见性, 交互和射线拦截.
@@ -119,6 +175,9 @@ namespace Game.UI
             canvasGroup.blocksRaycasts = visible && interactable;
         }
 
+        /// <summary>
+        /// 执行 ResolveCanvasGroup 逻辑.
+        /// </summary>
         private void ResolveCanvasGroup()
         {
             if (canvasGroup != null)
@@ -128,23 +187,8 @@ namespace Game.UI
 
             if (!TryGetComponent(out canvasGroup))
             {
-                // 面板统一通过CanvasGroup控制交互状态.
-                canvasGroup = gameObject.AddComponent<CanvasGroup>();
+                throw new System.InvalidOperationException($"{nameof(UIPanelBase)} requires {nameof(CanvasGroup)}.");
             }
-        }
-
-        private IEnumerator FocusDefaultButtonNextFrame()
-        {
-            yield return null;
-
-            if (defaultSelectedButton == null || EventSystem.current == null || !defaultSelectedButton.gameObject.activeInHierarchy)
-            {
-                yield break;
-            }
-
-            // 先清空再设置, 确保EventSystem触发新的选中状态.
-            EventSystem.current.SetSelectedGameObject(null);
-            EventSystem.current.SetSelectedGameObject(defaultSelectedButton.gameObject);
         }
     }
 }

@@ -55,6 +55,9 @@ namespace Game.Gameplay
             gunClip.Reload(reloadSound);
         }
 
+        /// <summary>
+        /// 执行 RestoreAmmo 逻辑.
+        /// </summary>
         public void RestoreAmmo(int currentBullet, int maxBullet)
         {
             // 读档恢复备弹时直接覆盖数量, 无限弹药保持 -1.

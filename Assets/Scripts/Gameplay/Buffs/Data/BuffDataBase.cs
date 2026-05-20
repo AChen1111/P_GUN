@@ -19,6 +19,9 @@ namespace Game.Gameplay
 
         public IReadOnlyList<Buff> Buffs => buffs;
 
+        /// <summary>
+        /// 执行 ReplaceBuffs 逻辑.
+        /// </summary>
         public void ReplaceBuffs(IEnumerable<Buff> newBuffs)
         {
             if (newBuffs != null)
@@ -34,6 +37,9 @@ namespace Game.Gameplay
 
         protected override List<Buff> DataValues => buffs;
 
+        /// <summary>
+        /// 执行 TryGetKey 逻辑.
+        /// </summary>
         protected override bool TryGetKey(Buff buff, out int key)
         {
             if (buff == null)

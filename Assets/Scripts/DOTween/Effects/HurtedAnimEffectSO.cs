@@ -11,6 +11,9 @@ namespace Game.Animation
         [SerializeField] private int blinkSteps = 4;
         [SerializeField] private float hurtTintGbScale = 0.28f;
 
+        /// <summary>
+        /// 执行 Play 逻辑.
+        /// </summary>
         public override void Play(GameObject target, float duration, Action onComplete)
         {
             var sr = target.GetComponentInChildren<SpriteRenderer>();

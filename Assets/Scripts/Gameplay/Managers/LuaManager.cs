@@ -21,6 +21,9 @@ namespace Game.Gameplay
 
         public static LuaManager Instance { get; private set; }
 
+        /// <summary>
+        /// 初始化运行时依赖.
+        /// </summary>
         private void Awake()
         {
             if (Instance != null && Instance != this)
@@ -34,6 +37,9 @@ namespace Game.Gameplay
             luaEnv = new LuaEnv();
         }
 
+        /// <summary>
+        /// 执行每帧更新逻辑.
+        /// </summary>
         private void Update()
         {
             luaEnv?.Tick();
@@ -50,42 +56,45 @@ namespace Game.Gameplay
 
             var table = GetBuffTable(buff);
             return table != null ? new LuaBuffInstance(buff, table) : null;
-        }
 
-        private LuaTable GetBuffTable(Buff buff)
-        {
-            var luaFile = buff.LuaFile;
-            if (luaFile == null)
+            LuaTable GetBuffTable(Buff buff)
             {
-                Debug.LogError($"{nameof(LuaManager)}: Buff 未绑定 Lua 文件, Buff: {buff.BuffName}.", this);
-                return null;
-            }
-
-            if (buffTableCache.TryGetValue(luaFile, out var cachedTable))
-            {
-                return cachedTable;
-            }
-
-            try
-            {
-                var results = luaEnv.DoString(luaFile.text, luaFile.name);
-                var table = results != null && results.Length > 0 ? results[0] as LuaTable : null;
-                if (table == null)
+                var luaFile = buff.LuaFile;
+                if (luaFile == null)
                 {
-                    Debug.LogError($"{nameof(LuaManager)}: Lua 文件没有返回 table, Buff: {buff.BuffName}, Lua: {luaFile.name}.", this);
+                    Debug.LogError($"{nameof(LuaManager)}: Buff 未绑定 Lua 文件, Buff: {buff.BuffName}.", this);
                     return null;
                 }
 
-                buffTableCache[luaFile] = table;
-                return table;
-            }
-            catch (Exception exception)
-            {
-                Debug.LogError($"{nameof(LuaManager)}: 加载 Lua 文件失败, Buff: {buff.BuffName}, Lua: {luaFile.name}, Error: {exception.Message}.", this);
-                return null;
-            }
-        }
+                if (buffTableCache.TryGetValue(luaFile, out var cachedTable))
+                {
+                    return cachedTable;
+                }
 
+                try
+                {
+                    var results = luaEnv.DoString(luaFile.text, luaFile.name);
+                    var table = results != null && results.Length > 0 ? results[0] as LuaTable : null;
+                    if (table == null)
+                    {
+                        Debug.LogError($"{nameof(LuaManager)}: Lua 文件没有返回 table, Buff: {buff.BuffName}, Lua: {luaFile.name}.", this);
+                        return null;
+                    }
+
+                    buffTableCache[luaFile] = table;
+                    return table;
+                }
+                catch (Exception exception)
+                {
+                    Debug.LogError($"{nameof(LuaManager)}: 加载 Lua 文件失败, Buff: {buff.BuffName}, Lua: {luaFile.name}, Error: {exception.Message}.", this);
+                    return null;
+                }
+            }
+}
+
+        /// <summary>
+        /// 释放销毁时持有的运行时状态.
+        /// </summary>
         private void OnDestroy()
         {
             if (Instance == this)

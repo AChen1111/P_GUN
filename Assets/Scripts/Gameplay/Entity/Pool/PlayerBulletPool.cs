@@ -14,13 +14,7 @@ namespace Game.Gameplay
     public class PlayerBulletPool : PoolBase<PlayerBullet> {
         public new static PlayerBulletPool Instance {
             get {
-                var instance = PoolBase<PlayerBullet>.Instance as PlayerBulletPool;
-                if(instance == null) {
-                    var go = new GameObject("[PlayerBulletPool]");
-                    instance = go.AddComponent<PlayerBulletPool>();
-                }
-
-                return instance;
+                return PoolBase<PlayerBullet>.Instance as PlayerBulletPool;
             }
         }
 

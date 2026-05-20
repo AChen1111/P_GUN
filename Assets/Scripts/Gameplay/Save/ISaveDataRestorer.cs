@@ -5,6 +5,9 @@ namespace Game.Gameplay.Save
     /// </summary>
     public interface ISaveDataRestorer<TSaveData>
     {
+        /// <summary>
+        /// 执行 RestoreSaveData 逻辑.
+        /// </summary>
         void RestoreSaveData(TSaveData data);
     }
 }

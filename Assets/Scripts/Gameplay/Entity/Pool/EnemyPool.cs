@@ -14,12 +14,7 @@ namespace Game.Gameplay
     public class EnemyPool : PoolBase<EnemyBase> {
         public new static EnemyPool Instance {
             get {
-                var instance = PoolBase<EnemyBase>.Instance as EnemyPool;
-                if (instance == null) {
-                    var go = new GameObject("[EnemyPool]");
-                    instance = go.AddComponent<EnemyPool>();
-                }
-                return instance;
+                return PoolBase<EnemyBase>.Instance as EnemyPool;
             }
         }
 

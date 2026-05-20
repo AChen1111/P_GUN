@@ -33,6 +33,9 @@ namespace Game.Gameplay
         public EnemyDatabase Enemies { get; private set; }
         public bool IsLoaded { get; private set; }
 
+        /// <summary>
+        /// 初始化运行时依赖.
+        /// </summary>
         private void Awake()
         {
             if (Instance != null && Instance != this)
@@ -71,6 +74,9 @@ namespace Game.Gameplay
             }
         }
 
+        /// <summary>
+        /// 执行 GetLoadedAsset 逻辑.
+        /// </summary>
         private static TDatabase GetLoadedAsset<TDatabase>(AsyncOperationHandle<TDatabase> handle, string databaseName)
             where TDatabase : ScriptableObject
         {
@@ -83,6 +89,9 @@ namespace Game.Gameplay
             return null;
         }
 
+        /// <summary>
+        /// 释放销毁时持有的运行时状态.
+        /// </summary>
         private void OnDestroy()
         {
             if (Instance == this)
@@ -97,6 +106,9 @@ namespace Game.Gameplay
             ItemDatabase.ClearRuntimeDatabase(Items);
         }
 
+        /// <summary>
+        /// 执行 ReleaseHandle 逻辑.
+        /// </summary>
         private static void ReleaseHandle<TDatabase>(AsyncOperationHandle<TDatabase> handle)
         {
             if (handle.IsValid())

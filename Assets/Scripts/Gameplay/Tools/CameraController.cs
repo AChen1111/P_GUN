@@ -14,6 +14,9 @@ namespace Game.Gameplay
 
         private Vector3 velocity;
 
+        /// <summary>
+        /// 执行延迟帧更新逻辑.
+        /// </summary>
         private void LateUpdate() {
             if(Global.player == null) return;
 

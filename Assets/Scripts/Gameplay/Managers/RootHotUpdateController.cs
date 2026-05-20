@@ -27,14 +27,6 @@ namespace Game.Gameplay
             "item/power_up",
             "item/purify"
         };
-        private static readonly string[] ItemSpawnTableAddresses =
-        {
-            "item/spawn_table/normal_room"
-        };
-        private static readonly string[] EnemySpawnTableAddresses =
-        {
-            "enemy/spawn_table/normal_room"
-        };
         private static readonly string[] WeaponAddresses =
         {
             "weapon/pistol",
@@ -56,6 +48,9 @@ namespace Game.Gameplay
         [SerializeField] private Text statusText;
         [SerializeField] private Slider progressSlider;
 
+        /// <summary>
+        /// 执行启动后的初始化逻辑.
+        /// </summary>
         private async void Start()
         {
             try
@@ -68,151 +63,151 @@ namespace Game.Gameplay
                 SetStatus("启动失败, 请检查配置.");
                 throw;
             }
-        }
 
-        private async Task RunBootFlowAsync()
-        {
-            ResolveSceneReferences();
-
-            SetStatus("初始化资源系统...");
-            SetProgress(0f);
-            await InitializeAddressablesAsync();
-
-            await TryUpdateRemoteContentAsync();
-
-            SetStatus("加载数据库...");
-            SetProgress(0.8f);
-            await dataBaseManager.LoadAllAsync();
-            if (!dataBaseManager.IsLoaded)
+            async Task RunBootFlowAsync()
             {
-                throw new InvalidOperationException("Required databases were not loaded.");
-            }
-
-            SetStatus("加载热更资源...");
-            SetProgress(0.9f);
-            await LoadRuntimeContentAsync();
-            runtimeContent.MarkReady();
-
-            SetStatus("进入主菜单...");
-            SetProgress(1f);
-            SceneManager.LoadScene(nextSceneName);
-        }
-
-        private void ResolveSceneReferences()
-        {
-            if (dataBaseManager == null)
-            {
-                dataBaseManager = FindObjectOfType<DataBaseManager>();
-            }
-
-            if (runtimeContent == null)
-            {
-                runtimeContent = FindObjectOfType<AddressableRuntimeContent>();
-            }
-
-            if (dataBaseManager == null)
-            {
-                throw new InvalidOperationException($"{nameof(DataBaseManager)} must be placed in Root scene.");
-            }
-
-            if (runtimeContent == null)
-            {
-                throw new InvalidOperationException($"{nameof(AddressableRuntimeContent)} must be placed in Root scene.");
-            }
-        }
-
-        private static async Task InitializeAddressablesAsync()
-        {
-            var handle = Addressables.InitializeAsync(false);
-            await handle.Task;
-
-            if (handle.Status != AsyncOperationStatus.Succeeded)
-            {
-                throw new InvalidOperationException("Addressables initialize failed.");
-            }
-
-            Addressables.Release(handle);
-        }
-
-        private async Task TryUpdateRemoteContentAsync()
-        {
-            try
-            {
-                SetStatus("检查资源更新...");
-                SetProgress(0.15f);
-                await UpdateCatalogsIfNeededAsync();
-
-                SetStatus("检查下载大小...");
-                SetProgress(0.35f);
-                var downloadSize = await GetDownloadSizeAsync();
-                if (downloadSize <= 0)
+                if (dataBaseManager == null)
                 {
-                    SetStatus("资源已是最新.");
-                    SetProgress(0.7f);
-                    return;
+                    throw new InvalidOperationException($"{nameof(DataBaseManager)} must be assigned on {nameof(RootHotUpdateController)}.");
                 }
 
-                await DownloadDependenciesAsync(downloadSize);
+                if (runtimeContent == null)
+                {
+                    throw new InvalidOperationException($"{nameof(AddressableRuntimeContent)} must be assigned on {nameof(RootHotUpdateController)}.");
+                }
+
+                SetStatus("初始化资源系统...");
+                SetProgress(0f);
+                await InitializeAddressablesAsync();
+                await TryUpdateRemoteContentAsync();
+                SetStatus("加载数据库...");
+                SetProgress(0.8f);
+                await dataBaseManager.LoadAllAsync();
+                if (!dataBaseManager.IsLoaded)
+                {
+                    throw new InvalidOperationException("Required databases were not loaded.");
+                }
+
+                SetStatus("加载热更资源...");
+                SetProgress(0.9f);
+                await LoadRuntimeContentAsync();
+                runtimeContent.MarkReady();
+                SetStatus("进入主菜单...");
+                SetProgress(1f);
+                SceneManager.LoadScene(nextSceneName);
             }
-            catch (Exception exception)
+
+    async Task LoadRuntimeContentAsync()
+    {
+        await runtimeContent.LoadAssetAsync<LevelGraph>("room/level1");
+
+        //预加载物品资源
+        foreach (var address in ItemAddresses)
+        {
+            var prefab = await runtimeContent.LoadAssetAsync<GameObject>(address);
+            var item = prefab.GetComponent<Item>();
+            if (item == null)
             {
-                // 更新失败时允许继续使用包体内置资源或本地缓存, 避免弱网直接阻断单机流程.
-                Debug.LogWarning($"{nameof(RootHotUpdateController)}: 更新检查或下载失败, 将继续使用本地内容. Error: {exception.Message}", this);
-                SetStatus("更新失败, 使用本地资源.");
+                throw new InvalidOperationException($"Item prefab missing Item component: {address}");
+            }
+
+            runtimeContent.RegisterPrefabById("item", item.ItemId, prefab);
+        }
+
+        foreach (var address in WeaponAddresses)
+        {
+            await runtimeContent.LoadAssetAsync<GameObject>(address);
+        }
+    }
+
+    async Task TryUpdateRemoteContentAsync()
+    {
+        try
+        {
+            SetStatus("检查资源更新...");
+            SetProgress(0.15f);
+            await UpdateCatalogsIfNeededAsync();
+            SetStatus("检查下载大小...");
+            SetProgress(0.35f);
+            var downloadSize = await GetDownloadSizeAsync();
+            if (downloadSize <= 0)
+            {
+                SetStatus("资源已是最新.");
                 SetProgress(0.7f);
+                return;
             }
+
+            await DownloadDependenciesAsync(downloadSize);
+        }
+        catch (Exception exception)
+        {
+            // 更新失败时允许继续使用包体内置资源或本地缓存, 避免弱网直接阻断单机流程.
+            Debug.LogWarning($"{nameof(RootHotUpdateController)}: 更新检查或下载失败, 将继续使用本地内容. Error: {exception.Message}", this);
+            SetStatus("更新失败, 使用本地资源.");
+            SetProgress(0.7f);
+        }
+    }
+
+    static async Task InitializeAddressablesAsync()
+    {
+        var handle = Addressables.InitializeAsync(false);
+        await handle.Task;
+        if (handle.Status != AsyncOperationStatus.Succeeded)
+        {
+            throw new InvalidOperationException("Addressables initialize failed.");
         }
 
-        private async Task UpdateCatalogsIfNeededAsync()
+        Addressables.Release(handle);
+    }
+
+    async Task UpdateCatalogsIfNeededAsync()
+    {
+        //返回:需要更新的 Catalog 列表, 如果没有更新则返回空列表.
+        var checkHandle = Addressables.CheckForCatalogUpdates(false);
+        await checkHandle.Task;
+        try
         {
+            if (checkHandle.Status != AsyncOperationStatus.Succeeded)
+            {
+                throw new InvalidOperationException("CheckForCatalogUpdates failed.");
+            }
 
-            //返回:需要更新的 Catalog 列表, 如果没有更新则返回空列表. 
-            var checkHandle = Addressables.CheckForCatalogUpdates(false);
-            await checkHandle.Task;
+            /// 只有当确实有新的 Catalog 可用时才调用 UpdateCatalogs, 避免不必要的网络请求和资源重载.
+            var catalogs = checkHandle.Result;
+            if (catalogs == null || catalogs.Count == 0)
+            {
+                return;
+            }
 
+            SetStatus("更新资源目录...");
+            //这里只更新资源索引,没有发生资源的替换
+            var updateHandle = Addressables.UpdateCatalogs(catalogs, false);
+            await updateHandle.Task;
             try
             {
-                if (checkHandle.Status != AsyncOperationStatus.Succeeded)
+                if (updateHandle.Status != AsyncOperationStatus.Succeeded)
                 {
-                    throw new InvalidOperationException("CheckForCatalogUpdates failed.");
-                }
-
-                /// 只有当确实有新的 Catalog 可用时才调用 UpdateCatalogs, 避免不必要的网络请求和资源重载.
-                var catalogs = checkHandle.Result;
-                if (catalogs == null || catalogs.Count == 0)
-                {
-                    return;
-                }
-
-                SetStatus("更新资源目录...");
-                //这里只更新资源索引,没有发生资源的替换
-                var updateHandle = Addressables.UpdateCatalogs(catalogs, false);
-                await updateHandle.Task;
-
-                try
-                {
-                    if (updateHandle.Status != AsyncOperationStatus.Succeeded)
-                    {
-                        throw new InvalidOperationException("UpdateCatalogs failed.");
-                    }
-                }
-                finally
-                {
-                    Addressables.Release(updateHandle);
+                    throw new InvalidOperationException("UpdateCatalogs failed.");
                 }
             }
             finally
             {
-                Addressables.Release(checkHandle);
+                Addressables.Release(updateHandle);
             }
         }
-        
+        finally
+        {
+            Addressables.Release(checkHandle);
+        }
+    }
+}
+
         /// <summary>
         /// 获取需要下载的资源总大小, 用于在 UI 上显示下载进度. 这个方法会检查 DownloadLabels 标签下的所有资源, 包括它们的依赖项, 并返回需要下载的总字节数.
         /// </summary>
         /// <returns></returns>
         /// <exception cref="InvalidOperationException"></exception> <summary>
-        /// 
+        ///
         /// </summary>
         /// <returns></returns>
         private static async Task<long> GetDownloadSizeAsync()
@@ -234,7 +229,7 @@ namespace Game.Gameplay
                 Addressables.Release(handle);
             }
         }
-        
+
         /// <summary>
         /// 下载依赖资源
         /// </summary>
@@ -268,41 +263,9 @@ namespace Game.Gameplay
             }
         }
 
-        //加载资源
-        private async Task LoadRuntimeContentAsync()
-        {
-            await runtimeContent.LoadAssetAsync<LevelGraph>("room/level1");
-
-            // 生成表必须先进入运行时缓存, 房间和掉落逻辑只做同步读取.
-            foreach (var address in ItemSpawnTableAddresses)
-            {
-                await runtimeContent.LoadAssetAsync<ItemSpawnTableSO>(address);
-            }
-
-            foreach (var address in EnemySpawnTableAddresses)
-            {
-                await runtimeContent.LoadAssetAsync<EnemySpawnTableSO>(address);
-            }
-
-            //预加载物品资源
-            foreach (var address in ItemAddresses)
-            {
-                var prefab = await runtimeContent.LoadAssetAsync<GameObject>(address);
-                var item = prefab.GetComponent<Item>();
-                if (item == null)
-                {
-                    throw new InvalidOperationException($"Item prefab missing Item component: {address}");
-                }
-
-                runtimeContent.RegisterPrefabById("item", item.ItemId, prefab);
-            }
-
-            foreach (var address in WeaponAddresses)
-            {
-                await runtimeContent.LoadAssetAsync<GameObject>(address);
-            }
-        }
-
+        /// <summary>
+        /// 执行 SetStatus 逻辑.
+        /// </summary>
         private void SetStatus(string message)
         {
             if (statusText != null)
@@ -311,6 +274,9 @@ namespace Game.Gameplay
             }
         }
 
+        /// <summary>
+        /// 执行 SetProgress 逻辑.
+        /// </summary>
         private void SetProgress(float value)
         {
             if (progressSlider != null)
@@ -319,6 +285,9 @@ namespace Game.Gameplay
             }
         }
 
+        /// <summary>
+        /// 执行 FormatBytes 逻辑.
+        /// </summary>
         private static string FormatBytes(long bytes)
         {
             if (bytes < 1024L) return $"{bytes} B";

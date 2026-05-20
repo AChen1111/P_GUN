@@ -31,6 +31,9 @@ namespace Game.Gameplay
 
         protected override WeaponType WeaponType => WeaponType.Gun;
 
+        /// <summary>
+        /// 执行 OnInit 逻辑.
+        /// </summary>
         protected override void OnInit()
         {
             OwnerFightRoom = FightRoom.currentFightRoom;
@@ -38,6 +41,9 @@ namespace Game.Gameplay
             hasShot = false;
         }
 
+        /// <summary>
+        /// 执行 RegisterFSM 逻辑.
+        /// </summary>
         protected override void RegisterFSM(FSM<EnemyState> fsm)
         {
             fsm.State(EnemyState.Follow)
@@ -51,94 +57,93 @@ namespace Game.Gameplay
                 .OnExit(EndAttack);
 
             fsm.StartState(EnemyState.Follow);
-        }
 
-        private void UpdateFollow()
-        {
-            stateTimer += Time.deltaTime;
-            DoFollow();
-
-            if (stateTimer >= followBeforeAttackTime)
+            void EndAttack()
             {
-                FSM.ChangeState(EnemyState.Attack);
-            }
-        }
-
-        private void BeginAttack()
-        {
-            stateTimer = 0f;
-            hasShot = false;
-            StopMove();
-            SetAnimatorSpeed(0f);
-            PlayAttackAnimation();
-        }
-
-        private void UpdateAttack()
-        {
-            stateTimer += Time.deltaTime;
-
-            if (!hasShot && stateTimer >= attackShootDelay)
-            {
-                hasShot = true;
-                ShootAtPlayer();
+                stateTimer = 0f;
+                hasShot = false;
             }
 
-            if (stateTimer >= attackLockDuration)
+            void UpdateAttack()
             {
-                FSM.ChangeState(EnemyState.Follow);
+                stateTimer += Time.deltaTime;
+                if (!hasShot && stateTimer >= attackShootDelay)
+                {
+                    hasShot = true;
+                    ShootAtPlayer();
+                }
+
+                if (stateTimer >= attackLockDuration)
+                {
+                    FSM.ChangeState(EnemyState.Follow);
+                }
             }
-        }
 
-        private void EndAttack()
-        {
-            stateTimer = 0f;
-            hasShot = false;
-        }
-
-        private void DoFollow()
-        {
-            if (!FollowPlayerWithBodySpace(out var direction))
+            void BeginAttack()
             {
+                stateTimer = 0f;
+                hasShot = false;
                 StopMove();
                 SetAnimatorSpeed(0f);
-                return;
+                PlayAttackAnimation();
             }
 
-            FaceDirection(direction);
-        }
-
-        private void ShootAtPlayer()
-        {
-            if (bulletPrefab == null || Global.player == null) return;
-
-            var direction = ((Vector2)(Global.player.transform.position - transform.position)).normalized;
-            var spawnPosition = transform.position + (Vector3)(direction * bulletSpawnDistance);
-
-            // 参考霰弹枪散射规则, 中心一发, 其余子弹按左右交替角度偏移.
-            var baseAngle = direction.ToAngle();
-            var count = Mathf.Max(1, bulletCount);
-            for (var i = 0; i < count; i++)
+            void UpdateFollow()
             {
-                var spreadSign = i % 2 == 0 ? 1 : -1;
-                var bulletAngle = i == 0 ? baseAngle : baseAngle + spreadSign * i * bulletSpreadStepAngle;
-                var bulletDirection = bulletAngle.AngleToDirection2D().normalized;
-                EnemyBulletPool.Instance.Get(bulletPrefab, spawnPosition, Quaternion.identity, bulletDirection, AttackDamage);
+                stateTimer += Time.deltaTime;
+                DoFollow();
+                if (stateTimer >= followBeforeAttackTime)
+                {
+                    FSM.ChangeState(EnemyState.Attack);
+                }
             }
 
-            PlayShootSound();
-        }
-
-        private void PlayShootSound()
+    void ShootAtPlayer()
+    {
+        if (bulletPrefab == null || Global.player == null)
+            return;
+        var direction = ((Vector2)(Global.player.transform.position - transform.position)).normalized;
+        var spawnPosition = transform.position + (Vector3)(direction * bulletSpawnDistance);
+        // 参考霰弹枪散射规则, 中心一发, 其余子弹按左右交替角度偏移.
+        var baseAngle = direction.ToAngle();
+        var count = Mathf.Max(1, bulletCount);
+        for (var i = 0; i < count; i++)
         {
-            audioPlay.Play();
+            var spreadSign = i % 2 == 0 ? 1 : -1;
+            var bulletAngle = i == 0 ? baseAngle : baseAngle + spreadSign * i * bulletSpreadStepAngle;
+            var bulletDirection = bulletAngle.AngleToDirection2D().normalized;
+            EnemyBulletPool.Instance.Get(bulletPrefab, spawnPosition, Quaternion.identity, bulletDirection, AttackDamage);
         }
 
-        private void FaceDirection(Vector2 direction)
+        PlayShootSound();
+    }
+
+    void DoFollow()
+    {
+        if (!FollowPlayerWithBodySpace(out var direction))
         {
-            if (Sr == null) return;
-
-            if (direction.x < 0f) Sr.flipX = true;
-            else if (direction.x > 0f) Sr.flipX = false;
+            StopMove();
+            SetAnimatorSpeed(0f);
+            return;
         }
+
+        FaceDirection(direction);
+    }
+
+    void FaceDirection(Vector2 direction)
+    {
+        if (Sr == null)
+            return;
+        if (direction.x < 0f)
+            Sr.flipX = true;
+        else if (direction.x > 0f)
+            Sr.flipX = false;
+    }
+
+    void PlayShootSound()
+    {
+        audioPlay.Play();
+    }
+}
     }
 }

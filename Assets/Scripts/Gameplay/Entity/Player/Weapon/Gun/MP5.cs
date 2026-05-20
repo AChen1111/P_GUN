@@ -15,12 +15,18 @@ namespace Game.Gameplay
 
 		public override PlayerBullet BulletPrefab => PlayerBullet;
 
+		/// <summary>
+		/// 执行 ShootDown 逻辑.
+		/// </summary>
 		public override void ShootDown(Vector2 dir)
 		{
 			if(gunClip.IsOutOfAmmo || !gunClip.CanShoot) return;
 			TryPlaySound(true);
 		}
 
+        /// <summary>
+        /// 执行 Shooting 逻辑.
+        /// </summary>
         public override void Shooting(Vector2 dir)
         {
 			gunClip.CheckAmmo();
@@ -38,11 +44,17 @@ namespace Game.Gameplay
 			}
         }
 
+		/// <summary>
+		/// 执行 ShootUp 逻辑.
+		/// </summary>
 		public override void ShootUp(Vector2 dir)
 		{
 			PlayerAudioSource.Stop();
 		}
 
+		/// <summary>
+		/// 执行 OnGunUsed 逻辑.
+		/// </summary>
 		public override void OnGunUsed()
 		{
 			base.OnGunUsed();

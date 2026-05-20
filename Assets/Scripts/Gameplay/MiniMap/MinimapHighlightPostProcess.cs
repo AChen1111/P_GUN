@@ -35,6 +35,9 @@ namespace Game.Gameplay
         [Header("Floor Tilemap 名称（与房间模板中一致）")]
         public string FloorTilemapName = "Floor";
 
+        /// <summary>
+        /// 执行 Run 逻辑.
+        /// </summary>
         public override void Run(DungeonGeneratorLevelGrid2D level)
         {
             // 在共享 Tilemap 根节点下新建高亮层
@@ -84,11 +87,11 @@ namespace Game.Gameplay
                         positions.Add(localPos + roomInstance.Position);
                 }
 
-                // 挂载 MinimapRoomData 到 RoomTemplateInstance
-                var data = roomInstance.RoomTemplateInstance
-                    .GetComponent<MinimapRoomData>()
-                    ?? roomInstance.RoomTemplateInstance
-                    .AddComponent<MinimapRoomData>();
+                var data = roomInstance.RoomTemplateInstance.GetComponent<MinimapRoomData>();
+                if (data == null)
+                {
+                    throw new System.InvalidOperationException($"{nameof(MinimapRoomData)} must be configured on room template instance.");
+                }
 
                 data.Positions = positions;
                 data.HighlightTilemap = highlightTilemap;

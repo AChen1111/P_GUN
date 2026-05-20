@@ -17,13 +17,6 @@ MonoBehaviour:
     m_SerializedData: []
   m_GUID: d2b216c749b463c44bdf7f47574230f5
   m_SerializeEntries:
-  - m_GUID: 0b78e19efc2cfbe45aeaae9e06e3b46f
-    m_Address: item/spawn_table/normal_room
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - item
-    - spawn_table
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 0d97b75cf6914479889ba297b299cc12
     m_Address: item/purify
     m_ReadOnly: 0

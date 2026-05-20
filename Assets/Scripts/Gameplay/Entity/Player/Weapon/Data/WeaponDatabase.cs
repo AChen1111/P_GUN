@@ -16,6 +16,9 @@ namespace Game.Gameplay
 
         public IReadOnlyList<WeaponData> Weapons => weapons;
 
+        /// <summary>
+        /// 执行 ReplaceWeapons 逻辑.
+        /// </summary>
         public void ReplaceWeapons(IEnumerable<WeaponData> newWeapons)
         {
             ReplaceData(weapons, newWeapons);
@@ -25,6 +28,9 @@ namespace Game.Gameplay
 
         protected override IEqualityComparer<string> KeyComparer => StringComparer.OrdinalIgnoreCase;
 
+        /// <summary>
+        /// 执行 TryGetKey 逻辑.
+        /// </summary>
         protected override bool TryGetKey(WeaponData data, out string key)
         {
             key = data.weaponId;

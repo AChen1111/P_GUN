@@ -16,6 +16,9 @@ namespace Game.Gameplay
 
         public override PlayerBullet BulletPrefab => PlayerBullet;
 
+        /// <summary>
+        /// 执行 Shoot 逻辑.
+        /// </summary>
         public void Shoot(Vector2 dir,bool playSound = true)
 		{
 			var obj = GetBullet(dir);
@@ -27,6 +30,9 @@ namespace Game.Gameplay
 			}
 		}
 
+		/// <summary>
+		/// 执行 ShootDown 逻辑.
+		/// </summary>
 		public override void ShootDown(Vector2 dir)
         {
 			gunClip.CheckAmmo();
@@ -51,6 +57,9 @@ namespace Game.Gameplay
 			}
         }
 
+        /// <summary>
+        /// 执行 Shooting 逻辑.
+        /// </summary>
         public override void Shooting(Vector2 dir)
         {
             ShootDown(dir);

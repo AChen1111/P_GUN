@@ -78,6 +78,9 @@ namespace Game.Gameplay
     public virtual BulletBag BulletBag => bulletBag;
     public GunClip GunClip => gunClip;
 
+    /// <summary>
+    /// 执行 RestoreAmmo 逻辑.
+    /// </summary>
     public void RestoreAmmo(int clipAmmo, int clipMaxAmmo, int bagAmmo, int bagMaxAmmo)
     {
         if (gunClip != null)
@@ -91,6 +94,9 @@ namespace Game.Gameplay
         }
     }
 
+    /// <summary>
+    /// 初始化运行时依赖.
+    /// </summary>
     protected virtual void Awake()
     {
         ApplyDataFromDatabase();
@@ -101,8 +107,24 @@ namespace Game.Gameplay
             gunClip = new GunClip(clipSize);
             bulletBag = new BulletBag(MaxBulletBagNum);
         }
-    }
 
+        void ApplyDataFromDatabase()
+        {
+            var database = weaponDatabase != null ? weaponDatabase : DataBaseManager.Instance?.Weapons;
+            if (database != null && database.TryGetById(WeaponId, out var data))
+            {
+                data.ApplyTo(this);
+            }
+            else
+            {
+                Debug.LogWarning($"Weapon {WeaponId} not found in database.");
+            }
+        }
+}
+
+    /// <summary>
+    /// 执行 ApplyData 逻辑.
+    /// </summary>
     public void ApplyData(WeaponData data)
     {
         shootSounds.Clear();
@@ -124,19 +146,6 @@ namespace Game.Gameplay
         clipSize = data.clipSize;
         shootInterval = data.ShootInterval;
         bulletSpeed = data.bulletSpeed;
-    }
-
-    private void ApplyDataFromDatabase()
-    {
-        var database = weaponDatabase != null ? weaponDatabase : DataBaseManager.Instance?.Weapons;
-        if (database != null && database.TryGetById(WeaponId, out var data))
-        {
-            data.ApplyTo(this);
-        }
-        else
-        {
-            Debug.LogWarning($"Weapon {WeaponId} not found in database.");
-        }
     }
 
     /// <summary>
@@ -189,6 +198,9 @@ namespace Game.Gameplay
         bulletBag.Reload(gunClip, ReloadSound);
     }
 
+    /// <summary>
+    /// 执行启动后的初始化逻辑.
+    /// </summary>
     private void Start() {
         PlayerAudioSource  = WeaponGlobal.Instance.WeaponAudioSource;
     }

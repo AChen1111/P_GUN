@@ -11,6 +11,9 @@ namespace Game.Animation
         [SerializeField] private int vibrato = 24;
         [SerializeField] private float randomness = 100f;
 
+        /// <summary>
+        /// 执行 Play 逻辑.
+        /// </summary>
         public override void Play(GameObject target, float duration, Action onComplete)
         {
             target.transform.DOShakePosition(duration, strength, vibrato, randomness, false, true)

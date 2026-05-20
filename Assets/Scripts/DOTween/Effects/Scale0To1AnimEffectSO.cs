@@ -9,6 +9,9 @@ namespace Game.Animation
     {
         [SerializeField] private Ease ease = Ease.OutBack;
 
+        /// <summary>
+        /// 执行 Play 逻辑.
+        /// </summary>
         public override void Play(GameObject target, float duration, Action onComplete)
         {
             var t = target.transform;

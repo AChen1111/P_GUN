@@ -26,18 +26,27 @@ namespace Game.UI.Save
         private int pendingDeleteSlot = -1;
         private int pendingOverwriteSlot = -1;
 
+        /// <summary>
+        /// 执行 OpenForMainMenu 逻辑.
+        /// </summary>
         public void OpenForMainMenu()
         {
             mode = SaveSlotPanelMode.MainMenu;
             OpenByStack();
         }
 
+        /// <summary>
+        /// 执行 OpenForSafeHouse 逻辑.
+        /// </summary>
         public void OpenForSafeHouse()
         {
             mode = SaveSlotPanelMode.SafeHouse;
             OpenByStack();
         }
 
+        /// <summary>
+        /// 执行 OnOpen 逻辑.
+        /// </summary>
         protected override void OnOpen()
         {
             pendingDeleteSlot = -1;
@@ -50,6 +59,9 @@ namespace Game.UI.Save
             Refresh();
         }
 
+        /// <summary>
+        /// 执行 OnClose 逻辑.
+        /// </summary>
         protected override void OnClose()
         {
             pendingDeleteSlot = -1;
@@ -57,16 +69,25 @@ namespace Game.UI.Save
             ClearItems();
         }
 
+        /// <summary>
+        /// 注册启用时需要的监听.
+        /// </summary>
         private void OnEnable()
         {
             backButton?.onClick.AddListener(CloseByStack);
         }
 
+        /// <summary>
+        /// 注销禁用时需要的监听.
+        /// </summary>
         private void OnDisable()
         {
             backButton?.onClick.RemoveListener(CloseByStack);
         }
 
+        /// <summary>
+        /// 执行 OpenByStack 逻辑.
+        /// </summary>
         private void OpenByStack()
         {
             var stackManager = UIStackManager.Instance;
@@ -78,6 +99,9 @@ namespace Game.UI.Save
             stackManager.Push(this);
         }
 
+        /// <summary>
+        /// 执行 CloseByStack 逻辑.
+        /// </summary>
         private void CloseByStack()
         {
             var stackManager = UIStackManager.Instance;
@@ -87,6 +111,9 @@ namespace Game.UI.Save
             }
         }
 
+        /// <summary>
+        /// 执行 Refresh 逻辑.
+        /// </summary>
         private void Refresh()
         {
             ClearItems();
@@ -122,8 +149,65 @@ namespace Game.UI.Save
                     HandleDeleteClicked);
                 activeItems.Add(item);
             }
-        }
 
+            void HandleDeleteClicked(int slotIndex)
+            {
+                var summary = SaveSlotStorage.ReadSummary(slotIndex);
+                if (!summary.exists)
+                {
+                    SetStatus("删除失败, 槽位为空.");
+                    Refresh();
+                    return;
+                }
+
+                if (pendingDeleteSlot != slotIndex)
+                {
+                    pendingDeleteSlot = slotIndex;
+                    pendingOverwriteSlot = -1;
+                    SetStatus($"再次点击槽位 {slotIndex} 的删除按钮会移除存档.");
+                    Refresh();
+                    return;
+                }
+
+                pendingDeleteSlot = -1;
+                pendingOverwriteSlot = -1;
+                var result = SaveGameService.DeleteSlot(slotIndex);
+                SetStatus(result.Message);
+                Refresh();
+            }
+
+            void HandleLoadClicked(int slotIndex)
+            {
+                pendingOverwriteSlot = -1;
+                pendingDeleteSlot = -1;
+                var result = SaveGameService.LoadFromSlot(slotIndex);
+                SetStatus(result.Message);
+                Refresh();
+            }
+
+            void HandleSaveClicked(int slotIndex)
+            {
+                var summary = SaveSlotStorage.ReadSummary(slotIndex);
+                if (summary.exists && pendingOverwriteSlot != slotIndex)
+                {
+                    pendingOverwriteSlot = slotIndex;
+                    pendingDeleteSlot = -1;
+                    SetStatus($"再次点击槽位 {slotIndex} 的保存按钮会覆盖存档.");
+                    Refresh();
+                    return;
+                }
+
+                pendingOverwriteSlot = -1;
+                pendingDeleteSlot = -1;
+                var result = SaveGameService.SaveToSlot(slotIndex);
+                SetStatus(result.Message);
+                Refresh();
+            }
+}
+
+        /// <summary>
+        /// 执行 ClearItems 逻辑.
+        /// </summary>
         private void ClearItems()
         {
             for (var i = activeItems.Count - 1; i >= 0; i--)
@@ -137,60 +221,9 @@ namespace Game.UI.Save
             activeItems.Clear();
         }
 
-        private void HandleSaveClicked(int slotIndex)
-        {
-            var summary = SaveSlotStorage.ReadSummary(slotIndex);
-            if (summary.exists && pendingOverwriteSlot != slotIndex)
-            {
-                pendingOverwriteSlot = slotIndex;
-                pendingDeleteSlot = -1;
-                SetStatus($"再次点击槽位 {slotIndex} 的保存按钮会覆盖存档.");
-                Refresh();
-                return;
-            }
-
-            pendingOverwriteSlot = -1;
-            pendingDeleteSlot = -1;
-            var result = SaveGameService.SaveToSlot(slotIndex);
-            SetStatus(result.Message);
-            Refresh();
-        }
-
-        private void HandleLoadClicked(int slotIndex)
-        {
-            pendingOverwriteSlot = -1;
-            pendingDeleteSlot = -1;
-            var result = SaveGameService.LoadFromSlot(slotIndex);
-            SetStatus(result.Message);
-            Refresh();
-        }
-
-        private void HandleDeleteClicked(int slotIndex)
-        {
-            var summary = SaveSlotStorage.ReadSummary(slotIndex);
-            if (!summary.exists)
-            {
-                SetStatus("删除失败, 槽位为空.");
-                Refresh();
-                return;
-            }
-
-            if (pendingDeleteSlot != slotIndex)
-            {
-                pendingDeleteSlot = slotIndex;
-                pendingOverwriteSlot = -1;
-                SetStatus($"再次点击槽位 {slotIndex} 的删除按钮会移除存档.");
-                Refresh();
-                return;
-            }
-
-            pendingDeleteSlot = -1;
-            pendingOverwriteSlot = -1;
-            var result = SaveGameService.DeleteSlot(slotIndex);
-            SetStatus(result.Message);
-            Refresh();
-        }
-
+        /// <summary>
+        /// 执行 SetStatus 逻辑.
+        /// </summary>
         private void SetStatus(string message)
         {
             if (statusText != null)

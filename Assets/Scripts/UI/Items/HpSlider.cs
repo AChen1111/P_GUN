@@ -63,12 +63,18 @@ namespace Game.UI
         public int CurrentHp => _currentHp;
         public int MaxHp => _maxHp;
 
+        /// <summary>
+        /// 初始化运行时依赖.
+        /// </summary>
         void Awake()
         {
             if (autoSyncGlobalHp)
                 BindGlobalPlayer();
         }
 
+        /// <summary>
+        /// 注册启用时需要的监听.
+        /// </summary>
         void OnEnable()
         {
             if (autoSyncGlobalHp)
@@ -78,6 +84,9 @@ namespace Game.UI
             }
         }
 
+        /// <summary>
+        /// 注销禁用时需要的监听.
+        /// </summary>
         void OnDisable()
         {
             if (autoSyncGlobalHp)
@@ -86,12 +95,18 @@ namespace Game.UI
             StopAllAnimations(false);
         }
 
+        /// <summary>
+        /// 释放销毁时持有的运行时状态.
+        /// </summary>
         void OnDestroy()
         {
             EventCenter.RemoveListener<Player>(GameEvent.PlayerHPChanged, OnPlayerHPChanged);
             StopAllAnimations(false);
         }
 
+        /// <summary>
+        /// 执行每帧更新逻辑.
+        /// </summary>
         void Update()
         {
             if (autoSyncGlobalHp)
@@ -238,6 +253,9 @@ namespace Game.UI
             RefreshByHpImmediate(_currentHp);
         }
 
+        /// <summary>
+        /// 执行 BindGlobalPlayer 逻辑.
+        /// </summary>
         void BindGlobalPlayer()
         {
             var player = Global.player;
@@ -250,6 +268,9 @@ namespace Game.UI
             _hasPlayedAutoSyncInitAnimation = true;
         }
 
+        /// <summary>
+        /// 执行 OnPlayerHPChanged 逻辑.
+        /// </summary>
         void OnPlayerHPChanged(Player player)
         {
             if (!autoSyncGlobalHp) return;
@@ -260,6 +281,9 @@ namespace Game.UI
             SyncFromPlayer(false);
         }
 
+        /// <summary>
+        /// 执行 SyncFromPlayer 逻辑.
+        /// </summary>
         void SyncFromPlayer(bool playInitAnimation)
         {
             var player = _boundPlayer != null ? _boundPlayer : Global.player;
@@ -288,6 +312,9 @@ namespace Game.UI
             }
         }
 
+        /// <summary>
+        /// 执行 PlayInitBuildAnimation 逻辑.
+        /// </summary>
         IEnumerator PlayInitBuildAnimation()
         {
             int hpToAnimate = Mathf.Min(Mathf.Clamp(_currentHp, 0, _maxHp), _hearts.Count * 2);
@@ -351,6 +378,9 @@ namespace Game.UI
             _initAnimationCoroutine = null;
         }
 
+        /// <summary>
+        /// 执行 RefreshByHpImmediate 逻辑.
+        /// </summary>
         void RefreshByHpImmediate(int hp)
         {
             int hpLeft = hp;
@@ -363,6 +393,9 @@ namespace Game.UI
             }
         }
 
+        /// <summary>
+        /// 执行 SetHeartValue 逻辑.
+        /// </summary>
         void SetHeartValue(int index, int value, bool applyScale = true)
         {
             if (index < 0 || index >= _hearts.Count || index >= _heartValues.Count) return;
@@ -376,6 +409,9 @@ namespace Game.UI
                 ApplyHeartScale(heart);
         }
 
+        /// <summary>
+        /// 执行 AppendDamageStep 逻辑.
+        /// </summary>
         void AppendDamageStep(Sequence sequence, int index, int targetValue)
         {
             if (sequence == null || index < 0 || index >= _hearts.Count) return;
@@ -404,6 +440,9 @@ namespace Game.UI
                 sequence.AppendInterval(hpChangeStepInterval);
         }
 
+        /// <summary>
+        /// 执行 AppendHealStep 逻辑.
+        /// </summary>
         void AppendHealStep(Sequence sequence, int index, int targetValue)
         {
             if (sequence == null || index < 0 || index >= _hearts.Count) return;
@@ -434,12 +473,18 @@ namespace Game.UI
                 sequence.AppendInterval(hpChangeStepInterval);
         }
 
+        /// <summary>
+        /// 执行 PrepareHpChangeAnimation 逻辑.
+        /// </summary>
         void PrepareHpChangeAnimation()
         {
             StopAllAnimations(false);
             RefreshByHpImmediate(_currentHp);
         }
 
+        /// <summary>
+        /// 执行 StopAllAnimations 逻辑.
+        /// </summary>
         void StopAllAnimations(bool complete)
         {
             StopInitAnimation();
@@ -447,6 +492,9 @@ namespace Game.UI
             KillHeartTweens();
         }
 
+        /// <summary>
+        /// 执行 StopInitAnimation 逻辑.
+        /// </summary>
         void StopInitAnimation()
         {
             if (_initAnimationCoroutine == null) return;
@@ -455,6 +503,9 @@ namespace Game.UI
             _initAnimationCoroutine = null;
         }
 
+        /// <summary>
+        /// 执行 KillHpChangeAnimation 逻辑.
+        /// </summary>
         void KillHpChangeAnimation(bool complete)
         {
             if (_hpChangeSequence == null) return;
@@ -470,6 +521,9 @@ namespace Game.UI
             _hpChangeSequence = null;
         }
 
+        /// <summary>
+        /// 执行 KillHeartTweens 逻辑.
+        /// </summary>
         void KillHeartTweens()
         {
             for (int i = 0; i < _hearts.Count; i++)
@@ -491,6 +545,9 @@ namespace Game.UI
             }
         }
 
+        /// <summary>
+        /// 执行 PulseHeart 逻辑.
+        /// </summary>
         void PulseHeart(Image heart, float duration)
         {
             if (heart == null) return;
@@ -505,17 +562,26 @@ namespace Game.UI
                 .SetUpdate(true);
         }
 
+        /// <summary>
+        /// 执行 ApplyHeartScale 逻辑.
+        /// </summary>
         void ApplyHeartScale(Image heart)
         {
             if (heart == null) return;
             heart.transform.localScale = GetHeartScale();
         }
 
+        /// <summary>
+        /// 执行 GetHeartScale 逻辑.
+        /// </summary>
         Vector3 GetHeartScale()
         {
             return Vector3.one * Mathf.Max(0f, heartScale);
         }
 
+        /// <summary>
+        /// 执行 GetOrCreateRow 逻辑.
+        /// </summary>
         Transform GetOrCreateRow(int rowIndex)
         {
             while (_rows.Count <= rowIndex)
@@ -555,6 +621,9 @@ namespace Game.UI
             layout.childForceExpandHeight = false;
         }
 
+        /// <summary>
+        /// 执行 ClearAllHearts 逻辑.
+        /// </summary>
         void ClearAllHearts()
         {
             KillHeartTweens();

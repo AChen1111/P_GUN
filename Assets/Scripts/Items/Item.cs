@@ -52,6 +52,9 @@ namespace Game.Items
         public int ItemId => itemId;
         public IReadOnlyList<ItemEffectBase> Effects => effects;
 
+        /// <summary>
+        /// 初始化运行时依赖.
+        /// </summary>
         private void Awake()
         {
             if (_dotweenAnimation == null)
@@ -65,6 +68,9 @@ namespace Game.Items
             }
         }
 
+        /// <summary>
+        /// 重置编辑器默认配置.
+        /// </summary>
         private void Reset()
         {
             var c = GetComponent<Collider2D>();
@@ -74,6 +80,9 @@ namespace Game.Items
             iconRenderer = GetComponent<SpriteRenderer>();
         }
 
+        /// <summary>
+        /// 执行每帧更新逻辑.
+        /// </summary>
         private void Update()
         {
             if (!isPlayerInRange || !isActive || hasPicked) return;
@@ -82,13 +91,100 @@ namespace Game.Items
             {
                 PickUp();
             }
+
+            void PickUp()
+            {
+                if (!isActive || hasPicked)
+                    return;
+                var inventory = ResolvePlayerInventory();
+                if (inventory == null)
+                {
+                    Debug.LogError($"{nameof(Item)}拾取失败, Player缺少{nameof(PlayerInventory)}组件.", this);
+                    return;
+                }
+
+                if (!TryAddToInventory(inventory))
+                {
+                    return;
+                }
+
+                hasPicked = true;
+                isActive = false;
+                HideTip();
+                EventCenter.Trigger(GameEvent.ItemPicked, this);
+                if (TryPlayAnimatorPickup())
+                {
+                    return;
+                }
+
+                if (_dotweenAnimation != null)
+                {
+                    _dotweenAnimation.Play(FinishPickupPresentation);
+                    return;
+                }
+
+                FinishPickupPresentation();
+            }
+
+    PlayerInventory ResolvePlayerInventory()
+    {
+        // 物品只使用当前触发范围内的玩家背包, 避免跨模块依赖全局玩家引用.
+        return playerInventoryInRange;
+    }
+
+    bool TryAddToInventory(PlayerInventory inventory)
+    {
+        if (inventoryAdded)
+            return true;
+        inventoryAdded = inventory.AddFromItem(this);
+        return inventoryAdded;
+    }
+
+    bool TryPlayAnimatorPickup()
+    {
+        if (_animator == null || !HasPickupTrigger(_animator))
+            return false;
+        _animator.SetTrigger(PickupTriggerName);
+        if (pickupAnimatorFallbackDelay > 0f)
+        {
+            animatorFallbackCoroutine = StartCoroutine(ApplyEffectsAfterDelay(pickupAnimatorFallbackDelay));
         }
 
+        return true;
+    }
+
+    static bool HasPickupTrigger(Animator animator)
+    {
+        foreach (var parameter in animator.parameters)
+        {
+            if (parameter.type == AnimatorControllerParameterType.Trigger && parameter.name == PickupTriggerName)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    IEnumerator ApplyEffectsAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        FinishPickupPresentation();
+        animatorFallbackCoroutine = null;
+    }
+}
+
+        /// <summary>
+        /// 注销禁用时需要的监听.
+        /// </summary>
         private void OnDisable()
         {
             HideTip();
         }
 
+        /// <summary>
+        /// 执行 SetPickupEnabled 逻辑.
+        /// </summary>
         public void SetPickupEnabled(bool enabled)
         {
             isActive = enabled;
@@ -105,12 +201,27 @@ namespace Game.Items
             }
         }
 
+        /// <summary>
+        /// 执行 OnSpawnFromPool 逻辑.
+        /// </summary>
         public void OnSpawnFromPool()
         {
             ResetPoolRuntimeState();
             ResetAnimatorState();
-        }
 
+            void ResetAnimatorState()
+            {
+                if (_animator == null)
+                    return;
+                _animator.ResetTrigger(PickupTriggerName);
+                _animator.Rebind();
+                _animator.Update(0f);
+            }
+}
+
+        /// <summary>
+        /// 执行 OnRecycleToPool 逻辑.
+        /// </summary>
         public void OnRecycleToPool()
         {
             StopAnimatorFallbackCoroutine();
@@ -119,6 +230,9 @@ namespace Game.Items
             ResetPoolRuntimeState();
         }
 
+        /// <summary>
+        /// 处理 2D 触发进入事件.
+        /// </summary>
         private void OnTriggerEnter2D(Collider2D other)
         {
             if (!IsPlayer(other)) return;
@@ -133,6 +247,9 @@ namespace Game.Items
             ShowTip();
         }
 
+        /// <summary>
+        /// 处理 2D 触发离开事件.
+        /// </summary>
         private void OnTriggerExit2D(Collider2D other)
         {
             if (!IsPlayer(other)) return;
@@ -145,11 +262,17 @@ namespace Game.Items
             HideTip();
         }
 
+        /// <summary>
+        /// 执行 OnPickupAnimFinished 逻辑.
+        /// </summary>
         public void OnPickupAnimFinished()
         {
             FinishPickupPresentation();
         }
 
+        /// <summary>
+        /// 执行 EditorApplyIconFromDatabase 逻辑.
+        /// </summary>
         [ContextMenu("编辑器/从数据库同步物品图标")]
         public bool EditorApplyIconFromDatabase()
         {
@@ -170,78 +293,19 @@ namespace Game.Items
             // 编辑器工具只负责把数据库图标写回 Prefab, 运行时不再重复覆盖.
             iconRenderer.sprite = data.icon;
             return true;
-        }
 
-        private void PickUp()
-        {
-            if (!isActive || hasPicked) return;
-
-            var inventory = ResolvePlayerInventory();
-            if (inventory == null)
+            void ResolveIconRenderer()
             {
-                Debug.LogError($"{nameof(Item)}拾取失败, Player缺少{nameof(PlayerInventory)}组件.", this);
-                return;
+                if (iconRenderer != null)
+                    return;
+                // 默认使用同物体上的 SpriteRenderer, 让 Prefab 不需要额外层级绑定.
+                iconRenderer = GetComponent<SpriteRenderer>();
             }
+}
 
-            if (!TryAddToInventory(inventory))
-            {
-                return;
-            }
-
-            hasPicked = true;
-            isActive = false;
-            HideTip();
-            EventCenter.Trigger(GameEvent.ItemPicked, this);
-
-            if (TryPlayAnimatorPickup())
-            {
-                return;
-            }
-
-            if (_dotweenAnimation != null)
-            {
-                _dotweenAnimation.Play(FinishPickupPresentation);
-                return;
-            }
-
-            FinishPickupPresentation();
-        }
-
-        private bool TryPlayAnimatorPickup()
-        {
-            if (_animator == null || !HasPickupTrigger(_animator)) return false;
-
-            _animator.SetTrigger(PickupTriggerName);
-
-            if (pickupAnimatorFallbackDelay > 0f)
-            {
-                animatorFallbackCoroutine = StartCoroutine(ApplyEffectsAfterDelay(pickupAnimatorFallbackDelay));
-            }
-
-            return true;
-        }
-
-        private IEnumerator ApplyEffectsAfterDelay(float delay)
-        {
-            yield return new WaitForSeconds(delay);
-            FinishPickupPresentation();
-            animatorFallbackCoroutine = null;
-        }
-
-        private bool TryAddToInventory(PlayerInventory inventory)
-        {
-            if (inventoryAdded) return true;
-
-            inventoryAdded = inventory.AddFromItem(this);
-            return inventoryAdded;
-        }
-
-        private PlayerInventory ResolvePlayerInventory()
-        {
-            // 物品只使用当前触发范围内的玩家背包, 避免跨模块依赖全局玩家引用.
-            return playerInventoryInRange;
-        }
-
+        /// <summary>
+        /// 执行 FinishPickupPresentation 逻辑.
+        /// </summary>
         private void FinishPickupPresentation()
         {
             if (pickupPresentationFinished) return;
@@ -263,33 +327,51 @@ namespace Game.Items
             }
         }
 
+        /// <summary>
+        /// 执行 ShowTip 逻辑.
+        /// </summary>
         private void ShowTip()
         {
             if (!isActive || hasPicked) return;
             EventCenter.Trigger(GameEvent.ItemTipShown, ResolveItemData());
         }
 
+        /// <summary>
+        /// 执行 HideTip 逻辑.
+        /// </summary>
         private void HideTip()
         {
             EventCenter.Trigger(GameEvent.ItemTipHidden);
         }
 
+        /// <summary>
+        /// 执行 ResolveItemData 逻辑.
+        /// </summary>
         private ItemData ResolveItemData()
         {
             return TryResolveItemData(out var data) ? data : default;
         }
 
+        /// <summary>
+        /// 执行 GetItemData 逻辑.
+        /// </summary>
         public ItemData GetItemData()
         {
             return ResolveItemData();
         }
 
+        /// <summary>
+        /// 执行 TryGetItemData 逻辑.
+        /// </summary>
         public bool TryGetItemData(out ItemData data)
         {
             // 背包入库前必须解析到正式配置, 避免把默认空数据写入运行时背包.
             return TryResolveItemData(out data);
         }
 
+        /// <summary>
+        /// 执行 TryResolveItemData 逻辑.
+        /// </summary>
         private bool TryResolveItemData(out ItemData data)
         {
             if (itemDatabase != null && itemDatabase.TryGetById(itemId, out data))
@@ -307,32 +389,17 @@ namespace Game.Items
             return false;
         }
 
-        private void ResolveIconRenderer()
-        {
-            if (iconRenderer != null) return;
-
-            // 默认使用同物体上的 SpriteRenderer, 让 Prefab 不需要额外层级绑定.
-            iconRenderer = GetComponent<SpriteRenderer>();
-        }
-
+        /// <summary>
+        /// 执行 IsPlayer 逻辑.
+        /// </summary>
         private static bool IsPlayer(Collider2D other)
         {
             return other != null && other.CompareTag("Player");
         }
 
-        private static bool HasPickupTrigger(Animator animator)
-        {
-            foreach (var parameter in animator.parameters)
-            {
-                if (parameter.type == AnimatorControllerParameterType.Trigger && parameter.name == PickupTriggerName)
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
+        /// <summary>
+        /// 执行 ResetPoolRuntimeState 逻辑.
+        /// </summary>
         private void ResetPoolRuntimeState()
         {
             isActive = true;
@@ -344,21 +411,15 @@ namespace Game.Items
             playerInventoryInRange = null;
         }
 
+        /// <summary>
+        /// 执行 StopAnimatorFallbackCoroutine 逻辑.
+        /// </summary>
         private void StopAnimatorFallbackCoroutine()
         {
             if (animatorFallbackCoroutine == null) return;
 
             StopCoroutine(animatorFallbackCoroutine);
             animatorFallbackCoroutine = null;
-        }
-
-        private void ResetAnimatorState()
-        {
-            if (_animator == null) return;
-
-            _animator.ResetTrigger(PickupTriggerName);
-            _animator.Rebind();
-            _animator.Update(0f);
         }
     }
 }

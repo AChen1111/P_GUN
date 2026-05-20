@@ -13,6 +13,9 @@ namespace Game.ItemEffects
     {
         [SerializeField] private bool showHeadMessage = true;
 
+        /// <summary>
+        /// 执行 CanUse 逻辑.
+        /// </summary>
         public override bool CanUse(ItemEffectContext ctx)
         {
             var manager = ResolveBuffManager();
@@ -33,6 +36,9 @@ namespace Game.ItemEffects
             return false;
         }
 
+        /// <summary>
+        /// 执行 OnPick 逻辑.
+        /// </summary>
         public override void OnPick(ItemEffectContext ctx)
         {
             var player = Global.player;
@@ -52,6 +58,9 @@ namespace Game.ItemEffects
             EventCenter.Trigger(GameEvent.PlayerHeadMessageRequested, new PlayerHeadMessageEvent(message, 1.5f));
         }
 
+        /// <summary>
+        /// 执行 ResolveBuffManager 逻辑.
+        /// </summary>
         private static BuffManager ResolveBuffManager()
         {
             var player = Global.player;

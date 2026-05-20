@@ -30,6 +30,9 @@ namespace Game.Gameplay
         public int MaxDamage => Mathf.Max(minDamage, maxDamage);
         public float ShootInterval => Mathf.Max(0f, shootInterval);
 
+        /// <summary>
+        /// 执行 ApplyTo 逻辑.
+        /// </summary>
         public void ApplyTo(Gun gun)
         {
             if (gun == null) return;

@@ -39,7 +39,28 @@ namespace Game.Gameplay
 
             currentHighlightedRoom = this;
             Paint();
-        }
+
+            void Paint()
+            {
+                if (HighlightTilemap == null || Positions == null)
+                    return;
+                EnsureHighlightTile();
+                HighlightTilemap.ClearAllTiles();
+                foreach (var pos in Positions)
+                    HighlightTilemap.SetTile(pos, highlightTile);
+            }
+
+    void EnsureHighlightTile()
+    {
+        if (highlightTile != null)
+            return;
+        highlightTile = ScriptableObject.CreateInstance<Tile>();
+        var tex = new Texture2D(1, 1);
+        tex.SetPixel(0, 0, HighlightColor);
+        tex.Apply();
+        highlightTile.sprite = Sprite.Create(tex, new Rect(0, 0, 1, 1), new Vector2(0.5f, 0.5f), 1f);
+    }
+}
 
         /// <summary>
         /// 清除此房间的高亮。
@@ -49,33 +70,6 @@ namespace Game.Gameplay
             HighlightTilemap?.ClearAllTiles();
             if (currentHighlightedRoom == this)
                 currentHighlightedRoom = null;
-        }
-
-        private void Paint()
-        {
-            if (HighlightTilemap == null || Positions == null) return;
-
-            EnsureHighlightTile();
-
-            HighlightTilemap.ClearAllTiles();
-            foreach (var pos in Positions)
-                HighlightTilemap.SetTile(pos, highlightTile);
-        }
-
-        private void EnsureHighlightTile()
-        {
-            if (highlightTile != null) return;
-
-            highlightTile = ScriptableObject.CreateInstance<Tile>();
-            var tex = new Texture2D(1, 1);
-            tex.SetPixel(0, 0, HighlightColor);
-            tex.Apply();
-            highlightTile.sprite = Sprite.Create(
-                tex,
-                new Rect(0, 0, 1, 1),
-                new Vector2(0.5f, 0.5f),
-                1f
-            );
         }
     }
 }

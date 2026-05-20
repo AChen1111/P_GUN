@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using QFramework;
 using DG.Tweening;
@@ -12,12 +13,18 @@ namespace Game.Gameplay
     /// <summary>
     /// 敌人基类
     /// </summary>
-    [RequireComponent(typeof(ItemSpawner))]
+    [RequireComponent(typeof(Rigidbody2D), typeof(AudioSource), typeof(ItemSpawner))]
     public abstract class EnemyBase : MonoBehaviour, Game.Pooling.IPoolable {
 
         #region 子类实现
+        /// <summary>
+        /// 执行 OnInit 逻辑.
+        /// </summary>
         protected abstract void OnInit();
         protected abstract WeaponType WeaponType { get; }
+        /// <summary>
+        /// 执行 RegisterFSM 逻辑.
+        /// </summary>
         protected abstract void RegisterFSM(FSM<EnemyState> fsm);
         #endregion
 
@@ -84,26 +91,22 @@ namespace Game.Gameplay
         protected AudioSource AudioSource => audioSource;
         protected bool IsDead => isDead;
 
+        /// <summary>
+        /// 重置编辑器默认配置.
+        /// </summary>
         private void Reset() {
-            gameObject.AddComponent<SpriteRenderer>();
-            gameObject.AddComponent<Animator>();
-            gameObject.AddComponent<Rigidbody2D>();
-            gameObject.AddComponent<Collider2D>();
-            gameObject.AddComponent<AudioSource>();
-
-
             sr = GetComponent<SpriteRenderer>();
             animator = GetComponent<Animator>();
             rb = GetComponent<Rigidbody2D>();
             col = GetComponent<Collider2D>();
             audioSource = GetComponent<AudioSource>();
             itemSpawner = GetComponent<ItemSpawner>();
-            if(itemSpawner == null) {
-                itemSpawner = gameObject.AddComponent<ItemSpawner>();
-            }
         }
 
 
+        /// <summary>
+        /// 初始化运行时依赖.
+        /// </summary>
         private void Awake() {
             ///初始化组件
             sr = GetComponent<SpriteRenderer>();
@@ -119,13 +122,41 @@ namespace Game.Gameplay
             CaptureDefaultVisualState();
             gameObject.tag = "Enemy";
             ResetRuntimeState();
-        }
 
+            void ResolveItemSpawner()
+            {
+                if (itemSpawner != null)
+                    return;
+                itemSpawner = GetComponent<ItemSpawner>();
+                if (itemSpawner == null)
+                {
+                    throw new InvalidOperationException($"{nameof(EnemyBase)} requires {nameof(ItemSpawner)} on enemy prefab.");
+                }
+            }
+
+            void CaptureDefaultVisualState()
+            {
+                if (sr == null)
+                    return;
+                defaultSpriteColor = sr.color;
+                hasDefaultSpriteColor = true;
+            }
+}
+
+        /// <summary>
+        /// 执行启动后的初始化逻辑.
+        /// </summary>
         private void Start() {
             Init();
         }
+        /// <summary>
+        /// 执行 OnStart 逻辑.
+        /// </summary>
         protected virtual void OnStart(){}
 
+        /// <summary>
+        /// 执行每帧更新逻辑.
+        /// </summary>
         private void Update()
         {
             if (isDead) return;
@@ -133,7 +164,13 @@ namespace Game.Gameplay
             FSM.Update();
             OnUpdate();
         }
+        /// <summary>
+        /// 执行 OnUpdate 逻辑.
+        /// </summary>
         protected virtual void OnUpdate(){}
+        /// <summary>
+        /// 执行固定帧物理更新逻辑.
+        /// </summary>
         private void FixedUpdate()
         {
             if (isDead) return;
@@ -141,13 +178,22 @@ namespace Game.Gameplay
             FSM.FixedUpdate();
             OnFixedUpdate();
         }
+        /// <summary>
+        /// 执行 OnFixedUpdate 逻辑.
+        /// </summary>
         protected virtual void OnFixedUpdate(){}
 
+        /// <summary>
+        /// 释放销毁时持有的运行时状态.
+        /// </summary>
         protected virtual void OnDestroy()
         {
             OnFSMDestroy();
             FSM.Clear();
         }
+        /// <summary>
+        /// 执行 OnFSMDestroy 逻辑.
+        /// </summary>
         protected virtual void OnFSMDestroy(){
             FSM.Clear();
         }
@@ -171,14 +217,46 @@ namespace Game.Gameplay
             if(CurrentHp <= 0) {
                 Dead();
             }
-        }
+
+            void ShowDamageText(int damage)
+            {
+                if (damage <= 0 || damageTextPrefab == null)
+                    return;
+                // 敌人只传递伤害值和基准位置, 具体随机字号和飘字动画交给 DamageText prefab.
+                var damageTextPool = DamageTextPool.Instance;
+                if (damageTextPool == null)
+                {
+                    Debug.LogError($"{nameof(DamageTextPool)} is missing in scene.", this);
+                    return;
+                }
+
+                damageTextPool.Play(damageTextPrefab, damage, GetBloodVfxPosition() + damageTextOffset);
+            }
+}
+        /// <summary>
+        /// 执行 HurtAnim 逻辑.
+        /// </summary>
         protected virtual void HurtAnim()
         {
             // 受击时先清理上一次闪烁, 再播放统一受击动画和闪烁.
             ResetVisualState();
             DOTweenAnimMgr.Play("Hurted", gameObject,0.5f);
             PlayHurtFlash();
-        }
+
+            void PlayHurtFlash()
+            {
+                if (sr == null)
+                    return;
+                sr.DOKill(false);
+                sr.color = defaultSpriteColor;
+                var loops = Mathf.Max(2, hurtFlashLoops * 2);
+                DOTween.To(() => sr.color, color => sr.color = color, hurtFlashColor, hurtFlashInterval).SetTarget(sr).SetLoops(loops, LoopType.Yoyo).OnComplete(() =>
+                {
+                    if (sr != null)
+                        sr.color = defaultSpriteColor;
+                });
+            }
+}
 
         /// <summary>
         /// 对外接口,执行死亡逻辑
@@ -197,7 +275,26 @@ namespace Game.Gameplay
             PlayDeathAnimation();
             OnDead();
             StartDeathRecycle();
-        }
+
+            void StartDeathRecycle()
+            {
+                StopDeathRecycle();
+                deathRecycleCoroutine = StartCoroutine(DeathRecycleCoroutine());
+            }
+
+            void PlayDeathAnimation()
+            {
+                TrySetAnimatorTrigger(deadTriggerName);
+                PlayStateIfDifferent(deadStateName, true);
+            }
+
+    System.Collections.IEnumerator DeathRecycleCoroutine()
+    {
+        yield return new WaitForSeconds(deathRecycleDelay);
+        deathRecycleCoroutine = null;
+        EnemyPool.Instance.Release(this);
+    }
+}
 
         /// <summary>
         /// 默认受伤逻辑, 子类只在有特殊受伤行为时重写.
@@ -214,7 +311,18 @@ namespace Game.Gameplay
         protected virtual void OnDead() {
             FightRoom.NotifyEnemyDefeated(this);
             TryDropItem();
-        }
+
+            void TryDropItem()
+            {
+                if (itemSpawner == null || itemDropChance <= 0f)
+                    return;
+                if (itemSpawner.itemTable == null || itemSpawner.itemTable.Entries.Count == 0)
+                    return;
+                if (UnityEngine.Random.value > itemDropChance)
+                    return;
+                itemSpawner.SpawnItem(transform.position);
+            }
+}
 
         /// <summary>
         /// 对外接口,执行初始化逻辑
@@ -227,21 +335,33 @@ namespace Game.Gameplay
             OnStart();
         }
 
+        /// <summary>
+        /// 执行 ApplyDamage 逻辑.
+        /// </summary>
         protected void ApplyDamage(int damage) {
             if(damage <= 0) return;
             //Debug.Log("ApplyDamage: " + damage + " CurrentHp: " + CurrentHp);
             CurrentHp -= damage;
         }
 
+        /// <summary>
+        /// 执行 OnSpawnFromPool 逻辑.
+        /// </summary>
         public void OnSpawnFromPool() {
             ResetRuntimeState();
             Init();
         }
 
+        /// <summary>
+        /// 执行 OnRecycleToPool 逻辑.
+        /// </summary>
         public void OnRecycleToPool() {
             PrepareForPoolRelease();
         }
 
+        /// <summary>
+        /// 执行 SetOwnerFightRoom 逻辑.
+        /// </summary>
         public void SetOwnerFightRoom(FightRoom ownerFightRoom) {
             OwnerFightRoom = ownerFightRoom;
         }
@@ -283,15 +403,22 @@ namespace Game.Gameplay
             if(col != null) {
                 col.enabled = true;
             }
-        }
 
-        private void CaptureDefaultVisualState() {
-            if(sr == null) return;
+            void ResetAnimatorState()
+            {
+                if (animator == null)
+                    return;
+                TryResetAnimatorTrigger(attackTriggerName);
+                TryResetAnimatorTrigger(deadTriggerName);
+                SetAnimatorSpeed(0f);
+                animator.Rebind();
+                animator.Update(0f);
+            }
+}
 
-            defaultSpriteColor = sr.color;
-            hasDefaultSpriteColor = true;
-        }
-
+        /// <summary>
+        /// 执行 ResetVisualState 逻辑.
+        /// </summary>
         protected void ResetVisualState() {
             transform.DOKill(false);
 
@@ -307,28 +434,13 @@ namespace Game.Gameplay
             }
         }
 
+        /// <summary>
+        /// 执行 StopMove 逻辑.
+        /// </summary>
         protected void StopMove() {
             if(rb != null) {
                 rb.velocity = Vector2.zero;
             }
-        }
-
-        private void ResolveItemSpawner() {
-            if(itemSpawner != null) return;
-
-            itemSpawner = GetComponent<ItemSpawner>();
-            if(itemSpawner == null) {
-                // 敌人默认组合物品生成器, prefab 可继续手动配置掉落表.
-                itemSpawner = gameObject.AddComponent<ItemSpawner>();
-            }
-        }
-
-        private void TryDropItem() {
-            if(itemSpawner == null || itemDropChance <= 0f) return;
-            if(!itemSpawner.HasAvailableTable()) return;
-            if(Random.value > itemDropChance) return;
-
-            itemSpawner.SpawnItem(transform.position);
         }
 
         /// <summary>
@@ -388,37 +500,9 @@ namespace Game.Gameplay
             PlayStateIfDifferent(attackStateName, true);
         }
 
-        private void PlayDeathAnimation() {
-            TrySetAnimatorTrigger(deadTriggerName);
-            PlayStateIfDifferent(deadStateName, true);
-        }
-
-        private void PlayHurtFlash() {
-            if(sr == null) return;
-
-            sr.DOKill(false);
-            sr.color = defaultSpriteColor;
-
-            var loops = Mathf.Max(2, hurtFlashLoops * 2);
-            DOTween.To(() => sr.color, color => sr.color = color, hurtFlashColor, hurtFlashInterval)
-                .SetTarget(sr)
-                .SetLoops(loops, LoopType.Yoyo)
-                .OnComplete(() => {
-                    if(sr != null) sr.color = defaultSpriteColor;
-                });
-        }
-
-        private void StartDeathRecycle() {
-            StopDeathRecycle();
-            deathRecycleCoroutine = StartCoroutine(DeathRecycleCoroutine());
-        }
-
-        private System.Collections.IEnumerator DeathRecycleCoroutine() {
-            yield return new WaitForSeconds(deathRecycleDelay);
-            deathRecycleCoroutine = null;
-            EnemyPool.Instance.Release(this);
-        }
-
+        /// <summary>
+        /// 执行 StopDeathRecycle 逻辑.
+        /// </summary>
         private void StopDeathRecycle() {
             if(deathRecycleCoroutine == null) return;
 
@@ -426,16 +510,9 @@ namespace Game.Gameplay
             deathRecycleCoroutine = null;
         }
 
-        private void ResetAnimatorState() {
-            if(animator == null) return;
-
-            TryResetAnimatorTrigger(attackTriggerName);
-            TryResetAnimatorTrigger(deadTriggerName);
-            SetAnimatorSpeed(0f);
-            animator.Rebind();
-            animator.Update(0f);
-        }
-
+        /// <summary>
+        /// 执行 TrySetAnimatorTrigger 逻辑.
+        /// </summary>
         private void TrySetAnimatorTrigger(string triggerName) {
             if(!HasAnimatorParameter(triggerName, AnimatorControllerParameterType.Trigger)) return;
 
@@ -443,12 +520,18 @@ namespace Game.Gameplay
             animator.SetTrigger(triggerName);
         }
 
+        /// <summary>
+        /// 执行 TryResetAnimatorTrigger 逻辑.
+        /// </summary>
         private void TryResetAnimatorTrigger(string triggerName) {
             if(!HasAnimatorParameter(triggerName, AnimatorControllerParameterType.Trigger)) return;
 
             animator.ResetTrigger(triggerName);
         }
 
+        /// <summary>
+        /// 执行 HasAnimatorParameter 逻辑.
+        /// </summary>
         private bool HasAnimatorParameter(string parameterName, AnimatorControllerParameterType parameterType) {
             if(animator == null || string.IsNullOrEmpty(parameterName)) return false;
 
@@ -459,6 +542,9 @@ namespace Game.Gameplay
             return false;
         }
 
+        /// <summary>
+        /// 执行 PlayStateIfDifferent 逻辑.
+        /// </summary>
         private void PlayStateIfDifferent(string stateName, bool restart = false) {
             if(animator == null || string.IsNullOrEmpty(stateName)) return;
             if(!animator.HasState(0, Animator.StringToHash(stateName))) return;
@@ -467,6 +553,9 @@ namespace Game.Gameplay
             animator.Play(stateName, 0, 0f);
         }
 
+        /// <summary>
+        /// 执行 GetBloodVfxPosition 逻辑.
+        /// </summary>
         private Vector3 GetBloodVfxPosition() {
             if(col != null) {
                 return col.bounds.center;
@@ -477,19 +566,6 @@ namespace Game.Gameplay
             }
 
             return transform.position;
-        }
-
-        private void ShowDamageText(int damage) {
-            if(damage <= 0 || damageTextPrefab == null) return;
-
-            // 敌人只传递伤害值和基准位置, 具体随机字号和飘字动画交给 DamageText prefab.
-            var damageTextPool = DamageTextPool.Instance;
-            if(damageTextPool == null) {
-                Debug.LogError($"{nameof(DamageTextPool)} is missing in scene.", this);
-                return;
-            }
-
-            damageTextPool.Play(damageTextPrefab, damage, GetBloodVfxPosition() + damageTextOffset);
         }
         #endregion
     }

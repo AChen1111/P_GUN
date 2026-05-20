@@ -25,12 +25,18 @@ namespace Game.Gameplay
 
         protected override WeaponType WeaponType => WeaponType.Gun;
 
+        /// <summary>
+        /// 执行 OnInit 逻辑.
+        /// </summary>
         protected override void OnInit()
         {
             shootDuration = new ShootDuration(shootInterval);
             OwnerFightRoom = FightRoom.currentFightRoom;
         }
 
+        /// <summary>
+        /// 执行 RegisterFSM 逻辑.
+        /// </summary>
         protected override void RegisterFSM(FSM<EnemyState> fsm)
         {
             // ── Follow 状态：追踪玩家，计时到达后切换到 Attack ──
@@ -63,45 +69,50 @@ namespace Game.Gameplay
                 .OnExit(() => stateTimer = 0f);
 
             fsm.StartState(EnemyState.Follow);
-        }
 
-        private void DoFollow()
-        {
-            if (IsDead)
+            void TryShootByInterval()
             {
-                if (Rb != null) Rb.velocity = Vector2.zero;
-                return;
+                if (shootDuration == null)
+                    return;
+                if (!shootDuration.CanShoot)
+                    return;
+                shootDuration.RecordShootTime();
+                DoShoot();
             }
 
-            if (FollowPlayerWithBodySpace(out var dir) && Sr != null)
+            void DoFollow()
             {
-                if (dir.x < 0f) Sr.flipX = true;
-                else if (dir.x > 0f) Sr.flipX = false;
+                if (IsDead)
+                {
+                    if (Rb != null)
+                        Rb.velocity = Vector2.zero;
+                    return;
+                }
+
+                if (FollowPlayerWithBodySpace(out var dir) && Sr != null)
+                {
+                    if (dir.x < 0f)
+                        Sr.flipX = true;
+                    else if (dir.x > 0f)
+                        Sr.flipX = false;
+                }
             }
-        }
 
-        private void DoShoot()
+    void DoShoot()
+    {
+        if (bulletPrefab == null || Global.player == null)
+            return;
+        //Debug.Log("DoShoot");
+        var dirToPlayer = (Global.player.transform.position - transform.position).normalized;
+        var spawnPos = transform.position + (Vector3)(dirToPlayer * 0.5f);
+        var bullet = EnemyBulletPool.Instance.Get(bulletPrefab, spawnPos, Quaternion.identity, dirToPlayer, AttackDamage);
+        if (bullet == null)
+            return;
+        if (AudioSource != null && shootSounds != null && shootSounds.Count > 0)
         {
-            if (bulletPrefab == null || Global.player == null) return;
-            //Debug.Log("DoShoot");
-            var dirToPlayer = (Global.player.transform.position - transform.position).normalized;
-            var spawnPos = transform.position + (Vector3)(dirToPlayer * 0.5f);
-            var bullet = EnemyBulletPool.Instance.Get(bulletPrefab, spawnPos, Quaternion.identity, dirToPlayer, AttackDamage);
-            if (bullet == null) return;
-
-            if (AudioSource != null && shootSounds != null && shootSounds.Count > 0)
-            {
-                AudioSource.PlayOneShot(shootSounds[Random.Range(0, shootSounds.Count)]);
-            }
+            AudioSource.PlayOneShot(shootSounds[Random.Range(0, shootSounds.Count)]);
         }
-
-        private void TryShootByInterval()
-        {
-            if (shootDuration == null) return;
-            if (!shootDuration.CanShoot) return;
-
-            shootDuration.RecordShootTime();
-            DoShoot();
-        }
+    }
+}
     }
 }
