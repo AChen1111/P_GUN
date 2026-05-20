@@ -27,6 +27,14 @@ namespace Game.Gameplay
             "item/power_up",
             "item/purify"
         };
+        private static readonly string[] ItemSpawnTableAddresses =
+        {
+            "item/spawn_table/normal_room"
+        };
+        private static readonly string[] EnemySpawnTableAddresses =
+        {
+            "enemy/spawn_table/normal_room"
+        };
         private static readonly string[] WeaponAddresses =
         {
             "weapon/pistol",
@@ -264,6 +272,17 @@ namespace Game.Gameplay
         private async Task LoadRuntimeContentAsync()
         {
             await runtimeContent.LoadAssetAsync<LevelGraph>("room/level1");
+
+            // 生成表必须先进入运行时缓存, 房间和掉落逻辑只做同步读取.
+            foreach (var address in ItemSpawnTableAddresses)
+            {
+                await runtimeContent.LoadAssetAsync<ItemSpawnTableSO>(address);
+            }
+
+            foreach (var address in EnemySpawnTableAddresses)
+            {
+                await runtimeContent.LoadAssetAsync<EnemySpawnTableSO>(address);
+            }
 
             //预加载物品资源
             foreach (var address in ItemAddresses)

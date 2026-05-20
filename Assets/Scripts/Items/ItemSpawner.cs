@@ -14,23 +14,22 @@ namespace Game.Items
         private const float DefaultSpawnAnimDuration = 1.5f;
 
         public ItemSpawnTableSO itemTable;
+        [SerializeField] private string itemTableAddress = "item/spawn_table/normal_room";
 
         /// <summary>
         /// 生成物品，并播放抽中配置项的动画。
         /// </summary>
         public GameObject SpawnItem(Vector3 position)
         {
-            //检查物品生成表是否设置
-            if(itemTable == null || itemTable.Entries.Count == 0)
+            if(!TryGetItemTable(out var table))
             {
-                Debug.LogWarning("Item table is not set");
                 return null;
             }
 
             //随机获取一个物品
-            if(itemTable.TryGetRandomEntry(out var entry))
+            if(table.TryGetRandomEntry(out var entry))
             {
-                return itemTable.TryResolvePrefab(entry, out var prefab)
+                return table.TryResolvePrefab(entry, out var prefab)
                     ? SpawnItem(prefab, position, entry.spawnAnimEffect, entry.spawnAnimDuration)
                     : null;
             }
@@ -45,15 +44,13 @@ namespace Game.Items
         /// </summary>
         public GameObject SpawnItem(Vector3 position, DOTweenAnimType animEffect)
         {
-            //检查物品生成表是否设置
-            if(itemTable == null || itemTable.Entries.Count == 0)
+            if(!TryGetItemTable(out var table))
             {
-                Debug.LogWarning("Item table is not set");
                 return null;
             }
 
             //随机获取一个物品，外部传入动画时覆盖配置项动画。
-            if(itemTable.TryGetRandomPrefab(out GameObject prefab))
+            if(table.TryGetRandomPrefab(out GameObject prefab))
             {
                 return SpawnItem(prefab, position, animEffect, DefaultSpawnAnimDuration);
             }
@@ -68,15 +65,13 @@ namespace Game.Items
         /// </summary>
         public GameObject SpawnItem(Vector3 position, string animEffectKey)
         {
-            //检查物品生成表是否设置
-            if(itemTable == null || itemTable.Entries.Count == 0)
+            if(!TryGetItemTable(out var table))
             {
-                Debug.LogWarning("Item table is not set");
                 return null;
             }
 
             //随机获取一个物品
-            if(itemTable.TryGetRandomPrefab(out GameObject prefab))
+            if(table.TryGetRandomPrefab(out GameObject prefab))
             {
                 return SpawnItem(prefab, position, animEffectKey);
             }
@@ -84,6 +79,48 @@ namespace Game.Items
             //如果获取失败，则返回null
             Debug.LogWarning("No prefab found in item table");
             return null;
+        }
+
+        public bool HasAvailableTable()
+        {
+            var table = ResolveItemTable();
+            return table != null && table.Entries.Count > 0;
+        }
+
+        public ItemSpawnTableSO ResolveItemTable()
+        {
+            var content = AddressableRuntimeContent.Instance;
+            if(content == null)
+            {
+                // 允许直接从 GameScene Play, 此时使用 Inspector 中的本地生成表.
+                return itemTable;
+            }
+
+            if(string.IsNullOrWhiteSpace(itemTableAddress))
+            {
+                Debug.LogError($"{nameof(ItemSpawner)}: 物品生成表 Address 未配置.", this);
+                return null;
+            }
+
+            if(content.TryGetAsset<ItemSpawnTableSO>(itemTableAddress, out var runtimeItemTable))
+            {
+                return runtimeItemTable;
+            }
+
+            Debug.LogError($"{nameof(ItemSpawner)}: 找不到已预加载的物品生成表, Address: {itemTableAddress}.", this);
+            return null;
+        }
+
+        private bool TryGetItemTable(out ItemSpawnTableSO table)
+        {
+            table = ResolveItemTable();
+            if(table != null && table.Entries.Count > 0)
+            {
+                return true;
+            }
+
+            Debug.LogWarning("Item table is not set");
+            return false;
         }
 
         /// <summary>

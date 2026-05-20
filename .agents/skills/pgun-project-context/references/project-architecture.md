@@ -8,7 +8,7 @@ Important external packages and conventions:
 
 - QFramework is used for `ViewController`, FSM, UI tooling, and utility extensions.
 - DOTween is used for runtime animation feedback.
-- Addressables are used for loading hot-update databases, room data, item prefabs, enemy prefabs, and weapon prefabs.
+- Addressables are used for loading hot-update databases, room data, item/enemy spawn tables, item prefabs, enemy prefabs, and weapon prefabs.
 - xLua is used by the Buff system.
 - `Assets/UnityEasyWorkTools` is the shared editor tooling suite, currently containing visual animation sequences, UI auto binding, and table import tools.
 - `Assets/UnityEasyWorkTools/UnityEasyWorkToolsPathSettings.asset` stores editable default paths for UnityEasyWorkTools. Open it through `Tools/UnityEasyWorkTools/Settings/Open Path Settings`.
@@ -87,7 +87,7 @@ Locations:
 
 `ItemDatabase` stores all `ItemData` and queries by `itemId`.
 
-`ItemSpawnTableSO` stores weighted prefab entries. Entries may use `itemId`, Addressables address, or a legacy direct prefab reference. Runtime spawning should resolve prefabs through `TryResolvePrefab` or `TryGetRandomPrefab`, because these APIs prefer `AddressableRuntimeContent` hot-update prefabs before falling back to legacy references. It does not own display data.
+`ItemSpawnTableSO` stores weighted prefab entries. Entries may use `itemId`, Addressables address, or a legacy direct prefab reference. Runtime spawning should resolve the table from `AddressableRuntimeContent` first, then resolve prefabs through `TryResolvePrefab` or `TryGetRandomPrefab`, because these APIs prefer hot-update prefabs before falling back to legacy references. It does not own display data.
 
 `Item` is the runtime pickup component. It:
 
@@ -257,6 +257,8 @@ Rooms track fight progression. `FightRoom.NotifyEnemyDefeated(this)` is part of 
 
 `GameScene` uses `AddressableDungeonBootstrapper` on the Edgar `DungeonGeneratorGrid2D` owner. The generator should stay `GenerateOn = Manually`; the bootstrapper loads `room/level1` from `AddressableRuntimeContent`, assigns `FixedLevelGraphConfig.LevelGraph`, then calls `Generate()`. Direct GameScene play can fall back to the inspector-assigned level graph.
 
+`NormalRoom` resolves `EnemySpawnTableSO` from `AddressableRuntimeContent` by Addressables address first. Direct GameScene play without Root content may use the inspector-assigned table for local testing.
+
 ## Animation And Presentation
 
 Locations:
@@ -394,6 +396,8 @@ Addressable database keys are currently string fields in `DataBaseManager`:
 - `"WeaponDatabase"`
 - `"BuffDataBase"`
 - `"EnemyDatabase"`
+- `"item/spawn_table/normal_room"`
+- `"enemy/spawn_table/normal_room"`
 
 `Assets/Editor/AddressablesLocalGroupSetup.cs` and `Assets/UnityEasyWorkTools/TableImporter/Importers/AddressablesLabelTableImporter.cs` support editor-side Addressables setup/import. Preserve labels and database keys when moving assets.
 
@@ -403,8 +407,8 @@ Current hot-update Addressables groups are:
 
 - `Room`: `Level1.asset`, room templates, and corridor prefabs.
 - `Buff`: `BuffDataBase` and Buff Lua text assets.
-- `Item`: `ItemDatabase` and item prefabs.
-- `Enemy`: `EnemyDatabase` and enemy prefabs.
+- `Item`: `ItemDatabase`, item spawn tables, and item prefabs.
+- `Enemy`: `EnemyDatabase`, enemy spawn tables, and enemy prefabs.
 - `Weapon`: `WeaponDatabase` and weapon prefabs.
 
 These groups are Local-first hot-update groups. Their `BuildPath` and `LoadPath` use `Local.BuildPath` and `Local.LoadPath`, so the first player build includes the bundles in the package. The project still builds a remote catalog, with `Remote.BuildPath = ServerData/P_GUN/[BuildTarget]` and `Remote.LoadPath = https://achen1o1.xyz/AB/P_GUN/[BuildTarget]`. Each group keeps `ContentUpdateGroupSchema.StaticContent` enabled (`Prevent Updates` in the Inspector), so later updates should be produced with the official Addressables `Update a Previous Build` workflow and the original `addressables_content_state.bin`. Upload generated remote catalog/hash/bundles to `/www/wwwroot/39.97.56.180/AB/P_GUN/[BuildTarget]` on the Nginx server. Do not put first-package-only scene, UI, player, bullet, or VFX assets into Addressables unless they are explicitly intended to hot update.

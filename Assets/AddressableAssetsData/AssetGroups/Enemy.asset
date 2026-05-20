@@ -24,12 +24,26 @@ MonoBehaviour:
     - enemy
     - prefab
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 098e92a0ddc6fbd4b9f1a562511b0f62
+    m_Address: Assets/GameDataSO/EnemySpawnTable/lRoomEnemySpawnTable.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - enemy
+    - spawn_table
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 35827546b14bc8d48a139f245049f973
     m_Address: enemy/orc_masked
     m_ReadOnly: 0
     m_SerializedLabels:
     - enemy
     - prefab
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 530afc5dd9ac460e99c893f4a4c57130
+    m_Address: enemy/spawn_table/normal_room
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - enemy
+    - spawn_table
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 5997eda64fd4b9e46ab562272521a078
     m_Address: enemy/enemy_a
