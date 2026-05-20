@@ -15,15 +15,8 @@ MonoBehaviour:
   m_GroupName: Content Update
   m_Data:
     m_SerializedData: []
-  m_GUID: 42d3ec656bee85641b2f36c8d48b32ea
+  m_GUID: f0940ddba69151f4d8630996b0bfa6fe
   m_SerializeEntries:
-  - m_GUID: 0ba30ec915a74a50a3b00b0e798dc227
-    m_Address: BuffDataBase
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - buff
-    - database
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 55a2fdf4283883548a4042623e2f8635
     m_Address: room/level1
     m_ReadOnly: 0
@@ -38,58 +31,9 @@ MonoBehaviour:
     - room
     - room_template
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: bedc99d1d01a09b47a4db6c1717c43d1
-    m_Address: item/power_up
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - item
-    - prefab
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: c3725d4757effc442acdafa92d4d4329
-    m_Address: room/normal
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - room
-    - room_template
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: c42c8260bc4f449588c588d697b5211e
-    m_Address: EnemyDatabase
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - database
-    - enemy
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: c7689240beca890469aab85afd109862
-    m_Address: enemy/bat
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - enemy
-    - prefab
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: dacb677e2179264459e62d814f35a5f8
-    m_Address: item/chest
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - item
-    - prefab
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: ec55b4f84b4c70f4e958efa2efb7d253
-    m_Address: item/speed_up
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - item
-    - prefab
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: fd8d6940222a8bf40800d474d7a6228c
-    m_Address: room/final
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - room
-    - room_template
-    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 63af2ccf367b1c745b05c3dc480c23af, type: 2}
   m_SchemaSet:
     m_Schemas:
-    - {fileID: 11400000, guid: 9aa5b00e5f0d27d48a4b96529f5d3410, type: 2}
-    - {fileID: 11400000, guid: 6cbbba072c3dbe543b1a009acdf7c6b6, type: 2}
+    - {fileID: 11400000, guid: 4f90647c8f4e7604d9fc1eacfe053c25, type: 2}
+    - {fileID: 11400000, guid: db5d4419f3c8f37429e606acb325a3c5, type: 2}

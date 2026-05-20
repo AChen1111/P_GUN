@@ -159,7 +159,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8074dc491ddc34f4e83332d9eae76980, type: 3}
   m_Name: (Clone)(Clone)(Clone)
   m_EditorClassIdentifier: 
-  Position: {x: 64, y: 16}
+  Position: {x: 64, y: 32}
   Name: Normal
   IndividualRoomTemplates:
   - {fileID: 7403787295593108228, guid: c3725d4757effc442acdafa92d4d4329, type: 3}
@@ -178,6 +178,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   From: {fileID: -5136948030227078473}
   To: {fileID: -6361455431359808864}
+  RoomTemplates: []
+--- !u!114 &-465549266975258761
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f692f83df7c1b5468af64edd22287dc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  From: {fileID: -986878107181062339}
+  To: {fileID: 4300927869867473786}
   RoomTemplates: []
 --- !u!114 &-199142497763018215
 MonoBehaviour:
@@ -219,6 +234,7 @@ MonoBehaviour:
   - {fileID: -2833434590376767031}
   - {fileID: -8747060893842570362}
   - {fileID: -199142497763018215}
+  - {fileID: -465549266975258761}
   CorridorIndividualRoomTemplates:
   - {fileID: 6295766628286017278, guid: d12f56f144e67244f9b540d241a530e7, type: 3}
   - {fileID: 2707270387595432028, guid: 35efb202e0c0b4b439f45af81a36f5d5, type: 3}
@@ -238,6 +254,7 @@ MonoBehaviour:
   - {fileID: -1281722422756332559}
   - {fileID: -6499302656051904039}
   - {fileID: -986878107181062339}
+  - {fileID: 4300927869867473786}
   EditorData:
     PanOffset: {x: -10.39773, y: 88.93337}
     Zoom: 0.90878564
@@ -321,6 +338,23 @@ MonoBehaviour:
   From: {fileID: 6497398534049028861}
   To: {fileID: -1281722422756332559}
   RoomTemplates: []
+--- !u!114 &4300927869867473786
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8074dc491ddc34f4e83332d9eae76980, type: 3}
+  m_Name: (Clone)(Clone)(Clone)(Clone)
+  m_EditorClassIdentifier: 
+  Position: {x: 64, y: -48}
+  Name: Normal
+  IndividualRoomTemplates:
+  - {fileID: 7403787295593108228, guid: c3725d4757effc442acdafa92d4d4329, type: 3}
+  RoomTemplateSets: []
 --- !u!114 &5444332047428035842
 MonoBehaviour:
   m_ObjectHideFlags: 0

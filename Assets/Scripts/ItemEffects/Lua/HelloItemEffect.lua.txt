@@ -1,0 +1,7 @@
+local HelloItemEffect = {}
+
+function HelloItemEffect.OnPick(ctx)
+   CS.UnityEngine.Debug.Log("HelloItemEffect.OnPick in Lua")
+end
+
+return HelloItemEffect

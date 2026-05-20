@@ -13,9 +13,9 @@ namespace Game.UI
 
         [Header("音频配置")]
         [SerializeField] private AudioMixer audioMixer;
-        [SerializeField] private string masterVolumeParameter = "MasterVolume";
-        [SerializeField] private string musicVolumeParameter = "MusicVolume";
-        [SerializeField] private string sfxVolumeParameter = "SfxVolume";
+        [SerializeField] private string masterVolumeParameter = "Master";
+        [SerializeField] private string musicVolumeParameter = "BGM";
+        [SerializeField] private string sfxVolumeParameter = "SFX";
 
         private GameSettingsData currentData;
         private bool isRefreshingView;
