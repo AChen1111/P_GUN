@@ -12,15 +12,17 @@ namespace Game.Gameplay
     {
         [Header("敌人生成表")]
         [SerializeField] private EnemySpawnTableSO enemySpawnTable;
+        [SerializeField] private string enemySpawnTableAddress = "enemy/spawn_table/normal_room";
 
         [Header("敌人可能出现的位置坐标点")]
         [SerializeField] private List<Transform> enemyPoints = new List<Transform>();
 
         protected override int GetInitialWaveCount()
         {
-            if (enemySpawnTable != null && enemySpawnTable.WaveCount > 0)
+            var spawnTable = ResolveEnemySpawnTable();
+            if (spawnTable != null && spawnTable.WaveCount > 0)
             {
-                return enemySpawnTable.WaveCount;
+                return spawnTable.WaveCount;
             }
 
             return base.GetInitialWaveCount();
@@ -42,12 +44,13 @@ namespace Game.Gameplay
                 return 0;
             }
 
-            if (enemySpawnTable == null || !enemySpawnTable.TryGetWave(CurrentWaveIndex, out var wave)) return 0;
+            var spawnTable = ResolveEnemySpawnTable();
+            if (spawnTable == null || !spawnTable.TryGetWave(CurrentWaveIndex, out var wave)) return 0;
 
-            return SpawnFromWave(wave, validPoints);
+            return SpawnFromWave(spawnTable, wave, validPoints);
         }
 
-        private int SpawnFromWave(EnemySpawnWave wave, List<Transform> validPoints)
+        private int SpawnFromWave(EnemySpawnTableSO spawnTable, EnemySpawnWave wave, List<Transform> validPoints)
         {
             if (wave == null || wave.enemies == null) return 0;
 
@@ -58,7 +61,7 @@ namespace Game.Gameplay
             {
                 if (entry.count <= 0) continue;
 
-                if (!enemySpawnTable.TryGetEnemyData(entry.enemyId, out var enemyData))
+                if (!spawnTable.TryGetEnemyData(entry.enemyId, out var enemyData))
                 {
                     Debug.LogWarning($"{nameof(NormalRoom)}: 生成表找不到 enemyId={entry.enemyId} 对应的敌人配置.", this);
                     continue;
@@ -81,6 +84,30 @@ namespace Game.Gameplay
             }
 
             return actualSpawnCount;
+        }
+
+        private EnemySpawnTableSO ResolveEnemySpawnTable()
+        {
+            var content = AddressableRuntimeContent.Instance;
+            if (content == null)
+            {
+                // 允许直接从 GameScene Play, 此时使用 Inspector 中的本地生成表.
+                return enemySpawnTable;
+            }
+
+            if (string.IsNullOrWhiteSpace(enemySpawnTableAddress))
+            {
+                Debug.LogError($"{nameof(NormalRoom)}: 敌人生成表 Address 未配置.", this);
+                return null;
+            }
+
+            if (content.TryGetAsset<EnemySpawnTableSO>(enemySpawnTableAddress, out var runtimeSpawnTable))
+            {
+                return runtimeSpawnTable;
+            }
+
+            Debug.LogError($"{nameof(NormalRoom)}: 找不到已预加载的敌人生成表, Address: {enemySpawnTableAddress}.", this);
+            return null;
         }
 
         private bool SpawnEnemy(EnemyBase enemyPrefab, EnemyData enemyData, Vector3 spawnPosition)

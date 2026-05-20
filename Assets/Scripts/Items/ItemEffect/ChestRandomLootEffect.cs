@@ -16,6 +16,9 @@ namespace Game.Items
         [Tooltip("优先使用的物品生成表")]
         [SerializeField] private ItemSpawnTableSO spawnTable;
 
+        [Tooltip("物品生成表 Address, 为空时使用本地直连配置")]
+        [SerializeField] private string spawnTableAddress;
+
         [Tooltip("旧配置兼容：未配置生成表时从这里随机抽取")]
         [SerializeField] private List<GameObject> lootTable = new List<GameObject>();
 
@@ -65,16 +68,17 @@ namespace Game.Items
             spawnAnimEffect = DOTweenAnimType.None;
             spawnAnimDuration = 0f;
 
-            if (spawnTable != null)
+            var activeSpawnTable = ResolveSpawnTable();
+            if (activeSpawnTable != null)
             {
-                if (spawnTable.TryGetRandomEntry(out var entry))
+                if (activeSpawnTable.TryGetRandomEntry(out var entry))
                 {
                     spawnAnimEffect = entry.spawnAnimEffect;
                     spawnAnimDuration = entry.spawnAnimDuration;
-                    return spawnTable.TryResolvePrefab(entry, out var prefab) ? prefab : null;
+                    return activeSpawnTable.TryResolvePrefab(entry, out var prefab) ? prefab : null;
                 }
 
-                Debug.LogWarning($"{nameof(ChestRandomLootEffect)}: 生成表 {spawnTable.name} 没有可用物品。");
+                Debug.LogWarning($"{nameof(ChestRandomLootEffect)}: 生成表 {activeSpawnTable.name} 没有可用物品。");
                 return null;
             }
 
@@ -117,11 +121,35 @@ namespace Game.Items
             return configuredPrefab;
         }
 
+        private ItemSpawnTableSO ResolveSpawnTable()
+        {
+            if (string.IsNullOrWhiteSpace(spawnTableAddress))
+            {
+                return spawnTable;
+            }
+
+            var content = AddressableRuntimeContent.Instance;
+            if (content == null)
+            {
+                // 允许直接从 GameScene Play, 此时使用 Inspector 中的本地生成表.
+                return spawnTable;
+            }
+
+            if (content.TryGetAsset<ItemSpawnTableSO>(spawnTableAddress, out var runtimeSpawnTable))
+            {
+                return runtimeSpawnTable;
+            }
+
+            Debug.LogError($"{nameof(ChestRandomLootEffect)}: 找不到已预加载的物品生成表, Address: {spawnTableAddress}.", this);
+            return null;
+        }
+
         private bool HasAvailableLoot()
         {
-            if (spawnTable != null)
+            var activeSpawnTable = ResolveSpawnTable();
+            if (activeSpawnTable != null)
             {
-                return spawnTable.TryGetRandomEntry(out _);
+                return activeSpawnTable.TryGetRandomEntry(out _);
             }
 
             if (lootTable == null)

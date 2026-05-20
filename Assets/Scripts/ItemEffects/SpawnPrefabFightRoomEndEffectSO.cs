@@ -14,6 +14,7 @@ namespace Game.ItemEffects
     {
         [SerializeField] private GameObject prefab;
         [SerializeField] private ItemSpawnTableSO spawnTable;
+        [SerializeField] private string spawnTableAddress;
         [SerializeField] private Vector3 worldOffset = Vector3.zero;
         [SerializeField] private string animEffectKey = "Scale0To1";
 
@@ -33,9 +34,10 @@ namespace Game.ItemEffects
             var selectedPrefab = ResolveRuntimePrefab(prefab);
             var selectedAnimEffect = DOTweenAnimType.None;
             var selectedAnimDuration = 0f;
-            if (spawnTable != null && spawnTable.TryGetRandomEntry(out var randomEntry))
+            var activeSpawnTable = ResolveSpawnTable();
+            if (activeSpawnTable != null && activeSpawnTable.TryGetRandomEntry(out var randomEntry))
             {
-                selectedPrefab = spawnTable.TryResolvePrefab(randomEntry, out var resolvedPrefab) ? resolvedPrefab : null;
+                selectedPrefab = activeSpawnTable.TryResolvePrefab(randomEntry, out var resolvedPrefab) ? resolvedPrefab : null;
                 selectedAnimEffect = randomEntry.spawnAnimEffect;
                 selectedAnimDuration = randomEntry.spawnAnimDuration;
             }
@@ -59,6 +61,29 @@ namespace Game.ItemEffects
         {
             var spawner = room.GetComponent<ItemSpawner>();
             return spawner != null ? spawner : room.GetComponentInChildren<ItemSpawner>();
+        }
+
+        private ItemSpawnTableSO ResolveSpawnTable()
+        {
+            if (string.IsNullOrWhiteSpace(spawnTableAddress))
+            {
+                return spawnTable;
+            }
+
+            var content = AddressableRuntimeContent.Instance;
+            if (content == null)
+            {
+                // 允许直接从 GameScene Play, 此时使用 Inspector 中的本地生成表.
+                return spawnTable;
+            }
+
+            if (content.TryGetAsset<ItemSpawnTableSO>(spawnTableAddress, out var runtimeSpawnTable))
+            {
+                return runtimeSpawnTable;
+            }
+
+            Debug.LogError($"{nameof(SpawnPrefabFightRoomEndEffectSO)}: 找不到已预加载的物品生成表, Address: {spawnTableAddress}.", this);
+            return null;
         }
 
         /// <summary>

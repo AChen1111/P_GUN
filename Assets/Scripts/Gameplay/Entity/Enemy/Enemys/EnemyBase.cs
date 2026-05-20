@@ -325,7 +325,7 @@ namespace Game.Gameplay
 
         private void TryDropItem() {
             if(itemSpawner == null || itemDropChance <= 0f) return;
-            if(itemSpawner.itemTable == null || itemSpawner.itemTable.Entries.Count == 0) return;
+            if(!itemSpawner.HasAvailableTable()) return;
             if(Random.value > itemDropChance) return;
 
             itemSpawner.SpawnItem(transform.position);

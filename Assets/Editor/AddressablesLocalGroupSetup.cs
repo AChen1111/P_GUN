@@ -41,6 +41,7 @@ public static class AddressablesLocalGroupSetup
             new[]
             {
                 Entry("Assets/GameDataSO/DataBase/ItemDatabase.asset", "ItemDatabase", "item", "database"),
+                Entry("Assets/GameDataSO/ItemSpawnerTable/NormalRoomItemTable.asset", "item/spawn_table/normal_room", "item", "spawn_table"),
                 Entry("Assets/Prefab/Item/Heart.prefab", "item/heart", "item", "prefab"),
                 Entry("Assets/Prefab/Item/Chest.prefab", "item/chest", "item", "prefab"),
                 Entry("Assets/Prefab/Item/SpeedUp.prefab", "item/speed_up", "item", "prefab"),
@@ -52,6 +53,7 @@ public static class AddressablesLocalGroupSetup
             new[]
             {
                 Entry("Assets/GameDataSO/DataBase/EnemyDatabase.asset", "EnemyDatabase", "enemy", "database"),
+                Entry("Assets/GameDataSO/EnemySpawnTable/NormalRoomEnemySpawnTable.asset", "enemy/spawn_table/normal_room", "enemy", "spawn_table"),
                 Entry("Assets/Prefab/Enemy/EnemyA.prefab", "enemy/enemy_a", "enemy", "prefab"),
                 Entry("Assets/Prefab/Enemy/Bat.prefab", "enemy/bat", "enemy", "prefab"),
                 Entry("Assets/Prefab/Enemy/Goblin.prefab", "enemy/goblin", "enemy", "prefab"),

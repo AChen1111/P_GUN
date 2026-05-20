@@ -102,6 +102,7 @@ MonoBehaviour:
     - prefab
     - enemy
     - weapon
+    - spawn_table
   m_SchemaTemplates: []
   m_GroupTemplateObjects:
   - {fileID: 11400000, guid: ab6d296da78c83f4c8faef95920bc66c, type: 2}
