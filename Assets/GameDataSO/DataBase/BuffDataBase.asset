@@ -16,10 +16,10 @@ MonoBehaviour:
   - id: 0
     buffName: SpeedUpBuff
     icon: {fileID: 21300000, guid: 1303efc9353781040b963f0e6dbc5a55, type: 3}
-    description: "\u79FB\u52A8\u901F\u5EA6\u63D0\u534750%."
+    description: "\u79FB\u52A8\u901F\u5EA6\u63D0\u5347511%."
     tag: 0
     luaFile: {fileID: 4900000, guid: 648678a33bef4bec9cd2e901e934f017, type: 3}
-    duration: 5
+    duration: 10
     isPermanent: 0
     interval: 1
     modifiers:
@@ -57,6 +57,16 @@ MonoBehaviour:
     icon: {fileID: 21300000, guid: 2d4c93aa1465d33499a2174f838e2ebf, type: 3}
     description: "\u6C38\u4E45\u4E2D\u6BD2: \u6BCF\u96945\u79D2\u6BCF\u5C42\u53D7\u52301\u70B9\u4F24\u5BB3."
     tag: 1
+    luaFile: {fileID: 4900000, guid: 921073a9ab0a469886c62babb3cfbd9c, type: 3}
+    duration: 0
+    isPermanent: 1
+    interval: 5
+    modifiers: []
+  - id: 3
+    buffName: PoisonBuff
+    icon: {fileID: 21300000, guid: 2d4c93aa1465d33499a2174f838e2ebf, type: 3}
+    description: "\u6C38\u4E45\u4E2D\u6BD2: \u6BCF\u96945\u79D2\u6BCF\u5C42\u53D7\u52301\u70B9\u4F24\u5BB3."
+    tag: 0
     luaFile: {fileID: 4900000, guid: 921073a9ab0a469886c62babb3cfbd9c, type: 3}
     duration: 0
     isPermanent: 1

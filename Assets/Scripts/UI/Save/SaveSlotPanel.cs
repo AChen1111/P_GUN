@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System;
 using Game.Gameplay.Save;
 using UnityEngine;
 using UnityEngine.UI;
@@ -176,13 +177,26 @@ namespace Game.UI.Save
                 Refresh();
             }
 
-            void HandleLoadClicked(int slotIndex)
+            async void HandleLoadClicked(int slotIndex)
             {
                 pendingOverwriteSlot = -1;
                 pendingDeleteSlot = -1;
-                var result = SaveGameService.LoadFromSlot(slotIndex);
-                SetStatus(result.Message);
-                Refresh();
+                try
+                {
+                    var result = await SaveGameService.LoadFromSlotAsync(slotIndex);
+                    if (!result.Success)
+                    {
+                        SetStatus(result.Message);
+                        Refresh();
+                    }
+                }
+                catch (Exception exception)
+                {
+                    Debug.LogError($"{nameof(SaveSlotPanel)}: 读取存档失败, Error: {exception.Message}", this);
+                    SetStatus("读取失败, 请检查配置.");
+                    Refresh();
+                    throw;
+                }
             }
 
             void HandleSaveClicked(int slotIndex)

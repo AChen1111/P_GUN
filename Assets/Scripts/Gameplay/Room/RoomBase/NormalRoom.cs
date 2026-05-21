@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System;
 using UnityEngine;
 using Game.Core;
 using Game.Pooling;
@@ -105,10 +106,18 @@ namespace Game.Gameplay
         /// <summary>
         /// 执行 OnFightAllWavesEnd 逻辑.
         /// </summary>
-        protected override void OnFightAllWavesEnd()
+        protected override async void OnFightAllWavesEnd()
         {
             if(canGenerateItems) {
-                itemSpawner.SpawnItem(transform.position);
+                try
+                {
+                    await itemSpawner.SpawnItemAsync(transform.position);
+                }
+                catch (Exception exception)
+                {
+                    Debug.LogError($"{nameof(NormalRoom)}: 房间奖励生成失败, Error: {exception.Message}", this);
+                    throw;
+                }
             }
         }
     }

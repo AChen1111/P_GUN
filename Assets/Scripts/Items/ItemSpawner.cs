@@ -1,12 +1,12 @@
-using UnityEngine;
-using Game.Pooling;
+using System.Threading.Tasks;
 using Game.Animation;
 using Game.Presentation;
+using UnityEngine;
 
 namespace Game.Items
 {
     /// <summary>
-    /// 轻量物品生成器：只负责在指定位置生成物品。
+    /// 轻量物品生成器: 只负责在指定位置生成物品.
     /// </summary>
     public class ItemSpawner : MonoBehaviour
     {
@@ -15,18 +15,12 @@ namespace Game.Items
         public ItemSpawnTableSO itemTable;
 
         /// <summary>
-        /// 生成物品，并播放抽中配置项的动画。
+        /// 生成物品, 只使用已加载或直接引用的预制体.
         /// </summary>
         public GameObject SpawnItem(Vector3 position)
         {
-            // 检查物品生成表是否设置.
-            if(itemTable == null || itemTable.Entries.Count == 0)
-            {
-                Debug.LogWarning("Item table is not set");
-                return null;
-            }
+            if (!TryValidateItemTable()) return null;
 
-            //随机获取一个物品
             if(itemTable.TryGetRandomEntry(out var entry))
             {
                 return itemTable.TryResolvePrefab(entry, out var prefab)
@@ -34,59 +28,97 @@ namespace Game.Items
                     : null;
             }
 
-            //如果获取失败，则返回null
             Debug.LogWarning("No prefab found in item table");
             return null;
         }
 
         /// <summary>
-        /// 生成物品，并通过枚举播放动画。
+        /// 异步生成物品, 支持按需加载 Addressables 预制体.
+        /// </summary>
+        public async Task<GameObject> SpawnItemAsync(Vector3 position)
+        {
+            if (!TryValidateItemTable()) return null;
+
+            if(itemTable.TryGetRandomEntry(out var entry))
+            {
+                var prefab = await itemTable.TryResolvePrefabAsync(entry);
+                return prefab != null
+                    ? SpawnItem(prefab, position, entry.spawnAnimEffect, entry.spawnAnimDuration)
+                    : null;
+            }
+
+            Debug.LogWarning("No prefab found in item table");
+            return null;
+        }
+
+        /// <summary>
+        /// 生成物品, 外部传入动画时覆盖配置项动画.
         /// </summary>
         public GameObject SpawnItem(Vector3 position, DOTweenAnimType animEffect)
         {
-            // 检查物品生成表是否设置.
-            if(itemTable == null || itemTable.Entries.Count == 0)
-            {
-                Debug.LogWarning("Item table is not set");
-                return null;
-            }
+            if (!TryValidateItemTable()) return null;
 
-            //随机获取一个物品，外部传入动画时覆盖配置项动画。
-            if(itemTable.TryGetRandomPrefab(out GameObject prefab))
+            if(itemTable.TryGetRandomPrefab(out var prefab))
             {
                 return SpawnItem(prefab, position, animEffect, DefaultSpawnAnimDuration);
             }
 
-            //如果获取失败，则返回null
             Debug.LogWarning("No prefab found in item table");
             return null;
         }
 
         /// <summary>
-        /// 生成物品，并通过旧 string key 播放动画。
+        /// 异步生成物品, 外部传入动画时覆盖配置项动画.
+        /// </summary>
+        public async Task<GameObject> SpawnItemAsync(Vector3 position, DOTweenAnimType animEffect)
+        {
+            if (!TryValidateItemTable()) return null;
+
+            var prefab = await itemTable.TryGetRandomPrefabAsync();
+            if(prefab != null)
+            {
+                return SpawnItem(prefab, position, animEffect, DefaultSpawnAnimDuration);
+            }
+
+            Debug.LogWarning("No prefab found in item table");
+            return null;
+        }
+
+        /// <summary>
+        /// 生成物品, 使用旧 string key 播放动画.
         /// </summary>
         public GameObject SpawnItem(Vector3 position, string animEffectKey)
         {
-            // 检查物品生成表是否设置.
-            if(itemTable == null || itemTable.Entries.Count == 0)
-            {
-                Debug.LogWarning("Item table is not set");
-                return null;
-            }
+            if (!TryValidateItemTable()) return null;
 
-            //随机获取一个物品
-            if(itemTable.TryGetRandomPrefab(out GameObject prefab))
+            if(itemTable.TryGetRandomPrefab(out var prefab))
             {
                 return SpawnItem(prefab, position, animEffectKey);
             }
 
-            //如果获取失败，则返回null
             Debug.LogWarning("No prefab found in item table");
             return null;
         }
 
         /// <summary>
-        /// 生成指定预制体，并通过枚举播放动画。
+        /// 异步生成物品, 使用旧 string key 播放动画.
+        /// </summary>
+        public async Task<GameObject> SpawnItemAsync(Vector3 position, string animEffectKey)
+        {
+            if (!TryValidateItemTable()) return null;
+
+            var prefab = await itemTable.TryGetRandomPrefabAsync();
+            if(prefab != null)
+            {
+                return SpawnItem(prefab, position, animEffectKey);
+            }
+
+            Debug.LogWarning("No prefab found in item table");
+            return null;
+        }
+
+        /// <summary>
+        /// 生成指定预制体, 并通过枚举播放动画.
         /// </summary>
         public GameObject SpawnItem(GameObject prefab, Vector3 position, DOTweenAnimType animEffect)
         {
@@ -94,7 +126,15 @@ namespace Game.Items
         }
 
         /// <summary>
-        /// 生成指定预制体，并通过枚举播放指定秒数的动画。
+        /// 异步接口兼容已解析预制体的生成入口.
+        /// </summary>
+        public Task<GameObject> SpawnItemAsync(GameObject prefab, Vector3 position, DOTweenAnimType animEffect)
+        {
+            return Task.FromResult(SpawnItem(prefab, position, animEffect));
+        }
+
+        /// <summary>
+        /// 生成指定预制体, 并通过枚举播放指定秒数的动画.
         /// </summary>
         public GameObject SpawnItem(GameObject prefab, Vector3 position, DOTweenAnimType animEffect, float animDuration)
         {
@@ -115,7 +155,15 @@ namespace Game.Items
         }
 
         /// <summary>
-        /// 生成指定预制体，并通过旧 string key 播放动画。
+        /// 异步接口兼容已解析预制体和动画时长.
+        /// </summary>
+        public Task<GameObject> SpawnItemAsync(GameObject prefab, Vector3 position, DOTweenAnimType animEffect, float animDuration)
+        {
+            return Task.FromResult(SpawnItem(prefab, position, animEffect, animDuration));
+        }
+
+        /// <summary>
+        /// 生成指定预制体, 并通过旧 string key 播放动画.
         /// </summary>
         public GameObject SpawnItem(GameObject prefab, Vector3 position, string animEffectKey)
         {
@@ -133,6 +181,28 @@ namespace Game.Items
 
             PlaySpawnAnimation(animEffectKey, DefaultSpawnAnimDuration, obj, item);
             return obj;
+        }
+
+        /// <summary>
+        /// 异步接口兼容已解析预制体和旧动画 key.
+        /// </summary>
+        public Task<GameObject> SpawnItemAsync(GameObject prefab, Vector3 position, string animEffectKey)
+        {
+            return Task.FromResult(SpawnItem(prefab, position, animEffectKey));
+        }
+
+        /// <summary>
+        /// 检查物品生成表是否可用.
+        /// </summary>
+        private bool TryValidateItemTable()
+        {
+            if(itemTable != null && itemTable.Entries.Count > 0)
+            {
+                return true;
+            }
+
+            Debug.LogWarning("Item table is not set");
+            return false;
         }
 
         /// <summary>
@@ -174,6 +244,5 @@ namespace Game.Items
                 }
             });
         }
-
     }
 }

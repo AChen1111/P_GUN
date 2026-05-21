@@ -820,8 +820,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   nextSceneName: StartScene
-  dataBaseManager: {fileID: 1340272845}
-  runtimeContent: {fileID: 1340272843}
   statusText: {fileID: 781186201}
   progressSlider: {fileID: 689449497}
 --- !u!114 &1340272843

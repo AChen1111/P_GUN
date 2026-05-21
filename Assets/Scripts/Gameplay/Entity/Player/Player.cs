@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using DG.Tweening;
 using UnityEngine;
 using QFramework;
@@ -93,6 +94,8 @@ namespace Game.Gameplay
         Transform _autoAimTarget;
         bool isGameEnded;
         bool wasMouseCombatBlocked;
+        bool weaponLoadoutReady;
+        Task weaponLoadoutTask;
 
 
         public int MaxHP => Mathf.Max(0, Mathf.RoundToInt(CalculateBuffedStat(StatType.MaxHp, maxHp)));
@@ -121,8 +124,7 @@ namespace Game.Gameplay
             ResolveAnimator();
             CaptureDefaultVisualState();
 
-            TryApplyAddressableWeaponLoadout();
-            SelectInitialGun();
+            weaponLoadoutTask = InitializeWeaponLoadoutAsync();
 
             void CaptureDefaultVisualState()
             {
@@ -148,48 +150,6 @@ namespace Game.Gameplay
                 }
             }
 
-            void TryApplyAddressableWeaponLoadout()
-            {
-                var content = AddressableRuntimeContent.Instance;
-                if (content == null || !content.IsReady)
-                {
-                    throw new InvalidOperationException($"{nameof(Player)} requires ready {nameof(AddressableRuntimeContent)} before weapon loadout.");
-                }
-
-                if (Weapon == null)
-                {
-                    throw new InvalidOperationException($"{nameof(Player)} requires Weapon transform.");
-                }
-
-                var prefabs = new List<GameObject>(AddressableWeaponAddresses.Length);
-                foreach (var address in AddressableWeaponAddresses)
-                {
-                    if (!content.TryGetAsset<GameObject>(address, out var prefab) || prefab == null)
-                    {
-                        throw new InvalidOperationException($"{nameof(Player)} missing preloaded weapon prefab, Address: {address}.");
-                    }
-
-                    prefabs.Add(prefab);
-                }
-
-                ClearCurrentGunInstances();
-                foreach (var prefab in prefabs)
-                {
-                    var instance = Instantiate(prefab, Weapon);
-                    instance.name = prefab.name;
-                    var newGun = instance.GetComponent<Gun>();
-                    if (newGun == null)
-                    {
-                        throw new InvalidOperationException($"{nameof(Player)} weapon prefab missing {nameof(Gun)} component, Prefab: {prefab.name}.");
-                    }
-
-                    guns.Add(newGun);
-                }
-
-                gun = null;
-                currentGunIndex = Mathf.Clamp(currentGunIndex, 0, Mathf.Max(0, guns.Count - 1));
-            }
-
             void ResolveBuffManager()
             {
                 if (buffManager != null)
@@ -213,28 +173,89 @@ namespace Game.Gameplay
                     Debug.LogWarning("Player SpriteRenderer 未绑定，受击闪烁将被跳过。");
                 }
             }
+}
 
-    void ClearCurrentGunInstances()
-    {
-        // 热更武器实例化前清理 Player prefab 自带枪械, 防止旧枪仍被切换到.
-        foreach (var oldGun in guns)
+        /// <summary>
+        /// 初始化 Addressables 武器配置.
+        /// </summary>
+        private async Task InitializeWeaponLoadoutAsync()
         {
-            if (oldGun != null)
+            try
             {
-                Destroy(oldGun.gameObject);
+                await ApplyAddressableWeaponLoadoutAsync();
+                SelectInitialGun();
+                weaponLoadoutReady = true;
+                gun?.OnGunUsed();
+            }
+            catch (Exception exception)
+            {
+                Debug.LogError($"{nameof(Player)}: 武器加载失败, Error: {exception.Message}", this);
+                throw;
             }
         }
 
-        guns.Clear();
-    }
-}
+        /// <summary>
+        /// 按玩家自己的武器地址列表加载并实例化武器.
+        /// </summary>
+        private async Task ApplyAddressableWeaponLoadoutAsync()
+        {
+            var loader = AddressableLoader.Instance;
+            if (loader == null)
+            {
+                throw new InvalidOperationException($"{nameof(Player)} requires {nameof(AddressableLoader)} before weapon loadout.");
+            }
+
+            if (Weapon == null)
+            {
+                throw new InvalidOperationException($"{nameof(Player)} requires Weapon transform.");
+            }
+
+            ClearCurrentGunInstances();
+            foreach (var address in AddressableWeaponAddresses)
+            {
+                var prefab = await loader.LoadAssetAsync<GameObject>(address);
+                var instance = Instantiate(prefab, Weapon);
+                instance.name = prefab.name;
+                var newGun = instance.GetComponent<Gun>();
+                if (newGun == null)
+                {
+                    throw new InvalidOperationException($"{nameof(Player)} weapon prefab missing {nameof(Gun)} component, Prefab: {prefab.name}.");
+                }
+
+                guns.Add(newGun);
+            }
+
+            gun = null;
+            currentGunIndex = Mathf.Clamp(currentGunIndex, 0, Mathf.Max(0, guns.Count - 1));
+        }
+
+        /// <summary>
+        /// 清理 Player prefab 自带枪械, 防止旧枪仍被切换到.
+        /// </summary>
+        private void ClearCurrentGunInstances()
+        {
+            foreach (var oldGun in guns)
+            {
+                if (oldGun != null)
+                {
+                    Destroy(oldGun.gameObject);
+                }
+            }
+
+            guns.Clear();
+        }
 
         /// <summary>
         /// 执行启动后的初始化逻辑.
         /// </summary>
-        void Start()
+        async void Start()
         {
-            gun?.OnGunUsed();
+            if (weaponLoadoutTask == null)
+            {
+                return;
+            }
+
+            await weaponLoadoutTask;
         }
 
         /// <summary>
@@ -396,6 +417,11 @@ namespace Game.Gameplay
         /// </summary>
         void HandleCombatInput(Vector2 dir, bool mouseCombatBlocked)
         {
+            if (!weaponLoadoutReady || gun == null || guns.Count == 0)
+            {
+                return;
+            }
+
             if (!mouseCombatBlocked)
             {
                 if (Input.GetMouseButtonDown(0))
@@ -629,14 +655,33 @@ namespace Game.Gameplay
         /// <summary>
         /// 执行 RestoreSaveData 逻辑.
         /// </summary>
-        public void RestoreSaveData(PlayerSaveData data)
+        public async void RestoreSaveData(PlayerSaveData data)
+        {
+            if (data == null) return;
+
+            try
+            {
+                await RestoreSaveDataAsync(data);
+            }
+            catch (Exception exception)
+            {
+                Debug.LogError($"{nameof(Player)}: 恢复存档失败, Error: {exception.Message}", this);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// 异步恢复玩家存档数据, 等待武器和背包效果资源加载完成.
+        /// </summary>
+        public async Task RestoreSaveDataAsync(PlayerSaveData data)
         {
             if (data == null) return;
 
             transform.position = data.position.ToVector3();
 
             RestoreBuffs(data);
-            RestoreInventory(data);
+            await RestoreInventoryAsync(data);
+            await EnsureWeaponLoadoutReadyAsync();
             RestoreWeapons(data);
 
             currentGunIndex = Mathf.Clamp(data.currentGunIndex, 0, Mathf.Max(0, guns.Count - 1));
@@ -644,56 +689,95 @@ namespace Game.Gameplay
             HP = Mathf.Clamp(data.hp, 0, MaxHP);
             PublishHPChanged();
             gun?.OnGunUsed();
+        }
 
-            void RestoreWeapons(PlayerSaveData data)
-            {
-                for (var i = 0; i < data.weapons.Count; i++)
-                {
-                    var weaponData = data.weapons[i];
-                    if (weaponData == null)
-                        continue;
-                    var targetGun = guns.Find(candidate => candidate != null && candidate.WeaponId == weaponData.weaponId);
-                    targetGun?.RestoreAmmo(weaponData.clipAmmo, weaponData.clipMaxAmmo, weaponData.bagAmmo, weaponData.bagMaxAmmo);
-                }
-            }
-
-            void RestoreBuffs(PlayerSaveData data)
-            {
-                var manager = buffManager != null ? buffManager : GetComponent<BuffManager>();
-                manager?.RestoreSaveData(data.buffs, this);
-            }
-
-            void RestoreInventory(PlayerSaveData data)
-            {
-                var inventory = GetComponent<PlayerInventory>();
-                if (inventory == null)
-                    return;
-                inventory.Clear();
-                var database = DataBaseManager.Instance != null ? DataBaseManager.Instance.Items : ItemDatabase.RuntimeDatabase;
-                for (var i = 0; i < data.inventory.Count; i++)
-                {
-                    var stack = data.inventory[i];
-                    if (stack == null)
-                        continue;
-                    inventory.RestoreStack(stack.itemId, stack.count, database, ResolveItemEffects(stack.itemId));
-                }
-            }
-
-    static IReadOnlyList<ItemEffectBase> ResolveItemEffects(int itemId)
-    {
-        var content = AddressableRuntimeContent.Instance;
-        if (content != null && content.TryGetPrefabById("item", itemId, out var prefab) && prefab != null)
+        /// <summary>
+        /// 等待 Addressables 武器装配完成.
+        /// </summary>
+        private async Task EnsureWeaponLoadoutReadyAsync()
         {
-            var item = prefab.GetComponent<Item>();
-            if (item != null)
+            if (weaponLoadoutTask != null)
             {
-                return item.Effects;
+                await weaponLoadoutTask;
+            }
+
+            if (!weaponLoadoutReady)
+            {
+                throw new InvalidOperationException($"{nameof(Player)} weapon loadout is not ready.");
             }
         }
 
-        return null;
-    }
-}
+        /// <summary>
+        /// 恢复武器弹药数据.
+        /// </summary>
+        private void RestoreWeapons(PlayerSaveData data)
+        {
+            for (var i = 0; i < data.weapons.Count; i++)
+            {
+                var weaponData = data.weapons[i];
+                if (weaponData == null)
+                    continue;
+                var targetGun = guns.Find(candidate => candidate != null && candidate.WeaponId == weaponData.weaponId);
+                targetGun?.RestoreAmmo(weaponData.clipAmmo, weaponData.clipMaxAmmo, weaponData.bagAmmo, weaponData.bagMaxAmmo);
+            }
+        }
+
+        /// <summary>
+        /// 恢复 Buff 数据.
+        /// </summary>
+        private void RestoreBuffs(PlayerSaveData data)
+        {
+            var manager = buffManager != null ? buffManager : GetComponent<BuffManager>();
+            manager?.RestoreSaveData(data.buffs, this);
+        }
+
+        /// <summary>
+        /// 恢复背包数据并按需加载物品效果.
+        /// </summary>
+        private async Task RestoreInventoryAsync(PlayerSaveData data)
+        {
+            var inventory = GetComponent<PlayerInventory>();
+            if (inventory == null)
+            {
+                return;
+            }
+
+            inventory.Clear();
+            var database = DataBaseManager.Instance != null ? DataBaseManager.Instance.Items : ItemDatabase.RuntimeDatabase;
+            for (var i = 0; i < data.inventory.Count; i++)
+            {
+                var stack = data.inventory[i];
+                if (stack == null)
+                    continue;
+                inventory.RestoreStack(stack.itemId, stack.count, database, await ResolveItemEffectsAsync(stack.itemId));
+            }
+        }
+
+        /// <summary>
+        /// 通过物品 Addressables 地址加载背包效果配置.
+        /// </summary>
+        private static async Task<IReadOnlyList<ItemEffectBase>> ResolveItemEffectsAsync(int itemId)
+        {
+            if (!AddressableItemAddressCatalog.TryGetAddress(itemId, out var address))
+            {
+                throw new InvalidOperationException($"Missing addressable item address, ItemId: {itemId}.");
+            }
+
+            var loader = AddressableLoader.Instance;
+            if (loader == null)
+            {
+                throw new InvalidOperationException($"{nameof(AddressableLoader)} must exist before restoring inventory effects.");
+            }
+
+            var prefab = await loader.LoadAssetAsync<GameObject>(address);
+            var item = prefab.GetComponent<Item>();
+            if (item == null)
+            {
+                throw new InvalidOperationException($"Item prefab missing {nameof(Item)} component, Address: {address}.");
+            }
+
+            return item.Effects;
+        }
 
         /// <summary>
         /// 执行 PublishHPChanged 逻辑.

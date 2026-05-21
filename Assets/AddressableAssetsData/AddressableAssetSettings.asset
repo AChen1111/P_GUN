@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 468a46d0ae32c3544b7d98094e6448a9, type: 3}
   m_Name: AddressableAssetSettings
   m_EditorClassIdentifier: 
-  m_DefaultGroup: 3ffbe8d06de32b347bbef89eb72714b5
+  m_DefaultGroup: d71024e3a5ce28449bb9e1ce8a458a4e
   m_currentHash:
     serializedVersion: 2
-    Hash: 00000000000000000000000000000000
+    Hash: c7dbd2e55325c92f44b0376617c1ddb7
   m_OptimizeCatalogSize: 0
   m_BuildRemoteCatalog: 1
   m_BundleLocalCatalog: 0
@@ -49,6 +49,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: a5119a4ea8213274bb34c9a3a3c0657b, type: 2}
   - {fileID: 11400000, guid: 639c36c931294274e8030a60b090431e, type: 2}
   - {fileID: 11400000, guid: 213694761bfdf9e43bac2f5f842e4a47, type: 2}
+  - {fileID: 11400000, guid: 99a6c06e928dda64982ebc47c169c3c5, type: 2}
   - {fileID: 11400000, guid: 58af224d5a5c605459b3ff2da560303b, type: 2}
   m_BuildSettings:
     m_CompileScriptsInVirtualMode: 0
@@ -101,6 +102,7 @@ MonoBehaviour:
     - prefab
     - enemy
     - weapon
+    - shared
   m_SchemaTemplates: []
   m_GroupTemplateObjects:
   - {fileID: 11400000, guid: ab6d296da78c83f4c8faef95920bc66c, type: 2}

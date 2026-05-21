@@ -320,9 +320,25 @@ namespace Game.Gameplay
                     return;
                 if (UnityEngine.Random.value > itemDropChance)
                     return;
-                itemSpawner.SpawnItem(transform.position);
+                SpawnDropItemAsync(transform.position);
             }
 }
+
+        /// <summary>
+        /// 异步生成死亡掉落物.
+        /// </summary>
+        private async void SpawnDropItemAsync(Vector3 spawnPosition)
+        {
+            try
+            {
+                await itemSpawner.SpawnItemAsync(spawnPosition);
+            }
+            catch (Exception exception)
+            {
+                Debug.LogError($"{nameof(EnemyBase)}: 死亡掉落生成失败, Error: {exception.Message}", this);
+                throw;
+            }
+        }
 
         /// <summary>
         /// 对外接口,执行初始化逻辑

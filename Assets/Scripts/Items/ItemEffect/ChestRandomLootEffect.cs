@@ -1,14 +1,14 @@
+using System;
 using System.Collections.Generic;
-using UnityEngine;
-using Game.Core;
-using Game.Pooling;
+using System.Threading.Tasks;
 using Game.Animation;
-using Game.Presentation;
+using Game.Core;
+using UnityEngine;
 
 namespace Game.Items
 {
     /// <summary>
-    /// 宝箱类效果：在触发位置随机生成一个道具预制体。
+    /// 宝箱类效果: 在触发位置随机生成一个道具预制体.
     /// </summary>
     [CreateAssetMenu(fileName = "ChestRandomLootEffect", menuName = "PG/Item/Effects/Chest Random Loot", order = 2)]
     public class ChestRandomLootEffect : ItemEffectBase
@@ -28,35 +28,28 @@ namespace Game.Items
         public override bool CanUse(ItemEffectContext ctx)
         {
             return ResolveSpawner(ctx) != null && HasAvailableLoot();
-
-            bool HasAvailableLoot()
-            {
-                if (spawnTable != null)
-                {
-                    return spawnTable.TryGetRandomEntry(out _);
-                }
-
-                if (lootTable == null)
-                {
-                    return false;
-                }
-
-                for (int i = 0; i < lootTable.Count; i++)
-                {
-                    if (lootTable[i] != null)
-                    {
-                        return true;
-                    }
-                }
-
-                return false;
-            }
-}
+        }
 
         /// <summary>
         /// 执行 OnPick 逻辑.
         /// </summary>
-        public override void OnPick(ItemEffectContext ctx)
+        public override async void OnPick(ItemEffectContext ctx)
+        {
+            try
+            {
+                await SpawnLootAsync(ctx);
+            }
+            catch (Exception exception)
+            {
+                Debug.LogError($"{nameof(ChestRandomLootEffect)}: 生成宝箱掉落失败, Error: {exception.Message}", this);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// 异步加载并生成掉落物.
+        /// </summary>
+        private async Task SpawnLootAsync(ItemEffectContext ctx)
         {
             var spawner = ResolveSpawner(ctx);
             if (spawner == null)
@@ -66,86 +59,130 @@ namespace Game.Items
             }
 
             var newItemPosition = ctx.WorldPosition + new Vector3(
-                Random.Range(-randomOffsetRange.x, randomOffsetRange.x),
-                Random.Range(-randomOffsetRange.y, randomOffsetRange.y),
+                UnityEngine.Random.Range(-randomOffsetRange.x, randomOffsetRange.x),
+                UnityEngine.Random.Range(-randomOffsetRange.y, randomOffsetRange.y),
                 0f);
 
-            var dropAnimEffect = DOTweenAnimType.None;
-            var dropAnimDuration = 0f;
-            var drop = GetRandomPrefab(out dropAnimEffect, out dropAnimDuration);
-            if (drop == null) return;
+            var selection = await GetRandomPrefabAsync();
+            if (selection.Prefab == null) return;
 
-            if (dropAnimEffect != DOTweenAnimType.None)
+            if (selection.SpawnAnimEffect != DOTweenAnimType.None)
             {
-                spawner.SpawnItem(drop, newItemPosition, dropAnimEffect, dropAnimDuration);
+                spawner.SpawnItem(selection.Prefab, newItemPosition, selection.SpawnAnimEffect, selection.SpawnAnimDuration);
                 return;
             }
 
-            spawner.SpawnItem(drop, newItemPosition, animEffectKey);
+            spawner.SpawnItem(selection.Prefab, newItemPosition, animEffectKey);
+        }
 
-            GameObject GetRandomPrefab(out DOTweenAnimType spawnAnimEffect, out float spawnAnimDuration)
+        /// <summary>
+        /// 获取一个可生成的掉落物预制体.
+        /// </summary>
+        private async Task<LootSelection> GetRandomPrefabAsync()
+        {
+            if (spawnTable != null)
             {
-                spawnAnimEffect = DOTweenAnimType.None;
-                spawnAnimDuration = 0f;
-                if (spawnTable != null)
+                if (spawnTable.TryGetRandomEntry(out var entry))
                 {
-                    if (spawnTable.TryGetRandomEntry(out var entry))
+                    return new LootSelection
                     {
-                        spawnAnimEffect = entry.spawnAnimEffect;
-                        spawnAnimDuration = entry.spawnAnimDuration;
-                        return spawnTable.TryResolvePrefab(entry, out var prefab) ? prefab : null;
-                    }
-
-                    Debug.LogWarning($"{nameof(ChestRandomLootEffect)}: 生成表 {spawnTable.name} 没有可用物品。");
-                    return null;
+                        Prefab = await spawnTable.TryResolvePrefabAsync(entry),
+                        SpawnAnimEffect = entry.spawnAnimEffect,
+                        SpawnAnimDuration = entry.spawnAnimDuration
+                    };
                 }
 
-                if (lootTable == null || lootTable.Count == 0)
-                {
-                    Debug.LogWarning($"{nameof(ChestRandomLootEffect)}: 没有可用的掉落配置。");
-                    return null;
-                }
-
-                var validPrefabs = new List<GameObject>();
-                foreach (var configuredPrefab in lootTable)
-                {
-                    if (configuredPrefab != null)
-                    {
-                        validPrefabs.Add(ResolveRuntimePrefab(configuredPrefab));
-                    }
-                }
-
-                if (validPrefabs.Count == 0)
-                {
-                    Debug.LogWarning($"{nameof(ChestRandomLootEffect)}: 掉落配置中没有有效预制体。");
-                    return null;
-                }
-
-                return validPrefabs[Random.Range(0, validPrefabs.Count)];
+                Debug.LogWarning($"{nameof(ChestRandomLootEffect)}: 生成表 {spawnTable.name} 没有可用物品。");
+                return default;
             }
 
-    static GameObject ResolveRuntimePrefab(GameObject configuredPrefab)
-    {
-        var item = configuredPrefab != null ? configuredPrefab.GetComponent<Item>() : null;
-        var content = AddressableRuntimeContent.Instance;
-        if (item != null && content == null)
-        {
-            throw new System.InvalidOperationException($"{nameof(ChestRandomLootEffect)} requires {nameof(AddressableRuntimeContent)} for item prefab replacement.");
+            if (lootTable == null || lootTable.Count == 0)
+            {
+                Debug.LogWarning($"{nameof(ChestRandomLootEffect)}: 没有可用的掉落配置。");
+                return default;
+            }
+
+            var validPrefabs = new List<GameObject>();
+            foreach (var configuredPrefab in lootTable)
+            {
+                if (configuredPrefab != null)
+                {
+                    validPrefabs.Add(await ResolveRuntimePrefabAsync(configuredPrefab));
+                }
+            }
+
+            if (validPrefabs.Count == 0)
+            {
+                Debug.LogWarning($"{nameof(ChestRandomLootEffect)}: 掉落配置中没有有效预制体。");
+                return default;
+            }
+
+            return new LootSelection
+            {
+                Prefab = validPrefabs[UnityEngine.Random.Range(0, validPrefabs.Count)]
+            };
         }
 
-        if (item != null && content != null && content.TryGetPrefabById("item", item.ItemId, out var runtimePrefab))
+        /// <summary>
+        /// 宝箱掉落选择结果.
+        /// </summary>
+        private struct LootSelection
         {
-            return runtimePrefab;
+            public GameObject Prefab;
+            public DOTweenAnimType SpawnAnimEffect;
+            public float SpawnAnimDuration;
         }
 
-        if (item != null)
+        /// <summary>
+        /// 旧 prefab 配置优先按 itemId 解析热更新预制体.
+        /// </summary>
+        private static async Task<GameObject> ResolveRuntimePrefabAsync(GameObject configuredPrefab)
         {
-            throw new System.InvalidOperationException($"{nameof(ChestRandomLootEffect)} missing runtime item prefab, ItemId: {item.ItemId}.");
+            var item = configuredPrefab != null ? configuredPrefab.GetComponent<Item>() : null;
+            if (item == null)
+            {
+                return configuredPrefab;
+            }
+
+            if (!AddressableItemAddressCatalog.TryGetAddress(item.ItemId, out var address))
+            {
+                return configuredPrefab;
+            }
+
+            var loader = AddressableLoader.Instance;
+            if (loader == null)
+            {
+                throw new InvalidOperationException($"{nameof(ChestRandomLootEffect)} requires {nameof(AddressableLoader)} for item prefab replacement.");
+            }
+
+            return await loader.LoadAssetAsync<GameObject>(address);
         }
 
-        return configuredPrefab;
-    }
-}
+        /// <summary>
+        /// 检查是否存在可用掉落配置.
+        /// </summary>
+        private bool HasAvailableLoot()
+        {
+            if (spawnTable != null)
+            {
+                return spawnTable.TryGetRandomEntry(out _);
+            }
+
+            if (lootTable == null)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < lootTable.Count; i++)
+            {
+                if (lootTable[i] != null)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
 
         /// <summary>
         /// 执行 ResolveSpawner 逻辑.
@@ -154,6 +191,5 @@ namespace Game.Items
         {
             return ctx.SourceObject != null ? ctx.SourceObject.GetComponentInParent<ItemSpawner>() : null;
         }
-
     }
 }
