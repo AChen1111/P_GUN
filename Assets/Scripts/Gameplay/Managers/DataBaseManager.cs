@@ -1,17 +1,13 @@
+using System;
 using System.Threading.Tasks;
-using UnityEngine;
-using UnityEngine.AddressableAssets;
-using UnityEngine.ResourceManagement.AsyncOperations;
 using Game.Core;
-using Game.Pooling;
-using Game.Animation;
-using Game.Presentation;
 using Game.Items;
+using UnityEngine;
 
 namespace Game.Gameplay
 {
     /// <summary>
-    /// 全局数据库管理器, 负责在进入游戏前通过 Addressables 加载数据库资产.
+    /// 全局数据库管理器, 负责按需通过 AddressableLoader 加载数据库资产.
     /// </summary>
     public sealed class DataBaseManager : MonoBehaviour
     {
@@ -20,10 +16,7 @@ namespace Game.Gameplay
         [SerializeField] private string buffDataBaseKey = "BuffDataBase";
         [SerializeField] private string enemyDatabaseKey = "EnemyDatabase";
 
-        private AsyncOperationHandle<ItemDatabase> itemHandle;
-        private AsyncOperationHandle<WeaponDatabase> weaponHandle;
-        private AsyncOperationHandle<BuffDataBase> buffHandle;
-        private AsyncOperationHandle<EnemyDatabase> enemyHandle;
+        private Task loadingTask;
 
         public static DataBaseManager Instance { get; private set; }
 
@@ -49,44 +42,71 @@ namespace Game.Gameplay
         }
 
         /// <summary>
-        /// 加载所有数据库, 登录界面或启动流程应等待该任务完成后再进入游戏.
+        /// 兼容旧入口, 实际加载转交给 EnsureLoadedAsync.
         /// </summary>
-        public async Task LoadAllAsync()
+        public Task LoadAllAsync()
         {
-            IsLoaded = false;
+            return EnsureLoadedAsync();
+        }
 
-            itemHandle = Addressables.LoadAssetAsync<ItemDatabase>(itemDatabaseKey);
-            weaponHandle = Addressables.LoadAssetAsync<WeaponDatabase>(weaponDatabaseKey);
-            buffHandle = Addressables.LoadAssetAsync<BuffDataBase>(buffDataBaseKey);
-            enemyHandle = Addressables.LoadAssetAsync<EnemyDatabase>(enemyDatabaseKey);
-
-            await Task.WhenAll(itemHandle.Task, weaponHandle.Task, buffHandle.Task, enemyHandle.Task);
-
-            Items = GetLoadedAsset(itemHandle, nameof(ItemDatabase));
-            Weapons = GetLoadedAsset(weaponHandle, nameof(WeaponDatabase));
-            Buffs = GetLoadedAsset(buffHandle, nameof(BuffDataBase));
-            Enemies = GetLoadedAsset(enemyHandle, nameof(EnemyDatabase));
-            IsLoaded = Items != null && Weapons != null && Buffs != null && Enemies != null;
-
+        /// <summary>
+        /// 确保所有全局数据库已经加载完成.
+        /// </summary>
+        public async Task EnsureLoadedAsync()
+        {
             if (IsLoaded)
             {
-                ItemDatabase.SetRuntimeDatabase(Items);
+                return;
+            }
+
+            if (loadingTask != null)
+            {
+                await loadingTask;
+                return;
+            }
+
+            loadingTask = LoadAllInternalAsync();
+            try
+            {
+                await loadingTask;
+            }
+            finally
+            {
+                loadingTask = null;
             }
         }
 
         /// <summary>
-        /// 执行 GetLoadedAsset 逻辑.
+        /// 执行数据库实际加载逻辑.
         /// </summary>
-        private static TDatabase GetLoadedAsset<TDatabase>(AsyncOperationHandle<TDatabase> handle, string databaseName)
-            where TDatabase : ScriptableObject
+        private async Task LoadAllInternalAsync()
         {
-            if (handle.Status == AsyncOperationStatus.Succeeded)
+            IsLoaded = false;
+            var loader = AddressableLoader.Instance;
+            if (loader == null)
             {
-                return handle.Result;
+                throw new InvalidOperationException($"{nameof(AddressableLoader)} must exist before loading databases.");
             }
 
-            Debug.LogError($"{nameof(DataBaseManager)}: 加载 {databaseName} 失败.");
-            return null;
+            var itemTask = loader.LoadAssetAsync<ItemDatabase>(itemDatabaseKey);
+            var weaponTask = loader.LoadAssetAsync<WeaponDatabase>(weaponDatabaseKey);
+            var buffTask = loader.LoadAssetAsync<BuffDataBase>(buffDataBaseKey);
+            var enemyTask = loader.LoadAssetAsync<EnemyDatabase>(enemyDatabaseKey);
+
+            await Task.WhenAll(itemTask, weaponTask, buffTask, enemyTask);
+
+            Items = itemTask.Result;
+            Weapons = weaponTask.Result;
+            Buffs = buffTask.Result;
+            Enemies = enemyTask.Result;
+            IsLoaded = Items != null && Weapons != null && Buffs != null && Enemies != null;
+            if (!IsLoaded)
+            {
+                throw new InvalidOperationException("Required databases were not loaded.");
+            }
+
+            // Item 模块通过 RuntimeDatabase 读取显示数据, 避免反向依赖 Gameplay.
+            ItemDatabase.SetRuntimeDatabase(Items);
         }
 
         /// <summary>
@@ -99,22 +119,7 @@ namespace Game.Gameplay
                 Instance = null;
             }
 
-            ReleaseHandle(itemHandle);
-            ReleaseHandle(weaponHandle);
-            ReleaseHandle(buffHandle);
-            ReleaseHandle(enemyHandle);
             ItemDatabase.ClearRuntimeDatabase(Items);
-        }
-
-        /// <summary>
-        /// 执行 ReleaseHandle 逻辑.
-        /// </summary>
-        private static void ReleaseHandle<TDatabase>(AsyncOperationHandle<TDatabase> handle)
-        {
-            if (handle.IsValid())
-            {
-                Addressables.Release(handle);
-            }
         }
     }
 }

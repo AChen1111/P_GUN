@@ -1,3 +1,6 @@
+using System;
+using System.Threading.Tasks;
+using Game.Gameplay;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Game.UI.Save;
@@ -10,6 +13,7 @@ namespace Game.UI
         [Header("主菜单面板")]
         [SerializeField] private SettingsPanel settingsPanel;
         [SerializeField] private SaveSlotPanel saveSlotPanel;
+        private bool isStartingGame;
 
 		/// <summary>
 		/// 初始化运行时依赖.
@@ -45,10 +49,40 @@ namespace Game.UI
         /// <summary>
         /// 执行 StartGame 逻辑.
         /// </summary>
-        public void StartGame()
+        public async void StartGame()
 		{
-			SceneManager.LoadScene("GameScene");
+            if (isStartingGame)
+            {
+                return;
+            }
+
+            isStartingGame = true;
+            try
+            {
+                await EnsureDatabasesLoadedAsync();
+			    SceneManager.LoadScene("GameScene");
+            }
+            catch (Exception exception)
+            {
+                isStartingGame = false;
+                Debug.LogError($"{nameof(MainPanel)}: 进入游戏失败, Error: {exception.Message}", this);
+                throw;
+            }
 		}
+
+        /// <summary>
+        /// 进入 GameScene 前加载全局数据库.
+        /// </summary>
+        private static Task EnsureDatabasesLoadedAsync()
+        {
+            var manager = DataBaseManager.Instance;
+            if (manager == null)
+            {
+                throw new InvalidOperationException($"{nameof(DataBaseManager)} must exist before entering GameScene.");
+            }
+
+            return manager.EnsureLoadedAsync();
+        }
 		/// <summary>
 		/// 执行 ExitGame 逻辑.
 		/// </summary>

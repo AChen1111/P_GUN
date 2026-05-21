@@ -35,14 +35,18 @@ Current `GameEvent` includes player health/death/game events, player Buff change
 
 Location: `Assets/Scripts/Gameplay/Managers/DataBaseManager.cs`
 
-`DataBaseManager` is a persistent singleton that lives in the `Root` scene and loads global databases through Addressables:
+`AddressableLoader` lives in `Assets/Scripts/Core/HotUpdate` and is the runtime Addressables asset loader singleton. It is explicitly attached in `Root`, caches assets by address, coalesces concurrent `LoadAssetAsync<T>()` calls, supports `TryGetLoadedAsset<T>()`, and owns Addressables handle release.
+
+`AddressableDiagnostics` lives in the same folder and builds failure reports for missing or unreachable bundles. `RootHotUpdateController` uses it when dependency downloads fail, and `AddressableLoader` uses it when an address load fails so logs include the required `.bundle` names.
+
+`DataBaseManager` is a persistent singleton that lives in the `Root` scene and loads global databases through `AddressableLoader`:
 
 - `ItemDatabase`
 - `WeaponDatabase`
 - `BuffDataBase`
 - `EnemyDatabase`
 
-Call `LoadAllAsync()` from `RootHotUpdateController` before entering gameplay. Runtime systems typically prefer explicitly assigned database references, then fall back to `DataBaseManager.Instance`; `Item` can also use `ItemDatabase.RuntimeDatabase` after `DataBaseManager` finishes loading.
+Call `EnsureLoadedAsync()` before entering `GameScene` or restoring a save. `RootHotUpdateController` no longer loads databases; main menu start and save load UI trigger database loading on demand. Runtime systems typically prefer explicitly assigned database references, then fall back to `DataBaseManager.Instance`; `Item` can also use `ItemDatabase.RuntimeDatabase` after `DataBaseManager` finishes loading.
 
 ## Pooling
 
@@ -87,7 +91,9 @@ Locations:
 
 `ItemDatabase` stores all `ItemData` and queries by `itemId`.
 
-`ItemSpawnTableSO` stores weighted prefab entries. Entries may use `itemId`, Addressables address, or a legacy direct prefab reference. Runtime spawning should resolve prefabs through `TryResolvePrefab` or `TryGetRandomPrefab`, because these APIs prefer `AddressableRuntimeContent` hot-update prefabs before falling back to legacy references. It does not own display data.
+`ItemSpawnTableSO` stores weighted prefab entries. Entries may use `itemId`, Addressables address, or a legacy direct prefab reference. Runtime spawning should use `TryResolvePrefabAsync` or `TryGetRandomPrefabAsync` so item prefabs are loaded on demand through `AddressableLoader`; legacy synchronous APIs only use already-loaded or direct prefab references. It does not own display data.
+
+`AddressableItemAddressCatalog` stores the current v1 itemId-to-address map for saved inventory effect restoration and legacy prefab replacement. Add new hot-update item prefab addresses there when adding new item IDs.
 
 `Item` is the runtime pickup component. It:
 
@@ -226,7 +232,7 @@ Important `Gun` concepts:
 
 Known concrete weapons include AK, AWP, Bow, Laser, MP5, Pistol, RocketGun, and ShotGun.
 
-At runtime, the `Player` first checks `AddressableRuntimeContent` for the fixed weapon address order `weapon/pistol`, `weapon/ak`, `weapon/awp`, `weapon/bow`, `weapon/laser`, `weapon/mp5`, `weapon/rocket_gun`, `weapon/shotgun`. When the Root preload is ready, those prefabs are instantiated under the player `Weapon` node and replace the player prefab's serialized guns list. Direct GameScene play still uses the serialized fallback guns.
+At runtime, the `Player` loads the fixed weapon address order `weapon/pistol`, `weapon/ak`, `weapon/awp`, `weapon/bow`, `weapon/laser`, `weapon/mp5`, `weapon/rocket_gun`, `weapon/shotgun` through `AddressableLoader`. The prefabs are instantiated under the player `Weapon` node and replace the player prefab's serialized guns list; combat input is ignored until the async loadout is ready.
 
 ## Enemies And Rooms
 
@@ -255,7 +261,7 @@ Important behavior:
 
 Rooms track fight progression. `FightRoom.NotifyEnemyDefeated(this)` is part of enemy death cleanup. When editing enemies, preserve room ownership cleanup to avoid stale fight-room state after pooling.
 
-`GameScene` uses `AddressableDungeonBootstrapper` on the Edgar `DungeonGeneratorGrid2D` owner. The generator should stay `GenerateOn = Manually`; the bootstrapper loads `room/level1` from `AddressableRuntimeContent`, assigns `FixedLevelGraphConfig.LevelGraph`, then calls `Generate()`. Direct GameScene play can fall back to the inspector-assigned level graph.
+`GameScene` uses `AddressableDungeonBootstrapper` on the Edgar `DungeonGeneratorGrid2D` owner. The generator should stay `GenerateOn = Manually`; the bootstrapper loads `room/level1` through `AddressableLoader`, assigns `FixedLevelGraphConfig.LevelGraph`, then calls `Generate()`.
 
 ## Animation And Presentation
 
@@ -406,12 +412,13 @@ Current hot-update Addressables groups are:
 - `Item`: `ItemDatabase` and item prefabs.
 - `Enemy`: `EnemyDatabase` and enemy prefabs.
 - `Weapon`: `WeaponDatabase` and weapon prefabs.
+- `Shared`: duplicated cross-group dependencies, including common bullet prefabs, player weapon sprites, shared SFX, `AudioMixer`, font assets, and shared URP 2D sprite render assets.
 
 These groups are Local-first hot-update groups. Their `BuildPath` and `LoadPath` use `Local.BuildPath` and `Local.LoadPath`, so the first player build includes the bundles in the package. The project still builds a remote catalog, with `Remote.BuildPath = ServerData/P_GUN/[BuildTarget]` and `Remote.LoadPath = https://achen1o1.xyz/AB/P_GUN/[BuildTarget]`. Each group keeps `ContentUpdateGroupSchema.StaticContent` enabled (`Prevent Updates` in the Inspector), so later updates should be produced with the official Addressables `Update a Previous Build` workflow and the original `addressables_content_state.bin`. Upload generated remote catalog/hash/bundles to `/www/wwwroot/39.97.56.180/AB/P_GUN/[BuildTarget]` on the Nginx server. Do not put first-package-only scene, UI, player, bullet, or VFX assets into Addressables unless they are explicitly intended to hot update.
 
 Generated `Content Update*` groups must use `Remote.BuildPath` and `Remote.LoadPath` before building/uploading update bundles. Use `PG/Addressables/一键保存上传` for routine hot-update publishing; it also validates the catalog and blocks uploads when a `contentupdate__*.bundle` still points to `Addressables.RuntimePath` or `StreamingAssets`.
 
-`Root` is the first Build Settings scene, followed by `StartScene` and `GameScene`. It owns the explicit scene singletons `DataBaseManager`, `LuaManager`, `AddressableRuntimeContent`, and `RootHotUpdateController`. Addressables `DisableCatalogUpdateOnStartup` is enabled so `RootHotUpdateController` owns the update UI timing. The boot flow initializes Addressables, checks and updates catalogs, downloads labels `room`, `buff`, `item`, `enemy`, and `weapon`, loads databases, preloads runtime Addressables content, then loads `StartScene`. Network/catalog/download failures may log and continue with built-in or cached content; missing databases or required runtime content are configuration errors and should fail loudly.
+`Root` is the first Build Settings scene, followed by `StartScene` and `GameScene`. It owns the explicit scene singletons `DataBaseManager`, `LuaManager`, `AddressableLoader`, and `RootHotUpdateController`. Addressables `DisableCatalogUpdateOnStartup` is enabled so `RootHotUpdateController` owns the update UI timing. The boot flow initializes Addressables, checks and updates catalogs, downloads labels `room`, `buff`, `item`, `enemy`, `weapon`, and `shared`, then loads `StartScene`. Databases, room graphs, item prefabs, and weapon prefabs are loaded later by the concrete systems that need them. Network/catalog/download failures may log and continue with built-in or cached content; missing databases or required runtime content are configuration errors and should fail loudly.
 
 ## Current Refactor Notes
 

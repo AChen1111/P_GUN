@@ -1,4 +1,6 @@
 using System.Collections;
+using System;
+using System.Threading.Tasks;
 using Edgar.Unity;
 using Game.Core;
 using Game.Gameplay.Save;
@@ -19,6 +21,7 @@ namespace Game.Gameplay
         public static AddressableDungeonBootstrapper Active { get; private set; }
 
         private bool generated;
+        private bool isGenerating;
         private int lastGeneratedSeed;
 
         public string LevelGraphAddress => levelGraphAddress;
@@ -69,53 +72,83 @@ namespace Game.Gameplay
         /// <summary>
         /// 执行 Generate 逻辑.
         /// </summary>
-        public void Generate()
+        public async void Generate()
         {
-            if (generated) return;
+            try
+            {
+                await GenerateAsync();
+            }
+            catch (Exception exception)
+            {
+                Debug.LogError($"{nameof(AddressableDungeonBootstrapper)}: 生成房间失败, Error: {exception.Message}", this);
+                throw;
+            }
+        }
 
+        /// <summary>
+        /// 异步加载关卡图后生成房间.
+        /// </summary>
+        public async Task GenerateAsync()
+        {
+            if (generated || isGenerating) return;
+
+            isGenerating = true;
             ResolveGenerator();
-            if (dungeonGenerator == null)
+            try
             {
-                throw new System.InvalidOperationException($"{nameof(AddressableDungeonBootstrapper)} requires {nameof(DungeonGeneratorGrid2D)}.");
-            }
+                if (dungeonGenerator == null)
+                {
+                    throw new InvalidOperationException($"{nameof(AddressableDungeonBootstrapper)} requires {nameof(DungeonGeneratorGrid2D)}.");
+                }
 
-            SaveGameService.ApplyPendingGenerationSettings(this, dungeonGenerator);
-            ApplyAddressableLevelGraph();
-            if (dungeonGenerator.FixedLevelGraphConfig.LevelGraph == null)
+                SaveGameService.ApplyPendingGenerationSettings(this, dungeonGenerator);
+                await ApplyAddressableLevelGraphAsync();
+                if (dungeonGenerator.FixedLevelGraphConfig.LevelGraph == null)
+                {
+                    throw new InvalidOperationException($"{nameof(AddressableDungeonBootstrapper)} requires a loaded LevelGraph.");
+                }
+
+                generated = true;
+                var payload = dungeonGenerator.Generate() as DungeonGeneratorPayloadGrid2D;
+                // 保存 Edgar 实际使用的 seed, 读档时用它重建同一张地图.
+                lastGeneratedSeed = payload?.GeneratedLevel != null ? payload.GeneratedLevel.Seed : dungeonGenerator.RandomGeneratorSeed;
+                StartCoroutine(RestorePendingSaveNextFrame());
+            }
+            finally
             {
-                throw new System.InvalidOperationException($"{nameof(AddressableDungeonBootstrapper)} requires a loaded LevelGraph.");
+                isGenerating = false;
             }
-
-            generated = true;
-            var payload = dungeonGenerator.Generate() as DungeonGeneratorPayloadGrid2D;
-            // 保存 Edgar 实际使用的 seed, 读档时用它重建同一张地图.
-            lastGeneratedSeed = payload?.GeneratedLevel != null ? payload.GeneratedLevel.Seed : dungeonGenerator.RandomGeneratorSeed;
-            StartCoroutine(RestorePendingSaveNextFrame());
 
             IEnumerator RestorePendingSaveNextFrame()
             {
                 // 房间实例的 Start 会在生成后一帧执行, 等门和房间初始化完成后再覆盖存档状态.
                 yield return null;
-                SaveGameService.TryRestorePendingSave();
-            }
+                var restoreTask = SaveGameService.TryRestorePendingSaveAsync();
+                while (!restoreTask.IsCompleted)
+                {
+                    yield return null;
+                }
 
-            void ApplyAddressableLevelGraph()
+                if (restoreTask.IsFaulted)
+                {
+                    throw restoreTask.Exception;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 通过 AddressableLoader 加载关卡图.
+        /// </summary>
+        private async Task ApplyAddressableLevelGraphAsync()
+        {
+            var loader = AddressableLoader.Instance;
+            if (loader == null)
             {
-                var content = AddressableRuntimeContent.Instance;
-                if (content == null)
-                {
-                    throw new System.InvalidOperationException($"{nameof(AddressableDungeonBootstrapper)} requires {nameof(AddressableRuntimeContent)}.");
-                }
-
-                if (content.TryGetAsset<LevelGraph>(levelGraphAddress, out var levelGraph))
-                {
-                    dungeonGenerator.FixedLevelGraphConfig.LevelGraph = levelGraph;
-                    return;
-                }
-
-                throw new System.InvalidOperationException($"{nameof(AddressableDungeonBootstrapper)} missing preloaded LevelGraph, Address: {levelGraphAddress}.");
+                throw new InvalidOperationException($"{nameof(AddressableDungeonBootstrapper)} requires {nameof(AddressableLoader)}.");
             }
-}
+
+            dungeonGenerator.FixedLevelGraphConfig.LevelGraph = await loader.LoadAssetAsync<LevelGraph>(levelGraphAddress);
+        }
 
         /// <summary>
         /// 执行 OverrideLevelGraphAddress 逻辑.

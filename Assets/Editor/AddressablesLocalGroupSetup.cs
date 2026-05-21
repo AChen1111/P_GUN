@@ -74,6 +74,36 @@ public static class AddressablesLocalGroupSetup
                 Entry("Assets/Prefab/GunList/Pistol.prefab", "weapon/pistol", "weapon", "prefab"),
                 Entry("Assets/Prefab/GunList/RocketGun.prefab", "weapon/rocket_gun", "weapon", "prefab"),
                 Entry("Assets/Prefab/GunList/ShotGun.prefab", "weapon/shotgun", "weapon", "prefab")
+            }),
+        new HotUpdateGroupDefinition(
+            "Shared",
+            new[]
+            {
+                Entry("Assets/GameDataSO/ItemSpawnerTable/NormalRoomItemTable.asset", "shared/gamedataso/itemspawnertable/normalroomitemtable", "shared"),
+                Entry("Assets/Audio/SFX/Player/Gun/GunSFX/AKShootEnd.mp3", "shared/audio/sfx/player/gun/gunsfx/akshootend", "shared"),
+                Entry("Assets/Assets/Player/Gun/Arrow.png", "shared/assets/player/gun/arrow", "shared"),
+                Entry("Assets/Assets/Player/Gun/ShotGun.png", "shared/assets/player/gun/shotgun", "shared"),
+                Entry("Assets/Assets/Player/Gun/AWP.png", "shared/assets/player/gun/awp", "shared"),
+                Entry("Assets/Prefab/Bullet/ArrowBullet.prefab", "shared/prefab/bullet/arrowbullet", "shared"),
+                Entry("Assets/Audio/AudioMixer/AudioMixer.mixer", "shared/audio/audiomixer/audiomixer", "shared"),
+                Entry("Assets/Prefab/Bullet/PlayerBullet.prefab", "shared/prefab/bullet/playerbullet", "shared"),
+                Entry("Assets/Audio/SFX/BulletHit/BulletHitBody01.wav", "shared/audio/sfx/bullethit/bullethitbody01", "shared"),
+                Entry("Assets/Assets/Player/Gun/Bow.png", "shared/assets/player/gun/bow", "shared"),
+                Entry("Assets/Assets/Player/Gun/RocketGun.png", "shared/assets/player/gun/rocketgun", "shared"),
+                Entry("Assets/Assets/Player/Gun/Lazer.png", "shared/assets/player/gun/lazer", "shared"),
+                Entry("Assets/Audio/SFX/BulletHit/BulletHitBody03.wav", "shared/audio/sfx/bullethit/bullethitbody03", "shared"),
+                Entry("Packages/com.unity.render-pipelines.universal/Runtime/Materials/Sprite-Lit-Default.mat", "shared/com.unity.render-pipelines.universal/runtime/materials/sprite-lit-default", "shared"),
+                Entry("Assets/Assets/Fonts/VonwaonBitmap-16px.ttf", "shared/assets/fonts/vonwaonbitmap-16px", "shared"),
+                Entry("Assets/Audio/SFX/BulletHit/BulletHitWall01.wav", "shared/audio/sfx/bullethit/bullethitwall01", "shared"),
+                Entry("Assets/Assets/Player/Gun/LazerBullet.png", "shared/assets/player/gun/lazerbullet", "shared"),
+                Entry("Assets/Assets/Player/Gun/AK.png", "shared/assets/player/gun/ak", "shared"),
+                Entry("Assets/Assets/Player/Gun/LazerM.mat", "shared/assets/player/gun/lazerm", "shared"),
+                Entry("Assets/Assets/Player/Gun/RocketBullet.png", "shared/assets/player/gun/rocketbullet", "shared"),
+                Entry("Packages/com.unity.render-pipelines.universal/Shaders/2D/Sprite-Lit-Default.shader", "shared/com.unity.render-pipelines.universal/shaders/2d/sprite-lit-default", "shared"),
+                Entry("Assets/Assets/Player/Gun/MP5.png", "shared/assets/player/gun/mp5", "shared"),
+                Entry("Assets/Assets/Player/Gun/Pistol.png", "shared/assets/player/gun/pistol", "shared"),
+                Entry("Assets/Assets/Player/PlayerBullet.png", "shared/assets/player/playerbullet", "shared"),
+                Entry("Assets/Audio/SFX/BulletHit/BulletHitBody02.wav", "shared/audio/sfx/bullethit/bullethitbody02", "shared")
             })
     };
 

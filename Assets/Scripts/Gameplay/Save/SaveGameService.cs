@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using Edgar.Unity;
 using Game.Core;
 using Game.Items;
@@ -225,10 +226,46 @@ namespace Game.Gameplay.Save
                 return SaveOperationResult.Fail("读取失败, 槽位为空.");
             }
 
-            // 读档统一重载 GameScene, 避免旧地图 seed, 敌人, 掉落物或房间实例残留.
+            return BeginLoadFromData(data);
+        }
+
+        /// <summary>
+        /// 异步读档入口, 主菜单读档前先确保全局数据库已经加载.
+        /// </summary>
+        public static async Task<SaveOperationResult> LoadFromSlotAsync(int slotIndex)
+        {
+            var data = SaveSlotStorage.ReadSlot(slotIndex);
+            if (data == null)
+            {
+                return SaveOperationResult.Fail("读取失败, 槽位为空.");
+            }
+
+            await EnsureDatabasesLoadedAsync();
+            return BeginLoadFromData(data);
+        }
+
+        /// <summary>
+        /// 记录待读取数据并切换到游戏场景.
+        /// </summary>
+        private static SaveOperationResult BeginLoadFromData(GameSaveData data)
+        {
             pendingLoadData = data;
             SceneManager.LoadScene(GameplaySceneName);
             return SaveOperationResult.Ok("正在进入游戏场景并恢复存档.", data);
+        }
+
+        /// <summary>
+        /// 确保读档恢复前数据库可用.
+        /// </summary>
+        private static Task EnsureDatabasesLoadedAsync()
+        {
+            var manager = DataBaseManager.Instance;
+            if (manager == null)
+            {
+                throw new InvalidOperationException($"{nameof(DataBaseManager)} must exist before loading save.");
+            }
+
+            return manager.EnsureLoadedAsync();
         }
 
         /// <summary>
@@ -269,6 +306,25 @@ namespace Game.Gameplay.Save
             }
 
             var result = RestoreSaveData(pendingLoadData);
+            if (result.Success)
+            {
+                pendingLoadData = null;
+            }
+
+            return result.Success;
+        }
+
+        /// <summary>
+        /// 异步恢复待读档数据, 允许玩家按需加载武器和背包效果资源.
+        /// </summary>
+        public static async Task<bool> TryRestorePendingSaveAsync()
+        {
+            if (pendingLoadData == null)
+            {
+                return false;
+            }
+
+            var result = await RestoreSaveDataAsync(pendingLoadData);
             if (result.Success)
             {
                 pendingLoadData = null;
@@ -357,5 +413,107 @@ namespace Game.Gameplay.Save
                 }
             }
 }
+
+        /// <summary>
+        /// 执行异步 RestoreSaveData 逻辑.
+        /// </summary>
+        private static async Task<SaveOperationResult> RestoreSaveDataAsync(GameSaveData data)
+        {
+            if (data == null)
+            {
+                return SaveOperationResult.Fail("读档失败, 存档数据为空.");
+            }
+
+            if (SceneManager.GetActiveScene().name != GameplaySceneName)
+            {
+                pendingLoadData = data;
+                SceneManager.LoadScene(GameplaySceneName);
+                return SaveOperationResult.Ok("正在进入游戏场景并恢复存档.", data);
+            }
+
+            RestoreRooms(data);
+
+            var player = Global.player;
+            if (player == null)
+            {
+                return SaveOperationResult.Fail("读档失败, 找不到玩家.");
+            }
+
+            await player.RestoreSaveDataAsync(data.player);
+            RestoreCurrentRoom(data.currentRoomId);
+            Debug.Log($"读档完成, Scene: {data.sceneName}, Room: {data.currentRoomId}.");
+            return SaveOperationResult.Ok("读档完成.", data);
+        }
+
+        /// <summary>
+        /// 恢复玩家当前所在房间.
+        /// </summary>
+        private static void RestoreCurrentRoom(string currentRoomId)
+        {
+            if (string.IsNullOrWhiteSpace(currentRoomId))
+            {
+                return;
+            }
+
+            var rooms = Room.ActiveRooms;
+            for (var i = 0; i < rooms.Count; i++)
+            {
+                var room = rooms[i];
+                if (room == null || room.SaveRoomId != currentRoomId)
+                {
+                    continue;
+                }
+
+                Room.SetCurrentPlayerRoom(room);
+                if (room.TryGetComponent<MinimapRoomData>(out var minimapData))
+                {
+                    minimapData.Highlight();
+                }
+
+                return;
+            }
+        }
+
+        /// <summary>
+        /// 恢复房间安全点状态.
+        /// </summary>
+        private static void RestoreRooms(GameSaveData data)
+        {
+            if (data.rooms == null || data.rooms.Count == 0)
+            {
+                return;
+            }
+
+            var roomsById = new Dictionary<string, Room>();
+            var rooms = Room.ActiveRooms;
+            for (var i = 0; i < rooms.Count; i++)
+            {
+                var room = rooms[i];
+                if (room == null || string.IsNullOrWhiteSpace(room.SaveRoomId))
+                {
+                    continue;
+                }
+
+                roomsById[room.SaveRoomId] = room;
+            }
+
+            for (var i = 0; i < data.rooms.Count; i++)
+            {
+                var roomData = data.rooms[i];
+                if (roomData == null || string.IsNullOrWhiteSpace(roomData.roomId))
+                {
+                    continue;
+                }
+
+                if (roomsById.TryGetValue(roomData.roomId, out var room))
+                {
+                    room.RestoreSaveData(roomData);
+                }
+                else
+                {
+                    Debug.LogWarning($"读档时找不到房间, RoomId: {roomData.roomId}.");
+                }
+            }
+        }
     }
 }

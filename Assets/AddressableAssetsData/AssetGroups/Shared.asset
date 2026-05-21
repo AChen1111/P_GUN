@@ -1,0 +1,181 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: Shared
+  m_EditorClassIdentifier: 
+  m_GroupName: Shared
+  m_Data:
+    m_SerializedData: []
+  m_GUID: d71024e3a5ce28449bb9e1ce8a458a4e
+  m_SerializeEntries:
+  - m_GUID: 0b78e19efc2cfbe45aeaae9e06e3b46f
+    m_Address: shared/gamedataso/itemspawnertable/normalroomitemtable
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - shared
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1e108a665f3ec78488b43fa3772b48b3
+    m_Address: shared/audio/sfx/player/gun/gunsfx/akshootend
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - shared
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 21548d9a6bfc5f243bf869ac2d4f86e6
+    m_Address: shared/assets/player/gun/arrow
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - shared
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 277985b7cfc3c954a9449e86c21cceed
+    m_Address: shared/assets/player/gun/shotgun
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - shared
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 406ef51de9dbb2f46be8cc1c646c5f93
+    m_Address: shared/assets/player/gun/awp
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - shared
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 509b372a670abc94c8dec5ddcce60e69
+    m_Address: shared/prefab/bullet/arrowbullet
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - shared
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 569809b44565dc442ba3ee727965ff13
+    m_Address: shared/audio/audiomixer/audiomixer
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - shared
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 576871a843cdcfa4facd211562818436
+    m_Address: shared/prefab/bullet/playerbullet
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - shared
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5910836691605a847a7138b387ed0bb8
+    m_Address: shared/audio/sfx/bullethit/bullethitbody01
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - shared
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5df31018abae18f4ab952981d9592330
+    m_Address: Assets/GameDataSO/ItemSpawnerTable/RoomEndTable.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - shared
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6e00296dcbf12324dac4fcfe2f416287
+    m_Address: shared/assets/player/gun/bow
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - shared
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7127fbc26c4ba0f49ac610f697dd5947
+    m_Address: shared/assets/player/gun/rocketgun
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - shared
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 81af13a4162b539469c8f22e41efbdd6
+    m_Address: shared/assets/player/gun/lazer
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - shared
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 95b2f6eb055766443ae1f8c9e647b3c2
+    m_Address: shared/audio/sfx/bullethit/bullethitbody03
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - shared
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a97c105638bdf8b4a8650670310a4cd3
+    m_Address: shared/com.unity.render-pipelines.universal/runtime/materials/sprite-lit-default
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - shared
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: aa945eefd1047034399d2d189e498e7c
+    m_Address: shared/assets/fonts/vonwaonbitmap-16px
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - shared
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b2dbfa8029e7085438df38aa4fb76b78
+    m_Address: shared/audio/sfx/bullethit/bullethitwall01
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - shared
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b2e3e02936baca84d81f905285107f1e
+    m_Address: shared/assets/player/gun/lazerbullet
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - shared
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c4f5774d1bbe5a04a9d2630a39f0abfc
+    m_Address: shared/assets/player/gun/ak
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - shared
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e03d6ca3ecc84a24882f6d129b3049cc
+    m_Address: shared/assets/player/gun/lazerm
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - shared
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e19648954dbfd1a40a67456fee495a8a
+    m_Address: shared/assets/player/gun/rocketbullet
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - shared
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e260cfa7296ee7642b167f1eb5be5023
+    m_Address: shared/com.unity.render-pipelines.universal/shaders/2d/sprite-lit-default
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - shared
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e80c7e6080d1edf46a3126017004c41f
+    m_Address: shared/assets/player/gun/mp5
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - shared
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ebd35303f0034ee4aab06bfced6d81de
+    m_Address: shared/assets/player/gun/pistol
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - shared
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f1ac879a30b0c4c4897ed49c5c9ee059
+    m_Address: shared/assets/player/playerbullet
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - shared
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f968faf5cbe8f1049a54591745eac144
+    m_Address: shared/audio/sfx/bullethit/bullethitbody02
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - shared
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 63af2ccf367b1c745b05c3dc480c23af, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 4529414f59132f54181d8373498c5512, type: 2}
+    - {fileID: 11400000, guid: dc09fb27aa91df04cbcd1cd8fe1aa058, type: 2}

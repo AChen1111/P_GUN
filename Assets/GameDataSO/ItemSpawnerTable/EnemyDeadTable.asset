@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 450f8c7e836e4394910c7ac76642fbed, type: 3}
-  m_Name: NormalRoomItemTable
+  m_Name: EnemyDeadTable
   m_EditorClassIdentifier: 
   entries:
   - prefab: {fileID: 5069590999830702722, guid: a4f46db2f0b85564a81ad43c4f0b8880, type: 3}

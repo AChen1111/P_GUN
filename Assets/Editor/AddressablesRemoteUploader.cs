@@ -5,8 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using UnityEditor;
-using UnityEditor.AddressableAssets;
-using UnityEditor.AddressableAssets.Build;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
@@ -15,7 +13,6 @@ public static class AddressablesRemoteUploader
 {
     private const string MenuPath = "PG/Addressables/一键保存上传";
     private const string LocalRelativeDirectory = "ServerData/P_GUN/StandaloneWindows64";
-    private const string ContentStateRelativePath = "Assets/AddressableAssetsData/Windows/addressables_content_state.bin";
     private const string RemoteHost = "39.97.56.180";
     private const string RemoteUser = "root";
     private const string RemoteDirectory = "/www/wwwroot/39.97.56.180/AB/P_GUN/StandaloneWindows64";
@@ -26,8 +23,6 @@ public static class AddressablesRemoteUploader
         try
         {
             SaveEditorChanges();
-            AddressablesLocalGroupSetup.ConfigureContentUpdateGroupsForRemote();
-            BuildContentUpdate();
 
             var localDirectory = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), LocalRelativeDirectory));
             ValidateLocalUploadDirectory(localDirectory);
@@ -70,37 +65,6 @@ public static class AddressablesRemoteUploader
         // 先保存当前编辑器改动, 避免构建到旧的序列化内容.
         EditorSceneManager.SaveOpenScenes();
         AssetDatabase.SaveAssets();
-        AssetDatabase.Refresh();
-    }
-
-    private static void BuildContentUpdate()
-    {
-        EditorUtility.DisplayProgressBar("Addressables 一键保存上传", "构建内容更新包...", 0.25f);
-
-        var settings = AddressableAssetSettingsDefaultObject.Settings;
-        if (settings == null)
-        {
-            throw new InvalidOperationException("Addressables settings not found.");
-        }
-
-        var contentStatePath = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), ContentStateRelativePath));
-        if (!File.Exists(contentStatePath))
-        {
-            throw new FileNotFoundException("找不到首包 content state, 无法执行 Update a Previous Build.", contentStatePath);
-        }
-
-        // 使用首包 content state 构建增量包, 保持已发布客户端的 catalog 版本兼容.
-        var result = ContentUpdateScript.BuildContentUpdate(settings, contentStatePath);
-        if (result == null)
-        {
-            throw new InvalidOperationException("Addressables content update build returned null.");
-        }
-
-        if (!string.IsNullOrEmpty(result.Error))
-        {
-            throw new InvalidOperationException(result.Error);
-        }
-
         AssetDatabase.Refresh();
     }
 
@@ -190,7 +154,7 @@ public static class AddressablesRemoteUploader
     [MenuItem(MenuPath, true)]
     private static bool ValidateSaveBuildAndUpload()
     {
-        return File.Exists(Path.Combine(Directory.GetCurrentDirectory(), ContentStateRelativePath));
+        return Directory.Exists(Path.Combine(Directory.GetCurrentDirectory(), LocalRelativeDirectory));
     }
 
     private static void EnsureRemoteDirectory()

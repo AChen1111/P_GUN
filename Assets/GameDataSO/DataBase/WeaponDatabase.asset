@@ -19,7 +19,7 @@ MonoBehaviour:
     - {fileID: 8300000, guid: 98ed46cee309cdd44a4b35d7a853b8cd, type: 3}
     reloadSound: {fileID: 8300000, guid: e83829ac711cc4b46887d2c2030cf5d8, type: 3}
     bulletSpeed: 50
-    minDamage: 11
+    minDamage: 12
     maxDamage: 20
     maxBulletBagNum: 100
     clipSize: 30

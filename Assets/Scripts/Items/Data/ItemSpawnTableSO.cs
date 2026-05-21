@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using Game.Core;
 using Game.Pooling;
@@ -49,17 +50,50 @@ namespace Game.Items
         }
 
         /// <summary>
+        /// 按权重异步获取一个随机物品预制体.
+        /// </summary>
+        public async Task<GameObject> TryGetRandomPrefabAsync()
+        {
+            if (TryGetRandomEntry(out var selectedEntry))
+            {
+                return await TryResolvePrefabAsync(selectedEntry);
+            }
+
+            return null;
+        }
+
+        /// <summary>
         /// 执行 TryResolvePrefab 逻辑.
         /// </summary>
         public bool TryResolvePrefab(ItemSpawnEntry entry, out GameObject prefab)
         {
-            if (TryResolveAddressablePrefab(entry, out prefab))
+            if (TryResolveLoadedAddressablePrefab(entry, out prefab))
             {
                 return true;
             }
 
             prefab = entry.prefab;
             return prefab != null;
+        }
+
+        /// <summary>
+        /// 异步解析物品预制体, 优先使用 Addressables 地址.
+        /// </summary>
+        public async Task<GameObject> TryResolvePrefabAsync(ItemSpawnEntry entry)
+        {
+            var address = ResolveAddress(entry);
+            if (!string.IsNullOrWhiteSpace(address))
+            {
+                var loader = AddressableLoader.Instance;
+                if (loader == null)
+                {
+                    throw new InvalidOperationException($"{nameof(AddressableLoader)} must exist before loading item prefab.");
+                }
+
+                return await loader.LoadAssetAsync<GameObject>(address);
+            }
+
+            return entry.prefab;
         }
 
         /// <summary>
@@ -100,31 +134,47 @@ namespace Game.Items
         /// </summary>
         private static bool HasResolvablePrefab(ItemSpawnEntry entry)
         {
-            return TryResolveAddressablePrefab(entry, out _) || entry.prefab != null;
+            return !string.IsNullOrWhiteSpace(ResolveAddress(entry)) || entry.prefab != null;
         }
 
         /// <summary>
-        /// 执行 TryResolveAddressablePrefab 逻辑.
+        /// 执行 TryResolveLoadedAddressablePrefab 逻辑.
         /// </summary>
-        private static bool TryResolveAddressablePrefab(ItemSpawnEntry entry, out GameObject prefab)
+        private static bool TryResolveLoadedAddressablePrefab(ItemSpawnEntry entry, out GameObject prefab)
         {
             prefab = null;
-            var content = AddressableRuntimeContent.Instance;
-            if (content == null) return false;
+            var loader = AddressableLoader.Instance;
+            if (loader == null) return false;
 
-            if (!string.IsNullOrWhiteSpace(entry.address)
-                && content.TryGetAsset<GameObject>(entry.address, out prefab))
+            var address = ResolveAddress(entry);
+            if (!string.IsNullOrWhiteSpace(address)
+                && loader.TryGetLoadedAsset<GameObject>(address, out prefab))
             {
                 return true;
             }
 
-            if (entry.itemId > 0 && content.TryGetPrefabById("item", entry.itemId, out prefab))
+            return false;
+        }
+
+        /// <summary>
+        /// 从配置项中解析 Addressables 地址.
+        /// </summary>
+        private static string ResolveAddress(ItemSpawnEntry entry)
+        {
+            if (!string.IsNullOrWhiteSpace(entry.address))
             {
-                return true;
+                return entry.address.Trim();
+            }
+
+            if (entry.itemId > 0 && AddressableItemAddressCatalog.TryGetAddress(entry.itemId, out var itemIdAddress))
+            {
+                return itemIdAddress;
             }
 
             var item = entry.prefab != null ? entry.prefab.GetComponent<Item>() : null;
-            return item != null && content.TryGetPrefabById("item", item.ItemId, out prefab);
+            return item != null && AddressableItemAddressCatalog.TryGetAddress(item.ItemId, out var prefabAddress)
+                ? prefabAddress
+                : null;
         }
     }
 }
