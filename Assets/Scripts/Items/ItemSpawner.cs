@@ -204,10 +204,6 @@ namespace Game.Items
             Debug.LogWarning("Item table is not set");
             return false;
         }
-
-        /// <summary>
-        /// 执行 PlaySpawnAnimation 逻辑.
-        /// </summary>
         private static void PlaySpawnAnimation(DOTweenAnimType animEffect, float animDuration, GameObject obj, Item item)
         {
             if(animEffect == DOTweenAnimType.None || DOTweenAnimMgr.Instance == null)
@@ -224,10 +220,6 @@ namespace Game.Items
                 }
             });
         }
-
-        /// <summary>
-        /// 执行 PlaySpawnAnimation 逻辑.
-        /// </summary>
         private static void PlaySpawnAnimation(string animEffectKey, float animDuration, GameObject obj, Item item)
         {
             if(string.IsNullOrEmpty(animEffectKey) || DOTweenAnimMgr.Instance == null)

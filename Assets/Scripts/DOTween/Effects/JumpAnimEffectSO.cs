@@ -10,10 +10,6 @@ namespace Game.Animation
         [SerializeField] private float jumpHeight = 0.35f;
         [SerializeField] private int bounceCount = 3;
         [SerializeField] private float leftDistance = 0.4f;
-
-        /// <summary>
-        /// 执行 Play 逻辑.
-        /// </summary>
         public override void Play(GameObject target, float duration, Action onComplete)
         {
             var t = target.transform;

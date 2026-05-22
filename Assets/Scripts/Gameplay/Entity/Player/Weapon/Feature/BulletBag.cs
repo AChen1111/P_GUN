@@ -51,19 +51,15 @@ namespace Game.Gameplay
                 currentBullet -= needBullet;
             }
 
-            EventCenter.Trigger(GameEvent.BulletBagChanged, this);
+            EventCenter.Trigger(GameplayEvents.BulletBagChanged, this);
             gunClip.Reload(reloadSound);
         }
-
-        /// <summary>
-        /// 执行 RestoreAmmo 逻辑.
-        /// </summary>
         public void RestoreAmmo(int currentBullet, int maxBullet)
         {
             // 读档恢复备弹时直接覆盖数量, 无限弹药保持 -1.
             this.maxBullet = maxBullet;
             this.currentBullet = maxBullet < 0 ? -1 : Mathf.Clamp(currentBullet, 0, Mathf.Max(0, maxBullet));
-            EventCenter.Trigger(GameEvent.BulletBagChanged, this);
+            EventCenter.Trigger(GameplayEvents.BulletBagChanged, this);
         }
 
     }

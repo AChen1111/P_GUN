@@ -14,36 +14,20 @@ namespace Game.Gameplay.Save
         private const string SnapshotFileNameFormat = "slot_{0}.png";
 
         public static string SaveFolderPath => Path.Combine(Application.persistentDataPath, SaveFolderName);
-
-        /// <summary>
-        /// 执行 GetSlotPath 逻辑.
-        /// </summary>
         public static string GetSlotPath(int slotIndex)
         {
             ValidateSlot(slotIndex);
             return Path.Combine(SaveFolderPath, string.Format(SaveFileNameFormat, slotIndex));
         }
-
-        /// <summary>
-        /// 执行 GetSnapshotPath 逻辑.
-        /// </summary>
         public static string GetSnapshotPath(int slotIndex)
         {
             ValidateSlot(slotIndex);
             return Path.Combine(SaveFolderPath, string.Format(SnapshotFileNameFormat, slotIndex));
         }
-
-        /// <summary>
-        /// 执行 SlotExists 逻辑.
-        /// </summary>
         public static bool SlotExists(int slotIndex)
         {
             return File.Exists(GetSlotPath(slotIndex));
         }
-
-        /// <summary>
-        /// 执行 ReadSlot 逻辑.
-        /// </summary>
         public static GameSaveData ReadSlot(int slotIndex)
         {
             var path = GetSlotPath(slotIndex);
@@ -52,10 +36,6 @@ namespace Game.Gameplay.Save
             var json = File.ReadAllText(path);
             return JsonUtility.FromJson<GameSaveData>(json);
         }
-
-        /// <summary>
-        /// 执行 WriteSlot 逻辑.
-        /// </summary>
         public static void WriteSlot(int slotIndex, GameSaveData data)
         {
             if (data == null)
@@ -67,10 +47,6 @@ namespace Game.Gameplay.Save
             var json = JsonUtility.ToJson(data, true);
             File.WriteAllText(GetSlotPath(slotIndex), json);
         }
-
-        /// <summary>
-        /// 执行 DeleteSlot 逻辑.
-        /// </summary>
         public static bool DeleteSlot(int slotIndex)
         {
             var path = GetSlotPath(slotIndex);
@@ -85,10 +61,6 @@ namespace Game.Gameplay.Save
 
             return true;
         }
-
-        /// <summary>
-        /// 执行 ReadSummary 逻辑.
-        /// </summary>
         public static SaveSlotSummary ReadSummary(int slotIndex)
         {
             var summary = new SaveSlotSummary
@@ -117,10 +89,6 @@ namespace Game.Gameplay.Save
             summary.snapshotPath = GetSnapshotPath(slotIndex);
             return summary;
         }
-
-        /// <summary>
-        /// 执行 ValidateSlot 逻辑.
-        /// </summary>
         private static void ValidateSlot(int slotIndex)
         {
             if (slotIndex < 1 || slotIndex > SaveGameService.SlotCount)

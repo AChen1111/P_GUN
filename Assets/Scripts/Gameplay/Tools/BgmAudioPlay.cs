@@ -55,7 +55,7 @@ namespace Game.Gameplay
 
             // 监听场景激活变化, 让常驻 BGM 管理器根据当前场景切换音乐.
             SceneManager.activeSceneChanged += OnActiveSceneChanged;
-            EventCenter.AddListener(GameEvent.PlayerDied, PlayPlayerDeadBgm);
+            EventCenter.AddListener(CoreEvents.PlayerDied, PlayPlayerDeadBgm);
             PlayBgmByScene(SceneManager.GetActiveScene().name);
         }
 
@@ -64,7 +64,7 @@ namespace Game.Gameplay
             if (Instance != this) return;
 
             SceneManager.activeSceneChanged -= OnActiveSceneChanged;
-            EventCenter.RemoveListener(GameEvent.PlayerDied, PlayPlayerDeadBgm);
+            EventCenter.RemoveListener(CoreEvents.PlayerDied, PlayPlayerDeadBgm);
         }
 
         private void OnActiveSceneChanged(Scene previousScene, Scene nextScene)

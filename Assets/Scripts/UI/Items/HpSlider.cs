@@ -46,7 +46,7 @@ namespace Game.UI
         [Tooltip("扣血时 heart 缩小的倍率。")]
         public float damageShrinkScale = 0.72f;
 
-        [Header("可选：自动同步 Global")]
+        [Header("可选：自动同步 PlayerRegistry")]
         public bool autoSyncGlobalHp = true;
 
         readonly List<Image> _hearts = new List<Image>();
@@ -79,7 +79,7 @@ namespace Game.UI
         {
             if (autoSyncGlobalHp)
             {
-                EventCenter.AddListener<Player>(GameEvent.PlayerHPChanged, OnPlayerHPChanged);
+                EventCenter.AddListener(GameplayEvents.PlayerHPChanged, OnPlayerHPChanged);
                 BindGlobalPlayer();
             }
         }
@@ -90,7 +90,7 @@ namespace Game.UI
         void OnDisable()
         {
             if (autoSyncGlobalHp)
-                EventCenter.RemoveListener<Player>(GameEvent.PlayerHPChanged, OnPlayerHPChanged);
+                EventCenter.RemoveListener(GameplayEvents.PlayerHPChanged, OnPlayerHPChanged);
 
             StopAllAnimations(false);
         }
@@ -100,13 +100,9 @@ namespace Game.UI
         /// </summary>
         void OnDestroy()
         {
-            EventCenter.RemoveListener<Player>(GameEvent.PlayerHPChanged, OnPlayerHPChanged);
+            EventCenter.RemoveListener(GameplayEvents.PlayerHPChanged, OnPlayerHPChanged);
             StopAllAnimations(false);
         }
-
-        /// <summary>
-        /// 执行每帧更新逻辑.
-        /// </summary>
         void Update()
         {
             if (autoSyncGlobalHp)
@@ -252,13 +248,9 @@ namespace Game.UI
             _currentHp = Mathf.Clamp(hp, 0, _maxHp);
             RefreshByHpImmediate(_currentHp);
         }
-
-        /// <summary>
-        /// 执行 BindGlobalPlayer 逻辑.
-        /// </summary>
         void BindGlobalPlayer()
         {
-            var player = Global.player;
+            var player = PlayerRegistry.Current;
             if (ReferenceEquals(_boundPlayer, player)) return;
 
             _boundPlayer = player;
@@ -267,10 +259,6 @@ namespace Game.UI
             SyncFromPlayer(!_hasPlayedAutoSyncInitAnimation);
             _hasPlayedAutoSyncInitAnimation = true;
         }
-
-        /// <summary>
-        /// 执行 OnPlayerHPChanged 逻辑.
-        /// </summary>
         void OnPlayerHPChanged(Player player)
         {
             if (!autoSyncGlobalHp) return;
@@ -280,13 +268,9 @@ namespace Game.UI
 
             SyncFromPlayer(false);
         }
-
-        /// <summary>
-        /// 执行 SyncFromPlayer 逻辑.
-        /// </summary>
         void SyncFromPlayer(bool playInitAnimation)
         {
-            var player = _boundPlayer != null ? _boundPlayer : Global.player;
+            var player = _boundPlayer != null ? _boundPlayer : PlayerRegistry.Current;
             if (player == null) return;
 
             if (_maxHp != player.MaxHP || _hearts.Count != Mathf.CeilToInt(player.MaxHP / 2f))
@@ -311,10 +295,6 @@ namespace Game.UI
                 Heal(targetHp - _currentHp);
             }
         }
-
-        /// <summary>
-        /// 执行 PlayInitBuildAnimation 逻辑.
-        /// </summary>
         IEnumerator PlayInitBuildAnimation()
         {
             int hpToAnimate = Mathf.Min(Mathf.Clamp(_currentHp, 0, _maxHp), _hearts.Count * 2);
@@ -377,10 +357,6 @@ namespace Game.UI
 
             _initAnimationCoroutine = null;
         }
-
-        /// <summary>
-        /// 执行 RefreshByHpImmediate 逻辑.
-        /// </summary>
         void RefreshByHpImmediate(int hp)
         {
             int hpLeft = hp;
@@ -392,10 +368,6 @@ namespace Game.UI
                 hpLeft -= target;
             }
         }
-
-        /// <summary>
-        /// 执行 SetHeartValue 逻辑.
-        /// </summary>
         void SetHeartValue(int index, int value, bool applyScale = true)
         {
             if (index < 0 || index >= _hearts.Count || index >= _heartValues.Count) return;
@@ -408,10 +380,6 @@ namespace Game.UI
             if (applyScale)
                 ApplyHeartScale(heart);
         }
-
-        /// <summary>
-        /// 执行 AppendDamageStep 逻辑.
-        /// </summary>
         void AppendDamageStep(Sequence sequence, int index, int targetValue)
         {
             if (sequence == null || index < 0 || index >= _hearts.Count) return;
@@ -439,10 +407,6 @@ namespace Game.UI
             if (hpChangeStepInterval > 0f)
                 sequence.AppendInterval(hpChangeStepInterval);
         }
-
-        /// <summary>
-        /// 执行 AppendHealStep 逻辑.
-        /// </summary>
         void AppendHealStep(Sequence sequence, int index, int targetValue)
         {
             if (sequence == null || index < 0 || index >= _hearts.Count) return;
@@ -472,29 +436,17 @@ namespace Game.UI
             if (hpChangeStepInterval > 0f)
                 sequence.AppendInterval(hpChangeStepInterval);
         }
-
-        /// <summary>
-        /// 执行 PrepareHpChangeAnimation 逻辑.
-        /// </summary>
         void PrepareHpChangeAnimation()
         {
             StopAllAnimations(false);
             RefreshByHpImmediate(_currentHp);
         }
-
-        /// <summary>
-        /// 执行 StopAllAnimations 逻辑.
-        /// </summary>
         void StopAllAnimations(bool complete)
         {
             StopInitAnimation();
             KillHpChangeAnimation(complete);
             KillHeartTweens();
         }
-
-        /// <summary>
-        /// 执行 StopInitAnimation 逻辑.
-        /// </summary>
         void StopInitAnimation()
         {
             if (_initAnimationCoroutine == null) return;
@@ -502,10 +454,6 @@ namespace Game.UI
             StopCoroutine(_initAnimationCoroutine);
             _initAnimationCoroutine = null;
         }
-
-        /// <summary>
-        /// 执行 KillHpChangeAnimation 逻辑.
-        /// </summary>
         void KillHpChangeAnimation(bool complete)
         {
             if (_hpChangeSequence == null) return;
@@ -520,10 +468,6 @@ namespace Game.UI
 
             _hpChangeSequence = null;
         }
-
-        /// <summary>
-        /// 执行 KillHeartTweens 逻辑.
-        /// </summary>
         void KillHeartTweens()
         {
             for (int i = 0; i < _hearts.Count; i++)
@@ -544,10 +488,6 @@ namespace Game.UI
                 }
             }
         }
-
-        /// <summary>
-        /// 执行 PulseHeart 逻辑.
-        /// </summary>
         void PulseHeart(Image heart, float duration)
         {
             if (heart == null) return;
@@ -561,27 +501,15 @@ namespace Game.UI
                 .SetLoops(2, LoopType.Yoyo)
                 .SetUpdate(true);
         }
-
-        /// <summary>
-        /// 执行 ApplyHeartScale 逻辑.
-        /// </summary>
         void ApplyHeartScale(Image heart)
         {
             if (heart == null) return;
             heart.transform.localScale = GetHeartScale();
         }
-
-        /// <summary>
-        /// 执行 GetHeartScale 逻辑.
-        /// </summary>
         Vector3 GetHeartScale()
         {
             return Vector3.one * Mathf.Max(0f, heartScale);
         }
-
-        /// <summary>
-        /// 执行 GetOrCreateRow 逻辑.
-        /// </summary>
         Transform GetOrCreateRow(int rowIndex)
         {
             while (_rows.Count <= rowIndex)
@@ -620,10 +548,6 @@ namespace Game.UI
             layout.childForceExpandWidth = false;
             layout.childForceExpandHeight = false;
         }
-
-        /// <summary>
-        /// 执行 ClearAllHearts 逻辑.
-        /// </summary>
         void ClearAllHearts()
         {
             KillHeartTweens();

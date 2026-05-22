@@ -24,10 +24,6 @@ namespace Game.UI
             ResolveReferences();
             Hide();
         }
-
-        /// <summary>
-        /// 执行每帧更新逻辑.
-        /// </summary>
         private void Update()
         {
             if (!isVisible)
@@ -37,10 +33,6 @@ namespace Game.UI
 
             UpdatePosition(Input.mousePosition);
         }
-
-        /// <summary>
-        /// 执行 Show 逻辑.
-        /// </summary>
         public void Show(BuffRuntimeInfo info, Vector2 screenPosition)
         {
             if (info == null)
@@ -71,10 +63,6 @@ namespace Game.UI
 
             UpdatePosition(screenPosition);
         }
-
-        /// <summary>
-        /// 执行 Hide 逻辑.
-        /// </summary>
         public void Hide()
         {
             ResolveReferences();
@@ -89,10 +77,6 @@ namespace Game.UI
 
             gameObject.SetActive(false);
         }
-
-        /// <summary>
-        /// 执行 UpdatePosition 逻辑.
-        /// </summary>
         private void UpdatePosition(Vector2 screenPosition)
         {
             if (rectTransform == null)
@@ -103,10 +87,6 @@ namespace Game.UI
             // Tooltip 使用屏幕空间 Canvas, 直接跟随鼠标屏幕坐标.
             rectTransform.position = screenPosition + screenOffset;
         }
-
-        /// <summary>
-        /// 执行 ResolveReferences 逻辑.
-        /// </summary>
         private void ResolveReferences()
         {
             if (rectTransform == null)

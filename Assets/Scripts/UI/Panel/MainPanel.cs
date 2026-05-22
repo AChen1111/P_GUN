@@ -45,10 +45,6 @@ namespace Game.UI
             m_Btn_Setting.onClick.RemoveListener(OpenSettingPanel);
 			m_Btn_Quit.onClick.RemoveListener(ExitGame);
         }
-
-        /// <summary>
-        /// 执行 StartGame 逻辑.
-        /// </summary>
         public async void StartGame()
 		{
             if (isStartingGame)
@@ -83,16 +79,10 @@ namespace Game.UI
 
             return manager.EnsureLoadedAsync();
         }
-		/// <summary>
-		/// 执行 ExitGame 逻辑.
-		/// </summary>
 		public void ExitGame()
 		{
 			Application.Quit();
 		}
-		/// <summary>
-		/// 执行 OpenSettingPanel 逻辑.
-		/// </summary>
 		public void OpenSettingPanel()
 		{
             if (settingsPanel == null)
@@ -110,10 +100,6 @@ namespace Game.UI
             // 设置界面作为主菜单上的栈式弹窗打开.
             stackManager.Push(settingsPanel);
 		}
-
-        /// <summary>
-        /// 执行 OpenLoadPanel 逻辑.
-        /// </summary>
         public void OpenLoadPanel()
         {
             if (saveSlotPanel == null)

@@ -1,10 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Game.Core;
-using Game.Pooling;
-using Game.Animation;
-using Game.Presentation;
-using Game.Items;
 using Game.Gameplay.Save;
 
 namespace Game.Gameplay
@@ -38,10 +34,6 @@ namespace Game.Gameplay
         {
             owner = GetComponent<Player>();
         }
-
-        /// <summary>
-        /// 执行每帧更新逻辑.
-        /// </summary>
         private void Update()
         {
             var deltaTime = Time.deltaTime;
@@ -64,7 +56,7 @@ namespace Game.Gameplay
                     }
                 }
 
-                info.Buff.OnUpdate(info, frameDeltaTime);
+                TriggerOnUpdate(info, frameDeltaTime);
                 TriggerInterval(info, frameDeltaTime);
             }
 
@@ -77,7 +69,7 @@ namespace Game.Gameplay
                 while (info.IntervalTimer >= info.Interval && buffInfoMap.ContainsKey(info.Buff.Id))
                 {
                     info.IntervalTimer -= info.Interval;
-                    info.Buff.OnInterval(info);
+                    TriggerOnInterval(info);
                 }
             }
         }
@@ -181,7 +173,7 @@ namespace Game.Gameplay
                     return null;
                 }
 
-                var scriptInstance = scriptFactory.CreateBuffInstance(targetBuff);
+                var scriptInstance = scriptFactory.Invoke(targetBuff);
                 if (scriptInstance == null)
                 {
                     Debug.LogError($"{nameof(BuffManager)}: 创建 Buff 脚本实例失败, Buff: {targetBuff.BuffName}.", this);
@@ -190,10 +182,10 @@ namespace Game.Gameplay
 
                 var runtimeInfo = new BuffRuntimeInfo
                 {
-                    owner = owner != null ? owner : Global.player,
+                    owner = owner != null ? owner : PlayerRegistry.Current,
                     Source = buffSource,
                     Buff = targetBuff,
-                    LuaInstance = scriptInstance
+                    ScriptInstance = scriptInstance
                 };
 
                 ResetBuffRuntimeInfo(runtimeInfo, targetBuff, buffSource);
@@ -224,7 +216,7 @@ namespace Game.Gameplay
 
             var previousMaxHp = GetOwnerMaxHp();
             TriggerOnRemove(info);
-            info.LuaInstance?.Dispose();
+            DisposeScriptInstance(info);
             RemoveAt(info.Index);
             NotifyOwnerStatsChanged(previousMaxHp);
             NotifyBuffsChanged();
@@ -247,7 +239,7 @@ namespace Game.Gameplay
                 if (info.Buff.Tag != tag) continue;
 
                 TriggerOnRemove(info);
-                info.LuaInstance?.Dispose();
+                DisposeScriptInstance(info);
                 RemoveAt(info.Index);
                 removedCount++;
             }
@@ -267,7 +259,7 @@ namespace Game.Gameplay
         {
             if (buffInfoMap.TryGetValue(buffId, out var info))
             {
-                info.Buff.OnTrigger(info);
+                TriggerOnTrigger(info);
             }
         }
 
@@ -280,7 +272,7 @@ namespace Game.Gameplay
             for (var i = buffs.Count - 1; i >= 0; i--)
             {
                 TriggerOnRemove(buffs[i]);
-                buffs[i].LuaInstance?.Dispose();
+                DisposeScriptInstance(buffs[i]);
                 RemoveAt(i);
             }
 
@@ -288,10 +280,6 @@ namespace Game.Gameplay
             NotifyOwnerStatsChanged(previousMaxHp);
             NotifyBuffsChanged();
         }
-
-        /// <summary>
-        /// 执行 RestoreSaveData 逻辑.
-        /// </summary>
         public void RestoreSaveData(IEnumerable<BuffSaveData> savedBuffs, UnityEngine.Object source)
         {
             ClearBuffs();
@@ -386,7 +374,7 @@ namespace Game.Gameplay
         /// <returns>玩家当前最大生命.</returns>
         private int GetOwnerMaxHp()
         {
-            var target = owner != null ? owner : Global.player;
+            var target = owner != null ? owner : PlayerRegistry.Current;
             return target != null ? target.MaxHP : 0;
         }
 
@@ -396,7 +384,7 @@ namespace Game.Gameplay
         /// <param name="previousMaxHp">变化前的最大生命.</param>
         private void NotifyOwnerStatsChanged(int previousMaxHp)
         {
-            var target = owner != null ? owner : Global.player;
+            var target = owner != null ? owner : PlayerRegistry.Current;
             target?.OnBuffStatsChanged(previousMaxHp);
         }
 
@@ -405,7 +393,7 @@ namespace Game.Gameplay
         /// </summary>
         private static void NotifyBuffsChanged()
         {
-            EventCenter.Trigger(GameEvent.PlayerBuffsChanged);
+            EventCenter.Trigger(GameplayEvents.PlayerBuffsChanged);
         }
 
     #endregion
@@ -418,7 +406,7 @@ namespace Game.Gameplay
         /// <param name="info">Buff 运行时信息</param>
         private static void TriggerOnAdd(BuffRuntimeInfo info)
         {
-            info.Buff.OnAdd(info);
+            info.ScriptInstance?.OnAdd(info);
         }
 
         /// <summary>
@@ -427,7 +415,45 @@ namespace Game.Gameplay
         /// <param name="info">Buff 运行时信息</param>
         private static void TriggerOnRemove(BuffRuntimeInfo info)
         {
-            info.Buff.OnRemove(info);
+            info.ScriptInstance?.OnRemove(info);
+        }
+
+        /// <summary>
+        /// 触发 Buff 的每帧脚本回调.
+        /// </summary>
+        /// <param name="info">Buff 运行时信息.</param>
+        /// <param name="deltaTime">时间增量.</param>
+        private static void TriggerOnUpdate(BuffRuntimeInfo info, float deltaTime)
+        {
+            info.ScriptInstance?.OnUpdate(info, deltaTime);
+        }
+
+        /// <summary>
+        /// 触发 Buff 的固定间隔脚本回调.
+        /// </summary>
+        /// <param name="info">Buff 运行时信息.</param>
+        private static void TriggerOnInterval(BuffRuntimeInfo info)
+        {
+            info.ScriptInstance?.OnInterval(info);
+        }
+
+        /// <summary>
+        /// 触发 Buff 的主动脚本回调.
+        /// </summary>
+        /// <param name="info">Buff 运行时信息.</param>
+        private static void TriggerOnTrigger(BuffRuntimeInfo info)
+        {
+            info.ScriptInstance?.OnTrigger(info);
+        }
+
+        /// <summary>
+        /// 释放 Buff 持有的脚本实例.
+        /// </summary>
+        /// <param name="info">Buff 运行时信息.</param>
+        private static void DisposeScriptInstance(BuffRuntimeInfo info)
+        {
+            info.ScriptInstance?.Dispose();
+            info.ScriptInstance = null;
         }
 
     #endregion

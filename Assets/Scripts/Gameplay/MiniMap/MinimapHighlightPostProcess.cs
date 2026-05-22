@@ -34,10 +34,6 @@ namespace Game.Gameplay
 
         [Header("Floor Tilemap 名称（与房间模板中一致）")]
         public string FloorTilemapName = "Floor";
-
-        /// <summary>
-        /// 执行 Run 逻辑.
-        /// </summary>
         public override void Run(DungeonGeneratorLevelGrid2D level)
         {
             // 在共享 Tilemap 根节点下新建高亮层

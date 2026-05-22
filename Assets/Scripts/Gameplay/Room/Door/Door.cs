@@ -37,7 +37,7 @@ namespace Game.Gameplay
 				isOpen = true;
 				CloseDoorSR.gameObject.SetActive(false);
 				doorCollider.enabled = false;
-				EventCenter.Trigger(GameEvent.DoorOpened, this);
+				EventCenter.Trigger(GameplayEvents.DoorOpened, this);
 			}
 			else
 			{
@@ -63,7 +63,7 @@ namespace Game.Gameplay
 			doorCollider.enabled = false;
 
 			audioPlay.Play();
-			EventCenter.Trigger(GameEvent.DoorOpened, this);
+			EventCenter.Trigger(GameplayEvents.DoorOpened, this);
 		}
 
 		/// <summary>
@@ -74,7 +74,7 @@ namespace Game.Gameplay
 			isOpen = false;
 			CloseDoorSR.gameObject.SetActive(true);
 			doorCollider.enabled = true;
-			EventCenter.Trigger(GameEvent.DoorClosed, this);
+			EventCenter.Trigger(GameplayEvents.DoorClosed, this);
 		}
     }
 }

@@ -49,16 +49,11 @@ namespace Game.Gameplay
         /// 是否满弹
         /// </summary>
         public bool IsFull => currentAmmo == maxAmmo;
-
-
-        /// <summary>
-        /// 执行 CheckAmmo 逻辑.
-        /// </summary>
         public void CheckAmmo()
         {
             if(IsOutOfAmmo)
             {
-                EventCenter.Trigger(GameEvent.PlayerHeadMessageRequested, new PlayerHeadMessageEvent("没有备弹", 2f));
+                EventCenter.Trigger(CoreEvents.PlayerHeadMessageRequested, new PlayerHeadMessageEvent("没有备弹", 2f));
                 GlobalAudioPlay.Instance.PlayerAudioSourceByPath("EmptyBulletSound");
                 return;
             }
@@ -91,13 +86,9 @@ namespace Game.Gameplay
             })
             .StartCurrentScene();
         }
-
-        /// <summary>
-        /// 执行 UpdateUI 逻辑.
-        /// </summary>
         private void UpdateUI()
         {
-            EventCenter.Trigger(GameEvent.BulletClipChanged, this);
+            EventCenter.Trigger(GameplayEvents.BulletClipChanged, this);
         }
 
         /// <summary>
@@ -107,10 +98,6 @@ namespace Game.Gameplay
         {
             UpdateUI();
         }
-
-        /// <summary>
-        /// 执行 RestoreAmmo 逻辑.
-        /// </summary>
         public void RestoreAmmo(int currentAmmo, int maxAmmo)
         {
             // 读档恢复弹夹时直接覆盖数量, 并清理换弹状态.

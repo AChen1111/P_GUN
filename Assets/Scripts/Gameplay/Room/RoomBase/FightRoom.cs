@@ -183,15 +183,11 @@ namespace Game.Gameplay
                 StartNextWave();
             }
 }
-
-        /// <summary>
-        /// 执行 TriggerWaveDisplayChanged 逻辑.
-        /// </summary>
         private void TriggerWaveDisplayChanged(bool isVisible)
         {
             var currentWave = Mathf.Clamp(totalWaveCount - remainWaveCount + 1, 1, totalWaveCount);
             // 波数显示只推送数据, 具体文本和显隐由 UI 层处理.
-            EventCenter.Trigger(GameEvent.RoomWaveDisplayChanged, new RoomWaveDisplayEvent(currentWave, totalWaveCount, isVisible));
+            EventCenter.Trigger(GameplayEvents.RoomWaveDisplayChanged, new RoomWaveDisplayEvent(currentWave, totalWaveCount, isVisible));
         }
 
         /// <summary>
@@ -244,10 +240,6 @@ namespace Game.Gameplay
         {
             if (currentFightRoom == this) currentFightRoom = null;
         }
-
-        /// <summary>
-        /// 执行 RestoreSaveData 逻辑.
-        /// </summary>
         public override void RestoreSaveData(RoomSaveData data)
         {
             base.RestoreSaveData(data);

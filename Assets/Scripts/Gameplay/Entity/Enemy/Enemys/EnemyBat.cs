@@ -30,20 +30,12 @@ namespace Game.Gameplay
         private bool hasShot;
 
         protected override WeaponType WeaponType => WeaponType.Gun;
-
-        /// <summary>
-        /// 执行 OnInit 逻辑.
-        /// </summary>
         protected override void OnInit()
         {
             OwnerFightRoom = FightRoom.currentFightRoom;
             stateTimer = 0f;
             hasShot = false;
         }
-
-        /// <summary>
-        /// 执行 RegisterFSM 逻辑.
-        /// </summary>
         protected override void RegisterFSM(FSM<EnemyState> fsm)
         {
             fsm.State(EnemyState.Follow)
@@ -100,9 +92,9 @@ namespace Game.Gameplay
 
     void ShootAtPlayer()
     {
-        if (bulletPrefab == null || Global.player == null)
+        if (bulletPrefab == null || PlayerRegistry.Current == null)
             return;
-        var direction = ((Vector2)(Global.player.transform.position - transform.position)).normalized;
+        var direction = ((Vector2)(PlayerRegistry.Current.transform.position - transform.position)).normalized;
         var spawnPosition = transform.position + (Vector3)(direction * bulletSpawnDistance);
         // 参考霰弹枪散射规则, 中心一发, 其余子弹按左右交替角度偏移.
         var baseAngle = direction.ToAngle();

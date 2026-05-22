@@ -43,7 +43,7 @@ namespace Game.UI
         /// </summary>
         private void OnEnable()
         {
-            EventCenter.AddListener(GameEvent.InventoryChanged, Refresh);
+            EventCenter.AddListener(ItemEvents.InventoryChanged, Refresh);
             Refresh();
         }
 
@@ -52,23 +52,15 @@ namespace Game.UI
         /// </summary>
         private void OnDisable()
         {
-            EventCenter.RemoveListener(GameEvent.InventoryChanged, Refresh);
+            EventCenter.RemoveListener(ItemEvents.InventoryChanged, Refresh);
             HideUseBlockedHint();
             ClearSlots();
         }
-
-        /// <summary>
-        /// 执行 OnOpen 逻辑.
-        /// </summary>
         protected override void OnOpen()
         {
             HideUseBlockedHint();
             Refresh();
         }
-
-        /// <summary>
-        /// 执行 SelectStack 逻辑.
-        /// </summary>
         public void SelectStack(InventoryItemStack stack)
         {
             selectedItemId = stack != null ? stack.ItemId : -1;
@@ -133,10 +125,6 @@ namespace Game.UI
         return string.IsNullOrEmpty(stack.Data.itemName) ? $"Item {stack.ItemId}" : stack.Data.itemName;
     }
 }
-
-        /// <summary>
-        /// 执行 UseStack 逻辑.
-        /// </summary>
         public void UseStack(InventoryItemStack stack)
         {
             if (stack == null)
@@ -203,10 +191,6 @@ namespace Game.UI
         useBlockedHintCoroutine = null;
     }
 }
-
-        /// <summary>
-        /// 执行 Refresh 逻辑.
-        /// </summary>
         private void Refresh()
         {
             ClearSlots();
@@ -250,10 +234,6 @@ namespace Game.UI
                 activeSlots.Add(slot);
             }
 }
-
-        /// <summary>
-        /// 执行 ClearSlots 逻辑.
-        /// </summary>
         private void ClearSlots()
         {
             for (int i = activeSlots.Count - 1; i >= 0; i--)
@@ -266,18 +246,10 @@ namespace Game.UI
 
             activeSlots.Clear();
         }
-
-        /// <summary>
-        /// 执行 ResolveInventory 逻辑.
-        /// </summary>
         private static PlayerInventory ResolveInventory()
         {
-            return Global.player != null ? Global.player.GetComponent<PlayerInventory>() : null;
+            return PlayerRegistry.Current != null ? PlayerRegistry.Current.GetComponent<PlayerInventory>() : null;
         }
-
-        /// <summary>
-        /// 执行 HideUseBlockedHint 逻辑.
-        /// </summary>
         private void HideUseBlockedHint()
         {
             if (useBlockedHintCoroutine != null)
@@ -298,10 +270,6 @@ namespace Game.UI
                 useBlockedHintText.rectTransform.anchoredPosition = useBlockedHintBasePosition;
             }
         }
-
-        /// <summary>
-        /// 执行 SetUseBlockedHintAlpha 逻辑.
-        /// </summary>
         private void SetUseBlockedHintAlpha(float alpha)
         {
             Color color = useBlockedHintText.color;

@@ -14,10 +14,6 @@ namespace Game.Gameplay
 
         [Header("玩家预制体")]
         [SerializeField] private Player playerPrefab;
-
-        /// <summary>
-        /// 执行 OnRoomInitialized 逻辑.
-        /// </summary>
         protected override void OnRoomInitialized()
         {
             needGenerateDoors = false;
@@ -26,9 +22,9 @@ namespace Game.Gameplay
             void PlacePlayerAtSpawn()
             {
                 var spawnPosition = playerSpawnPoint != null ? playerSpawnPoint.position : transform.position;
-                if (Global.player != null)
+                if (PlayerRegistry.Current != null)
                 {
-                    Global.player.transform.position = spawnPosition;
+                    PlayerRegistry.Current.transform.position = spawnPosition;
                     return;
                 }
 

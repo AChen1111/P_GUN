@@ -108,11 +108,11 @@ namespace Game.Gameplay
         /// </summary>
         void Awake()
         {
-            Global.player = this;
+            PlayerRegistry.Register(this);
             ResolveBuffManager();
             Restart();
-            EventCenter.AddListener(GameEvent.PlayerDied, HandleGameEnded);
-            EventCenter.AddListener(GameEvent.GameWin, HandleGameEnded);
+            EventCenter.AddListener(CoreEvents.PlayerDied, HandleGameEnded);
+            EventCenter.AddListener(CoreEvents.GameWin, HandleGameEnded);
 
             animator = GetComponentInChildren<Animator>();
             //默认不显示
@@ -262,10 +262,6 @@ namespace Game.Gameplay
                 Weapon.GetChild(i).gameObject.SetActive(false);
             }
         }
-
-        /// <summary>
-        /// 执行启动后的初始化逻辑.
-        /// </summary>
         async void Start()
         {
             if (weaponLoadoutTask == null)
@@ -275,10 +271,6 @@ namespace Game.Gameplay
 
             await weaponLoadoutTask;
         }
-
-        /// <summary>
-        /// 执行每帧更新逻辑.
-        /// </summary>
         void Update()
         {
             if (isGameEnded)
@@ -336,7 +328,7 @@ namespace Game.Gameplay
                 }
             }
 
-            if (isSleep && (rb.velocity.magnitude > 0.01f || InputCheck.IsAnyKeyHeld()))
+            if (isSleep && (rb.velocity.magnitude > 0.01f || Input.anyKey))
                 ExitSleepState();
             #endregion
 
@@ -379,15 +371,12 @@ namespace Game.Gameplay
         /// </summary>
         void OnDestroy()
         {
-            EventCenter.RemoveListener(GameEvent.PlayerDied, HandleGameEnded);
-            EventCenter.RemoveListener(GameEvent.GameWin, HandleGameEnded);
+            EventCenter.RemoveListener(CoreEvents.PlayerDied, HandleGameEnded);
+            EventCenter.RemoveListener(CoreEvents.GameWin, HandleGameEnded);
             RestoreHurtSlowTimeScale();
             ResetVisualState();
 
-            if (Global.player == this)
-            {
-                Global.player = null;
-            }
+            PlayerRegistry.Unregister(this);
         }
 
         /// <summary>
@@ -401,10 +390,6 @@ namespace Game.Gameplay
         #endregion
 
         #region Initialize
-
-        /// <summary>
-        /// 执行 SelectInitialGun 逻辑.
-        /// </summary>
         void SelectInitialGun()
         {
             if (guns == null || guns.Count == 0)
@@ -429,10 +414,6 @@ namespace Game.Gameplay
         #endregion
 
         #region Input And Combat
-
-        /// <summary>
-        /// 执行 HandleCombatInput 逻辑.
-        /// </summary>
         void HandleCombatInput(Vector2 dir, bool mouseCombatBlocked)
         {
             if (!weaponLoadoutReady || gun == null || guns.Count == 0)
@@ -477,7 +458,7 @@ namespace Game.Gameplay
                 SwitchAutoAim();
 
             if (Input.GetKeyDown(KeyCode.M))
-                EventCenter.Trigger(GameEvent.MiniMapToggleRequested);
+                EventCenter.Trigger(CoreEvents.MiniMapToggleRequested);
 
             void SwitchAutoAim()
             {
@@ -494,10 +475,6 @@ namespace Game.Gameplay
         #endregion
 
         #region Sleep
-
-        /// <summary>
-        /// 执行 ExitSleepState 逻辑.
-        /// </summary>
         void ExitSleepState()
         {
             if (!isSleep) return;
@@ -510,18 +487,10 @@ namespace Game.Gameplay
         #endregion
 
         #region Health
-
-        /// <summary>
-        /// 执行 Hurt 逻辑.
-        /// </summary>
         public void Hurt()
         {
             Hurt(new DamageInfo(1, Vector2.zero));
         }
-
-        /// <summary>
-        /// 执行 Hurt 逻辑.
-        /// </summary>
         public void Hurt(DamageInfo damageInfo)
         {
             if(!canHurt) return;
@@ -539,7 +508,7 @@ namespace Game.Gameplay
 
             if(HP <= 0)
             {
-                EventCenter.Trigger(GameEvent.PlayerDied);
+                EventCenter.Trigger(CoreEvents.PlayerDied);
                 return;
             }
 
@@ -634,20 +603,12 @@ namespace Game.Gameplay
         });
     }
 }
-
-        /// <summary>
-        /// 执行 Restart 逻辑.
-        /// </summary>
         public void Restart()
         {
             isGameEnded = false;
             HP = MaxHP;
             PublishHPChanged();
         }
-
-        /// <summary>
-        /// 执行 HandleGameEnded 逻辑.
-        /// </summary>
         private void HandleGameEnded()
         {
             isGameEnded = true;
@@ -656,10 +617,6 @@ namespace Game.Gameplay
                 AimPrefab.SetActive(false);
             }
         }
-
-        /// <summary>
-        /// 执行 Heal 逻辑.
-        /// </summary>
         public int Heal(int amount)
         {
             if (amount <= 0 || IsHPFull) return 0;
@@ -669,10 +626,6 @@ namespace Game.Gameplay
             PublishHPChanged();
             return HP - oldHp;
         }
-
-        /// <summary>
-        /// 执行 RestoreSaveData 逻辑.
-        /// </summary>
         public async void RestoreSaveData(PlayerSaveData data)
         {
             if (data == null) return;
@@ -796,13 +749,9 @@ namespace Game.Gameplay
 
             return item.Effects;
         }
-
-        /// <summary>
-        /// 执行 PublishHPChanged 逻辑.
-        /// </summary>
         private void PublishHPChanged()
         {
-            EventCenter.Trigger(GameEvent.PlayerHPChanged, this);
+            EventCenter.Trigger(GameplayEvents.PlayerHPChanged, this);
         }
 
         /// <summary>
@@ -823,20 +772,12 @@ namespace Game.Gameplay
                 PublishHPChanged();
             }
         }
-
-        /// <summary>
-        /// 执行 RestoreHurtSlowTimeScale 逻辑.
-        /// </summary>
         private void RestoreHurtSlowTimeScale()
         {
             if(hurtSlowCoroutine == null) return;
             if(Mathf.Approximately(Time.timeScale, Mathf.Clamp(hurtSlowTimeScale, 0.01f, 1f)))
                 Time.timeScale = hurtPreviousTimeScale;
         }
-
-        /// <summary>
-        /// 执行 ResetVisualState 逻辑.
-        /// </summary>
         private void ResetVisualState()
         {
             transform.DOKill(false);
@@ -929,20 +870,12 @@ namespace Game.Gameplay
                 _autoAimTarget = null;
             }
 }
-
-        /// <summary>
-        /// 执行 ClearAutoAimTarget 逻辑.
-        /// </summary>
         private void ClearAutoAimTarget()
         {
             // 自动瞄准关闭或脱离战斗时, 同步清理锁定目标和准星显示.
             _autoAimTarget = null;
             HideAutoAimIndicator();
         }
-
-        /// <summary>
-        /// 执行 HideAutoAimIndicator 逻辑.
-        /// </summary>
         private void HideAutoAimIndicator()
         {
             if (AimPrefab != null)
@@ -956,10 +889,6 @@ namespace Game.Gameplay
         #region Speed
 
         public float CurrentMoveSpeed => Mathf.Max(0f, CalculateBuffedStat(StatType.MoveSpeed, moveSpeed));
-
-        /// <summary>
-        /// 执行 GetSpeed 逻辑.
-        /// </summary>
         public float GetSpeed() => CurrentMoveSpeed;
 
         /// <summary>
@@ -997,10 +926,6 @@ namespace Game.Gameplay
         #endregion
 
         #region Helpers
-
-        /// <summary>
-        /// 执行 CalculateBuffedStat 逻辑.
-        /// </summary>
         private float CalculateBuffedStat(StatType statType, float baseValue)
         {
             return buffManager != null ? buffManager.CalculateStat(statType, baseValue) : baseValue;

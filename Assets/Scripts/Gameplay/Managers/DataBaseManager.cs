@@ -75,10 +75,6 @@ namespace Game.Gameplay
                 loadingTask = null;
             }
         }
-
-        /// <summary>
-        /// 执行数据库实际加载逻辑.
-        /// </summary>
         private async Task LoadAllInternalAsync()
         {
             IsLoaded = false;

@@ -14,10 +14,6 @@ namespace Game.Core
         private static bool isDebugPanelOpen;
 
         public static bool BlocksMouseCombat => isControlKeyHeld || isSettingsPanelOpen || isInventoryPanelOpen || isSaveSlotPanelOpen || isDebugPanelOpen;
-
-        /// <summary>
-        /// 执行 SetControlKeyHeld 逻辑.
-        /// </summary>
         public static void SetControlKeyHeld(bool isHeld)
         {
             if (isControlKeyHeld == isHeld)
@@ -28,10 +24,6 @@ namespace Game.Core
             isControlKeyHeld = isHeld;
             ApplyCursorState();
         }
-
-        /// <summary>
-        /// 执行 SetSettingsPanelOpen 逻辑.
-        /// </summary>
         public static void SetSettingsPanelOpen(bool isOpen)
         {
             if (isSettingsPanelOpen == isOpen)
@@ -42,10 +34,6 @@ namespace Game.Core
             isSettingsPanelOpen = isOpen;
             ApplyCursorState();
         }
-
-        /// <summary>
-        /// 执行 SetDebugPanelOpen 逻辑.
-        /// </summary>
         public static void SetDebugPanelOpen(bool isOpen)
         {
             if (isDebugPanelOpen == isOpen)
@@ -56,10 +44,6 @@ namespace Game.Core
             isDebugPanelOpen = isOpen;
             ApplyCursorState();
         }
-
-        /// <summary>
-        /// 执行 SetInventoryPanelOpen 逻辑.
-        /// </summary>
         public static void SetInventoryPanelOpen(bool isOpen)
         {
             if (isInventoryPanelOpen == isOpen)
@@ -70,10 +54,6 @@ namespace Game.Core
             isInventoryPanelOpen = isOpen;
             ApplyCursorState();
         }
-
-        /// <summary>
-        /// 执行 SetSaveSlotPanelOpen 逻辑.
-        /// </summary>
         public static void SetSaveSlotPanelOpen(bool isOpen)
         {
             if (isSaveSlotPanelOpen == isOpen)
@@ -97,10 +77,6 @@ namespace Game.Core
             isDebugPanelOpen = false;
             ApplyCursorState();
         }
-
-        /// <summary>
-        /// 执行 ApplyCursorState 逻辑.
-        /// </summary>
         private static void ApplyCursorState()
         {
             // 鼠标战斗被 UI 或 Ctrl 阻塞时显示光标, 默认战斗状态隐藏光标.

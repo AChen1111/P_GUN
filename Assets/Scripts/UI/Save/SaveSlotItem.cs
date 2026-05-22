@@ -29,10 +29,6 @@ namespace Game.UI.Save
         private Action<int> loadClicked;
         private Action<int> deleteClicked;
         private Sprite runtimeSnapshotSprite;
-
-        /// <summary>
-        /// 执行 Configure 逻辑.
-        /// </summary>
         public void Configure(
             SaveSlotSummary summary,
             SaveSlotPanelMode mode,
@@ -176,10 +172,6 @@ namespace Game.UI.Save
             deleteButton?.onClick.RemoveListener(HandleDeleteClicked);
             ClearRuntimeSnapshot();
         }
-
-        /// <summary>
-        /// 执行 ClearRuntimeSnapshot 逻辑.
-        /// </summary>
         private void ClearRuntimeSnapshot()
         {
             if (runtimeSnapshotSprite == null) return;
@@ -193,26 +185,14 @@ namespace Game.UI.Save
 
             runtimeSnapshotSprite = null;
         }
-
-        /// <summary>
-        /// 执行 HandleSaveClicked 逻辑.
-        /// </summary>
         private void HandleSaveClicked()
         {
             saveClicked?.Invoke(slotIndex);
         }
-
-        /// <summary>
-        /// 执行 HandleLoadClicked 逻辑.
-        /// </summary>
         private void HandleLoadClicked()
         {
             loadClicked?.Invoke(slotIndex);
         }
-
-        /// <summary>
-        /// 执行 HandleDeleteClicked 逻辑.
-        /// </summary>
         private void HandleDeleteClicked()
         {
             deleteClicked?.Invoke(slotIndex);

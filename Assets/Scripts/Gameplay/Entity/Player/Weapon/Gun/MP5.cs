@@ -14,19 +14,11 @@ namespace Game.Gameplay
         public UnityEngine.AudioSource SelfAudioSource;
 
 		public override PlayerBullet BulletPrefab => PlayerBullet;
-
-		/// <summary>
-		/// 执行 ShootDown 逻辑.
-		/// </summary>
 		public override void ShootDown(Vector2 dir)
 		{
 			if(gunClip.IsOutOfAmmo || !gunClip.CanShoot) return;
 			TryPlaySound(true);
 		}
-
-        /// <summary>
-        /// 执行 Shooting 逻辑.
-        /// </summary>
         public override void Shooting(Vector2 dir)
         {
 			gunClip.CheckAmmo();
@@ -37,24 +29,16 @@ namespace Game.Gameplay
 				shootDuration.RecordShootTime();
 				gunClip.Shoot();
 				var obj = GetBullet(dir);
-				gunFireEffect.Show(FirePointPosition, dir);
+				PlayGunFire(dir);
 			}
 			else if(gunClip.IsOutOfAmmo || gunClip.IsReloading) {
 				PlayerAudioSource.Stop();
 			}
         }
-
-		/// <summary>
-		/// 执行 ShootUp 逻辑.
-		/// </summary>
 		public override void ShootUp(Vector2 dir)
 		{
 			PlayerAudioSource.Stop();
 		}
-
-		/// <summary>
-		/// 执行 OnGunUsed 逻辑.
-		/// </summary>
 		public override void OnGunUsed()
 		{
 			base.OnGunUsed();

@@ -15,20 +15,12 @@ namespace Game.Gameplay
         public UnityEngine.AudioSource SelfAudioSource;
 
 		public override PlayerBullet BulletPrefab => PlayerBullet;
-
-		/// <summary>
-		/// 执行 Shoot 逻辑.
-		/// </summary>
 		public override void Shoot(Vector2 dir)
 		{
 			GetBullet(dir);
 			TryPlaySound(false);
-			gunFireEffect.Show(FirePointPosition, dir);
+			PlayGunFire(dir);
 		}
-
-		/// <summary>
-		/// 执行 ShootDown 逻辑.
-		/// </summary>
 		public override void ShootDown(Vector2 dir)
 		{
 			gunClip.CheckAmmo();

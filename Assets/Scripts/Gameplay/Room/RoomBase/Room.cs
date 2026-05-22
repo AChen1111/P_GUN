@@ -102,10 +102,6 @@ namespace Game.Gameplay
 				canGenerateItems = true;
 			}
 		}
-
-		/// <summary>
-		/// 执行启动后的初始化逻辑.
-		/// </summary>
 		private void Start() {
 			//Debug.Log("房间初始化");
 			InitRoom();
@@ -223,36 +219,20 @@ namespace Game.Gameplay
 				PlayerExitedRoom?.Invoke(this, other);
 			}
 		}
-
-		/// <summary>
-		/// 执行 GetRoomCenterPoint 逻辑.
-		/// </summary>
 		public Vector3 GetRoomCenterPoint()
 		{
 			if(roomCenterPoint == null) return transform.position;
 			return roomCenterPoint.position;
 		}
-
-		/// <summary>
-		/// 执行 SetCurrentPlayerRoom 逻辑.
-		/// </summary>
 		public static void SetCurrentPlayerRoom(Room room)
 		{
 			CurrentPlayerRoom = room;
 		}
-
-		/// <summary>
-		/// 执行 MarkVisited 逻辑.
-		/// </summary>
 		public void MarkVisited()
 		{
 			Visited = true;
 			CurrentPlayerRoom = this;
 		}
-
-		/// <summary>
-		/// 执行 RestoreSaveData 逻辑.
-		/// </summary>
 		public virtual void RestoreSaveData(RoomSaveData data)
 		{
 			if (data == null) return;
@@ -260,10 +240,6 @@ namespace Game.Gameplay
 			// 读档只覆盖安全点状态, 不重放房间生成或掉落逻辑.
 			Visited = data.visited;
 		}
-
-		/// <summary>
-		/// 执行 SetDoorsOpen 逻辑.
-		/// </summary>
 		protected void SetDoorsOpen(bool isOpen)
 		{
 			for (var i = 0; i < doorsList.Count; i++)

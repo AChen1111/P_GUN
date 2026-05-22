@@ -17,14 +17,8 @@ namespace Game.Gameplay
     public abstract class EnemyBase : MonoBehaviour, Game.Pooling.IPoolable {
 
         #region 子类实现
-        /// <summary>
-        /// 执行 OnInit 逻辑.
-        /// </summary>
         protected abstract void OnInit();
         protected abstract WeaponType WeaponType { get; }
-        /// <summary>
-        /// 执行 RegisterFSM 逻辑.
-        /// </summary>
         protected abstract void RegisterFSM(FSM<EnemyState> fsm);
         #endregion
 
@@ -142,21 +136,10 @@ namespace Game.Gameplay
                 hasDefaultSpriteColor = true;
             }
 }
-
-        /// <summary>
-        /// 执行启动后的初始化逻辑.
-        /// </summary>
         private void Start() {
             Init();
         }
-        /// <summary>
-        /// 执行 OnStart 逻辑.
-        /// </summary>
         protected virtual void OnStart(){}
-
-        /// <summary>
-        /// 执行每帧更新逻辑.
-        /// </summary>
         private void Update()
         {
             if (isDead) return;
@@ -164,13 +147,7 @@ namespace Game.Gameplay
             FSM.Update();
             OnUpdate();
         }
-        /// <summary>
-        /// 执行 OnUpdate 逻辑.
-        /// </summary>
         protected virtual void OnUpdate(){}
-        /// <summary>
-        /// 执行固定帧物理更新逻辑.
-        /// </summary>
         private void FixedUpdate()
         {
             if (isDead) return;
@@ -178,9 +155,6 @@ namespace Game.Gameplay
             FSM.FixedUpdate();
             OnFixedUpdate();
         }
-        /// <summary>
-        /// 执行 OnFixedUpdate 逻辑.
-        /// </summary>
         protected virtual void OnFixedUpdate(){}
 
         /// <summary>
@@ -191,9 +165,6 @@ namespace Game.Gameplay
             OnFSMDestroy();
             FSM.Clear();
         }
-        /// <summary>
-        /// 执行 OnFSMDestroy 逻辑.
-        /// </summary>
         protected virtual void OnFSMDestroy(){
             FSM.Clear();
         }
@@ -201,9 +172,6 @@ namespace Game.Gameplay
 
 
         #region 对外接口
-        /// <summary>
-        /// 对外接口,执行受伤逻辑
-        /// </summary>
         /// <param name="damageInfo">伤害信息</param>
         public void Hurt(DamageInfo damageInfo){
             if(isDead) return;
@@ -233,9 +201,6 @@ namespace Game.Gameplay
                 damageTextPool.Play(damageTextPrefab, damage, GetBloodVfxPosition() + damageTextOffset);
             }
 }
-        /// <summary>
-        /// 执行 HurtAnim 逻辑.
-        /// </summary>
         protected virtual void HurtAnim()
         {
             // 受击时先清理上一次闪烁, 再播放统一受击动画和闪烁.
@@ -257,10 +222,6 @@ namespace Game.Gameplay
                 });
             }
 }
-
-        /// <summary>
-        /// 对外接口,执行死亡逻辑
-        /// </summary>
         /// <param name="damageInfo">伤害信息</param>
         public void Dead(){
             if(isDead) return;
@@ -339,10 +300,6 @@ namespace Game.Gameplay
                 throw;
             }
         }
-
-        /// <summary>
-        /// 对外接口,执行初始化逻辑
-        /// </summary>
         public void Init() {
             if(isInited) return;
             isInited = true;
@@ -350,34 +307,18 @@ namespace Game.Gameplay
             RegisterFSM(FSM);
             OnStart();
         }
-
-        /// <summary>
-        /// 执行 ApplyDamage 逻辑.
-        /// </summary>
         protected void ApplyDamage(int damage) {
             if(damage <= 0) return;
             //Debug.Log("ApplyDamage: " + damage + " CurrentHp: " + CurrentHp);
             CurrentHp -= damage;
         }
-
-        /// <summary>
-        /// 执行 OnSpawnFromPool 逻辑.
-        /// </summary>
         public void OnSpawnFromPool() {
             ResetRuntimeState();
             Init();
         }
-
-        /// <summary>
-        /// 执行 OnRecycleToPool 逻辑.
-        /// </summary>
         public void OnRecycleToPool() {
             PrepareForPoolRelease();
         }
-
-        /// <summary>
-        /// 执行 SetOwnerFightRoom 逻辑.
-        /// </summary>
         public void SetOwnerFightRoom(FightRoom ownerFightRoom) {
             OwnerFightRoom = ownerFightRoom;
         }
@@ -431,10 +372,6 @@ namespace Game.Gameplay
                 animator.Update(0f);
             }
 }
-
-        /// <summary>
-        /// 执行 ResetVisualState 逻辑.
-        /// </summary>
         protected void ResetVisualState() {
             transform.DOKill(false);
 
@@ -449,10 +386,6 @@ namespace Game.Gameplay
                 sr.color = color;
             }
         }
-
-        /// <summary>
-        /// 执行 StopMove 逻辑.
-        /// </summary>
         protected void StopMove() {
             if(rb != null) {
                 rb.velocity = Vector2.zero;
@@ -466,13 +399,13 @@ namespace Game.Gameplay
         /// <returns>是否成功获得玩家并更新移动.</returns>
         protected bool FollowPlayerWithBodySpace(out Vector2 direction) {
             direction = Vector2.zero;
-            if(Global.player == null) {
+            if(PlayerRegistry.Current == null) {
                 StopMove();
                 SetAnimatorSpeed(0f);
                 return false;
             }
 
-            var toPlayer = (Vector2)(Global.player.transform.position - transform.position);
+            var toPlayer = (Vector2)(PlayerRegistry.Current.transform.position - transform.position);
             var distance = toPlayer.magnitude;
             if(distance <= 0.0001f) {
                 StopMove();
@@ -515,39 +448,23 @@ namespace Game.Gameplay
             TrySetAnimatorTrigger(attackTriggerName);
             PlayStateIfDifferent(attackStateName, true);
         }
-
-        /// <summary>
-        /// 执行 StopDeathRecycle 逻辑.
-        /// </summary>
         private void StopDeathRecycle() {
             if(deathRecycleCoroutine == null) return;
 
             StopCoroutine(deathRecycleCoroutine);
             deathRecycleCoroutine = null;
         }
-
-        /// <summary>
-        /// 执行 TrySetAnimatorTrigger 逻辑.
-        /// </summary>
         private void TrySetAnimatorTrigger(string triggerName) {
             if(!HasAnimatorParameter(triggerName, AnimatorControllerParameterType.Trigger)) return;
 
             animator.ResetTrigger(triggerName);
             animator.SetTrigger(triggerName);
         }
-
-        /// <summary>
-        /// 执行 TryResetAnimatorTrigger 逻辑.
-        /// </summary>
         private void TryResetAnimatorTrigger(string triggerName) {
             if(!HasAnimatorParameter(triggerName, AnimatorControllerParameterType.Trigger)) return;
 
             animator.ResetTrigger(triggerName);
         }
-
-        /// <summary>
-        /// 执行 HasAnimatorParameter 逻辑.
-        /// </summary>
         private bool HasAnimatorParameter(string parameterName, AnimatorControllerParameterType parameterType) {
             if(animator == null || string.IsNullOrEmpty(parameterName)) return false;
 
@@ -557,10 +474,6 @@ namespace Game.Gameplay
 
             return false;
         }
-
-        /// <summary>
-        /// 执行 PlayStateIfDifferent 逻辑.
-        /// </summary>
         private void PlayStateIfDifferent(string stateName, bool restart = false) {
             if(animator == null || string.IsNullOrEmpty(stateName)) return;
             if(!animator.HasState(0, Animator.StringToHash(stateName))) return;
@@ -568,10 +481,6 @@ namespace Game.Gameplay
 
             animator.Play(stateName, 0, 0f);
         }
-
-        /// <summary>
-        /// 执行 GetBloodVfxPosition 逻辑.
-        /// </summary>
         private Vector3 GetBloodVfxPosition() {
             if(col != null) {
                 return col.bounds.center;

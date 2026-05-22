@@ -46,10 +46,6 @@ namespace Game.Gameplay
                 dungeonGenerator.GenerateOn = GenerateOn.Manually;
             }
         }
-
-        /// <summary>
-        /// 执行启动后的初始化逻辑.
-        /// </summary>
         private void Start()
         {
             if (generateOnStart)
@@ -68,10 +64,6 @@ namespace Game.Gameplay
                 Active = null;
             }
         }
-
-        /// <summary>
-        /// 执行 Generate 逻辑.
-        /// </summary>
         public async void Generate()
         {
             try
@@ -103,7 +95,8 @@ namespace Game.Gameplay
 
                 SaveGameService.ApplyPendingGenerationSettings(this, dungeonGenerator);
                 await ApplyAddressableLevelGraphAsync();
-                if (dungeonGenerator.FixedLevelGraphConfig.LevelGraph == null)
+                var fixedGraphSettings = dungeonGenerator.FixedLevelGraphConfig;
+                if (fixedGraphSettings.LevelGraph == null)
                 {
                     throw new InvalidOperationException($"{nameof(AddressableDungeonBootstrapper)} requires a loaded LevelGraph.");
                 }
@@ -147,22 +140,15 @@ namespace Game.Gameplay
                 throw new InvalidOperationException($"{nameof(AddressableDungeonBootstrapper)} requires {nameof(AddressableLoader)}.");
             }
 
-            dungeonGenerator.FixedLevelGraphConfig.LevelGraph = await loader.LoadAssetAsync<LevelGraph>(levelGraphAddress);
+            var fixedGraphSettings = dungeonGenerator.FixedLevelGraphConfig;
+            fixedGraphSettings.LevelGraph = await loader.LoadAssetAsync<LevelGraph>(levelGraphAddress);
         }
-
-        /// <summary>
-        /// 执行 OverrideLevelGraphAddress 逻辑.
-        /// </summary>
         public void OverrideLevelGraphAddress(string address)
         {
             if (string.IsNullOrWhiteSpace(address)) return;
 
             levelGraphAddress = address;
         }
-
-        /// <summary>
-        /// 执行 ResolveGenerator 逻辑.
-        /// </summary>
         private void ResolveGenerator()
         {
             if (dungeonGenerator == null)

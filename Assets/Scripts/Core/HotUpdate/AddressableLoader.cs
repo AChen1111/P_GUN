@@ -121,10 +121,6 @@ namespace Game.Core
             assetsByAddress.Clear();
             loadingTasksByAddress.Clear();
         }
-
-        /// <summary>
-        /// 执行 Addressables 实际加载逻辑.
-        /// </summary>
         private async Task<UnityEngine.Object> LoadAssetInternalAsync<TAsset>(string address)
             where TAsset : UnityEngine.Object
         {

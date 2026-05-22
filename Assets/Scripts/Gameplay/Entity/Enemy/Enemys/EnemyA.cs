@@ -24,19 +24,11 @@ namespace Game.Gameplay
         private float stateTimer = 0f;
 
         protected override WeaponType WeaponType => WeaponType.Gun;
-
-        /// <summary>
-        /// 执行 OnInit 逻辑.
-        /// </summary>
         protected override void OnInit()
         {
             shootDuration = new ShootDuration(shootInterval);
             OwnerFightRoom = FightRoom.currentFightRoom;
         }
-
-        /// <summary>
-        /// 执行 RegisterFSM 逻辑.
-        /// </summary>
         protected override void RegisterFSM(FSM<EnemyState> fsm)
         {
             // ── Follow 状态：追踪玩家，计时到达后切换到 Attack ──
@@ -100,10 +92,10 @@ namespace Game.Gameplay
 
     void DoShoot()
     {
-        if (bulletPrefab == null || Global.player == null)
+        if (bulletPrefab == null || PlayerRegistry.Current == null)
             return;
         //Debug.Log("DoShoot");
-        var dirToPlayer = (Global.player.transform.position - transform.position).normalized;
+        var dirToPlayer = (PlayerRegistry.Current.transform.position - transform.position).normalized;
         var spawnPos = transform.position + (Vector3)(dirToPlayer * 0.5f);
         var bullet = EnemyBulletPool.Instance.Get(bulletPrefab, spawnPos, Quaternion.identity, dirToPlayer, AttackDamage);
         if (bullet == null)

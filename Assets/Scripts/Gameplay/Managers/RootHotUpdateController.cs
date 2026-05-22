@@ -24,10 +24,6 @@ namespace Game.Gameplay
         [Header("更新界面")]
         [SerializeField] private Text statusText;
         [SerializeField] private Slider progressSlider;
-
-        /// <summary>
-        /// 执行启动后的初始化逻辑.
-        /// </summary>
         private async void Start()
         {
             try
@@ -202,10 +198,6 @@ namespace Game.Gameplay
                 Addressables.Release(handle);
             }
         }
-
-        /// <summary>
-        /// 执行 SetStatus 逻辑.
-        /// </summary>
         private void SetStatus(string message)
         {
             if (statusText != null)
@@ -213,10 +205,6 @@ namespace Game.Gameplay
                 statusText.text = message;
             }
         }
-
-        /// <summary>
-        /// 执行 SetProgress 逻辑.
-        /// </summary>
         private void SetProgress(float value)
         {
             if (progressSlider != null)
@@ -224,10 +212,6 @@ namespace Game.Gameplay
                 progressSlider.value = Mathf.Clamp01(value);
             }
         }
-
-        /// <summary>
-        /// 执行 FormatBytes 逻辑.
-        /// </summary>
         private static string FormatBytes(long bytes)
         {
             if (bytes < 1024L) return $"{bytes} B";

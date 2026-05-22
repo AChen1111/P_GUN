@@ -1,208 +1,145 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine;
+using UnityEngine.Pool;
 
 namespace Game.Core
 {
-    /// <summary>
-    /// 事件枚举
-    /// </summary>
-    public enum GameEvent
-    {
-        PlayerHPChanged,
-        PlayerDied,
-        GameWin,
-        GameOver,
-        MiniMapToggleRequested,
-        MiniMapShown,
-        MiniMapHidden,
-        ItemTipShown,
-        ItemTipHidden,
-        ItemPicked,
-        InventoryChanged,
-        PlayerBuffsChanged,
-        BulletClipChanged,
-        BulletBagChanged,
-        PlayerHeadMessageRequested,
-        RoomWaveDisplayChanged,
-        DoorOpened,
-        DoorClosed,
-        AllRoomsGenerated
-    }
-
-    public struct RoomWaveDisplayEvent
-    {
-        // 当前显示的波次, 从 1 开始.
-        public int CurrentWave;
-        // 当前房间总波数, 用于显示 x/xx.
-        public int TotalWave;
-        // 战斗结束时隐藏波数文本.
-        public bool IsVisible;
-
-        public RoomWaveDisplayEvent(int currentWave, int totalWave, bool isVisible)
-        {
-            CurrentWave = currentWave;
-            TotalWave = totalWave;
-            IsVisible = isVisible;
-        }
-    }
-
-    public struct PlayerHeadMessageEvent
-    {
-        public string Message;
-        public float Duration;
-
-        public PlayerHeadMessageEvent(string message, float duration)
-        {
-            Message = message;
-            Duration = duration;
-        }
-    }
-
     public static class EventCenter
     {
-        private static readonly Dictionary<GameEvent, HashSet<Action>> eventMap =
-            new Dictionary<GameEvent, HashSet<Action>>();
+        private static readonly Dictionary<GameEventId, List<Action>> eventMap = new Dictionary<GameEventId, List<Action>>();
+        private static readonly Dictionary<GameEventId, object> payloadEventMap = new Dictionary<GameEventId, object>();
 
-        private static readonly Dictionary<GameEvent, HashSet<Delegate>> eventMapWithPayload =
-            new Dictionary<GameEvent, HashSet<Delegate>>();
-
-        /// <summary>
-        /// 执行 AddListener 逻辑.
-        /// </summary>
-        public static void AddListener(GameEvent eventType, Action listener)
+        public static void AddListener(GameEventId eventId, Action listener)
         {
+            if (eventId == null) throw new ArgumentNullException(nameof(eventId));
             if (listener == null) return;
-            GetListeners(eventType).Add(listener);
 
-            static HashSet<Action> GetListeners(GameEvent eventType)
+            var listeners = GetListeners(eventId);
+            if (!listeners.Contains(listener))
             {
-                if (!eventMap.TryGetValue(eventType, out var listeners))
-                {
-                    listeners = new HashSet<Action>();
-                    eventMap[eventType] = listeners;
-                }
-
-                return listeners;
+                listeners.Add(listener);
             }
-}
+        }
 
-        /// <summary>
-        /// 执行 AddListener 逻辑.
-        /// </summary>
-        public static void AddListener<T>(GameEvent eventType, Action<T> listener)
+        public static void AddListener<TPayload>(GameEventId<TPayload> eventId, Action<TPayload> listener)
         {
+            if (eventId == null) throw new ArgumentNullException(nameof(eventId));
             if (listener == null) return;
-            GetPayloadListeners(eventType).Add(listener);
 
-            static HashSet<Delegate> GetPayloadListeners(GameEvent eventType)
+            var listeners = GetPayloadListeners(eventId);
+            if (!listeners.Contains(listener))
             {
-                if (!eventMapWithPayload.TryGetValue(eventType, out var listeners))
-                {
-                    listeners = new HashSet<Delegate>();
-                    eventMapWithPayload[eventType] = listeners;
-                }
-
-                return listeners;
+                listeners.Add(listener);
             }
-}
+        }
 
-        /// <summary>
-        /// 执行 RemoveListener 逻辑.
-        /// </summary>
-        public static void RemoveListener(GameEvent eventType, Action listener)
+        public static void RemoveListener(GameEventId eventId, Action listener)
         {
+            if (eventId == null) throw new ArgumentNullException(nameof(eventId));
             if (listener == null) return;
+            if (!eventMap.TryGetValue(eventId, out var listeners)) return;
 
-            if (!eventMap.TryGetValue(eventType, out var listeners)) return;
             listeners.Remove(listener);
-
             if (listeners.Count == 0)
             {
-                eventMap.Remove(eventType);
+                eventMap.Remove(eventId);
             }
         }
 
-        /// <summary>
-        /// 执行 RemoveListener 逻辑.
-        /// </summary>
-        public static void RemoveListener<T>(GameEvent eventType, Action<T> listener)
+        public static void RemoveListener<TPayload>(GameEventId<TPayload> eventId, Action<TPayload> listener)
         {
+            if (eventId == null) throw new ArgumentNullException(nameof(eventId));
             if (listener == null) return;
+            if (!payloadEventMap.TryGetValue(eventId, out var rawListeners)) return;
 
-            if (!eventMapWithPayload.TryGetValue(eventType, out var listeners)) return;
+            var listeners = (List<Action<TPayload>>)rawListeners;
             listeners.Remove(listener);
-
             if (listeners.Count == 0)
             {
-                eventMapWithPayload.Remove(eventType);
+                payloadEventMap.Remove(eventId);
             }
         }
 
-        /// <summary>
-        /// 执行 Trigger 逻辑.
-        /// </summary>
-        public static void Trigger(GameEvent eventType)
+        public static void Trigger(GameEventId eventId)
         {
-            if (!eventMap.TryGetValue(eventType, out var listeners)) return;
+            if (eventId == null) throw new ArgumentNullException(nameof(eventId));
+            if (!eventMap.TryGetValue(eventId, out var listeners)) return;
 
-            foreach (var listener in CopyListeners(listeners))
+            // 触发时复制当前监听列表, 允许回调内安全增删监听.
+            var invokeList = ListPool<Action>.Get();
+            try
             {
-                listener?.Invoke();
-            }
-        }
-
-        /// <summary>
-        /// 执行 Trigger 逻辑.
-        /// </summary>
-        public static void Trigger<T>(GameEvent eventType, T payload)
-        {
-            if (!eventMapWithPayload.TryGetValue(eventType, out var listeners)) return;
-
-            foreach (var listener in CopyListeners(listeners))
-            {
-                if (listener is Action<T> typedListener)
+                invokeList.AddRange(listeners);
+                for (var i = 0; i < invokeList.Count; i++)
                 {
-                    typedListener.Invoke(payload);
-                    continue;
+                    invokeList[i]?.Invoke();
                 }
-
-                Debug.LogWarning($"{nameof(EventCenter)}: {eventType} has a listener with a different payload type.");
+            }
+            finally
+            {
+                invokeList.Clear();
+                ListPool<Action>.Release(invokeList);
             }
         }
 
-        /// <summary>
-        /// 执行 Clear 逻辑.
-        /// </summary>
-        public static void Clear(GameEvent eventType)
+        public static void Trigger<TPayload>(GameEventId<TPayload> eventId, TPayload payload)
         {
-            eventMap.Remove(eventType);
-            eventMapWithPayload.Remove(eventType);
+            if (eventId == null) throw new ArgumentNullException(nameof(eventId));
+            if (!payloadEventMap.TryGetValue(eventId, out var rawListeners)) return;
+
+            var listeners = (List<Action<TPayload>>)rawListeners;
+            // 触发时复制当前监听列表, 允许回调内安全增删监听.
+            var invokeList = ListPool<Action<TPayload>>.Get();
+            try
+            {
+                invokeList.AddRange(listeners);
+                for (var i = 0; i < invokeList.Count; i++)
+                {
+                    invokeList[i]?.Invoke(payload);
+                }
+            }
+            finally
+            {
+                invokeList.Clear();
+                ListPool<Action<TPayload>>.Release(invokeList);
+            }
         }
 
-        /// <summary>
-        /// 执行 ClearAll 逻辑.
-        /// </summary>
+        public static void Clear(GameEventId eventId)
+        {
+            if (eventId == null) throw new ArgumentNullException(nameof(eventId));
+
+            eventMap.Remove(eventId);
+            payloadEventMap.Remove(eventId);
+        }
+
         public static void ClearAll()
         {
             eventMap.Clear();
-            eventMapWithPayload.Clear();
+            payloadEventMap.Clear();
         }
 
-        /// <summary>
-        /// 执行 CopyListeners 逻辑.
-        /// </summary>
-        private static List<Action> CopyListeners(HashSet<Action> listeners)
+        private static List<Action> GetListeners(GameEventId eventId)
         {
-            return new List<Action>(listeners);
+            if (!eventMap.TryGetValue(eventId, out var listeners))
+            {
+                listeners = new List<Action>();
+                eventMap[eventId] = listeners;
+            }
+
+            return listeners;
         }
 
-        /// <summary>
-        /// 执行 CopyListeners 逻辑.
-        /// </summary>
-        private static List<Delegate> CopyListeners(HashSet<Delegate> listeners)
+        private static List<Action<TPayload>> GetPayloadListeners<TPayload>(GameEventId<TPayload> eventId)
         {
-            return new List<Delegate>(listeners);
+            if (!payloadEventMap.TryGetValue(eventId, out var rawListeners))
+            {
+                var newListeners = new List<Action<TPayload>>();
+                payloadEventMap[eventId] = newListeners;
+                return newListeners;
+            }
+
+            return (List<Action<TPayload>>)rawListeners;
         }
     }
 }

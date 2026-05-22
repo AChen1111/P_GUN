@@ -59,10 +59,6 @@ namespace Game.UI
             buffDebugWindow.SetVisible(false);
             GameplayCursorState.Reset();
         }
-
-        /// <summary>
-        /// 执行每帧更新逻辑.
-        /// </summary>
         private void Update()
         {
             // Ctrl 只接管鼠标战斗, 不影响移动, 换枪, 装弹和地图快捷键.
@@ -288,20 +284,12 @@ namespace Game.UI
                 GameplayCursorState.SetDebugPanelOpen(buffDebugWindow.IsVisible);
             }
         }
-
-        /// <summary>
-        /// 执行 RestoreSettingsCloseState 逻辑.
-        /// </summary>
         private void RestoreSettingsCloseState()
         {
             settingsOpen = false;
             Time.timeScale = previousTimeScale;
             GameplayCursorState.SetSettingsPanelOpen(false);
         }
-
-        /// <summary>
-        /// 执行 CloseInventoryPanel 逻辑.
-        /// </summary>
         private void CloseInventoryPanel()
         {
             UIStackManager stackManager = UIStackManager.Instance;
@@ -312,20 +300,12 @@ namespace Game.UI
 
             RestoreInventoryCloseState();
         }
-
-        /// <summary>
-        /// 执行 RestoreInventoryCloseState 逻辑.
-        /// </summary>
         private void RestoreInventoryCloseState()
         {
             inventoryOpen = false;
             Time.timeScale = inventoryPreviousTimeScale;
             GameplayCursorState.SetInventoryPanelOpen(false);
         }
-
-        /// <summary>
-        /// 执行 CloseSaveSlotPanel 逻辑.
-        /// </summary>
         private void CloseSaveSlotPanel()
         {
             UIStackManager stackManager = UIStackManager.Instance;
@@ -336,10 +316,6 @@ namespace Game.UI
 
             RestoreSaveSlotCloseState();
         }
-
-        /// <summary>
-        /// 执行 RestoreSaveSlotCloseState 逻辑.
-        /// </summary>
         private void RestoreSaveSlotCloseState()
         {
             saveSlotOpen = false;
@@ -380,26 +356,14 @@ namespace Game.UI
         private float removeButtonWidth = 70f;
 
         public bool IsVisible { get; private set; }
-
-        /// <summary>
-        /// 执行 SetVisible 逻辑.
-        /// </summary>
         public void SetVisible(bool visible)
         {
             IsVisible = visible;
         }
-
-        /// <summary>
-        /// 执行 Toggle 逻辑.
-        /// </summary>
         public void Toggle()
         {
             SetVisible(!IsVisible);
         }
-
-        /// <summary>
-        /// 执行 Draw 逻辑.
-        /// </summary>
         public void Draw(BuffDataBase explicitDataBase, Object source)
         {
             if (!IsVisible)
@@ -445,7 +409,7 @@ namespace Game.UI
 
     static BuffManager ResolveBuffManager()
     {
-        return Global.player != null ? Global.player.GetComponent<BuffManager>() : null;
+        return PlayerRegistry.Current != null ? PlayerRegistry.Current.GetComponent<BuffManager>() : null;
     }
 
     static BuffDataBase ResolveDatabase(BuffDataBase explicitDataBase)
@@ -594,10 +558,6 @@ namespace Game.UI
         statusText = info != null ? $"已添加 {info.Buff.BuffName}." : $"添加失败, ID: {buffId}.";
     }
 }
-
-        /// <summary>
-        /// 执行 BuildTagText 逻辑.
-        /// </summary>
         private static string BuildTagText(BuffTag tag)
         {
             return tag == BuffTag.Negative ? "负面" : "正面";

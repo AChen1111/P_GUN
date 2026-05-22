@@ -26,28 +26,16 @@ namespace Game.UI.Save
         private SaveSlotPanelMode mode = SaveSlotPanelMode.MainMenu;
         private int pendingDeleteSlot = -1;
         private int pendingOverwriteSlot = -1;
-
-        /// <summary>
-        /// 执行 OpenForMainMenu 逻辑.
-        /// </summary>
         public void OpenForMainMenu()
         {
             mode = SaveSlotPanelMode.MainMenu;
             OpenByStack();
         }
-
-        /// <summary>
-        /// 执行 OpenForSafeHouse 逻辑.
-        /// </summary>
         public void OpenForSafeHouse()
         {
             mode = SaveSlotPanelMode.SafeHouse;
             OpenByStack();
         }
-
-        /// <summary>
-        /// 执行 OnOpen 逻辑.
-        /// </summary>
         protected override void OnOpen()
         {
             pendingDeleteSlot = -1;
@@ -59,10 +47,6 @@ namespace Game.UI.Save
 
             Refresh();
         }
-
-        /// <summary>
-        /// 执行 OnClose 逻辑.
-        /// </summary>
         protected override void OnClose()
         {
             pendingDeleteSlot = -1;
@@ -85,10 +69,6 @@ namespace Game.UI.Save
         {
             backButton?.onClick.RemoveListener(CloseByStack);
         }
-
-        /// <summary>
-        /// 执行 OpenByStack 逻辑.
-        /// </summary>
         private void OpenByStack()
         {
             var stackManager = UIStackManager.Instance;
@@ -99,10 +79,6 @@ namespace Game.UI.Save
 
             stackManager.Push(this);
         }
-
-        /// <summary>
-        /// 执行 CloseByStack 逻辑.
-        /// </summary>
         private void CloseByStack()
         {
             var stackManager = UIStackManager.Instance;
@@ -111,10 +87,6 @@ namespace Game.UI.Save
                 stackManager.Pop();
             }
         }
-
-        /// <summary>
-        /// 执行 Refresh 逻辑.
-        /// </summary>
         private void Refresh()
         {
             ClearItems();
@@ -218,10 +190,6 @@ namespace Game.UI.Save
                 Refresh();
             }
 }
-
-        /// <summary>
-        /// 执行 ClearItems 逻辑.
-        /// </summary>
         private void ClearItems()
         {
             for (var i = activeItems.Count - 1; i >= 0; i--)
@@ -234,10 +202,6 @@ namespace Game.UI.Save
 
             activeItems.Clear();
         }
-
-        /// <summary>
-        /// 执行 SetStatus 逻辑.
-        /// </summary>
         private void SetStatus(string message)
         {
             if (statusText != null)
