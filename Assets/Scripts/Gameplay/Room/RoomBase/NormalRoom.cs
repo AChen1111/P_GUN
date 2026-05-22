@@ -108,10 +108,12 @@ namespace Game.Gameplay
         /// </summary>
         protected override async void OnFightAllWavesEnd()
         {
+            Debug.Log($"{nameof(NormalRoom)}: 所有波次敌人已生成完毕.", this);
             if(canGenerateItems) {
                 try
                 {
                     await itemSpawner.SpawnItemAsync(transform.position);
+                    Debug.Log($"{nameof(NormalRoom)}: 房间奖励生成成功.", this);
                 }
                 catch (Exception exception)
                 {

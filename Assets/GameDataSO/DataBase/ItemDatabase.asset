@@ -18,9 +18,9 @@ MonoBehaviour:
     description: "\u56DE\u590D\u4E00\u70B9\u751F\u547D\u503C"
     icon: {fileID: 872467033, guid: bf817939e9a0a3241b3cf68a375367e7, type: 3}
   - itemId: 2
-    itemName: "\u5B9D\u7BB1"
-    description: "\u83B7\u5F97\u968F\u673A\u9053\u5177"
-    icon: {fileID: 21300000, guid: 3d4ced8e78980334ea3a43c06147b491, type: 3}
+    itemName: "\u5947\u7279\u7684\u836F\u6C34"
+    description: "\u83B7\u53D6\u5947\u7279\u7684\u6548\u679C"
+    icon: {fileID: 747178361, guid: bf817939e9a0a3241b3cf68a375367e7, type: 3}
   - itemId: 3
     itemName: "\u52A0\u901F\u836F\u6C34"
     description: "\u52A0\u901F"

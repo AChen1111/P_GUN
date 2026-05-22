@@ -62,13 +62,13 @@ MonoBehaviour:
     isPermanent: 1
     interval: 5
     modifiers: []
-  - id: 3
-    buffName: PoisonBuff
-    icon: {fileID: 21300000, guid: 2d4c93aa1465d33499a2174f838e2ebf, type: 3}
-    description: "\u6C38\u4E45\u4E2D\u6BD2: \u6BCF\u96945\u79D2\u6BCF\u5C42\u53D7\u52301\u70B9\u4F24\u5BB3."
-    tag: 0
-    luaFile: {fileID: 4900000, guid: 921073a9ab0a469886c62babb3cfbd9c, type: 3}
+  - id: 4
+    buffName: HaHaBuff
+    icon: {fileID: 21300000, guid: aa78fb09db3ebed4bb2ea48742962cd7, type: 3}
+    description: hahahaha
+    tag: 1
+    luaFile: {fileID: 4900000, guid: 6d8209bb216055d459a83a1bbce2dce8, type: 3}
     duration: 0
     isPermanent: 1
-    interval: 5
+    interval: 3
     modifiers: []

@@ -1,18 +1,13 @@
 using System;
 using UnityEngine;
 using XLua;
-using Game.Core;
-using Game.Pooling;
-using Game.Animation;
-using Game.Presentation;
-using Game.Items;
 
 namespace Game.Gameplay
 {
     /// <summary>
     /// 单个 Buff 的 Lua 方法缓存, 负责把 C# 生命周期转发到 Lua.
     /// </summary>
-    public sealed class LuaBuffInstance : IDisposable
+    public sealed class LuaBuffInstance : IBuffScriptInstance
     {
         private readonly Buff ownerBuff;
         private Action<BuffRuntimeInfo> onAdd;

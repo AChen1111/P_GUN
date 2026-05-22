@@ -10,9 +10,10 @@ Assets/Scripts/Gameplay/Buffs/Buff/SpeedBuff.lua.txt,buff/lua/speed,Buff,buff;lu
 Assets/Scripts/Gameplay/Buffs/Buff/MaxHpUpBuff.lua.txt,buff/lua/max_hp,Buff,buff;lua,TRUE
 Assets/Scripts/Gameplay/Buffs/Buff/PoisonBuff.lua.txt,buff/lua/poison,Buff,buff;lua,TRUE
 Assets/Scripts/Gameplay/Buffs/Buff/DamageUpBuff.lua.txt,buff/lua/damage_up,Buff,buff;lua,TRUE
+Assets/Scripts/Gameplay/Buffs/Buff/HaHaBuff.lua.txt,buff/lua/haha,Buff,buff;lua,TRUE
 Assets/GameDataSO/DataBase/ItemDatabase.asset,ItemDatabase,Item,item;database,TRUE
 Assets/Prefab/Item/Heart.prefab,item/heart,Item,item;prefab,TRUE
-Assets/Prefab/Item/Chest.prefab,item/chest,Item,item;prefab,TRUE
+Assets/Prefab/Item/HarmUp.prefab,item/harm_up,Item,item;prefab,TRUE
 Assets/Prefab/Item/SpeedUp.prefab,item/speed_up,Item,item;prefab,TRUE
 Assets/Prefab/Item/PowerUp.prefab,item/power_up,Item,item;prefab,TRUE
 Assets/Prefab/Item/Purify.prefab,item/purify,Item,item;prefab,TRUE
@@ -34,3 +35,4 @@ Assets/Prefab/GunList/MP5.prefab,weapon/mp5,Weapon,weapon;prefab,TRUE
 Assets/Prefab/GunList/Pistol.prefab,weapon/pistol,Weapon,weapon;prefab,TRUE
 Assets/Prefab/GunList/RocketGun.prefab,weapon/rocket_gun,Weapon,weapon;prefab,TRUE
 Assets/Prefab/GunList/ShotGun.prefab,weapon/shotgun,Weapon,weapon;prefab,TRUE
+Assets/Scripts/Gameplay/Lua/Hotfix/MainHotfix.lua.txt,hotfix/main,Hotfix,hotfix;lua,TRUE

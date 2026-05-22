@@ -42,7 +42,7 @@ public static class AddressablesLocalGroupSetup
             {
                 Entry("Assets/GameDataSO/DataBase/ItemDatabase.asset", "ItemDatabase", "item", "database"),
                 Entry("Assets/Prefab/Item/Heart.prefab", "item/heart", "item", "prefab"),
-                Entry("Assets/Prefab/Item/Chest.prefab", "item/chest", "item", "prefab"),
+                Entry("Assets/Prefab/Item/HarmUp.prefab", "item/harm_up", "item", "prefab"),
                 Entry("Assets/Prefab/Item/SpeedUp.prefab", "item/speed_up", "item", "prefab"),
                 Entry("Assets/Prefab/Item/PowerUp.prefab", "item/power_up", "item", "prefab"),
                 Entry("Assets/Prefab/Item/Purify.prefab", "item/purify", "item", "prefab")
@@ -79,7 +79,7 @@ public static class AddressablesLocalGroupSetup
             "Shared",
             new[]
             {
-                Entry("Assets/GameDataSO/ItemSpawnerTable/NormalRoomItemTable.asset", "shared/gamedataso/itemspawnertable/normalroomitemtable", "shared"),
+                Entry("Assets/GameDataSO/ItemSpawnerTable/RoomEndTable.asset", "shared/gamedataso/itemspawnertable/roomendtable", "shared"),
                 Entry("Assets/Audio/SFX/Player/Gun/GunSFX/AKShootEnd.mp3", "shared/audio/sfx/player/gun/gunsfx/akshootend", "shared"),
                 Entry("Assets/Assets/Player/Gun/Arrow.png", "shared/assets/player/gun/arrow", "shared"),
                 Entry("Assets/Assets/Player/Gun/ShotGun.png", "shared/assets/player/gun/shotgun", "shared"),
@@ -104,6 +104,12 @@ public static class AddressablesLocalGroupSetup
                 Entry("Assets/Assets/Player/Gun/Pistol.png", "shared/assets/player/gun/pistol", "shared"),
                 Entry("Assets/Assets/Player/PlayerBullet.png", "shared/assets/player/playerbullet", "shared"),
                 Entry("Assets/Audio/SFX/BulletHit/BulletHitBody02.wav", "shared/audio/sfx/bullethit/bullethitbody02", "shared")
+            }),
+        new HotUpdateGroupDefinition(
+            "Hotfix",
+            new[]
+            {
+                Entry("Assets/Scripts/Gameplay/Lua/Hotfix/MainHotfix.lua.txt", "hotfix/main", "hotfix", "lua")
             })
     };
 

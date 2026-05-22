@@ -24,6 +24,13 @@ MonoBehaviour:
     - item
     - prefab
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 11f80f59cb4fd3c4f8e371ff95409cb6
+    m_Address: item/harm_up
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - item
+    - prefab
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: a4f46db2f0b85564a81ad43c4f0b8880
     m_Address: item/heart
     m_ReadOnly: 0
@@ -44,13 +51,6 @@ MonoBehaviour:
     m_SerializedLabels:
     - database
     - item
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: dacb677e2179264459e62d814f35a5f8
-    m_Address: item/chest
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - item
-    - prefab
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: ec55b4f84b4c70f4e958efa2efb7d253
     m_Address: item/speed_up

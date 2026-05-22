@@ -2,7 +2,9 @@
     "name": "XLua.Unity.Editor",
     "rootNamespace": "",
     "references": [
-        "XLua.Runtime"
+        "XLua.Runtime",
+        "Game.Gameplay",
+        "Game.Items"
     ],
     "includePlatforms": [
         "Editor"

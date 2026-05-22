@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using Game.Animation;
-using Game.Core;
 using UnityEngine;
 
 namespace Game.Items
@@ -33,11 +31,11 @@ namespace Game.Items
         /// <summary>
         /// 执行 OnPick 逻辑.
         /// </summary>
-        public override async void OnPick(ItemEffectContext ctx)
+        public override void OnPick(ItemEffectContext ctx)
         {
             try
             {
-                await SpawnLootAsync(ctx);
+                SpawnLoot(ctx);
             }
             catch (Exception exception)
             {
@@ -47,9 +45,9 @@ namespace Game.Items
         }
 
         /// <summary>
-        /// 异步加载并生成掉落物.
+        /// 生成掉落物.
         /// </summary>
-        private async Task SpawnLootAsync(ItemEffectContext ctx)
+        private void SpawnLoot(ItemEffectContext ctx)
         {
             var spawner = ResolveSpawner(ctx);
             if (spawner == null)
@@ -63,7 +61,7 @@ namespace Game.Items
                 UnityEngine.Random.Range(-randomOffsetRange.y, randomOffsetRange.y),
                 0f);
 
-            var selection = await GetRandomPrefabAsync();
+            var selection = GetRandomPrefab();
             if (selection.Prefab == null) return;
 
             if (selection.SpawnAnimEffect != DOTweenAnimType.None)
@@ -78,15 +76,16 @@ namespace Game.Items
         /// <summary>
         /// 获取一个可生成的掉落物预制体.
         /// </summary>
-        private async Task<LootSelection> GetRandomPrefabAsync()
+        private LootSelection GetRandomPrefab()
         {
             if (spawnTable != null)
             {
                 if (spawnTable.TryGetRandomEntry(out var entry))
                 {
+                    spawnTable.TryResolvePrefab(entry, out var prefab);
                     return new LootSelection
                     {
-                        Prefab = await spawnTable.TryResolvePrefabAsync(entry),
+                        Prefab = prefab,
                         SpawnAnimEffect = entry.spawnAnimEffect,
                         SpawnAnimDuration = entry.spawnAnimDuration
                     };
@@ -107,7 +106,8 @@ namespace Game.Items
             {
                 if (configuredPrefab != null)
                 {
-                    validPrefabs.Add(await ResolveRuntimePrefabAsync(configuredPrefab));
+                    // 宝箱旧配置直接使用 Inspector 中引用的 prefab, 不再通过 itemId 替换为 Addressables 资源.
+                    validPrefabs.Add(configuredPrefab);
                 }
             }
 
@@ -131,31 +131,6 @@ namespace Game.Items
             public GameObject Prefab;
             public DOTweenAnimType SpawnAnimEffect;
             public float SpawnAnimDuration;
-        }
-
-        /// <summary>
-        /// 旧 prefab 配置优先按 itemId 解析热更新预制体.
-        /// </summary>
-        private static async Task<GameObject> ResolveRuntimePrefabAsync(GameObject configuredPrefab)
-        {
-            var item = configuredPrefab != null ? configuredPrefab.GetComponent<Item>() : null;
-            if (item == null)
-            {
-                return configuredPrefab;
-            }
-
-            if (!AddressableItemAddressCatalog.TryGetAddress(item.ItemId, out var address))
-            {
-                return configuredPrefab;
-            }
-
-            var loader = AddressableLoader.Instance;
-            if (loader == null)
-            {
-                throw new InvalidOperationException($"{nameof(ChestRandomLootEffect)} requires {nameof(AddressableLoader)} for item prefab replacement.");
-            }
-
-            return await loader.LoadAssetAsync<GameObject>(address);
         }
 
         /// <summary>

@@ -30,7 +30,7 @@ namespace Game.Gameplay
 
 		[Header("物品生成器")]
 		public ItemSpawner itemSpawner;
-		protected bool canGenerateItems = false;
+		[SerializeField] protected bool canGenerateItems = false;
 
 
 		private bool doorsGenerated;

@@ -1,7 +1,11 @@
 {
     "name": "XLua.Runtime",
     "rootNamespace": "",
-    "references": [],
+    "references": [
+        "Game.Gameplay",
+        "Game.Items",
+        "Game.Animation"
+    ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,

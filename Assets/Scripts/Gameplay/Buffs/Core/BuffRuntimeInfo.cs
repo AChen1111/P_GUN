@@ -17,7 +17,7 @@ namespace Game.Gameplay
         public Player Owner => owner;
         public Object Source;
         public Buff Buff;
-        public LuaBuffInstance LuaInstance;
+        public IBuffScriptInstance LuaInstance;
         public float Duration;
         public float RemainingTime;
         public float Interval;

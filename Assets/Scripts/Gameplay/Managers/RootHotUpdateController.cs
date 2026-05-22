@@ -16,7 +16,7 @@ namespace Game.Gameplay
     /// </summary>
     public sealed class RootHotUpdateController : MonoBehaviour
     {
-        private static readonly string[] DownloadLabels = { "room", "buff", "item", "enemy", "weapon", "shared" };
+        private static readonly string[] DownloadLabels = { "room", "buff", "item", "enemy", "weapon", "shared", "hotfix" };
 
         [Header("启动流程")]
         [SerializeField] private string nextSceneName = "StartScene";
@@ -51,6 +51,8 @@ namespace Game.Gameplay
             SetProgress(0f);
             await InitializeAddressablesAsync();
             await TryUpdateRemoteContentAsync();
+            SetStatus("应用热修补丁...");
+            await StartupHotfixRuntime.ExecuteStartupHotfixAsync();
             SetStatus("进入主菜单...");
             SetProgress(1f);
             SceneManager.LoadScene(nextSceneName);

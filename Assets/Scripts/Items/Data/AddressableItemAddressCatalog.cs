@@ -10,7 +10,7 @@ namespace Game.Items
         private static readonly Dictionary<int, string> AddressesByItemId = new Dictionary<int, string>
         {
             { 1, "item/heart" },
-            { 2, "item/chest" },
+            { 2, "item/harm_up" },
             { 3, "item/speed_up" },
             { 4, "item/power_up" },
             { 5, "item/purify" }

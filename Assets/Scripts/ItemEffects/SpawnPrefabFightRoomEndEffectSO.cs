@@ -1,7 +1,5 @@
 using System;
-using System.Threading.Tasks;
 using Game.Animation;
-using Game.Core;
 using Game.Gameplay;
 using Game.Items;
 using UnityEngine;
@@ -22,11 +20,11 @@ namespace Game.ItemEffects
         /// <summary>
         /// 执行 Execute 逻辑.
         /// </summary>
-        public override async void Execute(FightRoom room)
+        public override void Execute(FightRoom room)
         {
             try
             {
-                await ExecuteAsync(room);
+                ExecuteInternal(room);
             }
             catch (Exception exception)
             {
@@ -36,9 +34,9 @@ namespace Game.ItemEffects
         }
 
         /// <summary>
-        /// 异步解析预制体并生成奖励.
+        /// 解析预制体并生成奖励.
         /// </summary>
-        private async Task ExecuteAsync(FightRoom room)
+        private void ExecuteInternal(FightRoom room)
         {
             if (room == null) return;
 
@@ -50,7 +48,7 @@ namespace Game.ItemEffects
             }
 
             var spawnPosition = room.GetRoomCenterPoint() + worldOffset;
-            var selection = await ResolveSelectionAsync();
+            var selection = ResolveSelection();
             if (selection.Prefab == null)
             {
                 Debug.LogWarning($"{nameof(SpawnPrefabFightRoomEndEffectSO)}: prefab 和 spawnTable 都为空。", this);
@@ -69,13 +67,14 @@ namespace Game.ItemEffects
         /// <summary>
         /// 解析战斗结束奖励预制体.
         /// </summary>
-        private async Task<PrefabSelection> ResolveSelectionAsync()
+        private PrefabSelection ResolveSelection()
         {
             if (spawnTable != null && spawnTable.TryGetRandomEntry(out var randomEntry))
             {
+                spawnTable.TryResolvePrefab(randomEntry, out var selectedPrefab);
                 return new PrefabSelection
                 {
-                    Prefab = await spawnTable.TryResolvePrefabAsync(randomEntry),
+                    Prefab = selectedPrefab,
                     SpawnAnimEffect = randomEntry.spawnAnimEffect,
                     SpawnAnimDuration = randomEntry.spawnAnimDuration
                 };
@@ -83,33 +82,9 @@ namespace Game.ItemEffects
 
             return new PrefabSelection
             {
-                Prefab = await ResolveRuntimePrefabAsync(prefab)
+                // 战斗结束奖励直接使用 Inspector 中引用的 prefab, 不再按 itemId 加载 Addressables 资源.
+                Prefab = prefab
             };
-        }
-
-        /// <summary>
-        /// 旧 prefab 配置优先按 itemId 解析热更新预制体.
-        /// </summary>
-        private static async Task<GameObject> ResolveRuntimePrefabAsync(GameObject configuredPrefab)
-        {
-            var item = configuredPrefab != null ? configuredPrefab.GetComponent<Item>() : null;
-            if (item == null)
-            {
-                return configuredPrefab;
-            }
-
-            if (!AddressableItemAddressCatalog.TryGetAddress(item.ItemId, out var address))
-            {
-                return configuredPrefab;
-            }
-
-            var loader = AddressableLoader.Instance;
-            if (loader == null)
-            {
-                throw new InvalidOperationException($"{nameof(SpawnPrefabFightRoomEndEffectSO)} requires {nameof(AddressableLoader)} for item prefab replacement.");
-            }
-
-            return await loader.LoadAssetAsync<GameObject>(address);
         }
 
         /// <summary>
