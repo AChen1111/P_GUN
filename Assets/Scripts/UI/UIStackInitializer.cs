@@ -6,10 +6,6 @@ namespace Game.UI
     {
         [Header("场景主面板")]
         [SerializeField] private UIPanelBase mainPanel;
-
-        /// <summary>
-        /// 执行启动后的初始化逻辑.
-        /// </summary>
         private void Start()
         {
             if (mainPanel == null)

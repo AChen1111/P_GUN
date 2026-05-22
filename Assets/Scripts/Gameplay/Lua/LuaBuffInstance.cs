@@ -89,10 +89,6 @@ namespace Game.Gameplay
         {
             SafeCall(onTrigger, nameof(OnTrigger), info);
         }
-
-        /// <summary>
-        /// 执行 Dispose 逻辑.
-        /// </summary>
         public void Dispose()
         {
             isDisposed = true;
@@ -102,10 +98,6 @@ namespace Game.Gameplay
             onInterval = null;
             onTrigger = null;
         }
-
-        /// <summary>
-        /// 执行 SafeCall 逻辑.
-        /// </summary>
         private void SafeCall(Action<BuffRuntimeInfo> luaAction, string methodName, BuffRuntimeInfo info)
         {
             if (isDisposed || luaAction == null) return;

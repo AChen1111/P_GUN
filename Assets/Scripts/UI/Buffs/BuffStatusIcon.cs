@@ -13,10 +13,6 @@ namespace Game.UI
 
         private BuffRuntimeInfo runtimeInfo;
         private BuffTooltipPanel tooltipPanel;
-
-        /// <summary>
-        /// 执行 Configure 逻辑.
-        /// </summary>
         public void Configure(BuffRuntimeInfo info, BuffTooltipPanel tooltip)
         {
             runtimeInfo = info;
@@ -36,10 +32,6 @@ namespace Game.UI
                 iconImage.enabled = runtimeInfo.Buff.Icon != null;
             }
 }
-
-        /// <summary>
-        /// 执行 RefreshLabel 逻辑.
-        /// </summary>
         public void RefreshLabel()
         {
             if (runtimeInfo == null || stackOrTimeText == null)
@@ -51,10 +43,6 @@ namespace Game.UI
                 ? Mathf.Max(1, runtimeInfo.StackCount).ToString()
                 : Mathf.CeilToInt(Mathf.Max(0f, runtimeInfo.RemainingTime)).ToString();
         }
-
-        /// <summary>
-        /// 执行 OnPointerEnter 逻辑.
-        /// </summary>
         public void OnPointerEnter(PointerEventData eventData)
         {
             if (tooltipPanel == null || runtimeInfo == null)
@@ -64,10 +52,6 @@ namespace Game.UI
 
             tooltipPanel.Show(runtimeInfo, eventData.position);
         }
-
-        /// <summary>
-        /// 执行 OnPointerExit 逻辑.
-        /// </summary>
         public void OnPointerExit(PointerEventData eventData)
         {
             tooltipPanel?.Hide();

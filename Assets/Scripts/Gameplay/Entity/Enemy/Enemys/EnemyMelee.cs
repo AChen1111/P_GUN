@@ -27,10 +27,6 @@ namespace Game.Gameplay
         private bool isAttacking;
 
         protected override WeaponType WeaponType => WeaponType.Melee;
-
-        /// <summary>
-        /// 执行 OnInit 逻辑.
-        /// </summary>
         protected override void OnInit()
         {
             ResolveComponents();
@@ -56,10 +52,6 @@ namespace Game.Gameplay
                 ConfigureDetector(false);
             }
 }
-
-        /// <summary>
-        /// 执行 RegisterFSM 逻辑.
-        /// </summary>
         protected override void RegisterFSM(FSM<EnemyState> fsm)
         {
             fsm.State(EnemyState.Follow)
@@ -208,10 +200,6 @@ namespace Game.Gameplay
 
             ConfigureDetector(false);
         }
-
-        /// <summary>
-        /// 执行 StopVelocity 逻辑.
-        /// </summary>
         private void StopVelocity()
         {
             if (Rb != null)
@@ -219,10 +207,6 @@ namespace Game.Gameplay
                 Rb.velocity = Vector2.zero;
             }
         }
-
-        /// <summary>
-        /// 执行 ConfigureDetector 逻辑.
-        /// </summary>
         private void ConfigureDetector(bool applyDefaultShape)
         {
             if (attackDetector == null) return;

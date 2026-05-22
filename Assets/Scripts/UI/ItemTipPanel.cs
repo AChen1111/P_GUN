@@ -33,10 +33,6 @@ namespace Game.UI
         {
             ResolveReferences();
         }
-
-        /// <summary>
-        /// 执行 Show 逻辑.
-        /// </summary>
         public void Show(ItemData data)
         {
             ResolveReferences();
@@ -70,10 +66,6 @@ namespace Game.UI
                 promptText.text = DefaultPromptText;
             }
         }
-
-        /// <summary>
-        /// 执行 Hide 逻辑.
-        /// </summary>
         public void Hide()
         {
             if (canvasGroup != null)
@@ -85,10 +77,6 @@ namespace Game.UI
 
             gameObject.SetActive(false);
         }
-
-        /// <summary>
-        /// 执行 ResolveReferences 逻辑.
-        /// </summary>
         private void ResolveReferences()
         {
             if (canvasGroup == null)

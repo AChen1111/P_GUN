@@ -56,10 +56,6 @@ namespace Game.Items
 
             return Task.FromResult<GameObject>(null);
         }
-
-        /// <summary>
-        /// 执行 TryResolvePrefab 逻辑.
-        /// </summary>
         public bool TryResolvePrefab(ItemSpawnEntry entry, out GameObject prefab)
         {
             // 物品生成表只使用 Inspector 中直接引用的 prefab, 不再通过 Addressables 地址加载.
@@ -108,10 +104,6 @@ namespace Game.Items
 
             return false;
         }
-
-        /// <summary>
-        /// 执行 HasResolvablePrefab 逻辑.
-        /// </summary>
         private static bool HasResolvablePrefab(ItemSpawnEntry entry)
         {
             // 生成时必须显式绑定 prefab.

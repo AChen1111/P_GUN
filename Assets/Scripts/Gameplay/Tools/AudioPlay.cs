@@ -83,10 +83,6 @@ namespace Game.Gameplay
             currentClip = clip;
             return clip;
         }
-
-        /// <summary>
-        /// 执行 Clear 逻辑.
-        /// </summary>
         public void Clear()
         {
             currentClip = null;

@@ -6,8 +6,7 @@ namespace Game.Core
     /// <summary>
     /// ScriptableObject 数据库基类, 只负责维护 id 索引和导入后刷新.
     /// </summary>
-    public abstract class ScriptableObjectDatabase<TDatabase, TKey, TValue> : ScriptableObject
-        where TDatabase : ScriptableObjectDatabase<TDatabase, TKey, TValue>
+    public abstract class ScriptableObjectDatabase<TKey, TValue> : ScriptableObject
     {
         private Dictionary<TKey, TValue> indexMap;
 
@@ -20,10 +19,6 @@ namespace Game.Core
         /// 字典比较器, 子类可覆盖以实现字符串大小写不敏感等规则.
         /// </summary>
         protected virtual IEqualityComparer<TKey> KeyComparer => EqualityComparer<TKey>.Default;
-
-        /// <summary>
-        /// 执行 TryGetById 逻辑.
-        /// </summary>
         public bool TryGetById(TKey id, out TValue data)
         {
             return IndexMap.TryGetValue(id, out data);
@@ -61,10 +56,6 @@ namespace Game.Core
                 return indexMap;
             }
         }
-
-        /// <summary>
-        /// 执行 RebuildIndex 逻辑.
-        /// </summary>
         private void RebuildIndex()
         {
             if (indexMap == null)

@@ -33,11 +33,6 @@ namespace Game.Animation
                 spriteRenderer = GetComponent<SpriteRenderer>();
             }
         }
-
-
-        /// <summary>
-        /// 执行 Play 逻辑.
-        /// </summary>
         public void Play(Action OnComplete)
         {
             if (isPlaying)
@@ -96,10 +91,6 @@ namespace Game.Animation
                     playingTween = null;
                 });
         }
-
-        /// <summary>
-        /// 执行 PreviewAnimation 逻辑.
-        /// </summary>
         [ContextMenu("预览动画")]
         public void PreviewAnimation()
         {
@@ -109,10 +100,6 @@ namespace Game.Animation
                 Debug.Log("动画完成");
             });
         }
-
-        /// <summary>
-        /// 执行 ResetSprite 逻辑.
-        /// </summary>
         [ContextMenu("重置精灵图")]
         public void ResetSprite()
         {

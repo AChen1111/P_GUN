@@ -43,26 +43,14 @@ namespace Game.Presentation
             ResolveText();
             CaptureDefaults();
         }
-
-        /// <summary>
-        /// 执行 OnSpawnFromPool 逻辑.
-        /// </summary>
         public void OnSpawnFromPool()
         {
             ResetState();
         }
-
-        /// <summary>
-        /// 执行 OnRecycleToPool 逻辑.
-        /// </summary>
         public void OnRecycleToPool()
         {
             ResetState();
         }
-
-        /// <summary>
-        /// 执行 Play 逻辑.
-        /// </summary>
         public void Play(int damage, Vector3 basePosition)
         {
             ResolveText();
@@ -104,20 +92,12 @@ namespace Game.Presentation
                 OnComplete?.Invoke(this);
             });
         }
-
-        /// <summary>
-        /// 执行 ResolveText 逻辑.
-        /// </summary>
         private void ResolveText()
         {
             if(text != null) return;
 
             text = GetComponent<TextMeshPro>();
         }
-
-        /// <summary>
-        /// 执行 CaptureDefaults 逻辑.
-        /// </summary>
         private void CaptureDefaults()
         {
             if(text != null) {
@@ -126,10 +106,6 @@ namespace Game.Presentation
 
             defaultScale = transform.localScale;
         }
-
-        /// <summary>
-        /// 执行 ResetState 逻辑.
-        /// </summary>
         private void ResetState()
         {
             // 对象池复用时必须清理 Tween, 避免上一轮淡出或回调影响下一次显示.

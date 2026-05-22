@@ -46,10 +46,6 @@ namespace Game.Gameplay
         {
             TryRequestAttack(other);
         }
-
-        /// <summary>
-        /// 执行 OnTriggerStay2D 逻辑.
-        /// </summary>
         private void OnTriggerStay2D(Collider2D other)
         {
             TryRequestAttack(other);
@@ -97,10 +93,6 @@ namespace Game.Gameplay
             currentPlayer = null;
             return false;
         }
-
-        /// <summary>
-        /// 执行 TryRequestAttack 逻辑.
-        /// </summary>
         private void TryRequestAttack(Collider2D other)
         {
             if (!other.CompareTag("Player")) return;

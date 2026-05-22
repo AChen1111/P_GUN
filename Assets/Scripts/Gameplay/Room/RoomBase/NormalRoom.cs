@@ -16,10 +16,6 @@ namespace Game.Gameplay
 
         [Header("敌人可能出现的位置坐标点")]
         [SerializeField] private List<Transform> enemyPoints = new List<Transform>();
-
-        /// <summary>
-        /// 执行 GetInitialWaveCount 逻辑.
-        /// </summary>
         protected override int GetInitialWaveCount()
         {
             if (enemySpawnTable != null && enemySpawnTable.WaveCount > 0)
@@ -102,10 +98,6 @@ namespace Game.Gameplay
         return true;
     }
 }
-
-        /// <summary>
-        /// 执行 OnFightAllWavesEnd 逻辑.
-        /// </summary>
         protected override async void OnFightAllWavesEnd()
         {
             Debug.Log($"{nameof(NormalRoom)}: 所有波次敌人已生成完毕.", this);

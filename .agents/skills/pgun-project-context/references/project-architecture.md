@@ -10,7 +10,7 @@ Important external packages and conventions:
 - DOTween is used for runtime animation feedback.
 - Addressables are used for loading hot-update databases, room data, item prefabs, enemy prefabs, and weapon prefabs.
 - xLua is used by the Buff system.
-- xLua runtime glue lives in `Assets/Scripts/Gameplay/Lua` as the `Game.Lua` asmdef. Gameplay code owns only the script abstractions (`IBuffScriptFactory`, `IBuffScriptInstance`, `BuffScriptRuntime`) so `Game.Gameplay` does not reference `XLua.Runtime`.
+- xLua runtime glue lives in `Assets/Scripts/Gameplay/Lua` as the `Game.Lua` asmdef. Gameplay code owns only the script abstractions (`IBuffScriptInstance`, `BuffScriptRuntime`) so `Game.Gameplay` does not reference `XLua.Runtime`.
 - `Assets/UnityEasyWorkTools` is the shared editor tooling suite, currently containing visual animation sequences, UI auto binding, and table import tools.
 - `Assets/UnityEasyWorkTools/UnityEasyWorkToolsPathSettings.asset` stores editable default paths for UnityEasyWorkTools. Open it through `Tools/UnityEasyWorkTools/Settings/Open Path Settings`.
 - UnityEasyWorkTools editor UI uses UI Toolkit. `.uxml` and `.uss` files are kept in each module's `Editor/UI` folder; C# editor scripts bind serialized data and implement commands.
@@ -19,7 +19,7 @@ Important external packages and conventions:
 
 Location: `Assets/Scripts/Core`
 
-`ScriptableObjectDatabase<TDatabase, TKey, TValue>` is the shared base for data tables. Subclasses provide `DataValues` and `TryGetKey`, then query with `TryGetById(TKey id, out TValue data)`. Importers should update data through subclass replace methods so the runtime index rebuilds.
+`ScriptableObjectDatabase<TKey, TValue>` is the shared base for data tables. Subclasses provide `DataValues` and `TryGetKey`, then query with `TryGetById(TKey id, out TValue data)`. Importers should update data through subclass replace methods so the runtime index rebuilds.
 
 Known subclasses:
 
@@ -28,9 +28,9 @@ Known subclasses:
 - `Game.Gameplay.WeaponDatabase`: key `string WeaponId`, value `WeaponData`.
 - `Game.Gameplay.EnemyDatabase`: key `int enemyId`, value `EnemyData`.
 
-`EventCenter` is the simple static event bus. Use `AddListener`, `RemoveListener`, and `Trigger` with `GameEvent`. Payload events are generic, so listener payload types must match trigger payload types.
+`EventCenter` is the simple static event bus. Use `AddListener`, `RemoveListener`, and `Trigger` with typed event keys.
 
-Current `GameEvent` includes player health/death/game events, player Buff changes, minimap show/hide/toggle, item tip show/hide, item picked, bullet clip/bag changes, door open/close, and room generation completion.
+Current event key groups are `CoreEvents` for global UI/gameplay signals, `GameplayEvents` for gameplay payload types, and `ItemEvents` for item/inventory signals. Payload event keys encode their payload type at compile time.
 
 ## Database Loading
 
@@ -100,9 +100,9 @@ Locations:
 
 - Requires `Collider2D`.
 - Uses `itemId` plus an optional `ItemDatabase` to resolve display data.
-- Shows/hides item tips through `EventCenter.Trigger(GameEvent.ItemTipShown, ItemData)` and `GameEvent.ItemTipHidden`.
+- Shows/hides item tips through `EventCenter.Trigger(ItemEvents.ItemTipShown, ItemData)` and `ItemEvents.ItemTipHidden`.
 - Picks up on `F` while the player is in range.
-- Triggers `GameEvent.ItemPicked`.
+- Triggers `ItemEvents.ItemPicked`.
 - Plays Animator trigger `OnPickup` if available.
 - Falls back to `GameDOTweenAnimation.Play(callback)` if no pickup trigger exists.
 - Adds itself to the player's `PlayerInventory`; item effects are executed later from the inventory UI.
@@ -125,7 +125,7 @@ public abstract void OnPick(ItemEffectContext ctx);
 
 Known item effects include healing, applying buffs, cleansing negative buffs, chest random loot, and spawning prefabs at fight-room end.
 
-`PlayerInventory` lives on the player prefab and stores runtime `InventoryItemStack` data by `itemId`. Stacks preserve display data and effect assets, but do not keep references to pooled pickup GameObjects. `AddFromItem(Item item)` stacks pickups and triggers `GameEvent.InventoryChanged`; `Use(int itemId)` executes all currently usable effects and consumes one item only when at least one effect can be used.
+`PlayerInventory` lives on the player prefab and stores runtime `InventoryItemStack` data by `itemId`. Stacks preserve display data and effect assets, but do not keep references to pooled pickup GameObjects. `AddFromItem(Item item)` stacks pickups and triggers `ItemEvents.InventoryChanged`; `Use(int itemId)` executes all currently usable effects and consumes one item only when at least one effect can be used.
 
 ## Save System
 
@@ -138,10 +138,11 @@ Locations:
 The v1 save system is a JSON safe-point framework with 3 fixed slots:
 
 - Slot files: `Application.persistentDataPath/Saves/slot_1.json` through `slot_3.json`.
-- `SaveGameService` is the UI-facing API for `SaveToSlot`, `LoadFromSlot`, `DeleteSlot`, and `GetSlotSummaries`.
+- `SaveGameService` is the UI-facing API for `SaveToSlot`, `LoadFromSlotAsync`, `DeleteSlot`, `GetSlotSummaries`, `ApplyPendingGenerationSettings`, and `TryRestorePendingSaveAsync`.
 - `SaveSlotStorage` owns JSON file path, read, write, delete, and summary extraction only.
 - `GameSaveData` stores version, saved time, scene name, LevelGraph address, map seed, current room id, player snapshot, and room snapshot list.
-- `LoadFromSlot` reads JSON, stores it as pending data, reloads `GameScene`, injects the saved LevelGraph address and Edgar seed before generation, then restores room progress and player state after generated rooms initialize.
+- `LoadFromSlotAsync` reads JSON, ensures databases are loaded, stores data as pending data, reloads `GameScene`, injects the saved LevelGraph address and Edgar seed before generation, then restores room progress and player state after generated rooms initialize.
+- `SaveDataBuilder`, `SaveDataRestorer`, and `SaveSlotSnapshotCapture` own capture, restore, and snapshot details so `SaveGameService` stays a facade.
 
 Rules:
 
@@ -185,7 +186,7 @@ Regular stat changes are data-driven through `StatModifier`:
 - `CalculateStat(StatType statType, float baseValue)`
 - `ActiveBuffs`
 
-If a non-permanent buff already exists, adding it resets duration and triggers `OnAdd` again. If a permanent buff already exists, adding it increments `BuffRuntimeInfo.StackCount`; stat modifiers scale by stack count, with `FinalMul` repeated once per stack. Add, remove, and clear operations trigger `GameEvent.PlayerBuffsChanged` for UI refresh.
+If a non-permanent buff already exists, adding it resets duration and triggers `OnAdd` again. If a permanent buff already exists, adding it increments `BuffRuntimeInfo.StackCount`; stat modifiers scale by stack count, with `FinalMul` repeated once per stack. Add, remove, and clear operations trigger `GameplayEvents.PlayerBuffsChanged` for UI refresh.
 
 `BuffTag` has `Positive` and `Negative`. Buff CSV uses a `tag` column with those enum names. Purge/cleanse item effects should call `RemoveBuffsByTag(BuffTag.Negative)` instead of scanning UI state.
 
@@ -199,7 +200,7 @@ If a non-permanent buff already exists, adding it resets duration and triggers `
 
 Lua failures are caught and logged, so C# callers should still validate missing or invalid Lua assets early where possible.
 
-`LuaManager` and `LuaBuffInstance` are compiled by `Game.Lua`, not `Game.Gameplay`. `LuaManager` registers itself through `BuffScriptRuntime.RegisterFactory()` and `StartupHotfixRuntime.RegisterRunner()` in `Awake`, then unregisters both on destroy. `BuffManager` creates script instances through `BuffScriptRuntime.Factory`; `RootHotUpdateController` executes startup hotfix through `StartupHotfixRuntime.ExecuteStartupHotfixAsync()` before loading `StartScene`. Do not reintroduce a direct `XLua.Runtime` reference into `Game.Gameplay`, because xLua Hotfix generated bridge code needs to reference gameplay assemblies from `XLua.Runtime`.
+`LuaManager` and `LuaBuffInstance` are compiled by `Game.Lua`, not `Game.Gameplay`. `LuaManager` registers `CreateBuffInstance` through `BuffScriptRuntime.RegisterFactory()` and registers startup hotfix through `StartupHotfixRuntime.RegisterRunner()` in `Awake`, then unregisters both on destroy. `BuffManager` creates script instances through the `BuffScriptRuntime.Factory` delegate; `RootHotUpdateController` executes startup hotfix through `StartupHotfixRuntime.ExecuteStartupHotfixAsync()` before loading `StartScene`. Do not reintroduce a direct `XLua.Runtime` reference into `Game.Gameplay`, because xLua Hotfix generated bridge code needs to reference gameplay assemblies from `XLua.Runtime`.
 
 xLua Hotfix target classes are listed in `Assets/XLua/Editor/PgunHotfixConfig.cs`. The asmdef-compatible workflow is:
 
@@ -219,7 +220,7 @@ Locations:
 - `Assets/Scripts/Gameplay/Entity/Player`
 - `Assets/Scripts/Gameplay/Entity/Player/Weapon`
 
-`Player` is a QFramework `ViewController`. It owns movement, sleep animation, health, hurt feedback, gun switching, auto aim, and player-global registration via `Global.player`.
+`Player` is a QFramework `ViewController`. It owns movement, sleep animation, health, hurt feedback, gun switching, auto aim, and player-global registration via `PlayerRegistry.Current`.
 
 Important `Player` APIs:
 
@@ -342,13 +343,13 @@ UI uses `Game.UI` namespace. The current stack includes:
 
 The item UI flow is event-driven:
 
-- `Item` triggers `GameEvent.ItemTipShown` with `ItemData`.
-- `Item` triggers `GameEvent.ItemTipHidden`.
+- `Item` triggers `ItemEvents.ItemTipShown` with `ItemData`.
+- `Item` triggers `ItemEvents.ItemTipHidden`.
 - UI listens and updates tip visibility/content.
 
 Buff status UI lives in `Assets/Scripts/UI/Buffs`:
 
-- `BuffStatusPanel` listens for `GameEvent.PlayerBuffsChanged`, reads `Global.player.buffManager.ActiveBuffs`, and creates one status icon per active Buff.
+- `BuffStatusPanel` listens for `GameplayEvents.PlayerBuffsChanged`, reads `PlayerRegistry.Current.buffManager.ActiveBuffs`, and creates one status icon per active Buff.
 - `BuffStatusIcon` displays `Buff.Icon` and either remaining seconds for non-permanent Buffs or `StackCount` for permanent Buffs.
 - `BuffTooltipPanel` shows `Buff.BuffName` and `Buff.Description` on hover.
 
@@ -356,7 +357,7 @@ Buff debug UI lives in `Assets/Scripts/UI/GameSceneUIInputController.cs`:
 
 - `BuffDebugWindow` is an IMGUI runtime debug helper for adding, removing, and clearing player Buffs.
 - `GameSceneUIInputController` toggles the window with `Alt+Up` and reports the debug panel state to `GameplayCursorState`.
-- The debug window reads a serialized `BuffDataBase` when provided, otherwise uses `DataBaseManager.Instance.Buffs`, and applies Buffs through `Global.player`'s `BuffManager`.
+- The debug window reads a serialized `BuffDataBase` when provided, otherwise uses `DataBaseManager.Instance.Buffs`, and applies Buffs through `PlayerRegistry.Current`'s `BuffManager`.
 
 Game scene UI stack rules:
 
@@ -365,7 +366,7 @@ Game scene UI stack rules:
 - Win, over, and game settings panels are `UIPanelBase` panels opened with `UIStackManager.Push()`.
 - `GameSceneUIInputController` belongs to the scene `GameUI` object, opens the settings panel with Esc, opens the inventory panel with CapsLock, pauses by preserving/restoring `Time.timeScale`, and updates `GameplayCursorState`.
 - `GameplayCursorState` is in `Game.Core`; Player must check `BlocksMouseCombat` before mouse aiming, auto-aim display, and mouse shooting.
-- `InventoryPanel` and `InventorySlotView` live in `Assets/Scripts/UI/Inventory`; their prefabs live in `Assets/Prefab/UI/Inventory`. The panel listens to `GameEvent.InventoryChanged`, reads `Global.player.GetComponent<PlayerInventory>()`, displays one slot per item stack, shows the selected item description on the right, and pops a top hint when a right-click use is blocked.
+- `InventoryPanel` and `InventorySlotView` live in `Assets/Scripts/UI/Inventory`; their prefabs live in `Assets/Prefab/UI/Inventory`. The panel listens to `ItemEvents.InventoryChanged`, reads `PlayerRegistry.Current.GetComponent<PlayerInventory>()`, displays one slot per item stack, shows the selected item description on the right, and pops a top hint when a right-click use is blocked.
 
 When adding UI, use existing event flow before adding direct scene references.
 

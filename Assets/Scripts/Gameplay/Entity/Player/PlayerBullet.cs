@@ -114,7 +114,7 @@ namespace Game.Gameplay
                 hasHit = true;
 
                 PlaySelfHitSound();
-                var finalDamage = Global.player != null ? Global.player.CalculateBulletDamage(damage) : damage;
+                var finalDamage = PlayerRegistry.Current != null ? PlayerRegistry.Current.CalculateBulletDamage(damage) : damage;
                 DamageInfo damageInfo = new DamageInfo(finalDamage, dir);
 
                 target.GetComponent<EnemyBase>()?.Hurt(damageInfo);

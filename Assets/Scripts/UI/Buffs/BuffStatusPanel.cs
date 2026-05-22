@@ -31,7 +31,7 @@ namespace Game.UI
         /// </summary>
         private void OnEnable()
         {
-            EventCenter.AddListener(GameEvent.PlayerBuffsChanged, Refresh);
+            EventCenter.AddListener(GameplayEvents.PlayerBuffsChanged, Refresh);
             Refresh();
         }
 
@@ -40,13 +40,9 @@ namespace Game.UI
         /// </summary>
         private void OnDisable()
         {
-            EventCenter.RemoveListener(GameEvent.PlayerBuffsChanged, Refresh);
+            EventCenter.RemoveListener(GameplayEvents.PlayerBuffsChanged, Refresh);
             ClearIcons();
         }
-
-        /// <summary>
-        /// 执行每帧更新逻辑.
-        /// </summary>
         private void Update()
         {
             for (var i = 0; i < activeIcons.Count; i++)
@@ -54,10 +50,6 @@ namespace Game.UI
                 activeIcons[i].RefreshLabel();
             }
         }
-
-        /// <summary>
-        /// 执行 Refresh 逻辑.
-        /// </summary>
         private void Refresh()
         {
             ClearIcons();
@@ -75,7 +67,7 @@ namespace Game.UI
 
             static BuffManager ResolveBuffManager()
             {
-                return Global.player != null ? Global.player.buffManager : null;
+                return PlayerRegistry.Current != null ? PlayerRegistry.Current.buffManager : null;
             }
 
             void CreateIcon(BuffRuntimeInfo info)
@@ -91,10 +83,6 @@ namespace Game.UI
                 activeIcons.Add(icon);
             }
 }
-
-        /// <summary>
-        /// 执行 ClearIcons 逻辑.
-        /// </summary>
         private void ClearIcons()
         {
             tooltipPanel?.Hide();

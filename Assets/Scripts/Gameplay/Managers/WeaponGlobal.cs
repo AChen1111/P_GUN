@@ -1,11 +1,5 @@
 using UnityEngine;
 using QFramework;
-using System.Collections.Generic;
-using Game.Core;
-using Game.Pooling;
-using Game.Animation;
-using Game.Presentation;
-using Game.Items;
 
 namespace Game.Gameplay
 {
@@ -22,5 +16,14 @@ namespace Game.Gameplay
 		}
 		public AudioSource WeaponAudioSource;
 
+        public void PlayGunFire(Vector2 position, Vector2 direction)
+        {
+            GunFire.Position2D(position);
+            GunFire.transform.right = direction;
+            GunFire.Show();
+
+            // 枪口火光只显示短暂数帧, 具体 SpriteRenderer 由场景 WeaponGlobal 绑定.
+            ActionKit.DelayFrame(3, () => GunFire.Hide()).StartCurrentScene();
+        }
     }
 }

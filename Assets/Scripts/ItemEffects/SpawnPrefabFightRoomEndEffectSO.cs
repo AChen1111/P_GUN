@@ -16,10 +16,6 @@ namespace Game.ItemEffects
         [SerializeField] private ItemSpawnTableSO spawnTable;
         [SerializeField] private Vector3 worldOffset = Vector3.zero;
         [SerializeField] private string animEffectKey = "Scale0To1";
-
-        /// <summary>
-        /// 执行 Execute 逻辑.
-        /// </summary>
         public override void Execute(FightRoom room)
         {
             try

@@ -11,7 +11,7 @@ namespace Game.Gameplay
     /// <summary>
     /// Lua 全局管理器, 负责创建 Lua 环境并缓存脚本 table.
     /// </summary>
-    public sealed class LuaManager : MonoBehaviour, IBuffScriptFactory, IStartupHotfixRunner
+    public sealed class LuaManager : MonoBehaviour, IStartupHotfixRunner
     {
         private const string StartupHotfixAddress = "hotfix/main";
 
@@ -39,14 +39,10 @@ namespace Game.Gameplay
             DontDestroyOnLoad(gameObject);
             luaEnv = new LuaEnv();
             // Root 场景中的 LuaManager 是 Buff 脚本工厂的唯一注册者.
-            BuffScriptRuntime.RegisterFactory(this);
+            BuffScriptRuntime.RegisterFactory(CreateBuffInstance);
             // Root 场景中的 LuaManager 负责执行启动热修入口.
             StartupHotfixRuntime.RegisterRunner(this);
         }
-
-        /// <summary>
-        /// 执行每帧更新逻辑.
-        /// </summary>
         private void Update()
         {
             luaEnv?.Tick();
@@ -181,7 +177,7 @@ namespace Game.Gameplay
                 Instance = null;
             }
 
-            BuffScriptRuntime.UnregisterFactory(this);
+            BuffScriptRuntime.UnregisterFactory(CreateBuffInstance);
             StartupHotfixRuntime.UnregisterRunner(this);
 
             foreach (var table in buffTableCache.Values)

@@ -1,6 +1,5 @@
 using UnityEngine;
 using Game.Core;
-using Game.Animation;
 using Game.Items;
 using Game.Gameplay;
 
@@ -12,22 +11,14 @@ namespace Game.ItemEffects
         [SerializeField] private int buffId = 0;
         [SerializeField] private BuffDataBase buffDataBase = null;
         [SerializeField] private bool showHeadMessage = true;
-
-        /// <summary>
-        /// 执行 CanUse 逻辑.
-        /// </summary>
         public override bool CanUse(ItemEffectContext ctx)
         {
-            var player = Global.player;
+            var player = PlayerRegistry.Current;
             return player != null && ResolveBuff() != null && player.GetComponent<BuffManager>() != null;
         }
-
-        /// <summary>
-        /// 执行 OnPick 逻辑.
-        /// </summary>
         public override void OnPick(ItemEffectContext ctx)
         {
-            var player = Global.player;
+            var player = PlayerRegistry.Current;
             if (player == null) return;
 
             var targetBuff = ResolveBuff();
@@ -43,12 +34,8 @@ namespace Game.ItemEffects
             var info = manager.AddBuff(targetBuff, ctx.SourceObject != null ? ctx.SourceObject : this);
             if (info == null || !showHeadMessage) return;
 
-            EventCenter.Trigger(GameEvent.PlayerHeadMessageRequested, new PlayerHeadMessageEvent($"{info.Buff.BuffName} 生效", 1.5f));
+            EventCenter.Trigger(CoreEvents.PlayerHeadMessageRequested, new PlayerHeadMessageEvent($"{info.Buff.BuffName} 生效", 1.5f));
         }
-
-        /// <summary>
-        /// 执行 ResolveBuff 逻辑.
-        /// </summary>
         private Buff ResolveBuff()
         {
             var database = buffDataBase != null ? buffDataBase : DataBaseManager.Instance?.Buffs;

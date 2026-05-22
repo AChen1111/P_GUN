@@ -38,10 +38,6 @@ namespace Game.Presentation
         {
             RefreshParticleSystems();
         }
-
-        /// <summary>
-        /// 执行每帧更新逻辑.
-        /// </summary>
         private void Update()
         {
             if (!isPlaying || Time.time < completeTime) return;
@@ -57,34 +53,18 @@ namespace Game.Presentation
             if (deactivateOnComplete)
                 gameObject.SetActive(false);
         }
-
-        /// <summary>
-        /// 执行 Play 逻辑.
-        /// </summary>
         public void Play(Vector3 position, Vector2 direction)
         {
             Play(position, direction, BloodVfxColorMode.Red);
         }
-
-        /// <summary>
-        /// 执行 OnSpawnFromPool 逻辑.
-        /// </summary>
         public void OnSpawnFromPool()
         {
             StopImmediate();
         }
-
-        /// <summary>
-        /// 执行 OnRecycleToPool 逻辑.
-        /// </summary>
         public void OnRecycleToPool()
         {
             StopImmediate();
         }
-
-        /// <summary>
-        /// 执行 Play 逻辑.
-        /// </summary>
         public void Play(Vector3 position, Vector2 direction, BloodVfxColorMode colorMode)
         {
             transform.position = position;
@@ -152,10 +132,6 @@ namespace Game.Presentation
         color.color = new ParticleSystem.MinMaxGradient(gradient);
     }
 }
-
-        /// <summary>
-        /// 执行 SetDirection 逻辑.
-        /// </summary>
         public void SetDirection(Vector2 direction)
         {
             if (direction.sqrMagnitude < 0.001f) return;
@@ -163,19 +139,11 @@ namespace Game.Presentation
             var angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
             transform.rotation = Quaternion.Euler(0f, 0f, angle);
         }
-
-        /// <summary>
-        /// 执行 RefreshParticleSystems 逻辑.
-        /// </summary>
         [ContextMenu("Refresh Particle Systems")]
         public void RefreshParticleSystems()
         {
             particleSystems = GetComponentsInChildren<ParticleSystem>(true);
         }
-
-        /// <summary>
-        /// 执行 StopImmediate 逻辑.
-        /// </summary>
         public void StopImmediate()
         {
             isPlaying = false;

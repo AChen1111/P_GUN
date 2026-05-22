@@ -33,10 +33,6 @@ namespace Game.Items
                 }
             }
         }
-
-        /// <summary>
-        /// 执行 Add 逻辑.
-        /// </summary>
         public void Add(ItemData data, IEnumerable<ItemEffectBase> sourceEffects)
         {
             // 每次拾取刷新展示数据, 允许数据库或 prefab 配置更新后立即反映到背包.
@@ -56,10 +52,6 @@ namespace Game.Items
                 }
             }
         }
-
-        /// <summary>
-        /// 执行 TryConsumeOne 逻辑.
-        /// </summary>
         public bool TryConsumeOne()
         {
             if (Count <= 0)
@@ -70,10 +62,6 @@ namespace Game.Items
             Count--;
             return true;
         }
-
-        /// <summary>
-        /// 执行 GetUsableEffects 逻辑.
-        /// </summary>
         public List<ItemEffectBase> GetUsableEffects(ItemEffectContext ctx)
         {
             var usableEffects = new List<ItemEffectBase>();

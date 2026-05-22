@@ -33,14 +33,14 @@ P_GUN is a Unity 2022.3 2D top-down shooter project. Runtime code is split by as
 - Prefer the existing namespace and asmdef layout: `Game.Core`, `Game.Gameplay`, `Game.Items`, `Game.ItemEffects`, `Game.Pooling`, `Game.UI`, `Game.Animation`, `Game.Presentation`.
 - Preserve existing serialized field names where possible, because Unity scene and prefab references depend on them.
 - Do not rename or move Unity assets, `.meta` files, asmdefs, scenes, or prefabs unless the task requires it.
-- For runtime cross-system notifications, prefer `Game.Core.EventCenter` and existing `GameEvent` values before adding new singleton coupling.
-- Buff 状态栏 UI lives in `Assets/Scripts/UI/Buffs` and `Assets/Prefab/UI/Buff`; it reads `BuffManager.ActiveBuffs` after `GameEvent.PlayerBuffsChanged` and must not maintain separate Buff display data.
+- For runtime cross-system notifications, prefer `Game.Core.EventCenter` with typed event keys from `CoreEvents`, `GameplayEvents`, and `ItemEvents` before adding new singleton coupling.
+- Buff 状态栏 UI lives in `Assets/Scripts/UI/Buffs` and `Assets/Prefab/UI/Buff`; it reads `BuffManager.ActiveBuffs` after `GameplayEvents.PlayerBuffsChanged` and must not maintain separate Buff display data.
 - Buff 调试窗口 lives in `Assets/Scripts/UI/GameSceneUIInputController.cs`; it is toggled with `Alt+Up`, and it adds/removes Buff through the player's `BuffManager` without creating scene managers.
 - `GameScene` UI uses an explicit scene `UIStackManager` plus `UIStackInitializer`; HUD is the stack bottom and modal panels such as settings, win, and over panels are pushed through the stack.
-- Inventory runtime lives in `Assets/Scripts/Items/Inventory`; `PlayerInventory` must be attached to the player prefab, stacks picked items by `itemId`, and triggers `GameEvent.InventoryChanged` after add/use/clear.
+- Inventory runtime lives in `Assets/Scripts/Items/Inventory`; `PlayerInventory` must be attached to the player prefab, stacks picked items by `itemId`, and triggers `ItemEvents.InventoryChanged` after add/use/clear.
 - `AddressableItemAddressCatalog` lives in `Assets/Scripts/Items/Data`; update it when adding a new hot-update item prefab ID/address used by saved inventory or legacy item prefab replacement.
 - Inventory UI lives in `Assets/Scripts/UI/Inventory` and prefabs live in `Assets/Prefab/UI/Inventory`; `GameSceneUIInputController` toggles it with `CapsLock`, pauses through the UI stack flow, and right-clicking a slot consumes one item only when at least one effect `CanUse` returns true.
-- Save system lives in `Assets/Scripts/Gameplay/Save`; it stores 3 JSON slots under `Application.persistentDataPath/Saves`, uses `SaveGameService` as the UI-facing API, and does not save ground drop items in v1.
+- Save system lives in `Assets/Scripts/Gameplay/Save`; it stores 3 JSON slots under `Application.persistentDataPath/Saves`, uses `SaveGameService` as the UI-facing API, and does not save ground drop items in v1. `SaveDataBuilder`, `SaveDataRestorer`, and `SaveSlotSnapshotCapture` own capture/restore/snapshot details.
 - Save slot UI lives in `Assets/Scripts/UI/Save` and `Assets/Prefab/UI/Save`; `SaveSlotPanel` opens in main-menu load/delete mode or safe-house save/load/delete mode, with `F5` as the temporary GameScene safe-house test shortcut.
 - Safe-point saves must fail clearly while `FightRoom.currentFightRoom` is not null; do not silently save mid-combat wave/enemy state in the v1 framework.
 - `UIPanelBase` roots should carry `ComponentAutoBindTool`; bindable child objects use UIAutoBind prefixes such as `Btn_`, `Txt_`, `Img_`, `Trans_`, and `Rect_`.
@@ -51,11 +51,11 @@ P_GUN is a Unity 2022.3 2D top-down shooter project. Runtime code is split by as
 - UnityEasyWorkTools editor UI must use UI Toolkit with `.uxml` and `.uss` files stored in each module's `Editor/UI` folder; editor C# should only bind data and handle commands.
 - Visual animation sequences belong to `Game.Animation`: runtime scripts live in `Assets/UnityEasyWorkTools/AnimationSequence/Scripts`, editor code lives in `Assets/UnityEasyWorkTools/AnimationSequence/Editor`, sequence assets are `AnimationSequenceAsset`, and playback is handled by scene `AnimationPlayer`.
 - UI auto binding tooling lives in `Assets/UnityEasyWorkTools/UIAutoBind`: runtime binding component and rules are in `Scripts`, editor inspector/code generation is in `Editor`, and the global setting asset stays beside them at the feature root.
-- For databases, prefer `ScriptableObjectDatabase<TDatabase, TKey, TValue>` and `TryGetById` patterns instead of ad hoc list scans.
+- For databases, prefer `ScriptableObjectDatabase<TKey, TValue>` and `TryGetById` patterns instead of ad hoc list scans.
 - Addressables hot-update groups are limited to `Room`, `Buff`, `Item`, `Enemy`, `Weapon`, `Shared`, and `Hotfix`; these groups keep `Prevent Updates` enabled, `Hotfix` owns the startup Lua entry `hotfix/main`, and `Shared` only stores duplicated cross-group dependencies such as common bullet prefabs, gun sprites, audio, fonts, and shared render assets.
 - `Root` must stay first in Build Settings and explicitly owns `DataBaseManager`, `LuaManager`, `AddressableLoader`, and `RootHotUpdateController`; do not create these singleton GameObjects from code.
 - xLua runtime integration lives in the nested `Game.Lua` asmdef under `Assets/Scripts/Gameplay/Lua`; `Game.Gameplay` must not reference `XLua.Runtime` directly, so xLua Hotfix generated bridge code can reference gameplay/item assemblies without asmdef cycles.
-- Buff runtime script calls go through `IBuffScriptFactory`, `IBuffScriptInstance`, and `BuffScriptRuntime`; gameplay code must depend on these abstractions instead of `LuaManager` or `LuaBuffInstance`.
+- Buff runtime script calls go through `IBuffScriptInstance` and the `BuffScriptRuntime` creation delegate; gameplay code must depend on these abstractions instead of `LuaManager` or `LuaBuffInstance`.
 - Root startup hotfix calls go through `IStartupHotfixRunner` and `StartupHotfixRuntime`; `LuaManager` loads Addressables address `hotfix/main` after catalog/dependency update and before entering `StartScene`.
 - xLua Hotfix target types are configured in `Assets/XLua/Editor/PgunHotfixConfig.cs`; after changing the list, run `XLua/Generate Code`, wait for compilation, then run `XLua/Hotfix Inject In Editor`.
 - `AddressableLoader` lives in `Assets/Scripts/Core/HotUpdate`; it is the only runtime Addressables asset loader singleton, and gameplay objects decide which address to request through `LoadAssetAsync<T>()`.

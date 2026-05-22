@@ -2,10 +2,6 @@ using System.Collections.Generic;
 using QFramework;
 using UnityEngine;
 using Game.Core;
-using Game.Pooling;
-using Game.Animation;
-using Game.Presentation;
-using Game.Items;
 
 namespace Game.Gameplay
 {
@@ -73,14 +69,9 @@ namespace Game.Gameplay
     protected ShootDuration shootDuration;
     protected GunClip gunClip;
     protected BulletBag bulletBag;
-    protected GunFire gunFireEffect = new GunFire();
 
     public virtual BulletBag BulletBag => bulletBag;
     public GunClip GunClip => gunClip;
-
-    /// <summary>
-    /// 执行 RestoreAmmo 逻辑.
-    /// </summary>
     public void RestoreAmmo(int clipAmmo, int clipMaxAmmo, int bagAmmo, int bagMaxAmmo)
     {
         if (gunClip != null)
@@ -121,10 +112,6 @@ namespace Game.Gameplay
             }
         }
 }
-
-    /// <summary>
-    /// 执行 ApplyData 逻辑.
-    /// </summary>
     public void ApplyData(WeaponData data)
     {
         shootSounds.Clear();
@@ -178,7 +165,7 @@ namespace Game.Gameplay
     {
         if(gunClip.IsOutOfAmmo)
         {
-            EventCenter.Trigger(GameEvent.PlayerHeadMessageRequested, new PlayerHeadMessageEvent("没有子弹", 2f));
+            EventCenter.Trigger(CoreEvents.PlayerHeadMessageRequested, new PlayerHeadMessageEvent("没有子弹", 2f));
             return;
         }
         GetBullet(dir);
@@ -192,15 +179,11 @@ namespace Game.Gameplay
         if (bulletBag == null || gunClip == null) return;
         if (gunClip.IsOutOfAmmo && !bulletBag.HasBullet)
         {
-            EventCenter.Trigger(GameEvent.PlayerHeadMessageRequested, new PlayerHeadMessageEvent("没有子弹", 2f));
+            EventCenter.Trigger(CoreEvents.PlayerHeadMessageRequested, new PlayerHeadMessageEvent("没有子弹", 2f));
             return;
         }
         bulletBag.Reload(gunClip, ReloadSound);
     }
-
-    /// <summary>
-    /// 执行启动后的初始化逻辑.
-    /// </summary>
     private void Start() {
         PlayerAudioSource  = WeaponGlobal.Instance.WeaponAudioSource;
     }
@@ -226,8 +209,13 @@ namespace Game.Gameplay
     /// </summary>
     public virtual void OnGunUsed()
     {
-        if (BulletBag != null) EventCenter.Trigger(GameEvent.BulletBagChanged, BulletBag);
+        if (BulletBag != null) EventCenter.Trigger(GameplayEvents.BulletBagChanged, BulletBag);
         gunClip?.OnGunUsed();
+    }
+
+    protected void PlayGunFire(Vector2 direction)
+    {
+        WeaponGlobal.Instance.PlayGunFire(FirePointPosition, direction);
     }
 
     /// <summary>

@@ -19,18 +19,10 @@ namespace Game.Items
 
         [SerializeField] private string animEffectKey = "Jump";
         [SerializeField] private Vector2 randomOffsetRange = new Vector2(0.5f, 0.5f);
-
-        /// <summary>
-        /// 执行 CanUse 逻辑.
-        /// </summary>
         public override bool CanUse(ItemEffectContext ctx)
         {
             return ResolveSpawner(ctx) != null && HasAvailableLoot();
         }
-
-        /// <summary>
-        /// 执行 OnPick 逻辑.
-        /// </summary>
         public override void OnPick(ItemEffectContext ctx)
         {
             try
@@ -158,10 +150,6 @@ namespace Game.Items
 
             return false;
         }
-
-        /// <summary>
-        /// 执行 ResolveSpawner 逻辑.
-        /// </summary>
         private ItemSpawner ResolveSpawner(ItemEffectContext ctx)
         {
             return ctx.SourceObject != null ? ctx.SourceObject.GetComponentInParent<ItemSpawner>() : null;

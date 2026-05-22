@@ -84,52 +84,6 @@ namespace Game.Gameplay
         }
 
         /// <summary>
-        /// 调用 Lua 的添加回调.
-        /// </summary>
-        /// <param name="info">Buff 运行时信息.</param>
-        public void OnAdd(BuffRuntimeInfo info)
-        {
-            info?.LuaInstance?.OnAdd(info);
-        }
-
-        /// <summary>
-        /// 调用 Lua 的移除回调.
-        /// </summary>
-        /// <param name="info">Buff 运行时信息.</param>
-        public void OnRemove(BuffRuntimeInfo info)
-        {
-            info?.LuaInstance?.OnRemove(info);
-        }
-
-        /// <summary>
-        /// 调用 Lua 的每帧更新回调.
-        /// </summary>
-        /// <param name="info">Buff 运行时信息.</param>
-        /// <param name="deltaTime">时间增量.</param>
-        public void OnUpdate(BuffRuntimeInfo info, float deltaTime)
-        {
-            info?.LuaInstance?.OnUpdate(info, deltaTime);
-        }
-
-        /// <summary>
-        /// 调用 Lua 的固定间隔回调.
-        /// </summary>
-        /// <param name="info">Buff 运行时信息.</param>
-        public void OnInterval(BuffRuntimeInfo info)
-        {
-            info?.LuaInstance?.OnInterval(info);
-        }
-
-        /// <summary>
-        /// 调用 Lua 的主动触发回调.
-        /// </summary>
-        /// <param name="info">Buff 运行时信息.</param>
-        public void OnTrigger(BuffRuntimeInfo info)
-        {
-            info?.LuaInstance?.OnTrigger(info);
-        }
-
-        /// <summary>
         /// 编辑器导入后修正非法参数.
         /// </summary>
         public void Validate()

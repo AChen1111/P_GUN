@@ -22,7 +22,7 @@ namespace Game.Gameplay
         /// </summary>
         void OnTriggerEnter2D(Collider2D other) {
             if(other.CompareTag("Player")) {
-                EventCenter.Trigger(GameEvent.GameWin);
+                EventCenter.Trigger(CoreEvents.GameWin);
             }
         }
     }

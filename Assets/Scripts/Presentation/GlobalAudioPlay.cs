@@ -3,13 +3,13 @@ using QFramework;
 using System.Collections.Generic;
 using System;
 using System.Collections;
-using Game.Core;
-using Game.Pooling;
 
 namespace Game.Presentation
 {
     public class GlobalAudioPlay : ViewController
     {
+        private const string GunClipPath = "SFX/Gun/";
+
         public UnityEngine.AudioSource SelfAudioSource;
 
 		//单例
@@ -30,9 +30,6 @@ namespace Game.Presentation
 		/// 音频列表
 		/// </summary>
 		private Dictionary<string, AudioClip> AudioClips = new Dictionary<string, AudioClip>();
-		/// <summary>
-		/// 执行 PlayerAudioSourceByPath 逻辑.
-		/// </summary>
 		public void PlayerAudioSourceByPath(string name, bool loop = false, Action onComplete = null)
 		{
 			if (SelfAudioSource.isPlaying) return;
@@ -46,7 +43,7 @@ namespace Game.Presentation
 			}
 			else
 			{
-				AudioClips[name] = Resources.Load<AudioClip>(Config.GunClipPath + name);
+				AudioClips[name] = Resources.Load<AudioClip>(GunClipPath + name);
 				if(AudioClips[name] == null)
 				{
 					Debug.LogError("AudioClip not found: " + name);

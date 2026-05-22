@@ -21,10 +21,6 @@ namespace Game.Gameplay
         public override BulletBag BulletBag => new BulletBag(-1);
 
         private bool mPressing = false;
-
-		/// <summary>
-		/// 执行 Shoot 逻辑.
-		/// </summary>
 		public override void Shoot(Vector2 dir)
 		{
 			var obj = GetBullet(dir);
@@ -33,10 +29,6 @@ namespace Game.Gameplay
 			obj.transform.right = dir;
 			TryPlaySound(false);
 		}
-
-		/// <summary>
-		/// 执行 ShootDown 逻辑.
-		/// </summary>
 		public override void ShootDown(Vector2 dir)
 		{
 			mPressing = true;
@@ -46,9 +38,6 @@ namespace Game.Gameplay
 
 		//蓄力时间计时器
 		private float mPressingTime = 0f;
-		/// <summary>
-		/// 执行 Shooting 逻辑.
-		/// </summary>
 		public override void Shooting(Vector2 dir)
 		{
 			if(mPressing)
@@ -65,10 +54,6 @@ namespace Game.Gameplay
 				ArrowSpriteRenderer.enabled = false;
 			}
 		}
-
-		/// <summary>
-		/// 执行 ShootUp 逻辑.
-		/// </summary>
 		public override void ShootUp(Vector2 dir)
 		{
 			//抬起时判断是否蓄力完成

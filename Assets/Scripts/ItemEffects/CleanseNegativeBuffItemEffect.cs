@@ -12,10 +12,6 @@ namespace Game.ItemEffects
     public class CleanseNegativeBuffItemEffect : ItemEffectBase
     {
         [SerializeField] private bool showHeadMessage = true;
-
-        /// <summary>
-        /// 执行 CanUse 逻辑.
-        /// </summary>
         public override bool CanUse(ItemEffectContext ctx)
         {
             var manager = ResolveBuffManager();
@@ -35,13 +31,9 @@ namespace Game.ItemEffects
 
             return false;
         }
-
-        /// <summary>
-        /// 执行 OnPick 逻辑.
-        /// </summary>
         public override void OnPick(ItemEffectContext ctx)
         {
-            var player = Global.player;
+            var player = PlayerRegistry.Current;
             if (player == null) return;
 
             var manager = ResolveBuffManager();
@@ -55,15 +47,11 @@ namespace Game.ItemEffects
             if (!showHeadMessage) return;
 
             var message = removedCount > 0 ? $"净化了 {removedCount} 个负面状态" : "没有可净化的负面状态";
-            EventCenter.Trigger(GameEvent.PlayerHeadMessageRequested, new PlayerHeadMessageEvent(message, 1.5f));
+            EventCenter.Trigger(CoreEvents.PlayerHeadMessageRequested, new PlayerHeadMessageEvent(message, 1.5f));
         }
-
-        /// <summary>
-        /// 执行 ResolveBuffManager 逻辑.
-        /// </summary>
         private static BuffManager ResolveBuffManager()
         {
-            var player = Global.player;
+            var player = PlayerRegistry.Current;
             return player != null ? player.GetComponent<BuffManager>() : null;
         }
     }

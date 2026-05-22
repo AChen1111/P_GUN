@@ -13,14 +13,10 @@ namespace Game.Gameplay
         [Min(0.01f)] public float smoothTime = 0.2f;
 
         private Vector3 velocity;
-
-        /// <summary>
-        /// 执行延迟帧更新逻辑.
-        /// </summary>
         private void LateUpdate() {
-            if(Global.player == null) return;
+            if(PlayerRegistry.Current == null) return;
 
-            Vector3 targetPos = Global.player.transform.position + offset;
+            Vector3 targetPos = PlayerRegistry.Current.transform.position + offset;
             transform.position = Vector3.SmoothDamp(transform.position, targetPos, ref velocity, smoothTime);
         }
     }

@@ -14,10 +14,6 @@ namespace Game.Items
         private readonly List<InventoryItemStack> orderedStacks = new List<InventoryItemStack>();
 
         public IReadOnlyList<InventoryItemStack> Items => orderedStacks;
-
-        /// <summary>
-        /// 执行 AddFromItem 逻辑.
-        /// </summary>
         public bool AddFromItem(Item item)
         {
             if (item == null)
@@ -43,21 +39,13 @@ namespace Game.Items
             }
 
             stack.Add(data, effects);
-            EventCenter.Trigger(GameEvent.InventoryChanged);
+            EventCenter.Trigger(ItemEvents.InventoryChanged);
             return true;
         }
-
-        /// <summary>
-        /// 执行 TryGetStack 逻辑.
-        /// </summary>
         public bool TryGetStack(int itemId, out InventoryItemStack stack)
         {
             return stacksById.TryGetValue(itemId, out stack);
         }
-
-        /// <summary>
-        /// 执行 Use 逻辑.
-        /// </summary>
         public bool Use(int itemId)
         {
             if (!stacksById.TryGetValue(itemId, out var stack) || stack.Count <= 0)
@@ -69,7 +57,7 @@ namespace Game.Items
             var usableEffects = stack.GetUsableEffects(ctx);
             if (usableEffects.Count == 0)
             {
-                EventCenter.Trigger(GameEvent.PlayerHeadMessageRequested, new PlayerHeadMessageEvent("当前无法使用", 1.5f));
+                EventCenter.Trigger(CoreEvents.PlayerHeadMessageRequested, new PlayerHeadMessageEvent("当前无法使用", 1.5f));
                 return false;
             }
 
@@ -85,7 +73,7 @@ namespace Game.Items
                 orderedStacks.Remove(stack);
             }
 
-            EventCenter.Trigger(GameEvent.InventoryChanged);
+            EventCenter.Trigger(ItemEvents.InventoryChanged);
             return true;
 
             ItemEffectContext BuildUseContext()
@@ -98,20 +86,12 @@ namespace Game.Items
                 };
             }
 }
-
-        /// <summary>
-        /// 执行 Clear 逻辑.
-        /// </summary>
         public void Clear()
         {
             stacksById.Clear();
             orderedStacks.Clear();
-            EventCenter.Trigger(GameEvent.InventoryChanged);
+            EventCenter.Trigger(ItemEvents.InventoryChanged);
         }
-
-        /// <summary>
-        /// 执行 RestoreStack 逻辑.
-        /// </summary>
         public bool RestoreStack(int itemId, int count, ItemDatabase database, IEnumerable<ItemEffectBase> effects)
         {
             if (count <= 0) return false;
@@ -131,7 +111,7 @@ namespace Game.Items
 
             stacksById[itemId] = stack;
             orderedStacks.Add(stack);
-            EventCenter.Trigger(GameEvent.InventoryChanged);
+            EventCenter.Trigger(ItemEvents.InventoryChanged);
             return true;
         }
     }

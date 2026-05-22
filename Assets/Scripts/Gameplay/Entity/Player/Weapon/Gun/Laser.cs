@@ -23,10 +23,6 @@ namespace Game.Gameplay
 		private float mLastDamageTime;
 
         public override BulletBag BulletBag => new BulletBag(-1);
-
-        /// <summary>
-        /// 执行 ShootDown 逻辑.
-        /// </summary>
         public override void ShootDown(Vector2 dir)
 		{
 			LineRenderer.enabled = true;
@@ -34,9 +30,6 @@ namespace Game.Gameplay
 			//播放音效
 			TryPlaySound(true);
 		}
-		/// <summary>
-		/// 执行 Shooting 逻辑.
-		/// </summary>
 		public override void Shooting(Vector2 dir)
 		{
 			var origin = FirePointPosition;
@@ -66,10 +59,6 @@ namespace Game.Gameplay
 
 			LineRenderer.SetPosition(1, origin + dir * maxLaserDistance);
 		}
-
-		/// <summary>
-		/// 执行 ShootUp 逻辑.
-		/// </summary>
 		public override void ShootUp(Vector2 dir)
 		{
 			LineRenderer.enabled = false;

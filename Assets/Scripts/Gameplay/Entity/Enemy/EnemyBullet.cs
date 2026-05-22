@@ -60,10 +60,6 @@ namespace Game.Gameplay
                 }
             }
 }
-
-        /// <summary>
-        /// 执行 OnSpawnFromPool 逻辑.
-        /// </summary>
         public void OnSpawnFromPool() {
             hasHit = false;
 
@@ -71,10 +67,6 @@ namespace Game.Gameplay
                 rb = GetComponent<Rigidbody2D>();
             }
         }
-
-        /// <summary>
-        /// 执行 OnRecycleToPool 逻辑.
-        /// </summary>
         public void OnRecycleToPool() {
             hasHit = true;
             StopAutoRecycleCoroutine();
@@ -111,18 +103,10 @@ namespace Game.Gameplay
         private void Reset() {
             gameObject.layer = LayerMask.NameToLayer("EnemyBullet");
         }
-
-        /// <summary>
-        /// 执行固定帧物理更新逻辑.
-        /// </summary>
         private void FixedUpdate() {
             if (rb == null) return;
             rb.velocity = dir * speed;
         }
-
-        /// <summary>
-        /// 执行 HandleHit 逻辑.
-        /// </summary>
         private void HandleHit(GameObject target) {
             if (hasHit || target == null) return;
 
@@ -176,10 +160,6 @@ namespace Game.Gameplay
             StopAutoRecycleCoroutine();
             StopMove();
         }
-
-        /// <summary>
-        /// 执行 StopAutoRecycleCoroutine 逻辑.
-        /// </summary>
         private void StopAutoRecycleCoroutine() {
             if (autoRecycleCoroutine == null) return;
 
