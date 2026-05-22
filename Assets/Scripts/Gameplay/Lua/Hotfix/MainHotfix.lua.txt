@@ -1,0 +1,5 @@
+-- 启动热修入口, 所有线上补丁从这里 require.
+-- 示例:
+-- require("hotfix.player_hurt_fix")
+
+return true

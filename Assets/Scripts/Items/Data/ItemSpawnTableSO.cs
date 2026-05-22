@@ -2,18 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
-using Game.Core;
-using Game.Pooling;
 using Game.Animation;
-using Game.Presentation;
 
 namespace Game.Items
 {
     [Serializable]
     public struct ItemSpawnEntry
     {
-        public int itemId;
-        public string address;
         public GameObject prefab;
 
         [Min(0)]
@@ -52,14 +47,14 @@ namespace Game.Items
         /// <summary>
         /// 按权重异步获取一个随机物品预制体.
         /// </summary>
-        public async Task<GameObject> TryGetRandomPrefabAsync()
+        public Task<GameObject> TryGetRandomPrefabAsync()
         {
             if (TryGetRandomEntry(out var selectedEntry))
             {
-                return await TryResolvePrefabAsync(selectedEntry);
+                return TryResolvePrefabAsync(selectedEntry);
             }
 
-            return null;
+            return Task.FromResult<GameObject>(null);
         }
 
         /// <summary>
@@ -67,33 +62,18 @@ namespace Game.Items
         /// </summary>
         public bool TryResolvePrefab(ItemSpawnEntry entry, out GameObject prefab)
         {
-            if (TryResolveLoadedAddressablePrefab(entry, out prefab))
-            {
-                return true;
-            }
-
+            // 物品生成表只使用 Inspector 中直接引用的 prefab, 不再通过 Addressables 地址加载.
             prefab = entry.prefab;
             return prefab != null;
         }
 
         /// <summary>
-        /// 异步解析物品预制体, 优先使用 Addressables 地址.
+        /// 异步接口兼容旧调用, 实际只返回表中直接引用的 prefab.
         /// </summary>
-        public async Task<GameObject> TryResolvePrefabAsync(ItemSpawnEntry entry)
+        public Task<GameObject> TryResolvePrefabAsync(ItemSpawnEntry entry)
         {
-            var address = ResolveAddress(entry);
-            if (!string.IsNullOrWhiteSpace(address))
-            {
-                var loader = AddressableLoader.Instance;
-                if (loader == null)
-                {
-                    throw new InvalidOperationException($"{nameof(AddressableLoader)} must exist before loading item prefab.");
-                }
-
-                return await loader.LoadAssetAsync<GameObject>(address);
-            }
-
-            return entry.prefab;
+            TryResolvePrefab(entry, out var prefab);
+            return Task.FromResult(prefab);
         }
 
         /// <summary>
@@ -134,47 +114,8 @@ namespace Game.Items
         /// </summary>
         private static bool HasResolvablePrefab(ItemSpawnEntry entry)
         {
-            return !string.IsNullOrWhiteSpace(ResolveAddress(entry)) || entry.prefab != null;
-        }
-
-        /// <summary>
-        /// 执行 TryResolveLoadedAddressablePrefab 逻辑.
-        /// </summary>
-        private static bool TryResolveLoadedAddressablePrefab(ItemSpawnEntry entry, out GameObject prefab)
-        {
-            prefab = null;
-            var loader = AddressableLoader.Instance;
-            if (loader == null) return false;
-
-            var address = ResolveAddress(entry);
-            if (!string.IsNullOrWhiteSpace(address)
-                && loader.TryGetLoadedAsset<GameObject>(address, out prefab))
-            {
-                return true;
-            }
-
-            return false;
-        }
-
-        /// <summary>
-        /// 从配置项中解析 Addressables 地址.
-        /// </summary>
-        private static string ResolveAddress(ItemSpawnEntry entry)
-        {
-            if (!string.IsNullOrWhiteSpace(entry.address))
-            {
-                return entry.address.Trim();
-            }
-
-            if (entry.itemId > 0 && AddressableItemAddressCatalog.TryGetAddress(entry.itemId, out var itemIdAddress))
-            {
-                return itemIdAddress;
-            }
-
-            var item = entry.prefab != null ? entry.prefab.GetComponent<Item>() : null;
-            return item != null && AddressableItemAddressCatalog.TryGetAddress(item.ItemId, out var prefabAddress)
-                ? prefabAddress
-                : null;
+            // 生成时必须显式绑定 prefab.
+            return entry.prefab != null;
         }
     }
 }

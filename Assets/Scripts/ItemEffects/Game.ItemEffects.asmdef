@@ -6,6 +6,7 @@
     "Game.Animation",
     "Game.Items",
     "Game.Gameplay",
+    "Game.Lua",
     "QFramework",
     "QFramework.CoreKit"
   ],

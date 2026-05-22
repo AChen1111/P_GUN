@@ -249,6 +249,34 @@ namespace Game.UI
 }
 
         /// <summary>
+        /// 从场景交互点打开安全屋存档面板.
+        /// </summary>
+        public void OpenSaveSlotPanelFromWorld()
+        {
+            if (settingsOpen || inventoryOpen)
+            {
+                return;
+            }
+
+            if (saveSlotOpen)
+            {
+                return;
+            }
+
+            if (saveSlotPanel == null)
+            {
+                Debug.LogError("打开存档面板失败, SaveSlotPanel未绑定.", this);
+                return;
+            }
+
+            saveSlotPreviousTimeScale = Time.timeScale;
+            saveSlotOpen = true;
+            Time.timeScale = 0f;
+            GameplayCursorState.SetSaveSlotPanelOpen(true);
+            saveSlotPanel.OpenForSafeHouse();
+        }
+
+        /// <summary>
         /// 绘制 IMGUI 调试界面.
         /// </summary>
         private void OnGUI()

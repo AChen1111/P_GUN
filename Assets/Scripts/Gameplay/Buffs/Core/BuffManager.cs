@@ -174,17 +174,17 @@ namespace Game.Gameplay
 
             BuffRuntimeInfo CreateBuffRuntimeInfo(Buff targetBuff, UnityEngine.Object buffSource)
             {
-                var luaManager = LuaManager.Instance;
-                if (luaManager == null)
+                var scriptFactory = BuffScriptRuntime.Factory;
+                if (scriptFactory == null)
                 {
-                    Debug.LogError($"{nameof(BuffManager)}: Root 场景未挂载 {nameof(LuaManager)}, 无法创建 Buff Lua 实例.", this);
+                    Debug.LogError($"{nameof(BuffManager)}: Root 场景未注册 Buff 脚本工厂, 无法创建 Buff 脚本实例.", this);
                     return null;
                 }
 
-                var luaInstance = luaManager.CreateBuffInstance(targetBuff);
-                if (luaInstance == null)
+                var scriptInstance = scriptFactory.CreateBuffInstance(targetBuff);
+                if (scriptInstance == null)
                 {
-                    Debug.LogError($"{nameof(BuffManager)}: 创建 Buff Lua 实例失败, Buff: {targetBuff.BuffName}.", this);
+                    Debug.LogError($"{nameof(BuffManager)}: 创建 Buff 脚本实例失败, Buff: {targetBuff.BuffName}.", this);
                     return null;
                 }
 
@@ -193,7 +193,7 @@ namespace Game.Gameplay
                     owner = owner != null ? owner : Global.player,
                     Source = buffSource,
                     Buff = targetBuff,
-                    LuaInstance = luaInstance
+                    LuaInstance = scriptInstance
                 };
 
                 ResetBuffRuntimeInfo(runtimeInfo, targetBuff, buffSource);

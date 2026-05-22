@@ -25,7 +25,3 @@ MonoBehaviour:
     weight: 1
     spawnAnimEffect: 5
     spawnAnimDuration: 1.5
-  - prefab: {fileID: 5069590999830702722, guid: 0d97b75cf6914479889ba297b299cc12, type: 3}
-    weight: 1
-    spawnAnimEffect: 1
-    spawnAnimDuration: 1.5

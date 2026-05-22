@@ -1,11 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using XLua;
 using Game.Core;
-using Game.Pooling;
-using Game.Animation;
-using Game.Presentation;
 using Game.Items;
 
 namespace Game.Gameplay
@@ -13,13 +11,16 @@ namespace Game.Gameplay
     /// <summary>
     /// Lua 全局管理器, 负责创建 Lua 环境并缓存脚本 table.
     /// </summary>
-    public sealed class LuaManager : MonoBehaviour
+    public sealed class LuaManager : MonoBehaviour, IBuffScriptFactory, IStartupHotfixRunner
     {
+        private const string StartupHotfixAddress = "hotfix/main";
+
         private readonly Dictionary<TextAsset, LuaTable> buffTableCache = new Dictionary<TextAsset, LuaTable>();
         private readonly Dictionary<TextAsset, LuaTable> itemEffectTableCache = new Dictionary<TextAsset, LuaTable>();
         private readonly Dictionary<TextAsset, Dictionary<string, Action<ItemEffectContext>>> itemEffectMethodCache = new Dictionary<TextAsset, Dictionary<string, Action<ItemEffectContext>>>();
 
         private LuaEnv luaEnv;
+        private bool startupHotfixExecuted;
 
         public static LuaManager Instance { get; private set; }
 
@@ -37,6 +38,10 @@ namespace Game.Gameplay
             Instance = this;
             DontDestroyOnLoad(gameObject);
             luaEnv = new LuaEnv();
+            // Root 场景中的 LuaManager 是 Buff 脚本工厂的唯一注册者.
+            BuffScriptRuntime.RegisterFactory(this);
+            // Root 场景中的 LuaManager 负责执行启动热修入口.
+            StartupHotfixRuntime.RegisterRunner(this);
         }
 
         /// <summary>
@@ -52,7 +57,7 @@ namespace Game.Gameplay
         /// </summary>
         /// <param name="buff">Buff 配置.</param>
         /// <returns>Lua Buff 实例.</returns>
-        public LuaBuffInstance CreateBuffInstance(Buff buff)
+        public IBuffScriptInstance CreateBuffInstance(Buff buff)
         {
             if (buff == null) return null;
 
@@ -92,6 +97,31 @@ namespace Game.Gameplay
                     return null;
                 }
             }
+        }
+
+        /// <summary>
+        /// 从 Addressables 加载并执行启动热修入口.
+        /// </summary>
+        /// <returns>异步任务.</returns>
+        public async Task ExecuteStartupHotfixAsync()
+        {
+            if (startupHotfixExecuted) return;
+
+            var loader = AddressableLoader.Instance;
+            if (loader == null)
+            {
+                throw new InvalidOperationException($"{nameof(AddressableLoader)} must exist before executing startup hotfix.");
+            }
+
+            var hotfixEntry = await loader.LoadAssetAsync<TextAsset>(StartupHotfixAddress);
+            if (hotfixEntry == null)
+            {
+                throw new InvalidOperationException($"Startup hotfix asset is null. Address: {StartupHotfixAddress}.");
+            }
+
+            luaEnv.DoString(hotfixEntry.text, hotfixEntry.name);
+            startupHotfixExecuted = true;
+            Debug.Log($"{nameof(LuaManager)}: 启动热修入口执行完成, Address: {StartupHotfixAddress}.", this);
         }
 
         /// <summary>
@@ -150,6 +180,9 @@ namespace Game.Gameplay
             {
                 Instance = null;
             }
+
+            BuffScriptRuntime.UnregisterFactory(this);
+            StartupHotfixRuntime.UnregisterRunner(this);
 
             foreach (var table in buffTableCache.Values)
             {

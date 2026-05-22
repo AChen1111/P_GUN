@@ -121,7 +121,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 3595009b13b4b404ca739c3ce80ab7fd, type: 3}
   currentClip: {fileID: 0}
   index: 0
-  isSFX: 1
+  is3D: 1
   loop: 0
   isRandom: 1
   min_distance: 1

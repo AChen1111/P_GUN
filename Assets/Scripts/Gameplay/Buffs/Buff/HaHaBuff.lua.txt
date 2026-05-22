@@ -1,0 +1,25 @@
+local HaHaBuff = {}
+
+function HaHaBuff.OnAdd(runtimeInfo)
+end
+
+function HaHaBuff.OnRemove(runtimeInfo)
+end
+
+function HaHaBuff.OnUpdate(runtimeInfo, deltaTime)
+end
+
+function HaHaBuff.OnInterval(runtimeInfo)
+    local owner = runtimeInfo.Owner
+    if owner == nil then
+        error("HaHaBuff Owner is nil.")
+    end
+    CS.UnityEngine.Debug.Log("HaHaBuff triggered.")
+    -- 间隔触发时在玩家头顶显示文本.
+    owner:ShowDisPlayer("hahaha", 1.5)
+end
+
+function HaHaBuff.OnTrigger(runtimeInfo)
+end
+
+return HaHaBuff

@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 468a46d0ae32c3544b7d98094e6448a9, type: 3}
   m_Name: AddressableAssetSettings
   m_EditorClassIdentifier: 
-  m_DefaultGroup: d71024e3a5ce28449bb9e1ce8a458a4e
+  m_DefaultGroup: 3ffbe8d06de32b347bbef89eb72714b5
   m_currentHash:
     serializedVersion: 2
-    Hash: c7dbd2e55325c92f44b0376617c1ddb7
+    Hash: 00000000000000000000000000000000
   m_OptimizeCatalogSize: 0
   m_BuildRemoteCatalog: 1
   m_BundleLocalCatalog: 0
@@ -44,6 +44,7 @@ MonoBehaviour:
   m_BuildAddressablesWithPlayerBuild: 0
   m_overridePlayerVersion: '[UnityEditor.PlayerSettings.bundleVersion]'
   m_GroupAssets:
+  - {fileID: 11400000, guid: 921fcdb4c93a2ea428f5641afb60d7ee, type: 2}
   - {fileID: 11400000, guid: 6ed4ea5299d9cb8439f9ea5da8c25982, type: 2}
   - {fileID: 11400000, guid: 0929a3429589efd4e8c3698144b475d8, type: 2}
   - {fileID: 11400000, guid: a5119a4ea8213274bb34c9a3a3c0657b, type: 2}
@@ -103,6 +104,7 @@ MonoBehaviour:
     - enemy
     - weapon
     - shared
+    - hotfix
   m_SchemaTemplates: []
   m_GroupTemplateObjects:
   - {fileID: 11400000, guid: ab6d296da78c83f4c8faef95920bc66c, type: 2}

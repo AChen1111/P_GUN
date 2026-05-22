@@ -17,12 +17,6 @@ MonoBehaviour:
     m_SerializedData: []
   m_GUID: d71024e3a5ce28449bb9e1ce8a458a4e
   m_SerializeEntries:
-  - m_GUID: 0b78e19efc2cfbe45aeaae9e06e3b46f
-    m_Address: shared/gamedataso/itemspawnertable/normalroomitemtable
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - shared
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 1e108a665f3ec78488b43fa3772b48b3
     m_Address: shared/audio/sfx/player/gun/gunsfx/akshootend
     m_ReadOnly: 0
@@ -72,7 +66,7 @@ MonoBehaviour:
     - shared
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 5df31018abae18f4ab952981d9592330
-    m_Address: Assets/GameDataSO/ItemSpawnerTable/RoomEndTable.asset
+    m_Address: shared/gamedataso/itemspawnertable/roomendtable
     m_ReadOnly: 0
     m_SerializedLabels:
     - shared

@@ -10,6 +10,7 @@ Important external packages and conventions:
 - DOTween is used for runtime animation feedback.
 - Addressables are used for loading hot-update databases, room data, item prefabs, enemy prefabs, and weapon prefabs.
 - xLua is used by the Buff system.
+- xLua runtime glue lives in `Assets/Scripts/Gameplay/Lua` as the `Game.Lua` asmdef. Gameplay code owns only the script abstractions (`IBuffScriptFactory`, `IBuffScriptInstance`, `BuffScriptRuntime`) so `Game.Gameplay` does not reference `XLua.Runtime`.
 - `Assets/UnityEasyWorkTools` is the shared editor tooling suite, currently containing visual animation sequences, UI auto binding, and table import tools.
 - `Assets/UnityEasyWorkTools/UnityEasyWorkToolsPathSettings.asset` stores editable default paths for UnityEasyWorkTools. Open it through `Tools/UnityEasyWorkTools/Settings/Open Path Settings`.
 - UnityEasyWorkTools editor UI uses UI Toolkit. `.uxml` and `.uss` files are kept in each module's `Editor/UI` folder; C# editor scripts bind serialized data and implement commands.
@@ -157,7 +158,7 @@ Rules:
 Locations:
 
 - `Assets/Scripts/Gameplay/Buffs`
-- `Assets/Scripts/Gameplay/Managers/LuaManager.cs`
+- `Assets/Scripts/Gameplay/Lua`
 
 `Buff` is serializable config stored inside `BuffDataBase`, not a standalone ScriptableObject. It contains id, display name, icon, description, positive/negative tag, Lua file, duration, permanence, interval, and stat modifiers.
 
@@ -197,6 +198,19 @@ If a non-permanent buff already exists, adding it resets duration and triggers `
 - `OnTrigger(BuffRuntimeInfo info)`
 
 Lua failures are caught and logged, so C# callers should still validate missing or invalid Lua assets early where possible.
+
+`LuaManager` and `LuaBuffInstance` are compiled by `Game.Lua`, not `Game.Gameplay`. `LuaManager` registers itself through `BuffScriptRuntime.RegisterFactory()` and `StartupHotfixRuntime.RegisterRunner()` in `Awake`, then unregisters both on destroy. `BuffManager` creates script instances through `BuffScriptRuntime.Factory`; `RootHotUpdateController` executes startup hotfix through `StartupHotfixRuntime.ExecuteStartupHotfixAsync()` before loading `StartScene`. Do not reintroduce a direct `XLua.Runtime` reference into `Game.Gameplay`, because xLua Hotfix generated bridge code needs to reference gameplay assemblies from `XLua.Runtime`.
+
+xLua Hotfix target classes are listed in `Assets/XLua/Editor/PgunHotfixConfig.cs`. The asmdef-compatible workflow is:
+
+1. Keep xLua tools under project `Tools/`.
+2. Run `XLua/Generate Code`.
+3. Wait for Unity compilation to finish.
+4. Run `XLua/Hotfix Inject In Editor`.
+
+The current injected target assemblies are `Game.Gameplay.dll` and `Game.Items.dll`; `Game.Lua` itself is not a hotfix target because it depends on `XLua.Runtime`.
+
+The startup hotfix entry asset is `Assets/Scripts/Gameplay/Lua/Hotfix/MainHotfix.lua.txt`, with Addressables address `hotfix/main` and labels `hotfix;lua`. Keep this file as the small entry script that requires or executes concrete patch scripts.
 
 ## Player And Weapons
 
@@ -412,13 +426,14 @@ Current hot-update Addressables groups are:
 - `Item`: `ItemDatabase` and item prefabs.
 - `Enemy`: `EnemyDatabase` and enemy prefabs.
 - `Weapon`: `WeaponDatabase` and weapon prefabs.
+- `Hotfix`: startup Lua hotfix entry `MainHotfix.lua.txt` at address `hotfix/main`.
 - `Shared`: duplicated cross-group dependencies, including common bullet prefabs, player weapon sprites, shared SFX, `AudioMixer`, font assets, and shared URP 2D sprite render assets.
 
 These groups are Local-first hot-update groups. Their `BuildPath` and `LoadPath` use `Local.BuildPath` and `Local.LoadPath`, so the first player build includes the bundles in the package. The project still builds a remote catalog, with `Remote.BuildPath = ServerData/P_GUN/[BuildTarget]` and `Remote.LoadPath = https://achen1o1.xyz/AB/P_GUN/[BuildTarget]`. Each group keeps `ContentUpdateGroupSchema.StaticContent` enabled (`Prevent Updates` in the Inspector), so later updates should be produced with the official Addressables `Update a Previous Build` workflow and the original `addressables_content_state.bin`. Upload generated remote catalog/hash/bundles to `/www/wwwroot/39.97.56.180/AB/P_GUN/[BuildTarget]` on the Nginx server. Do not put first-package-only scene, UI, player, bullet, or VFX assets into Addressables unless they are explicitly intended to hot update.
 
 Generated `Content Update*` groups must use `Remote.BuildPath` and `Remote.LoadPath` before building/uploading update bundles. Use `PG/Addressables/一键保存上传` for routine hot-update publishing; it also validates the catalog and blocks uploads when a `contentupdate__*.bundle` still points to `Addressables.RuntimePath` or `StreamingAssets`.
 
-`Root` is the first Build Settings scene, followed by `StartScene` and `GameScene`. It owns the explicit scene singletons `DataBaseManager`, `LuaManager`, `AddressableLoader`, and `RootHotUpdateController`. Addressables `DisableCatalogUpdateOnStartup` is enabled so `RootHotUpdateController` owns the update UI timing. The boot flow initializes Addressables, checks and updates catalogs, downloads labels `room`, `buff`, `item`, `enemy`, `weapon`, and `shared`, then loads `StartScene`. Databases, room graphs, item prefabs, and weapon prefabs are loaded later by the concrete systems that need them. Network/catalog/download failures may log and continue with built-in or cached content; missing databases or required runtime content are configuration errors and should fail loudly.
+`Root` is the first Build Settings scene, followed by `StartScene` and `GameScene`. It owns the explicit scene singletons `DataBaseManager`, `LuaManager`, `AddressableLoader`, and `RootHotUpdateController`. Addressables `DisableCatalogUpdateOnStartup` is enabled so `RootHotUpdateController` owns the update UI timing. The boot flow initializes Addressables, checks and updates catalogs, downloads labels `room`, `buff`, `item`, `enemy`, `weapon`, `shared`, and `hotfix`, executes `hotfix/main` through `LuaManager`, then loads `StartScene`. Databases, room graphs, item prefabs, and weapon prefabs are loaded later by the concrete systems that need them. Network/catalog/download failures may log and continue with built-in or cached content; missing databases or required runtime content are configuration errors and should fail loudly.
 
 ## Current Refactor Notes
 

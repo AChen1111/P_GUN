@@ -103,11 +103,6 @@ namespace XLua
 
         public static List<Assembly> GetHotfixAssembly()
         {
-            var projectPath = Assembly.Load("Assembly-CSharp").ManifestModule.FullyQualifiedName;
-            Regex rgx = new Regex(@"^(.*)[\\/]Library[\\/]ScriptAssemblies[\\/]Assembly-CSharp.dll$");
-            MatchCollection matches = rgx.Matches(projectPath);
-            projectPath = matches[0].Groups[1].Value;
-
             List<Type> types = new List<Type>();
             Action<Type, int> on_cfg = (type, hotfixType) =>
             {
@@ -142,8 +137,17 @@ namespace XLua
                 }
                 catch { } // 防止有的工程有非法的dll导致中断
             }
+
+            // P_GUN 使用 asmdef 拆分运行时代码, 项目里没有 Assembly-CSharp.dll, 这里按热修类型反查实际程序集.
+            var scriptAssembliesPath = Path.GetFullPath(Path.Combine(Application.dataPath, "../Library/ScriptAssemblies"));
             return types.Select(t => t.Assembly).Distinct()
-                .Where(a => a.ManifestModule.FullyQualifiedName.IndexOf(projectPath) == 0)
+                .Where(a =>
+                {
+                    var assemblyPath = a.ManifestModule.FullyQualifiedName;
+                    if (string.IsNullOrEmpty(assemblyPath)) return false;
+
+                    return Path.GetFullPath(assemblyPath).StartsWith(scriptAssembliesPath, StringComparison.OrdinalIgnoreCase);
+                })
                 .ToList();
         }
 
@@ -1627,7 +1631,20 @@ namespace XLua
         public int callbackOrder { get { return 0; } }
         public void OnPostBuildPlayerScriptDLLs(BuildReport report)
         {
-            var dir = Path.GetDirectoryName(report.files.Single(file => file.path.EndsWith("Assembly-CSharp.dll")).path);
+            // P_GUN 使用 asmdef, 构建产物没有 Assembly-CSharp.dll 时按热修目标程序集定位脚本目录.
+            var scriptDll = report.GetFiles().FirstOrDefault(file => file.path.EndsWith("Game.Gameplay.dll"));
+            if (string.IsNullOrEmpty(scriptDll.path))
+            {
+                scriptDll = report.GetFiles().FirstOrDefault(file => file.path.EndsWith("Game.Items.dll"));
+            }
+
+            if (string.IsNullOrEmpty(scriptDll.path))
+            {
+                UnityEngine.Debug.LogError("PgunHotfix: 构建产物中找不到 Hotfix 目标程序集, 跳过自动注入.");
+                return;
+            }
+
+            var dir = Path.GetDirectoryName(scriptDll.path);
             Hotfix.HotfixInject(dir);
         }
     }
@@ -1692,17 +1709,21 @@ namespace XLua
                 return;
             }
 
-            var assembly_csharp_path = Path.Combine(assemblyDir, "Assembly-CSharp.dll");
             var id_map_file_path = CSObjectWrapEditor.GeneratorConfig.common_path + "Resources/hotfix_id_map.lua.txt";
             var hotfix_cfg_in_editor = CSObjectWrapEditor.GeneratorConfig.common_path + "hotfix_cfg_in_editor.data";
 
             Dictionary<string, int> editor_cfg = new Dictionary<string, int>();
-            Assembly editor_assembly = typeof(Hotfix).Assembly;
-            HotfixConfig.GetConfig(editor_cfg, Utils.GetAllTypes().Where(t => t.Assembly == editor_assembly));
+            HotfixConfig.GetConfig(editor_cfg, Utils.GetAllTypes());
 
             if (!Directory.Exists(CSObjectWrapEditor.GeneratorConfig.common_path))
             {
                 Directory.CreateDirectory(CSObjectWrapEditor.GeneratorConfig.common_path);
+            }
+
+            var hotfixResourcePath = Path.GetDirectoryName(id_map_file_path);
+            if (!Directory.Exists(hotfixResourcePath))
+            {
+                Directory.CreateDirectory(hotfixResourcePath);
             }
 
             using (BinaryWriter writer = new BinaryWriter(new FileStream(hotfix_cfg_in_editor, FileMode.Create, FileAccess.Write)))
@@ -1715,11 +1736,14 @@ namespace XLua
                 }
             }
 
-#if UNITY_2019_1_OR_NEWER
-            List<string> args = new List<string>() { assembly_csharp_path, assembly_csharp_path, id_map_file_path, hotfix_cfg_in_editor };
-#else
-            List<string> args = new List<string>() { assembly_csharp_path, typeof(LuaEnv).Module.FullyQualifiedName, id_map_file_path, hotfix_cfg_in_editor };
-#endif
+            var editorXluaAssemblyPath = typeof(LuaEnv).Module.FullyQualifiedName;
+            var targetXluaAssemblyPath = Path.Combine(assemblyDir, Path.GetFileName(editorXluaAssemblyPath));
+            if (!File.Exists(targetXluaAssemblyPath))
+            {
+                targetXluaAssemblyPath = editorXluaAssemblyPath;
+            }
+
+            List<string> args = new List<string>() { string.Empty, targetXluaAssemblyPath, id_map_file_path, hotfix_cfg_in_editor };
 
             foreach (var path in
                 (from asm in AppDomain.CurrentDomain.GetAssemblies() select asm.ManifestModule.FullyQualifiedName)

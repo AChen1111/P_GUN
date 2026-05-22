@@ -2724,6 +2724,7 @@ MonoBehaviour:
   doorStateIsOpen: 1
   roomCenterPoint: {fileID: 0}
   itemSpawner: {fileID: 5592398116191201107}
+  canGenerateItems: 1
   waveCount: 3
   hasEnter: 0
   enemySpawnTable: {fileID: 11400000, guid: 530afc5dd9ac460e99c893f4a4c57130, type: 2}
@@ -2743,7 +2744,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b7ba8308aff449a478c441a96611108f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  itemTable: {fileID: 11400000, guid: 0b78e19efc2cfbe45aeaae9e06e3b46f, type: 2}
+  itemTable: {fileID: 11400000, guid: 5df31018abae18f4ab952981d9592330, type: 2}
 --- !u!61 &78627306088376484
 BoxCollider2D:
   m_ObjectHideFlags: 0

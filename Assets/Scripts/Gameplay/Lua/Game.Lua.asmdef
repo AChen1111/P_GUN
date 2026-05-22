@@ -1,0 +1,19 @@
+{
+  "name": "Game.Lua",
+  "rootNamespace": "Game.Gameplay",
+  "references": [
+    "Game.Core",
+    "Game.Gameplay",
+    "Game.Items",
+    "XLua.Runtime"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

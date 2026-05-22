@@ -12,9 +12,8 @@ GameObject:
   - component: {fileID: 4467875987911426615}
   - component: {fileID: 8113022132317116680}
   - component: {fileID: 4449328502507190729}
-  - component: {fileID: 7128293463167632912}
   m_Layer: 0
-  m_Name: Chest
+  m_Name: HarmUp
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -67,18 +66,18 @@ BoxCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: -0.000000074505806, y: -0.013551131}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1, y: 1}
+    oldSize: {x: 0.296875, y: 0.359375}
     newSize: {x: 0.625, y: 0.625}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 0.28450188, y: 0.39291063}
   m_EdgeRadius: 0
 --- !u!114 &8113022132317116680
 MonoBehaviour:
@@ -97,7 +96,8 @@ MonoBehaviour:
   iconRenderer: {fileID: 4449328502507190729}
   isActive: 1
   effects:
-  - {fileID: 11400000, guid: 759d4f9bf4d89924eaee92a050ac2cf7, type: 2}
+  - {fileID: 11400000, guid: ab28af5dd3214d5eae97b67a3f14b8d2, type: 2}
+  - {fileID: 11400000, guid: 5a02048b53f8482498e2d598fb78c5d9, type: 2}
   pickupAudio: {fileID: 0}
   _dotweenAnimation: {fileID: 0}
   _animator: {fileID: 0}
@@ -144,7 +144,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 3d4ced8e78980334ea3a43c06147b491, type: 3}
+  m_Sprite: {fileID: 747178361, guid: bf817939e9a0a3241b3cf68a375367e7, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -155,16 +155,3 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &7128293463167632912
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5069590999830702722}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b7ba8308aff449a478c441a96611108f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  itemTable: {fileID: 0}

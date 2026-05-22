@@ -1,0 +1,9 @@
+local ChestEffect = {}
+
+function ChestEffect.OnPick(ctx)
+    local owner = ctx.SourceObject
+    local component = owner:GetComponent(typeof(CS.Game.Items.ItemSpawner))
+    component:SpawnItem(ctx.WorldPosition)
+end
+
+return ChestEffect

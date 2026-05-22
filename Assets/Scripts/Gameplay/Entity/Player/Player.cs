@@ -123,6 +123,7 @@ namespace Game.Gameplay
             ResolveSpriteRenderer();
             ResolveAnimator();
             CaptureDefaultVisualState();
+            HideWeaponChildrenBeforeLoadout();
 
             weaponLoadoutTask = InitializeWeaponLoadoutAsync();
 
@@ -216,6 +217,8 @@ namespace Game.Gameplay
                 var prefab = await loader.LoadAssetAsync<GameObject>(address);
                 var instance = Instantiate(prefab, Weapon);
                 instance.name = prefab.name;
+                // 武器装载完成前保持隐藏, 避免加载过程中多把枪同时出现在玩家身上.
+                instance.SetActive(false);
                 var newGun = instance.GetComponent<Gun>();
                 if (newGun == null)
                 {
@@ -238,11 +241,26 @@ namespace Game.Gameplay
             {
                 if (oldGun != null)
                 {
+                    // Destroy 会延迟到帧末, 先隐藏可避免首帧显示预制体自带枪械.
+                    oldGun.gameObject.SetActive(false);
                     Destroy(oldGun.gameObject);
                 }
             }
 
             guns.Clear();
+        }
+
+        /// <summary>
+        /// 武器异步装载前隐藏预制体上已有的武器子物体.
+        /// </summary>
+        private void HideWeaponChildrenBeforeLoadout()
+        {
+            if (Weapon == null) return;
+
+            for (var i = 0; i < Weapon.childCount; i++)
+            {
+                Weapon.GetChild(i).gameObject.SetActive(false);
+            }
         }
 
         /// <summary>

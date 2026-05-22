@@ -12,8 +12,7 @@
         "Edgar.Unity",
         "Game.Items",
         "Unity.Addressables",
-        "Unity.ResourceManager",
-        "XLua.Runtime"
+        "Unity.ResourceManager"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

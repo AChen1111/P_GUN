@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 38b70f90f3b3e2e4abc4314f35cf6295, type: 3}
   m_Name: ChestEffect
   m_EditorClassIdentifier: 
-  luaScript: {fileID: 0}
+  luaScript: {fileID: 4900000, guid: 76f11a329f7cb7b4695cbe30df24940a, type: 3}
