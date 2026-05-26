@@ -17,6 +17,13 @@ MonoBehaviour:
     m_SerializedData: []
   m_GUID: 2fee3cb4824abda44874910376c22b5f
   m_SerializeEntries:
+  - m_GUID: 67153f50d179cc94286c695fd1454098
+    m_Address: hotfix/player_bullet_reverse
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hotfix
+    - lua
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: d704d1e8bf33dcd41a4f9ff5a1a30808
     m_Address: hotfix/main
     m_ReadOnly: 0

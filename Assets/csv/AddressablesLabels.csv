@@ -36,3 +36,4 @@ Assets/Prefab/GunList/Pistol.prefab,weapon/pistol,Weapon,weapon;prefab,TRUE
 Assets/Prefab/GunList/RocketGun.prefab,weapon/rocket_gun,Weapon,weapon;prefab,TRUE
 Assets/Prefab/GunList/ShotGun.prefab,weapon/shotgun,Weapon,weapon;prefab,TRUE
 Assets/Scripts/Gameplay/Lua/Hotfix/MainHotfix.lua.txt,hotfix/main,Hotfix,hotfix;lua,TRUE
+Assets/Scripts/Gameplay/Lua/Hotfix/player_bullet_reverse.lua.txt,hotfix/player_bullet_reverse,Hotfix,hotfix;lua,TRUE

@@ -18,6 +18,7 @@ internal static class PgunHotfixConfig
     {
         // 玩家主流程, 覆盖移动, 战斗输入, 受击, 武器装载和读档恢复.
         typeof(Player),
+        typeof(PlayerBullet),
 
         // Buff 主流程, 覆盖添加, 移除, 层数, 属性计算和存档恢复.
         typeof(BuffManager),

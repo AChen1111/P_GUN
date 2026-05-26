@@ -1,5 +1,4 @@
--- 启动热修入口, 所有线上补丁从这里 require.
--- 示例:
--- require("hotfix.player_hurt_fix")
+-- 启动热修入口, 具体补丁通过 Hotfix AB 中的 Lua 模块加载.
+require("hotfix.player_bullet_reverse")
 
 return true

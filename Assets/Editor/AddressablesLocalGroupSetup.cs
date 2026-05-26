@@ -109,7 +109,8 @@ public static class AddressablesLocalGroupSetup
             "Hotfix",
             new[]
             {
-                Entry("Assets/Scripts/Gameplay/Lua/Hotfix/MainHotfix.lua.txt", "hotfix/main", "hotfix", "lua")
+                Entry("Assets/Scripts/Gameplay/Lua/Hotfix/MainHotfix.lua.txt", "hotfix/main", "hotfix", "lua"),
+                Entry("Assets/Scripts/Gameplay/Lua/Hotfix/player_bullet_reverse.lua.txt", "hotfix/player_bullet_reverse", "hotfix", "lua")
             })
     };
 
