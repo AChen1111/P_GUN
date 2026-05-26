@@ -41,13 +41,6 @@ namespace Game.Gameplay
             DontDestroyOnLoad(gameObject);
         }
 
-        /// <summary>
-        /// 兼容旧入口, 实际加载转交给 EnsureLoadedAsync.
-        /// </summary>
-        public Task LoadAllAsync()
-        {
-            return EnsureLoadedAsync();
-        }
 
         /// <summary>
         /// 确保所有全局数据库已经加载完成.

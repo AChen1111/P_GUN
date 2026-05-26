@@ -24,10 +24,20 @@ namespace Game.Gameplay
         [Header("更新界面")]
         [SerializeField] private Text statusText;
         [SerializeField] private Slider progressSlider;
+
+        [Header("更新确认弹窗")]
+        [SerializeField] private GameObject updatePromptPanel;
+        [SerializeField] private Text updatePromptText;
+        [SerializeField] private Button updateConfirmButton;
+        [SerializeField] private Button updateSkipButton;
+
+        private TaskCompletionSource<bool> updatePromptCompletion;
+
         private async void Start()
         {
             try
             {
+                HideUpdatePrompt();
                 await RunBootFlowAsync();
             }
             catch (Exception exception)
@@ -63,7 +73,20 @@ namespace Game.Gameplay
             {
                 SetStatus("检查资源更新...");
                 SetProgress(0.15f);
-                await UpdateCatalogsIfNeededAsync();
+                var catalogs = await CheckCatalogUpdatesAsync();
+                if (catalogs.Count > 0)
+                {
+                    var shouldUpdateCatalogs = await ShowUpdatePromptAsync("发现资源更新, 是否立即更新?\n更新后会下载最新资源和热修补丁.");
+                    if (!shouldUpdateCatalogs)
+                    {
+                        SetStatus("已跳过资源更新.");
+                        SetProgress(0.9f);
+                        return;
+                    }
+
+                    await UpdateCatalogsAsync(catalogs);
+                }
+
                 SetStatus("检查下载大小...");
                 SetProgress(0.35f);
 
@@ -73,6 +96,17 @@ namespace Game.Gameplay
                     SetStatus("资源已是最新.");
                     SetProgress(0.9f);
                     return;
+                }
+
+                if (catalogs.Count == 0)
+                {
+                    var shouldDownload = await ShowUpdatePromptAsync($"需要下载 {FormatBytes(downloadSize)} 资源, 是否立即更新?");
+                    if (!shouldDownload)
+                    {
+                        SetStatus("已跳过资源下载.");
+                        SetProgress(0.9f);
+                        return;
+                    }
                 }
 
                 await DownloadDependenciesAsync(downloadSize);
@@ -102,9 +136,9 @@ namespace Game.Gameplay
         }
 
         /// <summary>
-        /// 只在确实有远程 Catalog 时更新资源目录.
+        /// 检查是否存在远程 Catalog 更新.
         /// </summary>
-        private async Task UpdateCatalogsIfNeededAsync()
+        private static async Task<List<string>> CheckCatalogUpdatesAsync()
         {
             // 返回需要更新的 Catalog 列表, 空列表表示本地目录已是最新.
             var checkHandle = Addressables.CheckForCatalogUpdates(false);
@@ -119,27 +153,40 @@ namespace Game.Gameplay
                 var catalogs = checkHandle.Result;
                 if (catalogs == null || catalogs.Count == 0)
                 {
-                    return;
+                    return new List<string>();
                 }
 
-                SetStatus("更新资源目录...");
-                var updateHandle = Addressables.UpdateCatalogs(catalogs, false);
-                await updateHandle.Task;
-                try
-                {
-                    if (updateHandle.Status != AsyncOperationStatus.Succeeded)
-                    {
-                        throw new InvalidOperationException("UpdateCatalogs failed.");
-                    }
-                }
-                finally
-                {
-                    Addressables.Release(updateHandle);
-                }
+                return new List<string>(catalogs);
             }
             finally
             {
                 Addressables.Release(checkHandle);
+            }
+        }
+
+        /// <summary>
+        /// 更新资源目录, 仅在玩家确认更新后执行.
+        /// </summary>
+        private async Task UpdateCatalogsAsync(IReadOnlyList<string> catalogs)
+        {
+            if (catalogs == null || catalogs.Count == 0)
+            {
+                return;
+            }
+
+            SetStatus("更新资源目录...");
+            var updateHandle = Addressables.UpdateCatalogs(catalogs, false);
+            await updateHandle.Task;
+            try
+            {
+                if (updateHandle.Status != AsyncOperationStatus.Succeeded)
+                {
+                    throw new InvalidOperationException("UpdateCatalogs failed.");
+                }
+            }
+            finally
+            {
+                Addressables.Release(updateHandle);
             }
         }
 
@@ -212,6 +259,63 @@ namespace Game.Gameplay
                 progressSlider.value = Mathf.Clamp01(value);
             }
         }
+
+        /// <summary>
+        /// 显示更新确认弹窗并等待玩家选择.
+        /// </summary>
+        private Task<bool> ShowUpdatePromptAsync(string message)
+        {
+            if (updatePromptPanel == null || updatePromptText == null || updateConfirmButton == null || updateSkipButton == null)
+            {
+                throw new InvalidOperationException("Root 更新确认弹窗未完整绑定.");
+            }
+
+            updatePromptCompletion = new TaskCompletionSource<bool>();
+            updatePromptText.text = message;
+            updateConfirmButton.onClick.RemoveListener(HandleUpdateConfirmed);
+            updateSkipButton.onClick.RemoveListener(HandleUpdateSkipped);
+            updateConfirmButton.onClick.AddListener(HandleUpdateConfirmed);
+            updateSkipButton.onClick.AddListener(HandleUpdateSkipped);
+            updatePromptPanel.SetActive(true);
+            return updatePromptCompletion.Task;
+        }
+
+        /// <summary>
+        /// 隐藏更新确认弹窗并清理按钮监听.
+        /// </summary>
+        private void HideUpdatePrompt()
+        {
+            updateConfirmButton?.onClick.RemoveListener(HandleUpdateConfirmed);
+            updateSkipButton?.onClick.RemoveListener(HandleUpdateSkipped);
+            if (updatePromptPanel != null)
+            {
+                updatePromptPanel.SetActive(false);
+            }
+        }
+
+        private void HandleUpdateConfirmed()
+        {
+            CompleteUpdatePrompt(true);
+        }
+
+        private void HandleUpdateSkipped()
+        {
+            CompleteUpdatePrompt(false);
+        }
+
+        private void CompleteUpdatePrompt(bool shouldUpdate)
+        {
+            var completion = updatePromptCompletion;
+            updatePromptCompletion = null;
+            HideUpdatePrompt();
+            completion?.TrySetResult(shouldUpdate);
+        }
+
+        private void OnDestroy()
+        {
+            HideUpdatePrompt();
+        }
+
         private static string FormatBytes(long bytes)
         {
             if (bytes < 1024L) return $"{bytes} B";
