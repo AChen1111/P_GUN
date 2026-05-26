@@ -213,6 +213,8 @@ The current injected target assemblies are `Game.Gameplay.dll` and `Game.Items.d
 
 The startup hotfix entry asset is `Assets/Scripts/Gameplay/Lua/Hotfix/MainHotfix.lua.txt`, with Addressables address `hotfix/main` and labels `hotfix;lua`. Keep this file as the small entry script that requires or executes concrete patch scripts.
 
+Before executing `hotfix/main`, `LuaManager` preloads all Addressables `TextAsset` entries with label `hotfix` into an in-memory Lua module cache and registers an xLua custom loader. Hotfix scripts can use `require("hotfix.some_patch")` when the script has an address such as `hotfix/some_patch` and the `hotfix;lua` labels. The custom loader is synchronous and must only read from this preloaded cache, not start Addressables requests from inside `AddLoader`.
+
 ## Player And Weapons
 
 Locations:

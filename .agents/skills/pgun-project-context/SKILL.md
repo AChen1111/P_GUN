@@ -57,6 +57,7 @@ P_GUN is a Unity 2022.3 2D top-down shooter project. Runtime code is split by as
 - xLua runtime integration lives in the nested `Game.Lua` asmdef under `Assets/Scripts/Gameplay/Lua`; `Game.Gameplay` must not reference `XLua.Runtime` directly, so xLua Hotfix generated bridge code can reference gameplay/item assemblies without asmdef cycles.
 - Buff runtime script calls go through `IBuffScriptInstance` and the `BuffScriptRuntime` creation delegate; gameplay code must depend on these abstractions instead of `LuaManager` or `LuaBuffInstance`.
 - Root startup hotfix calls go through `IStartupHotfixRunner` and `StartupHotfixRuntime`; `LuaManager` loads Addressables address `hotfix/main` after catalog/dependency update and before entering `StartScene`.
+- Startup hotfix `require("hotfix.xxx")` goes through `LuaManager`'s xLua custom loader; before executing `hotfix/main`, it preloads TextAssets with Addressables label `hotfix` into an in-memory Lua module cache.
 - xLua Hotfix target types are configured in `Assets/XLua/Editor/PgunHotfixConfig.cs`; after changing the list, run `XLua/Generate Code`, wait for compilation, then run `XLua/Hotfix Inject In Editor`.
 - `AddressableLoader` lives in `Assets/Scripts/Core/HotUpdate`; it is the only runtime Addressables asset loader singleton, and gameplay objects decide which address to request through `LoadAssetAsync<T>()`.
 - `AddressableDiagnostics` lives beside `AddressableLoader`; use it to print required `.bundle` names when Addressables downloads or loads fail.

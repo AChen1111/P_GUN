@@ -85,6 +85,45 @@ namespace Game.Core
         }
 
         /// <summary>
+        /// 按 Addressables 标签加载一组资源, 返回值使用资源地址作为 Key.
+        /// </summary>
+        public async Task<IReadOnlyDictionary<string, TAsset>> LoadAssetsByLabelAsync<TAsset>(string label)
+            where TAsset : UnityEngine.Object
+        {
+            if (string.IsNullOrWhiteSpace(label))
+            {
+                throw new ArgumentException("Label must not be empty.", nameof(label));
+            }
+
+            var locationsHandle = Addressables.LoadResourceLocationsAsync(label, typeof(TAsset));
+            await locationsHandle.Task;
+
+            try
+            {
+                if (locationsHandle.Status != AsyncOperationStatus.Succeeded || locationsHandle.Result == null)
+                {
+                    throw new InvalidOperationException($"Addressables label load failed. Label: {label}, AssetType: {typeof(TAsset).Name}", locationsHandle.OperationException);
+                }
+
+                var loadedAssets = new Dictionary<string, TAsset>();
+                foreach (var location in locationsHandle.Result)
+                {
+                    // PrimaryKey 使用 Addressables 地址, Lua require 会依赖这个地址映射模块路径.
+                    loadedAssets[location.PrimaryKey] = await LoadAssetAsync<TAsset>(location.PrimaryKey);
+                }
+
+                return loadedAssets;
+            }
+            finally
+            {
+                if (locationsHandle.IsValid())
+                {
+                    Addressables.Release(locationsHandle);
+                }
+            }
+        }
+
+        /// <summary>
         /// 释放指定地址的缓存资源.
         /// </summary>
         public void Release(string address)

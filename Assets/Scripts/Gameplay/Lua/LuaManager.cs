@@ -14,10 +14,13 @@ namespace Game.Gameplay
     public sealed class LuaManager : MonoBehaviour, IStartupHotfixRunner
     {
         private const string StartupHotfixAddress = "hotfix/main";
+        private const string StartupHotfixLabel = "hotfix";
+        private const string LuaFileExtension = ".lua";
 
         private readonly Dictionary<TextAsset, LuaTable> buffTableCache = new Dictionary<TextAsset, LuaTable>();
         private readonly Dictionary<TextAsset, LuaTable> itemEffectTableCache = new Dictionary<TextAsset, LuaTable>();
         private readonly Dictionary<TextAsset, Dictionary<string, Action<ItemEffectContext>>> itemEffectMethodCache = new Dictionary<TextAsset, Dictionary<string, Action<ItemEffectContext>>>();
+        private readonly Dictionary<string, byte[]> hotfixLuaBytesByModulePath = new Dictionary<string, byte[]>();
 
         private LuaEnv luaEnv;
         private bool startupHotfixExecuted;
@@ -38,6 +41,8 @@ namespace Game.Gameplay
             Instance = this;
             DontDestroyOnLoad(gameObject);
             luaEnv = new LuaEnv();
+            // 热修 require 只能同步取 bytes, 所以 loader 只读取启动阶段预加载好的 AB Lua 缓存.
+            luaEnv.AddLoader(LoadHotfixLuaModule);
             // Root 场景中的 LuaManager 是 Buff 脚本工厂的唯一注册者.
             BuffScriptRuntime.RegisterFactory(CreateBuffInstance);
             // Root 场景中的 LuaManager 负责执行启动热修入口.
@@ -109,6 +114,7 @@ namespace Game.Gameplay
                 throw new InvalidOperationException($"{nameof(AddressableLoader)} must exist before executing startup hotfix.");
             }
 
+            await PreloadHotfixLuaModulesAsync(loader);
             var hotfixEntry = await loader.LoadAssetAsync<TextAsset>(StartupHotfixAddress);
             if (hotfixEntry == null)
             {
@@ -118,6 +124,78 @@ namespace Game.Gameplay
             luaEnv.DoString(hotfixEntry.text, hotfixEntry.name);
             startupHotfixExecuted = true;
             Debug.Log($"{nameof(LuaManager)}: 启动热修入口执行完成, Address: {StartupHotfixAddress}.", this);
+        }
+
+        /// <summary>
+        /// 从 Hotfix AB 包预加载所有 Lua 文本, 供 xLua require 同步读取.
+        /// </summary>
+        private async Task PreloadHotfixLuaModulesAsync(AddressableLoader loader)
+        {
+            hotfixLuaBytesByModulePath.Clear();
+
+            var hotfixLuaAssets = await loader.LoadAssetsByLabelAsync<TextAsset>(StartupHotfixLabel);
+            foreach (var pair in hotfixLuaAssets)
+            {
+                RegisterHotfixLuaModule(pair.Key, pair.Value);
+            }
+        }
+
+        /// <summary>
+        /// 注册热修 Lua 模块路径, 支持 Addressables 地址和 TextAsset 名称两种 require 映射.
+        /// </summary>
+        private void RegisterHotfixLuaModule(string address, TextAsset luaAsset)
+        {
+            if (luaAsset == null)
+            {
+                throw new InvalidOperationException($"Hotfix Lua asset is null. Address: {address}.");
+            }
+
+            var bytes = luaAsset.bytes;
+            hotfixLuaBytesByModulePath[NormalizeLuaModulePath(address)] = bytes;
+
+            if (!string.IsNullOrWhiteSpace(luaAsset.name))
+            {
+                hotfixLuaBytesByModulePath[NormalizeLuaModulePath($"{StartupHotfixLabel}/{luaAsset.name}")] = bytes;
+            }
+        }
+
+        /// <summary>
+        /// xLua 自定义加载器, 把 require 名称映射到已预加载的 Hotfix AB 文本.
+        /// </summary>
+        private byte[] LoadHotfixLuaModule(ref string filepath)
+        {
+            var modulePath = NormalizeLuaModulePath(filepath);
+            if (!hotfixLuaBytesByModulePath.TryGetValue(modulePath, out var bytes))
+            {
+                return null;
+            }
+
+            filepath = modulePath;
+            return bytes;
+        }
+
+        /// <summary>
+        /// 将 require 模块名或 Addressables 地址归一为 hotfix/player_bullet_reverse.lua 形式.
+        /// </summary>
+        private static string NormalizeLuaModulePath(string moduleNameOrAddress)
+        {
+            if (string.IsNullOrWhiteSpace(moduleNameOrAddress))
+            {
+                throw new ArgumentException("Lua module path must not be empty.", nameof(moduleNameOrAddress));
+            }
+
+            var normalized = moduleNameOrAddress.Replace('\\', '/');
+            if (!normalized.Contains("/") && !normalized.EndsWith(LuaFileExtension, StringComparison.Ordinal))
+            {
+                normalized = normalized.Replace('.', '/');
+            }
+
+            if (!normalized.EndsWith(LuaFileExtension, StringComparison.Ordinal))
+            {
+                normalized += LuaFileExtension;
+            }
+
+            return normalized;
         }
 
         /// <summary>
