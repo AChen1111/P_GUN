@@ -16,8 +16,8 @@ MonoBehaviour:
   waves:
   - displayName: Wave 1
     enemies:
-    - enemyId: 2
-      count: 3
+    - enemyId: 3
+      count: 1
   - displayName: Wave 2
     enemies:
     - enemyId: 1
