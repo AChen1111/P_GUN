@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Game.Core;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using UnityEngine.Audio;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -12,7 +13,7 @@ using UnityEngine.UI;
 namespace Game.Gameplay
 {
     /// <summary>
-    /// Root 场景启动控制器, 只负责检查和下载 Addressables 更新.
+    /// Root 场景启动控制器, 负责更新检查, 本地启动设置, 以及进入主菜单.
     /// </summary>
     public sealed class RootHotUpdateController : MonoBehaviour
     {
@@ -58,6 +59,8 @@ namespace Game.Gameplay
             SetProgress(0f);
             await InitializeAddressablesAsync();
             await TryUpdateRemoteContentAsync();
+            SetStatus("应用本地音频设置...");
+            await ApplySavedAudioSettingsAsync();
             SetStatus("应用热修补丁...");
             await StartupHotfixRuntime.ExecuteStartupHotfixAsync();
             SetStatus("进入主菜单...");
@@ -134,6 +137,21 @@ namespace Game.Gameplay
             }
 
             Addressables.Release(handle);
+        }
+
+        /// <summary>
+        /// 启动进入主菜单前应用本地音量, 避免实际播放音量和设置面板显示不一致.
+        /// </summary>
+        private static async Task ApplySavedAudioSettingsAsync()
+        {
+            var loader = AddressableLoader.Instance;
+            if (loader == null)
+            {
+                throw new InvalidOperationException($"{nameof(AddressableLoader)} must exist before applying audio settings.");
+            }
+
+            AudioMixer audioMixer = await loader.LoadAssetAsync<AudioMixer>(GameAudioSettingsStore.AudioMixerAddress);
+            GameAudioSettingsStore.Apply(audioMixer);
         }
 
         /// <summary>

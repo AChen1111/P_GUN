@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: Enemy_ContentUpdateGroupSchema
   m_EditorClassIdentifier: 
   m_Group: {fileID: 11400000, guid: a5119a4ea8213274bb34c9a3a3c0657b, type: 2}
-  m_StaticContent: 1
+  m_StaticContent: 0

@@ -16,6 +16,7 @@ namespace Game.Gameplay
 
     /// <summary>
     /// 属性修正的计算分区.
+    /// Final = (Base + FlatSum) * (1 + PercentAddSum) * FinalMulProduct
     /// </summary>
     public enum ModifierType
     {

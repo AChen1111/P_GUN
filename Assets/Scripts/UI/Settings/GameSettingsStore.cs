@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.Audio;
+using Game.Core;
 
 namespace Game.UI.Settings
 {
@@ -11,12 +12,10 @@ namespace Game.UI.Settings
         private const string FullScreenKey = "Settings.FullScreen";
         private const string VSyncKey = "Settings.VSync";
         private const string FrameRateLimitKey = "Settings.FrameRateLimit";
-        private const string MasterVolumeKey = "Settings.MasterVolume";
-        private const string MusicVolumeKey = "Settings.MusicVolume";
-        private const string SfxVolumeKey = "Settings.SfxVolume";
         public static GameSettingsData Load()
         {
             GameSettingsData defaultData = GameSettingsData.CreateDefault();
+            GameAudioSettings audioSettings = GameAudioSettingsStore.Load(defaultData.MasterVolume, defaultData.MusicVolume, defaultData.SfxVolume);
 
             // PlayerPrefs只保存玩家本地偏好, 不承担玩法数据或进度数据.
             return new GameSettingsData
@@ -27,9 +26,9 @@ namespace Game.UI.Settings
                 FullScreen = PlayerPrefs.GetInt(FullScreenKey, defaultData.FullScreen ? 1 : 0) == 1,
                 VSync = PlayerPrefs.GetInt(VSyncKey, defaultData.VSync ? 1 : 0) == 1,
                 FrameRateLimit = PlayerPrefs.GetInt(FrameRateLimitKey, defaultData.FrameRateLimit),
-                MasterVolume = PlayerPrefs.GetFloat(MasterVolumeKey, defaultData.MasterVolume),
-                MusicVolume = PlayerPrefs.GetFloat(MusicVolumeKey, defaultData.MusicVolume),
-                SfxVolume = PlayerPrefs.GetFloat(SfxVolumeKey, defaultData.SfxVolume)
+                MasterVolume = audioSettings.MasterVolume,
+                MusicVolume = audioSettings.MusicVolume,
+                SfxVolume = audioSettings.SfxVolume
             };
         }
         public static void Save(GameSettingsData data)
@@ -40,9 +39,7 @@ namespace Game.UI.Settings
             PlayerPrefs.SetInt(FullScreenKey, data.FullScreen ? 1 : 0);
             PlayerPrefs.SetInt(VSyncKey, data.VSync ? 1 : 0);
             PlayerPrefs.SetInt(FrameRateLimitKey, data.FrameRateLimit);
-            PlayerPrefs.SetFloat(MasterVolumeKey, data.MasterVolume);
-            PlayerPrefs.SetFloat(MusicVolumeKey, data.MusicVolume);
-            PlayerPrefs.SetFloat(SfxVolumeKey, data.SfxVolume);
+            GameAudioSettingsStore.Save(new GameAudioSettings(data.MasterVolume, data.MusicVolume, data.SfxVolume), false);
             PlayerPrefs.Save();
         }
         public static void Apply(GameSettingsData data, AudioMixer audioMixer, string masterVolumeParameter, string musicVolumeParameter, string sfxVolumeParameter)
@@ -65,25 +62,7 @@ namespace Game.UI.Settings
                 return;
             }
 
-            SetMixerVolume(audioMixer, masterVolumeParameter, data.MasterVolume);
-            SetMixerVolume(audioMixer, musicVolumeParameter, data.MusicVolume);
-            SetMixerVolume(audioMixer, sfxVolumeParameter, data.SfxVolume);
-        }
-        private static void SetMixerVolume(AudioMixer audioMixer, string parameterName, float normalizedVolume)
-        {
-            if (string.IsNullOrEmpty(parameterName))
-            {
-                Debug.LogError("设置应用失败, AudioMixer参数名不能为空.");
-                return;
-            }
-
-            // 线性音量转分贝, 0时使用-80dB作为静音近似值.
-            float mixerValue = normalizedVolume <= 0.0001f ? -80f : Mathf.Log10(normalizedVolume) * 20f;
-
-            if (!audioMixer.SetFloat(parameterName, mixerValue))
-            {
-                Debug.LogError($"设置应用失败, AudioMixer未暴露参数: {parameterName}.");
-            }
+            GameAudioSettingsStore.Apply(new GameAudioSettings(data.MasterVolume, data.MusicVolume, data.SfxVolume), audioMixer, masterVolumeParameter, musicVolumeParameter, sfxVolumeParameter);
         }
     }
 }
