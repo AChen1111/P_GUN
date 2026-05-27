@@ -152,10 +152,13 @@ MonoBehaviour:
   OwnerFightRoom: {fileID: 0}
   audioPlay: {fileID: 3543157380447102985}
   bulletPrefab: {fileID: 8813529008298550284, guid: 10e246e394d07ef4ea3fe43c6de534c0, type: 3}
-  shootSounds: []
+  shootSounds:
+  - {fileID: 8300000, guid: d6a1e1dba80eb484386bf50f97ec2560, type: 3}
+  - {fileID: 8300000, guid: 4ce72a5102c96ac449defd59e5a058c4, type: 3}
+  - {fileID: 8300000, guid: 247c3d9a01e9b434899f18098abe4547, type: 3}
   followBeforeAttackTime: 1.5
-  attackShootDelay: 0.15
-  attackLockDuration: 0.35
+  attackShootDelay: 0.1
+  attackLockDuration: 0.2
   bulletSpawnDistance: 0.5
   bulletCount: 5
   bulletSpreadStepAngle: 2
@@ -329,7 +332,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b7ba8308aff449a478c441a96611108f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  itemTable: {fileID: 11400000, guid: 0b78e19efc2cfbe45aeaae9e06e3b46f, type: 2}
+  itemTable: {fileID: 11400000, guid: f8a228ed370da944eb682999dc6d1546, type: 2}
 --- !u!114 &3543157380447102985
 MonoBehaviour:
   m_ObjectHideFlags: 0

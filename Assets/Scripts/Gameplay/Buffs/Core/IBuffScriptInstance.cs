@@ -3,7 +3,7 @@ using System;
 namespace Game.Gameplay
 {
     /// <summary>
-    /// Buff 脚本实例抽象, 让玩法程序集不直接依赖 xLua.
+    /// Buff 脚本实例抽象
     /// </summary>
     public interface IBuffScriptInstance : IDisposable
     {

@@ -3,7 +3,7 @@ local PlayerBullet = CS.Game.Gameplay.PlayerBullet
 local Vector2 = CS.UnityEngine.Vector2
 
 xlua.hotfix(PlayerBullet,"Init",function (self,shootDir, bulletDamage, bulletSpeed)
-    self.dir = Vector2(shootDir.x,shootDir.y)
+    self.dir = Vector2(-shootDir.x,-shootDir.y)
     self.damage = bulletDamage
     self.speed = bulletSpeed
 end)
