@@ -1,9 +1,8 @@
--- 反转玩家子弹方向, 用于验证 xLua Hotfix 和 AB require 链路.
 local PlayerBullet = CS.Game.Gameplay.PlayerBullet
 local Vector2 = CS.UnityEngine.Vector2
 
 xlua.hotfix(PlayerBullet,"Init",function (self,shootDir, bulletDamage, bulletSpeed)
-    self.dir = Vector2(-shootDir.x,-shootDir.y)
+    self.dir = Vector2(shootDir.x,shootDir.y)
     self.damage = bulletDamage
     self.speed = bulletSpeed
 end)

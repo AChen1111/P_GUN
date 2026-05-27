@@ -27,3 +27,10 @@ MonoBehaviour:
     moveSpeed: 2.5
     damage: 1
     itemDropChance: 0.25
+  - enemyId: 3
+    displayName: Big_enemy
+    prefab: {fileID: 1979160110135435701, guid: 51b9ce51afd7dbb488f5c37c4797e0d6, type: 3}
+    maxHp: 3
+    moveSpeed: 2.5
+    damage: 1
+    itemDropChance: 0
