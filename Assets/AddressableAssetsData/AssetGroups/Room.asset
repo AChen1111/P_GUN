@@ -23,6 +23,7 @@ MonoBehaviour:
     m_SerializedLabels:
     - corridor
     - room
+    - hot_update
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 55a2fdf4283883548a4042623e2f8635
     m_Address: room/level1
@@ -30,6 +31,7 @@ MonoBehaviour:
     m_SerializedLabels:
     - level1
     - room
+    - hot_update
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 69e0cab51f1222e4bb3e4674e0348bc8
     m_Address: room/init
@@ -37,6 +39,7 @@ MonoBehaviour:
     m_SerializedLabels:
     - room
     - room_template
+    - hot_update
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: c3725d4757effc442acdafa92d4d4329
     m_Address: room/normal
@@ -44,6 +47,7 @@ MonoBehaviour:
     m_SerializedLabels:
     - room
     - room_template
+    - hot_update
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: d12f56f144e67244f9b540d241a530e7
     m_Address: room/corridor_lr
@@ -51,6 +55,7 @@ MonoBehaviour:
     m_SerializedLabels:
     - corridor
     - room
+    - hot_update
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: fd8d6940222a8bf40800d474d7a6228c
     m_Address: room/final
@@ -58,6 +63,7 @@ MonoBehaviour:
     m_SerializedLabels:
     - room
     - room_template
+    - hot_update
     FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 63af2ccf367b1c745b05c3dc480c23af, type: 2}

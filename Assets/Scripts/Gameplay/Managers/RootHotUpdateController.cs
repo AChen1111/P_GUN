@@ -16,7 +16,8 @@ namespace Game.Gameplay
     /// </summary>
     public sealed class RootHotUpdateController : MonoBehaviour
     {
-        private static readonly string[] DownloadLabels = { "room", "buff", "item", "enemy", "weapon", "shared", "hotfix" };
+        private const string HotUpdateDownloadLabel = "hot_update";
+        private static readonly string[] DownloadLabels = { HotUpdateDownloadLabel };
 
         [Header("启动流程")]
         [SerializeField] private string nextSceneName = "StartScene";

@@ -23,6 +23,7 @@ MonoBehaviour:
     m_SerializedLabels:
     - item
     - prefab
+    - hot_update
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 11f80f59cb4fd3c4f8e371ff95409cb6
     m_Address: item/harm_up
@@ -30,6 +31,7 @@ MonoBehaviour:
     m_SerializedLabels:
     - item
     - prefab
+    - hot_update
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: a4f46db2f0b85564a81ad43c4f0b8880
     m_Address: item/heart
@@ -37,6 +39,7 @@ MonoBehaviour:
     m_SerializedLabels:
     - item
     - prefab
+    - hot_update
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: bedc99d1d01a09b47a4db6c1717c43d1
     m_Address: item/power_up
@@ -44,6 +47,7 @@ MonoBehaviour:
     m_SerializedLabels:
     - item
     - prefab
+    - hot_update
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: d7289ca60b79f7849be1a94d4f3cb4be
     m_Address: ItemDatabase
@@ -51,6 +55,7 @@ MonoBehaviour:
     m_SerializedLabels:
     - database
     - item
+    - hot_update
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: ec55b4f84b4c70f4e958efa2efb7d253
     m_Address: item/speed_up
@@ -58,6 +63,7 @@ MonoBehaviour:
     m_SerializedLabels:
     - item
     - prefab
+    - hot_update
     FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 63af2ccf367b1c745b05c3dc480c23af, type: 2}

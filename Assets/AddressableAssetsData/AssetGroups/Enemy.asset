@@ -23,6 +23,7 @@ MonoBehaviour:
     m_SerializedLabels:
     - enemy
     - prefab
+    - hot_update
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 35827546b14bc8d48a139f245049f973
     m_Address: enemy/orc_masked
@@ -30,6 +31,7 @@ MonoBehaviour:
     m_SerializedLabels:
     - enemy
     - prefab
+    - hot_update
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 5997eda64fd4b9e46ab562272521a078
     m_Address: enemy/enemy_a
@@ -37,6 +39,7 @@ MonoBehaviour:
     m_SerializedLabels:
     - enemy
     - prefab
+    - hot_update
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 62bf63f566fb06a44a78f17618a6b6cf
     m_Address: enemy/slime
@@ -44,6 +47,7 @@ MonoBehaviour:
     m_SerializedLabels:
     - enemy
     - prefab
+    - hot_update
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 66cab04fd3d095d43a8c1ea2eae2f77d
     m_Address: enemy/goblin
@@ -51,6 +55,7 @@ MonoBehaviour:
     m_SerializedLabels:
     - enemy
     - prefab
+    - hot_update
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 73085d0d90bddfc47afdd98cf9f84cd6
     m_Address: enemy/ogre
@@ -58,6 +63,7 @@ MonoBehaviour:
     m_SerializedLabels:
     - enemy
     - prefab
+    - hot_update
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: b78964bc8875e5142a36b88e05a23ac0
     m_Address: enemy/orc_warrior
@@ -65,6 +71,7 @@ MonoBehaviour:
     m_SerializedLabels:
     - enemy
     - prefab
+    - hot_update
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: c42c8260bc4f449588c588d697b5211e
     m_Address: EnemyDatabase
@@ -72,6 +79,7 @@ MonoBehaviour:
     m_SerializedLabels:
     - database
     - enemy
+    - hot_update
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: c7689240beca890469aab85afd109862
     m_Address: enemy/bat
@@ -79,6 +87,7 @@ MonoBehaviour:
     m_SerializedLabels:
     - enemy
     - prefab
+    - hot_update
     FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 63af2ccf367b1c745b05c3dc480c23af, type: 2}
