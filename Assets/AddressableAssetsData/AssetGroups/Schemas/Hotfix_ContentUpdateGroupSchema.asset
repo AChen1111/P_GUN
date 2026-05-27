@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: Hotfix_ContentUpdateGroupSchema
   m_EditorClassIdentifier: 
   m_Group: {fileID: 11400000, guid: 921fcdb4c93a2ea428f5641afb60d7ee, type: 2}
-  m_StaticContent: 1
+  m_StaticContent: 0

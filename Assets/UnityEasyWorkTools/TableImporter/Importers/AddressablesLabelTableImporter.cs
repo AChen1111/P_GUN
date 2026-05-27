@@ -60,7 +60,7 @@ public sealed class AddressablesLabelTableImporter : ExcelTableImporterBase
         var csv = string.Join(
             Environment.NewLine,
             "assetPath,address,group,labels,clearLabels",
-            "Assets/Prefab/GunList/AK.prefab,weapon/ak,Local_Weapons_Base,weapons_base;weapon_ak,false"
+            "Assets/Prefab/GunList/AK.prefab,weapon/ak,Weapon,hot_update;weapon;prefab,false"
         );
 
         File.WriteAllText(path, csv, new UTF8Encoding(true));

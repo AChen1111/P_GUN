@@ -23,6 +23,7 @@ MonoBehaviour:
     m_SerializedLabels:
     - prefab
     - weapon
+    - hot_update
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 0a94435d9287e2b4b966018256ec5194
     m_Address: weapon/rocket_gun
@@ -30,6 +31,7 @@ MonoBehaviour:
     m_SerializedLabels:
     - prefab
     - weapon
+    - hot_update
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 4ea89973311c6f94da169560abf23ef9
     m_Address: weapon/shotgun
@@ -37,6 +39,7 @@ MonoBehaviour:
     m_SerializedLabels:
     - prefab
     - weapon
+    - hot_update
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 6468ba96de52d3a48ab7649bf7a8f5ca
     m_Address: weapon/mp5
@@ -44,6 +47,7 @@ MonoBehaviour:
     m_SerializedLabels:
     - prefab
     - weapon
+    - hot_update
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 6d6e0a3a98503714c899e24a2384c459
     m_Address: WeaponDatabase
@@ -51,6 +55,7 @@ MonoBehaviour:
     m_SerializedLabels:
     - database
     - weapon
+    - hot_update
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 78d6bb99e24c4a94fa86f5dd50caddd6
     m_Address: weapon/pistol
@@ -58,6 +63,7 @@ MonoBehaviour:
     m_SerializedLabels:
     - prefab
     - weapon
+    - hot_update
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 8b4f120b8e657e54eaab0c7e3e76abc3
     m_Address: weapon/awp
@@ -65,6 +71,7 @@ MonoBehaviour:
     m_SerializedLabels:
     - prefab
     - weapon
+    - hot_update
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: dd7733526380a19439e58ed60e12c1ad
     m_Address: weapon/ak
@@ -72,6 +79,7 @@ MonoBehaviour:
     m_SerializedLabels:
     - prefab
     - weapon
+    - hot_update
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: e03681111fe9cdb4b9482d45fab56849
     m_Address: weapon/laser
@@ -79,6 +87,7 @@ MonoBehaviour:
     m_SerializedLabels:
     - prefab
     - weapon
+    - hot_update
     FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 63af2ccf367b1c745b05c3dc480c23af, type: 2}

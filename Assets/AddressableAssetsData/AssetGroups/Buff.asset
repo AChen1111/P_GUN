@@ -23,6 +23,7 @@ MonoBehaviour:
     m_SerializedLabels:
     - buff
     - database
+    - hot_update
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 648678a33bef4bec9cd2e901e934f017
     m_Address: buff/lua/speed
@@ -30,6 +31,7 @@ MonoBehaviour:
     m_SerializedLabels:
     - buff
     - lua
+    - hot_update
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 87662b07a2474434950e657708d1bada
     m_Address: buff/lua/max_hp
@@ -37,6 +39,7 @@ MonoBehaviour:
     m_SerializedLabels:
     - buff
     - lua
+    - hot_update
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 921073a9ab0a469886c62babb3cfbd9c
     m_Address: buff/lua/poison
@@ -44,6 +47,7 @@ MonoBehaviour:
     m_SerializedLabels:
     - buff
     - lua
+    - hot_update
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: bfef84428f614290a92f0716f6fd7171
     m_Address: buff/lua/damage_up
@@ -51,6 +55,7 @@ MonoBehaviour:
     m_SerializedLabels:
     - buff
     - lua
+    - hot_update
     FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 63af2ccf367b1c745b05c3dc480c23af, type: 2}

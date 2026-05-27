@@ -2471,6 +2471,7 @@ MonoBehaviour:
   doorStateIsOpen: 1
   roomCenterPoint: {fileID: 0}
   itemSpawner: {fileID: 0}
+  canGenerateItems: 0
   finalSR: {fileID: 2225115908224705632}
 --- !u!61 &1324493256292910189
 BoxCollider2D:

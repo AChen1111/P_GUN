@@ -12,6 +12,7 @@ public static class AddressablesLocalGroupSetup
     private const string RemoteBuildPath = "ServerData/P_GUN/[BuildTarget]";
     private const string RemoteLoadPath = "https://achen1o1.xyz/AB/P_GUN/[BuildTarget]";
     private const string ContentUpdateGroupNamePrefix = "Content Update";
+    private const string HotUpdateDownloadLabel = "hot_update";
 
     private static readonly HotUpdateGroupDefinition[] HotUpdateGroups =
     {
@@ -343,7 +344,12 @@ public static class AddressablesLocalGroupSetup
 
     private static HotUpdateEntryDefinition Entry(string assetPath, string address, params string[] labels)
     {
-        return new HotUpdateEntryDefinition(assetPath, address, labels);
+        // 所有启动阶段需要预下载的资源都打统一标签, 新增热更组时不需要再改 RootHotUpdateController.
+        var mergedLabels = new[] { HotUpdateDownloadLabel }
+            .Concat(labels ?? Array.Empty<string>())
+            .Distinct()
+            .ToArray();
+        return new HotUpdateEntryDefinition(assetPath, address, mergedLabels);
     }
 
     private sealed class HotUpdateGroupDefinition
