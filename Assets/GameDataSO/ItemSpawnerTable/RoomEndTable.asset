@@ -13,11 +13,7 @@ MonoBehaviour:
   m_Name: RoomEndTable
   m_EditorClassIdentifier: 
   entries:
-  - prefab: {fileID: 5069590999830702722, guid: 11f80f59cb4fd3c4f8e371ff95409cb6, type: 3}
+  - prefab: {fileID: 5069590999830702722, guid: 06bc0eb67725be6489936e8feba3f252, type: 3}
     weight: 1
-    spawnAnimEffect: 5
-    spawnAnimDuration: 1
-  - prefab: {fileID: 5069590999830702722, guid: 0d97b75cf6914479889ba297b299cc12, type: 3}
-    weight: 1
-    spawnAnimEffect: 5
-    spawnAnimDuration: 1
+    spawnAnimEffect: 2
+    spawnAnimDuration: 1.5

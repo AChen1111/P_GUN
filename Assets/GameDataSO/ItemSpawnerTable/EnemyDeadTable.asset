@@ -13,11 +13,7 @@ MonoBehaviour:
   m_Name: EnemyDeadTable
   m_EditorClassIdentifier: 
   entries:
-  - prefab: {fileID: 5069590999830702722, guid: ec55b4f84b4c70f4e958efa2efb7d253, type: 3}
+  - prefab: {fileID: 5069590999830702722, guid: 0d97b75cf6914479889ba297b299cc12, type: 3}
     weight: 1
-    spawnAnimEffect: 1
-    spawnAnimDuration: 1.5
-  - prefab: {fileID: 5069590999830702722, guid: bedc99d1d01a09b47a4db6c1717c43d1, type: 3}
-    weight: 1
-    spawnAnimEffect: 5
+    spawnAnimEffect: 2
     spawnAnimDuration: 1.5

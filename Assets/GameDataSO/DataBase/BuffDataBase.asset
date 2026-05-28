@@ -45,8 +45,8 @@ MonoBehaviour:
     description: "\u6700\u5927\u751F\u547D\u503C\u63D0\u53472\u70B9."
     tag: 0
     luaFile: {fileID: 4900000, guid: 87662b07a2474434950e657708d1bada, type: 3}
-    duration: 5
-    isPermanent: 0
+    duration: 0
+    isPermanent: 1
     interval: 1
     modifiers:
     - statType: 3

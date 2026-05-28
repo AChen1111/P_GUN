@@ -10,7 +10,7 @@ using Game.Presentation;
 namespace Game.Items
 {
     /// <summary>
-    /// 场景中的可交互物品: 玩家靠近显示描述, 按 F 后收入背包并播放拾取表现.
+    /// 场景中的可交互物品: 玩家靠近显示描述, 按 F 后收入背包或直接触发效果并播放拾取表现.
     /// </summary>
     [RequireComponent(typeof(Collider2D))]
     public class Item : MonoBehaviour, Game.Pooling.IPoolable
@@ -24,7 +24,8 @@ namespace Game.Items
 
         [Header("拾取状态")]
         [SerializeField] private bool isActive = true;
-
+        [Header("是否加入背包")]
+        [SerializeField] private bool pickInBackBag = true;
         [Header("效果列表")]
         [SerializeField] private List<ItemEffectBase> effects = new List<ItemEffectBase>();
 
@@ -92,14 +93,7 @@ namespace Game.Items
             {
                 if (!isActive || hasPicked)
                     return;
-                var inventory = ResolvePlayerInventory();
-                if (inventory == null)
-                {
-                    Debug.LogError($"{nameof(Item)}拾取失败, Player缺少{nameof(PlayerInventory)}组件.", this);
-                    return;
-                }
-
-                if (!TryAddToInventory(inventory))
+                if (!TryProcessPickup())
                 {
                     return;
                 }
@@ -134,6 +128,34 @@ namespace Game.Items
             return true;
         inventoryAdded = inventory.AddFromItem(this);
         return inventoryAdded;
+    }
+
+    bool TryProcessPickup()
+    {
+        if (!pickInBackBag)
+        {
+            ApplyEffectsDirectly();
+            return true;
+        }
+
+        var inventory = ResolvePlayerInventory();
+        if (inventory == null)
+        {
+            Debug.LogError($"{nameof(Item)}拾取失败, Player缺少{nameof(PlayerInventory)}组件.", this);
+            return false;
+        }
+
+        return TryAddToInventory(inventory);
+    }
+
+    void ApplyEffectsDirectly()
+    {
+        // 非背包物品拾取时直接执行效果, 这里按需求不构造额外效果上下文.
+        var ctx = default(ItemEffectContext);
+        for (int i = 0; i < effects.Count; i++)
+        {
+            effects[i]?.OnPick(ctx);
+        }
     }
 
     bool TryPlayAnimatorPickup()
