@@ -16,6 +16,8 @@ namespace Game.Gameplay
         public Rigidbody2D rb;
         [SerializeField] private float lifeTime = 3f;
         [SerializeField] private int damage = 1;
+        [Tooltip("命中后给玩家附加的 Buff id, -1 表示不附加.")]
+        [SerializeField] private int hitBuffId = -1;
         private bool hasHit;
         private Coroutine autoRecycleCoroutine;
 
@@ -112,7 +114,11 @@ namespace Game.Gameplay
             if (hasHit || target == null) return;
 
             if (target.CompareTag("Player")) {
-                target.GetComponent<Player>()?.Hurt(new DamageInfo(damage, dir));
+                var player = target.GetComponent<Player>();
+                var isDamageApplied = player != null && player.Hurt(new DamageInfo(damage, dir));
+                if (isDamageApplied) {
+                    TryApplyHitBuff(player);
+                }
                 hasHit = true;
 
                 var audioSource = target.GetComponent<AudioSource>();
@@ -133,6 +139,18 @@ namespace Game.Gameplay
                 }
                 Recycle();
             }
+        }
+
+        /// <summary>
+        /// 命中 Buff 是子弹 prefab 配置, -1 表示本次命中不附加 Buff.
+        /// </summary>
+        private void TryApplyHitBuff(Player player) {
+            if (hitBuffId == -1 || player == null) return;
+
+            var manager = player.buffManager != null ? player.buffManager : player.GetComponent<BuffManager>();
+            if (manager == null) return;
+
+            manager.AddBuffById(hitBuffId, this);
         }
 
         /// <summary>

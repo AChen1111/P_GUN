@@ -151,12 +151,13 @@ MonoBehaviour:
   itemSpawner: {fileID: 7837503422260755806}
   OwnerFightRoom: {fileID: 0}
   audioPlay: {fileID: 3543157380447102985}
-  bulletPrefab: {fileID: 8813529008298550284, guid: 10e246e394d07ef4ea3fe43c6de534c0, type: 3}
+  bulletPrefab: {fileID: 8813529008298550284, guid: d13631114fea6f5448596d7d0280467f, type: 3}
   shootSounds:
   - {fileID: 8300000, guid: d6a1e1dba80eb484386bf50f97ec2560, type: 3}
   - {fileID: 8300000, guid: 4ce72a5102c96ac449defd59e5a058c4, type: 3}
   - {fileID: 8300000, guid: 247c3d9a01e9b434899f18098abe4547, type: 3}
   followBeforeAttackTime: 1.5
+  playerSafeDistance: 3
   attackShootDelay: 0.1
   attackLockDuration: 0.2
   bulletSpawnDistance: 0.5

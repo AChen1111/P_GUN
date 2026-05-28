@@ -66,7 +66,7 @@ MonoBehaviour:
   sr: {fileID: 8980726362857158556}
   moveSpeed: 5
   speedUp: 0
-  maxHp: 6
+  maxHp: 12
   HP: 0
   Weapon: {fileID: 5918398537855737486}
   guns:

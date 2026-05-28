@@ -61,7 +61,7 @@ namespace Game.Gameplay
                 .OnUpdate(UpdateChaseState)
                 .OnExit(EndChaseState);
 
-            fsm.StartState(EnemyState.Attack);
+            fsm.StartState(EnemyState.Follow);
         }
 
         protected override void OnDead()

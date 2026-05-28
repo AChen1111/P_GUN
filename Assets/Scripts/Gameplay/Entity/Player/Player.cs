@@ -110,6 +110,7 @@ namespace Game.Gameplay
         bool isDashInvincible;
         bool dashTimeScaleApplied;
         float nextDashReadyTime;
+        float dashEndTime;
         float dashPreviousTimeScale = 1f;
         float dashPreviousFixedDeltaTime = 0.02f;
         Coroutine dashCoroutine;
@@ -121,6 +122,8 @@ namespace Game.Gameplay
 
         public int MaxHP => Mathf.Max(0, Mathf.RoundToInt(CalculateBuffedStat(StatType.MaxHp, maxHp)));
         public bool IsHPFull => HP >= MaxHP;
+        public bool IsDashReady => !isDashing && DashReadyRemainingTime <= 0f;
+        public float DashReadyRemainingTime => GetDashReadyRemainingTime();
 
         #region Unity Lifecycle
 
@@ -579,6 +582,7 @@ namespace Game.Gameplay
 
             var remainingDistance = Mathf.Max(0f, dashDistance);
             var remainingTime = Mathf.Max(0.01f, dashDuration);
+            dashEndTime = Time.unscaledTime + remainingTime;
             var dashSpeed = remainingDistance / remainingTime;
 
             while (remainingDistance > 0f && remainingTime > 0f)
@@ -686,8 +690,23 @@ namespace Game.Gameplay
 
             isDashing = false;
             isDashInvincible = false;
+            dashEndTime = 0f;
             activeDashDirection = Vector2.zero;
             RestoreDashTimeScale();
+        }
+
+        /// <summary>
+        /// 计算冲刺再次可用的剩余真实时间, UI 使用它显示冷却或冲刺中剩余时间.
+        /// </summary>
+        float GetDashReadyRemainingTime()
+        {
+            var readyTime = nextDashReadyTime;
+            if (isDashing)
+            {
+                readyTime = Mathf.Max(readyTime, dashEndTime);
+            }
+
+            return Mathf.Max(0f, readyTime - Time.unscaledTime);
         }
 
         /// <summary>
@@ -722,13 +741,13 @@ namespace Game.Gameplay
         #endregion
 
         #region Health
-        public void Hurt()
+        public bool Hurt()
         {
-            Hurt(new DamageInfo(1, Vector2.zero));
+            return Hurt(new DamageInfo(1, Vector2.zero));
         }
-        public void Hurt(DamageInfo damageInfo)
+        public bool Hurt(DamageInfo damageInfo)
         {
-            if(!canHurt || isDashInvincible) return;
+            if(!canHurt || isDashInvincible) return false;
             if(damageInfo == null) damageInfo = new DamageInfo();
 
             ExitSleepState();
@@ -744,7 +763,7 @@ namespace Game.Gameplay
             if(HP <= 0)
             {
                 EventCenter.Trigger(CoreEvents.PlayerDied);
-                return;
+                return true;
             }
 
             //受击免疫
@@ -799,45 +818,47 @@ namespace Game.Gameplay
                 PlayHurtFlash();
             }
 
-    IEnumerator HurtSlowCoroutine()
-    {
-        hurtPreviousTimeScale = Time.timeScale;
-        Time.timeScale = Mathf.Clamp(hurtSlowTimeScale, 0.01f, 1f);
-        yield return new WaitForSecondsRealtime(Mathf.Max(0f, hurtSlowDuration));
-        RestoreHurtSlowTimeScale();
-        hurtSlowCoroutine = null;
-    }
+            IEnumerator HurtSlowCoroutine()
+            {
+                hurtPreviousTimeScale = Time.timeScale;
+                Time.timeScale = Mathf.Clamp(hurtSlowTimeScale, 0.01f, 1f);
+                yield return new WaitForSecondsRealtime(Mathf.Max(0f, hurtSlowDuration));
+                RestoreHurtSlowTimeScale();
+                hurtSlowCoroutine = null;
+            }
 
-    IEnumerator HurtInvincibleCoroutine()
-    {
-        //受击免疫使用真实时间, 避免受 Time.timeScale 影响.
-        yield return new WaitForSecondsRealtime(Mathf.Max(0f, hurtInvincibleDuration));
-        canHurt = true;
-        hurtInvincibleCoroutine = null;
-    }
+            IEnumerator HurtInvincibleCoroutine()
+            {
+                //受击免疫使用真实时间, 避免受 Time.timeScale 影响.
+                yield return new WaitForSecondsRealtime(Mathf.Max(0f, hurtInvincibleDuration));
+                canHurt = true;
+                hurtInvincibleCoroutine = null;
+            }
 
-    Vector2 GetFallbackKnockbackDirection()
-    {
-        // 没有伤害来源方向时, 按角色面向反方向后退.
-        if (sr == null)
-            return Vector2.zero;
-        return sr.flipX ? Vector2.right : Vector2.left;
-    }
+            Vector2 GetFallbackKnockbackDirection()
+            {
+                // 没有伤害来源方向时, 按角色面向反方向后退.
+                if (sr == null)
+                    return Vector2.zero;
+                return sr.flipX ? Vector2.right : Vector2.left;
+            }
 
-    void PlayHurtFlash()
-    {
-        if (sr == null)
-            return;
-        sr.DOKill(false);
-        sr.color = hasDefaultSpriteColor ? defaultSpriteColor : Color.white;
-        var loops = Mathf.Max(2, hurtFlashLoops * 2);
-        DOTween.To(() => sr.color, color => sr.color = color, hurtFlashColor, hurtFlashInterval).SetTarget(sr).SetLoops(loops, LoopType.Yoyo).SetUpdate(true).OnComplete(() =>
-        {
-            if (sr != null)
+            void PlayHurtFlash()
+            {
+                if (sr == null)
+                    return;
+                sr.DOKill(false);
                 sr.color = hasDefaultSpriteColor ? defaultSpriteColor : Color.white;
-        });
-    }
-}
+                var loops = Mathf.Max(2, hurtFlashLoops * 2);
+                DOTween.To(() => sr.color, color => sr.color = color, hurtFlashColor, hurtFlashInterval).SetTarget(sr).SetLoops(loops, LoopType.Yoyo).SetUpdate(true).OnComplete(() =>
+                {
+                    if (sr != null)
+                        sr.color = hasDefaultSpriteColor ? defaultSpriteColor : Color.white;
+                });
+            }
+
+            return true;
+        }
         public void Restart()
         {
             isGameEnded = false;
