@@ -80,7 +80,13 @@ public static class AddressablesLocalGroupSetup
             "Shared",
             new[]
             {
-                Entry("Assets/GameDataSO/ItemSpawnerTable/RoomEndTable.asset", "shared/gamedataso/itemspawnertable/roomendtable", "shared"),
+                // Shared 只放跨业务组重复依赖, 避免同一资源被多个 Bundle 各自打入.
+                Entry("Assets/Prefab/Player/Player.prefab", "shared/prefab/player/player", "shared", "player"),
+                Entry("Assets/GameDataSO/EnemySpawnTable/NormalRoomEnemySpawnTable.asset", "shared/gamedataso/enemyspawntable/normalroomenemyspawntable", "shared", "spawn_table"),
+                Entry("Assets/GameDataSO/ItemSpawnerTable/BatTable.asset", "shared/gamedataso/itemspawnertable/battable", "shared", "spawn_table"),
+                Entry("Assets/GameDataSO/ItemSpawnerTable/EnemyDeadTable.asset", "shared/gamedataso/itemspawnertable/enemydeadtable", "shared", "spawn_table"),
+                Entry("Assets/GameDataSO/ItemSpawnerTable/RoomEndTable.asset", "shared/gamedataso/itemspawnertable/roomendtable", "shared", "spawn_table"),
+                Entry("Assets/GameDataSO/ItemEffects/EffectSO/HealItemEffect.asset", "shared/gamedataso/itemeffects/effectso/healitemeffect", "shared", "item_effect"),
                 Entry("Assets/Audio/SFX/Player/Gun/GunSFX/AKShootEnd.mp3", "shared/audio/sfx/player/gun/gunsfx/akshootend", "shared"),
                 Entry("Assets/Assets/Player/Gun/Arrow.png", "shared/assets/player/gun/arrow", "shared"),
                 Entry("Assets/Assets/Player/Gun/ShotGun.png", "shared/assets/player/gun/shotgun", "shared"),

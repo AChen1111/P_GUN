@@ -95,9 +95,9 @@ MonoBehaviour:
   hurtKnockbackDistance: 0.65
   hurtKnockbackDuration: 0.12
   dashDistance: 3
-  dashDuration: 0.4
+  dashDuration: 0.5
   dashCooldown: 0.2
-  dashTimeScale: 0.35
+  dashTimeScale: 0.05
   dashCollisionSkin: 0.02
 --- !u!50 &6481072556287412660
 Rigidbody2D:

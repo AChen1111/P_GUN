@@ -25,14 +25,12 @@ namespace Game.Pooling
         [SerializeField] private List<PrefabInfo> prefabInfos;
 
     #region 池中物体信息
-#pragma warning disable CS0649 // Unity 序列化字段由 Inspector 赋值.
         [System.Serializable]
         private struct PrefabInfo
         {
             public T prefab; //预制体
             public int prewarmCount; //预热数量
         }
-#pragma warning restore CS0649
     #endregion
 
         [SerializeField] private bool collectionChecks = true;

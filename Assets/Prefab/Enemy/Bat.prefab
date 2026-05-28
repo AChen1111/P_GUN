@@ -158,8 +158,8 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 247c3d9a01e9b434899f18098abe4547, type: 3}
   followBeforeAttackTime: 1.5
   playerSafeDistance: 3
-  attackShootDelay: 0.1
-  attackLockDuration: 0.2
+  attackShootDelay: 0.3
+  attackLockDuration: 0.3
   bulletSpawnDistance: 0.5
   bulletCount: 5
   bulletSpreadStepAngle: 2

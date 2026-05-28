@@ -11,3 +11,6 @@
 !/.agents/skills/
 !/.agents/skills/pgun-project-context/
 !/.agents/skills/pgun-project-context/**
+!/docs/
+!/docs/resume-tech-doc/
+!/docs/resume-tech-doc/**
