@@ -28,6 +28,7 @@ namespace Game.Gameplay
             "weapon/rocket_gun",
             "weapon/shotgun"
         };
+        private const string EnemyBulletLayerName = "EnemyBullet";
 
         public UnityEngine.TextMesh DisPlayText;
         private Rigidbody2D rb;
@@ -624,7 +625,14 @@ namespace Game.Gameplay
                 return 0f;
 
             var filter = new ContactFilter2D();
-            filter.SetLayerMask(Physics2D.GetLayerCollisionMask(gameObject.layer));
+            var layerMask = Physics2D.GetLayerCollisionMask(gameObject.layer);
+            var enemyBulletLayer = LayerMask.NameToLayer(EnemyBulletLayerName);
+            if (enemyBulletLayer < 0)
+                throw new InvalidOperationException($"冲刺 Cast 配置错误, {EnemyBulletLayerName} 层不存在.");
+
+            // 冲刺无敌只忽略敌人子弹对位移 Cast 的阻挡, 不修改普通受击碰撞.
+            layerMask &= ~(1 << enemyBulletLayer);
+            filter.SetLayerMask(layerMask);
             filter.useTriggers = false;
 
             // Rigidbody2D.Cast 使用当前碰撞体形状预判阻挡, 保持冲刺不穿墙.
