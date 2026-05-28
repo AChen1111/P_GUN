@@ -20,6 +20,7 @@ namespace Game.Gameplay
 
         [Header("攻击参数")]
         [SerializeField] private float followBeforeAttackTime = 1.5f;
+        [SerializeField] private float playerSafeDistance = 3f;
         [SerializeField] private float attackShootDelay = 0.15f;
         [SerializeField] private float attackLockDuration = 0.35f;
         [SerializeField] private float bulletSpawnDistance = 0.5f;
@@ -83,12 +84,33 @@ namespace Game.Gameplay
             void UpdateFollow()
             {
                 stateTimer += Time.deltaTime;
+                if (TryEnterAttackWhenSafe())
+                    return;
+
                 DoFollow();
                 if (stateTimer >= followBeforeAttackTime)
                 {
                     FSM.ChangeState(EnemyState.Attack);
                 }
             }
+
+    bool TryEnterAttackWhenSafe()
+    {
+        if (PlayerRegistry.Current == null)
+            return false;
+
+        var toPlayer = (Vector2)(PlayerRegistry.Current.transform.position - transform.position);
+        var safeDistance = Mathf.Max(0f, playerSafeDistance);
+        if (toPlayer.sqrMagnitude > safeDistance * safeDistance)
+            return false;
+
+        StopMove();
+        SetAnimatorSpeed(0f);
+        FaceDirection(toPlayer);
+        // 进入安全距离后立刻切攻击状态, 避免继续贴近玩家.
+        FSM.ChangeState(EnemyState.Attack);
+        return true;
+    }
 
     void ShootAtPlayer()
     {

@@ -24,7 +24,20 @@ namespace Game.Gameplay
         private void Awake() {
             rb = GetComponent<Rigidbody2D>();
             _audioPlay = GetComponent<AudioPlay>();
+            ConfigureHitColliders();
             gameObject.layer = LayerMask.NameToLayer("PlayerBullet");
+        }
+
+        /// <summary>
+        /// 玩家子弹只需要触发命中, 禁用物理碰撞避免把敌人击退.
+        /// </summary>
+        private void ConfigureHitColliders()
+        {
+            var colliders = GetComponents<Collider2D>();
+            foreach (var hitCollider in colliders)
+            {
+                hitCollider.isTrigger = true;
+            }
         }
 
         /// <summary>

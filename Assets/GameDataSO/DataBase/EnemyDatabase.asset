@@ -17,7 +17,7 @@ MonoBehaviour:
     displayName: Bat
     prefab: {fileID: 557012345000001001, guid: c7689240beca890469aab85afd109862, type: 3}
     maxHp: 10
-    moveSpeed: 2.5
+    moveSpeed: 3
     damage: 1
     itemDropChance: 1
   - enemyId: 2
@@ -26,11 +26,11 @@ MonoBehaviour:
     maxHp: 3
     moveSpeed: 2.5
     damage: 1
-    itemDropChance: 0.25
+    itemDropChance: 0
   - enemyId: 3
     displayName: Big_enemy
     prefab: {fileID: 1979160110135435701, guid: 51b9ce51afd7dbb488f5c37c4797e0d6, type: 3}
-    maxHp: 3
-    moveSpeed: 2.5
+    maxHp: 100
+    moveSpeed: 2
     damage: 1
-    itemDropChance: 0
+    itemDropChance: 0.5
