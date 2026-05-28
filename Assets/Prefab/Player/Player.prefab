@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 5034370046872956088}
   - component: {fileID: 5094010000000000001}
   - component: {fileID: 1252440454147290903}
+  - component: {fileID: 3521258914276537010}
   m_Layer: 3
   m_Name: Player
   m_TagString: Player
@@ -64,6 +65,7 @@ MonoBehaviour:
   DisPlayText: {fileID: 7341739048906739580}
   sr: {fileID: 8980726362857158556}
   moveSpeed: 5
+  speedUp: 0
   maxHp: 6
   HP: 0
   Weapon: {fileID: 5918398537855737486}
@@ -80,9 +82,23 @@ MonoBehaviour:
   gun: {fileID: 2374162302897725077}
   currentGunIndex: 0
   canAutoAim: 0
+  damageMultiplier: 1
   buffManager: {fileID: 5034370046872956088}
   animator: {fileID: 5432406893568840566}
   isSleep: 0
+  hurtFlashColor: {r: 1, g: 0.35, b: 0.35, a: 1}
+  hurtFlashInterval: 0.06
+  hurtFlashLoops: 4
+  hurtSlowTimeScale: 0.9
+  hurtSlowDuration: 0.18
+  hurtInvincibleDuration: 1
+  hurtKnockbackDistance: 0.65
+  hurtKnockbackDuration: 0.12
+  dashDistance: 3
+  dashDuration: 0.4
+  dashCooldown: 0.2
+  dashTimeScale: 0.35
+  dashCollisionSkin: 0.02
 --- !u!50 &6481072556287412660
 Rigidbody2D:
   serializedVersion: 4
@@ -251,8 +267,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 604abfe742164146be7a2f1c0c291d3a, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   dataBase: {fileID: 0}
 --- !u!114 &5094010000000000001
 MonoBehaviour:
@@ -274,6 +290,41 @@ AudioListener:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 79155860018165750}
   m_Enabled: 1
+--- !u!58 &3521258914276537010
+CircleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 79155860018165750}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  serializedVersion: 2
+  m_Radius: 0.5
 --- !u!1 &1227615370327962422
 GameObject:
   m_ObjectHideFlags: 0

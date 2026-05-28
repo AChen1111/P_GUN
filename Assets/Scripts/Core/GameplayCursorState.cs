@@ -77,9 +77,25 @@ namespace Game.Core
             isDebugPanelOpen = false;
             ApplyCursorState();
         }
+
+        /// <summary>
+        /// 离开游戏场景时恢复普通系统光标.
+        /// </summary>
+        public static void RestoreDefaultCursor()
+        {
+            isControlKeyHeld = false;
+            isSettingsPanelOpen = false;
+            isInventoryPanelOpen = false;
+            isSaveSlotPanelOpen = false;
+            isDebugPanelOpen = false;
+            Cursor.visible = true;
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
+        }
+
         private static void ApplyCursorState()
         {
-            // 鼠标战斗被 UI 或 Ctrl 阻塞时显示光标, 默认战斗状态隐藏光标.
+            // 鼠标战斗被 UI 或 Ctrl 阻塞时显示普通光标, 默认战斗状态隐藏系统光标.
             Cursor.visible = BlocksMouseCombat;
             Cursor.lockState = CursorLockMode.None;
         }

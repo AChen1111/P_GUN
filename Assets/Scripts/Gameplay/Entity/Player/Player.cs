@@ -81,6 +81,14 @@ namespace Game.Gameplay
         [SerializeField] private float hurtKnockbackDistance = 0.65f;
         [SerializeField] private float hurtKnockbackDuration = 0.12f;
 
+        [Header("冲刺")]
+        // 冲刺参数暴露给 Inspector, 方便在不改代码的情况下调整手感.
+        [SerializeField] private float dashDistance = 2.2f;
+        [SerializeField] private float dashDuration = 0.12f;
+        [SerializeField] private float dashCooldown = 0.6f;
+        [SerializeField] private float dashTimeScale = 0.35f;
+        [SerializeField] private float dashCollisionSkin = 0.02f;
+
         //受击免疫标识.
         bool canHurt = true;
         Color defaultSpriteColor = Color.white;
@@ -96,6 +104,19 @@ namespace Game.Gameplay
         bool wasMouseCombatBlocked;
         bool weaponLoadoutReady;
         Task weaponLoadoutTask;
+
+        // 冲刺状态独立于受击免疫, 避免和 canHurt 的受击后无敌时间互相污染.
+        bool isDashing;
+        bool isDashInvincible;
+        bool dashTimeScaleApplied;
+        float nextDashReadyTime;
+        float dashPreviousTimeScale = 1f;
+        float dashPreviousFixedDeltaTime = 0.02f;
+        Coroutine dashCoroutine;
+        Vector2 activeDashDirection;
+
+        // 复用 Cast 结果数组, 避免冲刺期间每帧产生临时 GC.
+        readonly RaycastHit2D[] dashCastHits = new RaycastHit2D[8];
 
 
         public int MaxHP => Mathf.Max(0, Mathf.RoundToInt(CalculateBuffedStat(StatType.MaxHp, maxHp)));
@@ -281,12 +302,14 @@ namespace Game.Gameplay
 
             var mouseCombatBlocked = GameplayCursorState.BlocksMouseCombat;
             Vector2 dir = Weapon != null ? Weapon.right : Vector2.right;
+            Vector2 mouseDashDir = dir;
 
             if (!mouseCombatBlocked)
             {
                 // 获取鼠标瞄准方向, 鼠标被 UI 接管时完全跳过瞄准刷新.
                 var mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
                 dir = (mousePosition - transform.position).normalized;
+                mouseDashDir = dir;
 
                 // 自动瞄准命中目标时, 优先使用锁定目标方向.
                 AutoAim(ref dir);
@@ -300,7 +323,15 @@ namespace Game.Gameplay
             var horizontal = Input.GetAxisRaw("Horizontal");
             var vertical = Input.GetAxisRaw("Vertical");
 
-            if (hurtKnockbackTimer > 0f)
+            // 冲刺输入在移动计算前处理, 确保本帧立刻进入冲刺状态.
+            HandleDashInput(mouseDashDir, mouseCombatBlocked);
+
+            if (isDashing)
+            {
+                // 冲刺位移由协程直接推进 Rigidbody2D.position, 普通速度在这段时间归零.
+                rb.velocity = Vector2.zero;
+            }
+            else if (hurtKnockbackTimer > 0f)
             {
                 // 受击后退使用真实时间计时, 避免慢动作影响后退距离.
                 hurtKnockbackTimer -= Time.unscaledDeltaTime;
@@ -313,11 +344,13 @@ namespace Game.Gameplay
 
             if (animator != null)
             {
-                animator.SetFloat("Speed", rb.velocity.magnitude);
+                var motionSpeed = isDashing ? dashDistance / Mathf.Max(0.01f, dashDuration) : rb.velocity.magnitude;
+                animator.SetFloat("Speed", motionSpeed);
             }
 
             #region 睡眠状态检测
-            if(rb.velocity.magnitude < 0.01f && !isSleep) {
+            var hasMotionInput = isDashing || rb.velocity.magnitude >= 0.01f;
+            if(!hasMotionInput && !isSleep) {
                 sleepTimer += Time.deltaTime;
                 if(sleepTimer >= SleepDuration) {
                     isSleep = true;
@@ -328,17 +361,18 @@ namespace Game.Gameplay
                 }
             }
 
-            if (isSleep && (rb.velocity.magnitude > 0.01f || Input.anyKey))
+            if (isSleep && (hasMotionInput || Input.anyKey))
                 ExitSleepState();
             #endregion
 
 
             //翻转
-            if(horizontal < 0)
+            var visualHorizontal = isDashing ? activeDashDirection.x : horizontal;
+            if(visualHorizontal < 0)
             {
                 sr.flipX = true;
             }
-            else if(horizontal > 0)
+            else if(visualHorizontal > 0)
             {
                 sr.flipX = false;
             }
@@ -373,6 +407,7 @@ namespace Game.Gameplay
         {
             EventCenter.RemoveListener(CoreEvents.PlayerDied, HandleGameEnded);
             EventCenter.RemoveListener(CoreEvents.GameWin, HandleGameEnded);
+            CancelDash();
             RestoreHurtSlowTimeScale();
             ResetVisualState();
 
@@ -474,6 +509,206 @@ namespace Game.Gameplay
 
         #endregion
 
+        #region Dash
+
+        /// <summary>
+        /// 处理 Shift 冲刺输入.
+        /// </summary>
+        void HandleDashInput(Vector2 dashDirection, bool mouseCombatBlocked)
+        {
+            if (mouseCombatBlocked)
+                return;
+
+            if (!Input.GetKeyDown(KeyCode.LeftShift) && !Input.GetKeyDown(KeyCode.RightShift))
+                return;
+
+            if (!CanStartDash())
+                return;
+
+            dashDirection = ResolveDashDirection(dashDirection);
+            if (dashDirection.sqrMagnitude <= 0.0001f)
+                return;
+
+            dashCoroutine = StartCoroutine(DashCoroutine(dashDirection));
+        }
+
+        /// <summary>
+        /// 判断当前帧是否允许启动冲刺.
+        /// </summary>
+        bool CanStartDash()
+        {
+            if (isDashing)
+                return false;
+
+            // 受击击退和受击慢动作期间不允许冲刺, 避免两个 Time.timeScale 效果互相覆盖.
+            if (hurtKnockbackTimer > 0f || hurtSlowCoroutine != null)
+                return false;
+
+            // UI 暂停时 Time.timeScale 为 0, 这里直接阻止冲刺.
+            if (Mathf.Approximately(Time.timeScale, 0f))
+                return false;
+
+            return Time.unscaledTime >= nextDashReadyTime;
+        }
+
+        /// <summary>
+        /// 修正冲刺方向, 避免鼠标和玩家重合时得到零向量.
+        /// </summary>
+        Vector2 ResolveDashDirection(Vector2 dashDirection)
+        {
+            if (dashDirection.sqrMagnitude > 0.0001f)
+                return dashDirection.normalized;
+
+            // 鼠标和玩家重合时使用武器朝向, 避免零方向导致冲刺无效.
+            var fallbackDirection = Weapon != null ? (Vector2)Weapon.right : Vector2.right;
+            return fallbackDirection.sqrMagnitude > 0.0001f ? fallbackDirection.normalized : Vector2.right;
+        }
+
+        /// <summary>
+        /// 按真实时间推进冲刺位移和冲刺慢动作.
+        /// </summary>
+        IEnumerator DashCoroutine(Vector2 dashDirection)
+        {
+            isDashing = true;
+            isDashInvincible = true;
+            activeDashDirection = dashDirection;
+            nextDashReadyTime = Time.unscaledTime + Mathf.Max(0f, dashCooldown);
+            rb.velocity = Vector2.zero;
+            ApplyDashTimeScale();
+            ExitSleepState();
+
+            var remainingDistance = Mathf.Max(0f, dashDistance);
+            var remainingTime = Mathf.Max(0.01f, dashDuration);
+            var dashSpeed = remainingDistance / remainingTime;
+
+            while (remainingDistance > 0f && remainingTime > 0f)
+            {
+                var deltaTime = Time.unscaledDeltaTime;
+                if (deltaTime <= 0f)
+                {
+                    yield return null;
+                    continue;
+                }
+
+                var requestedDistance = Mathf.Min(remainingDistance, dashSpeed * deltaTime);
+                var moveDistance = GetDashMoveDistance(dashDirection, requestedDistance);
+                if (moveDistance <= 0f)
+                    break;
+
+                // 冲刺位移用真实时间手动推进, 避免 Time.timeScale 降低后玩家也被拖慢.
+                rb.position += dashDirection * moveDistance;
+                remainingDistance -= moveDistance;
+                remainingTime -= deltaTime;
+
+                // 实际移动距离小于请求距离时说明前方被阻挡, 本次冲刺提前结束.
+                if (moveDistance + dashCollisionSkin < requestedDistance)
+                    break;
+
+                yield return null;
+            }
+
+            FinishDash();
+            dashCoroutine = null;
+        }
+
+        /// <summary>
+        /// 根据当前 Rigidbody2D 碰撞体形状计算本帧可移动距离.
+        /// </summary>
+        float GetDashMoveDistance(Vector2 dashDirection, float requestedDistance)
+        {
+            if (requestedDistance <= 0f)
+                return 0f;
+
+            var filter = new ContactFilter2D();
+            filter.SetLayerMask(Physics2D.GetLayerCollisionMask(gameObject.layer));
+            filter.useTriggers = false;
+
+            // Rigidbody2D.Cast 使用当前碰撞体形状预判阻挡, 保持冲刺不穿墙.
+            var hitCount = rb.Cast(dashDirection, filter, dashCastHits, requestedDistance + dashCollisionSkin);
+            var moveDistance = requestedDistance;
+            for (var i = 0; i < hitCount; i++)
+            {
+                var hit = dashCastHits[i];
+                if (hit.collider == null)
+                    continue;
+
+                moveDistance = Mathf.Min(moveDistance, Mathf.Max(0f, hit.distance - dashCollisionSkin));
+            }
+
+            return moveDistance;
+        }
+
+        /// <summary>
+        /// 应用冲刺慢动作, 并记录进入冲刺前的时间缩放.
+        /// </summary>
+        void ApplyDashTimeScale()
+        {
+            dashPreviousTimeScale = Time.timeScale;
+            dashPreviousFixedDeltaTime = Time.fixedDeltaTime;
+            dashTimeScaleApplied = true;
+            var appliedTimeScale = Mathf.Clamp(dashTimeScale, 0.01f, 1f);
+            Time.timeScale = appliedTimeScale;
+            // 降低 timeScale 后同步缩短 fixedDeltaTime, 避免物理真实刷新频率下降导致冲刺卡顿.
+            Time.fixedDeltaTime = dashPreviousFixedDeltaTime * appliedTimeScale;
+        }
+
+        /// <summary>
+        /// 恢复冲刺慢动作, 但不覆盖暂停或其他系统已经写入的时间缩放.
+        /// </summary>
+        void RestoreDashTimeScale()
+        {
+            if (!dashTimeScaleApplied)
+                return;
+
+            var appliedTimeScale = Mathf.Clamp(dashTimeScale, 0.01f, 1f);
+            if (Mathf.Approximately(Time.timeScale, appliedTimeScale))
+            {
+                Time.timeScale = dashPreviousTimeScale;
+            }
+
+            if (Mathf.Approximately(Time.fixedDeltaTime, dashPreviousFixedDeltaTime * appliedTimeScale))
+            {
+                Time.fixedDeltaTime = dashPreviousFixedDeltaTime;
+            }
+
+            dashTimeScaleApplied = false;
+        }
+
+        /// <summary>
+        /// 结束冲刺并清理冲刺运行时状态.
+        /// </summary>
+        void FinishDash()
+        {
+            if (rb != null)
+            {
+                rb.velocity = Vector2.zero;
+            }
+
+            isDashing = false;
+            isDashInvincible = false;
+            activeDashDirection = Vector2.zero;
+            RestoreDashTimeScale();
+        }
+
+        /// <summary>
+        /// 外部中断冲刺时统一清理协程, 无敌和时间缩放.
+        /// </summary>
+        void CancelDash()
+        {
+            if (dashCoroutine != null)
+            {
+                StopCoroutine(dashCoroutine);
+                dashCoroutine = null;
+            }
+
+            if (!isDashing && !isDashInvincible && !dashTimeScaleApplied)
+                return;
+
+            FinishDash();
+        }
+
+        #endregion
+
         #region Sleep
         void ExitSleepState()
         {
@@ -493,7 +728,7 @@ namespace Game.Gameplay
         }
         public void Hurt(DamageInfo damageInfo)
         {
-            if(!canHurt) return;
+            if(!canHurt || isDashInvincible) return;
             if(damageInfo == null) damageInfo = new DamageInfo();
 
             ExitSleepState();
@@ -612,6 +847,7 @@ namespace Game.Gameplay
         private void HandleGameEnded()
         {
             isGameEnded = true;
+            CancelDash();
             if (AimPrefab != null)
             {
                 AimPrefab.SetActive(false);

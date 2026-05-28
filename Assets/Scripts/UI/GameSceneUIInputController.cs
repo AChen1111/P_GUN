@@ -57,7 +57,7 @@ namespace Game.UI
             }
 
             buffDebugWindow.SetVisible(false);
-            GameplayCursorState.Reset();
+            GameplayCursorState.RestoreDefaultCursor();
         }
         private void Update()
         {

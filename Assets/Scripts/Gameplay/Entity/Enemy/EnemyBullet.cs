@@ -105,6 +105,7 @@ namespace Game.Gameplay
         }
         private void FixedUpdate() {
             if (rb == null) return;
+            // FixedUpdate 和物理模拟已经受 Time.timeScale 影响, 这里保持基础速度避免二次减速.
             rb.velocity = dir * speed;
         }
         private void HandleHit(GameObject target) {
