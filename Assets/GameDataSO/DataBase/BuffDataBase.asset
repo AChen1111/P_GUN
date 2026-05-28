@@ -41,7 +41,7 @@ MonoBehaviour:
       value: 0.5
   - id: 2
     buffName: MaxHpUpBuff
-    icon: {fileID: -347879874, guid: bf817939e9a0a3241b3cf68a375367e7, type: 3}
+    icon: {fileID: 21300000, guid: 481e164eb8e5b2044bbe4ee2451ad349, type: 3}
     description: "\u6700\u5927\u751F\u547D\u503C\u63D0\u53472\u70B9."
     tag: 0
     luaFile: {fileID: 4900000, guid: 87662b07a2474434950e657708d1bada, type: 3}
@@ -54,7 +54,7 @@ MonoBehaviour:
       value: 2
   - id: 3
     buffName: PoisonBuff
-    icon: {fileID: -347879874, guid: bf817939e9a0a3241b3cf68a375367e7, type: 3}
+    icon: {fileID: 21300000, guid: 717c1661204c47848ae71e4b36b7424c, type: 3}
     description: "\u6C38\u4E45\u4E2D\u6BD2: \u6BCF\u96945\u79D2\u6BCF\u5C42\u53D7\u52301\u70B9\u4F24\u5BB3."
     tag: 1
     luaFile: {fileID: 4900000, guid: 921073a9ab0a469886c62babb3cfbd9c, type: 3}

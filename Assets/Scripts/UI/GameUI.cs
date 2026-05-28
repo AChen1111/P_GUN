@@ -13,6 +13,7 @@ namespace Game.UI
         public UnityEngine.UI.Text BulletBagText;
         public UnityEngine.UI.Text BulletText;
         public UnityEngine.UI.Text WaveText;
+        public Text DashTimeText;
 
         public static GameUI Instance;
         [Header("UI元素")]
@@ -104,6 +105,10 @@ namespace Game.UI
             Time.timeScale = 1;
             SceneManager.LoadScene("StartScene");
         }
+        private void Update()
+        {
+            UpdateDashTimeText();
+        }
         public void ShowWinPanel()
         {
             PushStackPanel(WinPanel, ref winStackPanel);
@@ -190,6 +195,20 @@ namespace Game.UI
         {
             ResolveItemTipPanel();
             itemTipPanel?.Hide();
+        }
+        private void UpdateDashTimeText()
+        {
+            if (DashTimeText == null) return;
+
+            var player = PlayerRegistry.Current;
+            if (player == null)
+            {
+                DashTimeText.text = string.Empty;
+                return;
+            }
+
+            // 冲刺 UI 每帧读取玩家只读状态, 避免 UI 直接接触冲刺内部字段.
+            DashTimeText.text = player.IsDashReady ? "冲刺已就绪" : $"{player.DashReadyRemainingTime:0.0}s";
         }
         private void ResolveItemTipPanel()
         {
