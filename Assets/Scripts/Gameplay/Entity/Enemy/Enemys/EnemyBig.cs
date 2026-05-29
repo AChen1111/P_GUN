@@ -81,8 +81,8 @@ namespace Game.Gameplay
 
         private void UpdateRadialState()
         {
-            stateTimer += Time.deltaTime;
-            radialBurstTimer += Time.deltaTime;
+            stateTimer += EnemyDeltaTime;
+            radialBurstTimer += EnemyDeltaTime;
 
             if (radialBurstTimer >= Mathf.Max(0.01f, radialBurstInterval))
             {
@@ -111,8 +111,8 @@ namespace Game.Gameplay
 
         private void UpdateChaseState()
         {
-            stateTimer += Time.deltaTime;
-            aimedShotTimer += Time.deltaTime;
+            stateTimer += EnemyDeltaTime;
+            aimedShotTimer += EnemyDeltaTime;
 
             if (MoveTowardPlayerUntilSafe())
                 return;
@@ -205,7 +205,7 @@ namespace Game.Gameplay
             var direction = toPlayer.normalized;
             if (Rb != null)
             {
-                Rb.velocity = direction * MoveSpeed;
+                Rb.velocity = direction * MoveSpeed * EnemyTimeScale;
             }
 
             FaceDirection(direction);

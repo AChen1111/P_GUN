@@ -59,7 +59,7 @@ namespace Game.Gameplay
 
             void UpdateAttack()
             {
-                stateTimer += Time.deltaTime;
+                stateTimer += EnemyDeltaTime;
                 if (!hasShot && stateTimer >= attackShootDelay)
                 {
                     hasShot = true;
@@ -83,7 +83,7 @@ namespace Game.Gameplay
 
             void UpdateFollow()
             {
-                stateTimer += Time.deltaTime;
+                stateTimer += EnemyDeltaTime;
                 if (TryEnterAttackWhenSafe())
                     return;
 

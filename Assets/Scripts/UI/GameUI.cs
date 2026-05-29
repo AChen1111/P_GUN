@@ -107,7 +107,7 @@ namespace Game.UI
         }
         private void Update()
         {
-            UpdateDashTimeText();
+            UpdateBulletTimeText();
         }
         public void ShowWinPanel()
         {
@@ -196,7 +196,7 @@ namespace Game.UI
             ResolveItemTipPanel();
             itemTipPanel?.Hide();
         }
-        private void UpdateDashTimeText()
+        private void UpdateBulletTimeText()
         {
             if (DashTimeText == null) return;
 
@@ -207,8 +207,14 @@ namespace Game.UI
                 return;
             }
 
-            // 冲刺 UI 每帧读取玩家只读状态, 避免 UI 直接接触冲刺内部字段.
-            DashTimeText.text = player.IsDashReady ? "冲刺已就绪" : $"{player.DashReadyRemainingTime:0.0}s";
+            // 子弹时间 UI 每帧读取玩家只读状态, 避免 UI 直接接触计时实现.
+            if (player.IsBulletTimeActive)
+            {
+                DashTimeText.text = $"子弹时间 {player.BulletTimeActiveRemainingTime:0.0}s";
+                return;
+            }
+
+            DashTimeText.text = player.IsBulletTimeReady ? "Shift 子弹时间" : $"冷却 {player.BulletTimeReadyRemainingTime:0.0}s";
         }
         private void ResolveItemTipPanel()
         {

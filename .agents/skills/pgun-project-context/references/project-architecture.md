@@ -49,6 +49,20 @@ Location: `Assets/Scripts/Gameplay/Managers/DataBaseManager.cs`
 
 Call `EnsureLoadedAsync()` before entering `GameScene` or restoring a save. `RootHotUpdateController` no longer loads databases; main menu start and save load UI trigger database loading on demand. Runtime systems typically prefer explicitly assigned database references, then fall back to `DataBaseManager.Instance`; `Item` can also use `ItemDatabase.RuntimeDatabase` after `DataBaseManager` finishes loading.
 
+## Gameplay Time
+
+Location: `Assets/Scripts/Gameplay/Tools/GameplayTime.cs`
+
+`GameplayTime` owns the local enemy time scale used by bullet time. Player Shift input triggers a timed bullet-time window with cooldown; activation sets `GameplayTime.SetEnemyTimeScale`, and duration end/cancel paths call `ResetEnemyTimeScale`. It must not change global `Time.timeScale`, so player movement, player bullets, and player weapon fire-rate timers remain normal.
+
+Enemy-side logic that should slow during bullet time must use:
+
+- `EnemyDeltaTime` / `GameplayTime.EnemyDeltaTime` for state timers and cooldown timers.
+- `EnemyTime` / `GameplayTime.EnemyTime` for absolute enemy cooldown clocks.
+- `EnemyTimeScale` / `GameplayTime.EnemyTimeScale` for Rigidbody velocity and enemy bullet speed.
+
+Enemy animations are scaled from `EnemyBase` by setting `Animator.speed`, so attack animation events are delayed consistently with enemy timers.
+
 ## Pooling
 
 Location: `Assets/Scripts/Pooling`

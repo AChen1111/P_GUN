@@ -43,6 +43,7 @@ P_GUN is a Unity 2022.3 2D top-down shooter project. Runtime code is split by as
 - Save system lives in `Assets/Scripts/Gameplay/Save`; it stores 3 JSON slots under `Application.persistentDataPath/Saves`, uses `SaveGameService` as the UI-facing API, and does not save ground drop items in v1. `SaveDataBuilder`, `SaveDataRestorer`, and `SaveSlotSnapshotCapture` own capture/restore/snapshot details.
 - Save slot UI lives in `Assets/Scripts/UI/Save` and `Assets/Prefab/UI/Save`; `SaveSlotPanel` opens in main-menu load/delete mode or safe-house save/load/delete mode, with `F5` as the temporary GameScene safe-house test shortcut.
 - Safe-point saves must fail clearly while `FightRoom.currentFightRoom` is not null; do not silently save mid-combat wave/enemy state in the v1 framework.
+- 子弹时间由 `Assets/Scripts/Gameplay/Tools/GameplayTime.cs` 提供敌人局部时间倍率; Player 按下 Shift 后按持续时间和冷却触发, 期间只写 `GameplayTime.SetEnemyTimeScale`, 不修改全局 `Time.timeScale`, 敌人移动、攻击计时、敌人子弹和敌人动画必须接入 `EnemyDeltaTime` / `EnemyTimeScale`.
 - `UIPanelBase` roots should carry `ComponentAutoBindTool`; bindable child objects use UIAutoBind prefixes such as `Btn_`, `Txt_`, `Img_`, `Trans_`, and `Rect_`.
 - For pooled objects, implement and reset state through `IPoolable.OnSpawnFromPool()` and `IPoolable.OnRecycleToPool()`.
 - Damage number presentation belongs to `Game.Presentation`: enemies pass final damage and world position to `DamageTextPool`, while the `DamageText` prefab script owns random font size, offset, tween playback, and recycle callback.

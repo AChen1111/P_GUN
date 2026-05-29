@@ -17,7 +17,7 @@ namespace Game.Gameplay
             if(PlayerRegistry.Current == null) return;
 
             Vector3 targetPos = PlayerRegistry.Current.transform.position + offset;
-            // 相机跟随使用未缩放时间, 避免冲刺慢动作期间相机刷新变慢造成画面卡顿.
+            // 相机跟随使用未缩放时间, 避免全局受击慢动作期间相机刷新变慢造成画面卡顿.
             transform.position = Vector3.SmoothDamp(transform.position, targetPos, ref velocity, smoothTime, Mathf.Infinity, Time.unscaledDeltaTime);
         }
     }

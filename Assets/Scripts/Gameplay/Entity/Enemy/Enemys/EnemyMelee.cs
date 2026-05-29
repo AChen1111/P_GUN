@@ -73,7 +73,7 @@ namespace Game.Gameplay
 
             void UpdateAttack()
             {
-                attackTimer += Time.deltaTime;
+                attackTimer += EnemyDeltaTime;
                 if (attackTimer >= attackLockDuration)
                 {
                     FSM.ChangeState(EnemyState.Follow);
@@ -85,7 +85,7 @@ namespace Game.Gameplay
                 attackTimer = 0f;
                 hasAppliedDamage = false;
                 isAttacking = true;
-                nextAttackTime = Time.time + attackCooldown;
+                nextAttackTime = EnemyTime + attackCooldown;
                 StopVelocity();
                 base.PlayAttackAnimation();
             }
@@ -138,7 +138,7 @@ namespace Game.Gameplay
 
             cachedTarget = player;
             if (isAttacking) return;
-            if (Time.time < nextAttackTime) return;
+            if (EnemyTime < nextAttackTime) return;
 
             FSM.ChangeState(EnemyState.Attack);
         }

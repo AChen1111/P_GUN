@@ -124,7 +124,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 16c5cd097ae445ce861dc97cb4946c21, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MaxHp: 4
+  MaxHp: 20
   CurrentHp: 3
   MoveSpeed: 2.5
   AttackDamage: 1
@@ -157,7 +157,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 4ce72a5102c96ac449defd59e5a058c4, type: 3}
   - {fileID: 8300000, guid: 247c3d9a01e9b434899f18098abe4547, type: 3}
   followBeforeAttackTime: 1.5
-  playerSafeDistance: 3
+  playerSafeDistance: 1
   attackShootDelay: 0.3
   attackLockDuration: 0.3
   bulletSpawnDistance: 0.5
