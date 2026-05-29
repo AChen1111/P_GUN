@@ -1,4 +1,3 @@
-using System.Collections;
 using UnityEngine;
 using System.Collections.Generic;
 using Game.Core;
@@ -19,7 +18,7 @@ namespace Game.Gameplay
         [Tooltip("命中后给玩家附加的 Buff id, -1 表示不附加.")]
         [SerializeField] private int hitBuffId = -1;
         private bool hasHit;
-        private Coroutine autoRecycleCoroutine;
+        private float lifeTimer;
 
         [Header("击中玩家音效")]
         public List<AudioClip> hitSoundsOnPlayer = new List<AudioClip>();
@@ -44,26 +43,15 @@ namespace Game.Gameplay
             dir = shootDir;
             damage = Mathf.Max(0, bulletDamage);
             hasHit = false;
-
-            StopAutoRecycleCoroutine();
-            autoRecycleCoroutine = StartCoroutine(AutoRecycleIfNotHit());
+            lifeTimer = 0f;
 
             if (rb == null) {
                 rb = GetComponent<Rigidbody2D>();
             }
-
-            IEnumerator AutoRecycleIfNotHit()
-            {
-                yield return new WaitForSeconds(lifeTime);
-                autoRecycleCoroutine = null;
-                if (!hasHit && gameObject != null)
-                {
-                    Recycle();
-                }
-            }
 }
         public void OnSpawnFromPool() {
             hasHit = false;
+            lifeTimer = 0f;
 
             if (rb == null) {
                 rb = GetComponent<Rigidbody2D>();
@@ -71,7 +59,6 @@ namespace Game.Gameplay
         }
         public void OnRecycleToPool() {
             hasHit = true;
-            StopAutoRecycleCoroutine();
             StopMove();
         }
 
@@ -105,10 +92,20 @@ namespace Game.Gameplay
         private void Reset() {
             gameObject.layer = LayerMask.NameToLayer("EnemyBullet");
         }
+        private void Update() {
+            if (hasHit) return;
+
+            // 子弹寿命使用敌人局部时间, 避免子弹时间中射程被真实时间提前截断.
+            lifeTimer += GameplayTime.EnemyDeltaTime;
+            if (lifeTimer >= lifeTime)
+            {
+                Recycle();
+            }
+        }
         private void FixedUpdate() {
             if (rb == null) return;
-            // FixedUpdate 和物理模拟已经受 Time.timeScale 影响, 这里保持基础速度避免二次减速.
-            rb.velocity = dir * speed;
+            // 敌人子弹使用敌人局部时间倍率, 玩家子弹和玩家移动不受影响.
+            rb.velocity = dir * speed * GameplayTime.EnemyTimeScale;
         }
         private void HandleHit(GameObject target) {
             if (hasHit || target == null) return;
@@ -158,7 +155,6 @@ namespace Game.Gameplay
         /// </summary>
         private void Recycle() {
             hasHit = true;
-            StopAutoRecycleCoroutine();
             StopMove();
             EnemyBulletPool.Instance.Release(this);
         }
@@ -176,14 +172,7 @@ namespace Game.Gameplay
         /// 注销禁用时需要的监听.
         /// </summary>
         private void OnDisable() {
-            StopAutoRecycleCoroutine();
             StopMove();
-        }
-        private void StopAutoRecycleCoroutine() {
-            if (autoRecycleCoroutine == null) return;
-
-            StopCoroutine(autoRecycleCoroutine);
-            autoRecycleCoroutine = null;
         }
     }
 }

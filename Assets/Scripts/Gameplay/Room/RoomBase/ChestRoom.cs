@@ -1,5 +1,4 @@
 using Game.Items;
-using PlasticGui;
 using UnityEngine;
 
 namespace Game.Gameplay
@@ -12,7 +11,7 @@ namespace Game.Gameplay
         [Header("物品生成点")]
         [SerializeField]private Transform[] transforms;
         [Header("Debug")]
-        [SerializeField]bool hasDone = false;
+        [SerializeField]bool hasDone = false;//是否完成了生成
         protected override void OnRoomInitialized()
         {
             base.OnRoomInitialized();

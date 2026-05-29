@@ -15,7 +15,7 @@ MonoBehaviour:
   items:
   - itemId: 1
     itemName: "\u5FC3"
-    description: "\u56DE\u590D\u4E00\u70B9\u751F\u547D\u503C"
+    description: "\u56DE\u590D\u4E00\u70B9\u751F\u547D\u503C."
     icon: {fileID: 872467033, guid: bf817939e9a0a3241b3cf68a375367e7, type: 3}
   - itemId: 2
     itemName: "\u5947\u7279\u7684\u836F\u6C34"

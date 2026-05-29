@@ -84,6 +84,10 @@ namespace Game.Gameplay
         protected Collider2D Col => col;
         protected AudioSource AudioSource => audioSource;
         protected bool IsDead => isDead;
+        // 敌人子类统一读取局部时间, 保证子弹时间只影响敌人侧逻辑.
+        protected float EnemyDeltaTime => GameplayTime.EnemyDeltaTime;
+        protected float EnemyTime => GameplayTime.EnemyTime;
+        protected float EnemyTimeScale => GameplayTime.EnemyTimeScale;
 
         /// <summary>
         /// 重置编辑器默认配置.
@@ -144,6 +148,7 @@ namespace Game.Gameplay
         {
             if (isDead) return;
 
+            ApplyAnimatorTimeScale();
             FSM.Update();
             OnUpdate();
         }
@@ -162,6 +167,7 @@ namespace Game.Gameplay
         /// </summary>
         protected virtual void OnDestroy()
         {
+            ResetAnimatorPlaybackSpeed();
             OnFSMDestroy();
             FSM.Clear();
         }
@@ -365,6 +371,7 @@ namespace Game.Gameplay
             {
                 if (animator == null)
                     return;
+                ResetAnimatorPlaybackSpeed();
                 TryResetAnimatorTrigger(attackTriggerName);
                 TryResetAnimatorTrigger(deadTriggerName);
                 SetAnimatorSpeed(0f);
@@ -390,6 +397,22 @@ namespace Game.Gameplay
             if(rb != null) {
                 rb.velocity = Vector2.zero;
             }
+        }
+        /// <summary>
+        /// 按敌人局部时间倍率缩放动画, 让攻击事件和视觉节奏一起变慢.
+        /// </summary>
+        private void ApplyAnimatorTimeScale() {
+            if(animator == null) return;
+
+            animator.speed = EnemyTimeScale;
+        }
+        /// <summary>
+        /// 回收或销毁前恢复动画速度, 避免对象池复用时继承子弹时间状态.
+        /// </summary>
+        private void ResetAnimatorPlaybackSpeed() {
+            if(animator == null) return;
+
+            animator.speed = 1f;
         }
 
         /// <summary>
@@ -421,7 +444,7 @@ namespace Game.Gameplay
             }
 
             if(rb != null) {
-                rb.velocity = direction * MoveSpeed;
+                rb.velocity = direction * MoveSpeed * EnemyTimeScale;
             }
 
             SetAnimatorSpeed(MoveSpeed);

@@ -26,7 +26,8 @@ namespace Game.Gameplay
         protected override WeaponType WeaponType => WeaponType.Gun;
         protected override void OnInit()
         {
-            shootDuration = new ShootDuration(shootInterval);
+            // 远程敌人的射击间隔使用敌人局部时钟, 玩家武器仍保留正常时钟.
+            shootDuration = new ShootDuration(shootInterval, () => EnemyTime);
             OwnerFightRoom = FightRoom.currentFightRoom;
         }
         protected override void RegisterFSM(FSM<EnemyState> fsm)
@@ -36,7 +37,7 @@ namespace Game.Gameplay
                 .OnEnter(() => stateTimer = 0f)
                 .OnUpdate(() =>
                 {
-                    stateTimer += Time.deltaTime;
+                    stateTimer += EnemyDeltaTime;
                     DoFollow();
                     if (stateTimer >= followDuration)
                         fsm.ChangeState(EnemyState.Attack);
@@ -53,7 +54,7 @@ namespace Game.Gameplay
                 })
                 .OnUpdate(() =>
                 {
-                    stateTimer += Time.deltaTime;
+                    stateTimer += EnemyDeltaTime;
                     TryShootByInterval();
                     if (stateTimer >= attackDuration)
                         fsm.ChangeState(EnemyState.Follow);
