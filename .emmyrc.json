@@ -1,0 +1,53 @@
+{
+  "$schema": "https://raw.githubusercontent.com/EmmyLuaLs/emmylua-analyzer-rust/refs/heads/main/crates/emmylua_code_analysis/resources/schema.json",
+  "runtime": {
+    "version": "Lua5.3",
+    "extensions": [
+      "lua",
+      "lua.txt"
+    ],
+    "requirePattern": [
+      "?.lua",
+      "?.lua.txt",
+      "?/init.lua",
+      "?/init.lua.txt"
+    ]
+  },
+  "workspace": {
+    "workspaceRoots": [
+      "./Assets/Scripts/Gameplay/Lua",
+      "./Assets/Scripts/Gameplay/Buffs/Buff",
+      "./Assets/Scripts/ItemEffects/Lua"
+    ],
+    "library": [
+      "./LuaAPI/Unity"
+    ],
+    "ignoreDir": [
+      ".git",
+      "Library",
+      "Temp",
+      "Logs",
+      "obj",
+      "UserSettings",
+      "Build",
+      "Builds"
+    ]
+  },
+  "diagnostics": {
+    "disable": [
+      "undefined-global",
+      "undefined-field",
+      "type-not-found",
+      "undefined-doc-param"
+    ],
+    "globals": [
+      "CS",
+      "typeof",
+      "xlua"
+    ]
+  },
+  "completion": {
+    "autoRequire": false,
+    "callSnippet": false
+  }
+}

@@ -6,6 +6,17 @@
 !/Packages/**
 !/ProjectSettings/
 !/ProjectSettings/**
+!/.emmyrc.json
+!/EmmyLuaSnippetToolData/
+!/EmmyLuaSnippetToolData/**
+!/LuaAPI/
+!/LuaAPI/**
+!/.vscode/
+!/.vscode/settings.json
+!/.idea/
+!/.idea/.idea.P_GUN/
+!/.idea/.idea.P_GUN/.idea/
+!/.idea/.idea.P_GUN/.idea/filetypes.xml
 !/AGENTS.md
 !/.agents/
 !/.agents/skills/

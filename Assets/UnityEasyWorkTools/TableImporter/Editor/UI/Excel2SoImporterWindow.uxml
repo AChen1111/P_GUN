@@ -1,6 +1,6 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="True">
     <ui:VisualElement name="excel2so-root" class="excel2so-window">
-        <ui:Label name="title-label" text="Excel2SO Importer / 表格工具" class="window-title" />
+        <ui:Label name="title-label" text="TableImporter" class="window-title" />
 
         <ui:VisualElement name="form-root" class="form-root">
             <ui:VisualElement class="main-layout">

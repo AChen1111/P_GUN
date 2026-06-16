@@ -27,7 +27,6 @@ namespace Game.UI
             m_Tog_Display = autoBindTool.GetBindComponent<Toggle>(0);
             m_Tog_Audio = autoBindTool.GetBindComponent<Toggle>(1);
 
-            // 分页容器不依赖自动绑定顺序, 避免插件重新绑定后把页面Rect从列表中移除.
             m_Rect_DisplayPage = go.transform.Find("Window/Pages/Rect_DisplayPage").GetComponent<RectTransform>();
             m_Rect_AudioPage = go.transform.Find("Window/Pages/Rect_AudioPage").GetComponent<RectTransform>();
 

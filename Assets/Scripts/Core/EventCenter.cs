@@ -25,6 +25,7 @@ namespace Game.Core
         {
             if (eventId == null) throw new ArgumentNullException(nameof(eventId));
             if (listener == null) return;
+            
 
             var listeners = GetPayloadListeners(eventId);
             if (!listeners.Contains(listener))

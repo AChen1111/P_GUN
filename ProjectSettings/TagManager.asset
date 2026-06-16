@@ -9,6 +9,7 @@ TagManager:
   - Item
   - Wall
   - MiniMap
+  - Sq
   layers:
   - Default
   - TransparentFX

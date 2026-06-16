@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
-
+using Object = UnityEngine.Object;
 namespace Game.Core
 {
     /// <summary>
@@ -12,9 +12,9 @@ namespace Game.Core
     /// </summary>
     public sealed class AddressableLoader : MonoBehaviour
     {
-        private readonly Dictionary<string, UnityEngine.Object> assetsByAddress = new Dictionary<string, UnityEngine.Object>();
+        private readonly Dictionary<string, Object> assetsByAddress = new Dictionary<string, Object>();
         private readonly Dictionary<string, AsyncOperationHandle> handlesByAddress = new Dictionary<string, AsyncOperationHandle>();
-        private readonly Dictionary<string, Task<UnityEngine.Object>> loadingTasksByAddress = new Dictionary<string, Task<UnityEngine.Object>>();
+        private readonly Dictionary<string, Task<Object>> loadingTasksByAddress = new Dictionary<string, Task<Object>>();
 
         public static AddressableLoader Instance { get; private set; }
 
@@ -40,23 +40,26 @@ namespace Game.Core
         /// <typeparam name="TAsset">资源类型.</typeparam>
         /// <returns>加载到的资源.</returns>
         public async Task<TAsset> LoadAssetAsync<TAsset>(string address)
-            where TAsset : UnityEngine.Object
+            where TAsset : Object
         {
             if (string.IsNullOrWhiteSpace(address))
             {
                 throw new ArgumentException("Address must not be empty.", nameof(address));
             }
 
+            //先尝试找已经被加载的资源
             if (TryGetCachedAsset(address, out TAsset cachedAsset))
             {
                 return cachedAsset;
             }
 
+            //在尝试找正在加载的资源
             if (loadingTasksByAddress.TryGetValue(address, out var existingTask))
             {
                 return CastLoadedAsset<TAsset>(address, await existingTask);
             }
 
+        
             var task = LoadAssetInternalAsync<TAsset>(address);
             loadingTasksByAddress[address] = task;
             try
@@ -73,7 +76,7 @@ namespace Game.Core
         /// 只读取已加载缓存, 不触发新的 Addressables 请求.
         /// </summary>
         public bool TryGetLoadedAsset<TAsset>(string address, out TAsset asset)
-            where TAsset : UnityEngine.Object
+            where TAsset : Object
         {
             if (!string.IsNullOrWhiteSpace(address) && TryGetCachedAsset(address, out asset))
             {
@@ -88,7 +91,7 @@ namespace Game.Core
         /// 按 Addressables 标签加载一组资源, 返回值使用资源地址作为 Key.
         /// </summary>
         public async Task<IReadOnlyDictionary<string, TAsset>> LoadAssetsByLabelAsync<TAsset>(string label)
-            where TAsset : UnityEngine.Object
+            where TAsset : Object
         {
             if (string.IsNullOrWhiteSpace(label))
             {
@@ -160,10 +163,11 @@ namespace Game.Core
             assetsByAddress.Clear();
             loadingTasksByAddress.Clear();
         }
-        private async Task<UnityEngine.Object> LoadAssetInternalAsync<TAsset>(string address)
-            where TAsset : UnityEngine.Object
+        private async Task<Object> LoadAssetInternalAsync<TAsset>(string address)
+            where TAsset : Object
         {
             var handle = Addressables.LoadAssetAsync<TAsset>(address);
+        
             await handle.Task;
 
             if (handle.Status != AsyncOperationStatus.Succeeded || handle.Result == null)
@@ -188,7 +192,7 @@ namespace Game.Core
         /// 从缓存中取出指定类型的资源.
         /// </summary>
         private bool TryGetCachedAsset<TAsset>(string address, out TAsset asset)
-            where TAsset : UnityEngine.Object
+            where TAsset : Object
         {
             if (assetsByAddress.TryGetValue(address, out var cachedAsset))
             {
@@ -208,8 +212,8 @@ namespace Game.Core
         /// <summary>
         /// 校验异步加载结果类型.
         /// </summary>
-        private static TAsset CastLoadedAsset<TAsset>(string address, UnityEngine.Object asset)
-            where TAsset : UnityEngine.Object
+        private static TAsset CastLoadedAsset<TAsset>(string address, Object asset)
+            where TAsset : Object
         {
             if (asset is TAsset typedAsset)
             {

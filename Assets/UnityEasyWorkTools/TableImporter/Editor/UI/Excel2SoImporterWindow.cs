@@ -9,7 +9,7 @@ using UnityEasyWorkTools.Editor;
 
 public sealed class Excel2SoImporterWindow : EditorWindow
 {
-    private const string MenuPath = "Tools/UnityEasyWorkTools/Table Importer/Importer Window";
+    private const string MenuPath = "Window/Table Importer";
 
     private static readonly string[] LayoutFileNames =
     {
@@ -69,7 +69,7 @@ public sealed class Excel2SoImporterWindow : EditorWindow
     public static void Open()
     {
         var window = GetWindow<Excel2SoImporterWindow>();
-        window.titleContent = new GUIContent("UnityEasyWorkTools Table Importer / 表格工具");
+        window.titleContent = new GUIContent("TableImporter");
         window.minSize = new Vector2(860f, 520f);
         window.Show();
     }
