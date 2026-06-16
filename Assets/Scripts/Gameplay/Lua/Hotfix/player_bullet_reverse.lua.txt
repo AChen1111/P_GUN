@@ -2,7 +2,7 @@ local PlayerBullet = CS.Game.Gameplay.PlayerBullet
 local Vector2 = CS.UnityEngine.Vector2
 
 xlua.hotfix(PlayerBullet,"Init",function (self,shootDir, bulletDamage, bulletSpeed)
-    self.dir = Vector2(shootDir.x,shootDir.y)
+    self.dir = Vector2(shootDir.x,shootDir.y)--更改射击方向,展示热更新功能
     self.damage = bulletDamage
     self.speed = bulletSpeed
 end)

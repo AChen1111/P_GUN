@@ -29,7 +29,7 @@ TableImporter 是 UnityEasyWorkTools 的导表模块, 用于把 `.xlsx` 和 `.cs
 3. 在 `Importers` 目录中创建或维护项目 importer 脚本。
 4. 继承 `Excel2SoListAssetImporter<TAsset>` 或 `Excel2SoRowAssetImporter<TAsset>`。
 5. 在 `Configure(Excel2SoMapping map)` 中配置列到字段的映射。
-6. 在 Unity 菜单打开 `Tools/UnityEasyWorkTools/Table Importer/Importer Window`。
+6. 在 Unity 菜单打开 `Window/Table Importer`。
 7. 选择表格文件和目标资产后执行导入。
 
 ## 说明书

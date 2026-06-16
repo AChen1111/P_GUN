@@ -4,7 +4,6 @@ using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
 using Game.Core;
-using Game.Items;
 using Game.Gameplay;
 
 namespace Game.UI
