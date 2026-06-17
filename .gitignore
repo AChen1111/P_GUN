@@ -7,10 +7,8 @@
 !/ProjectSettings/
 !/ProjectSettings/**
 !/.emmyrc.json
-!/EmmyLuaSnippetToolData/
-!/EmmyLuaSnippetToolData/**
-!/LuaAPI/
-!/LuaAPI/**
+# Lua 注解文件由本地工具生成, 不提交.
+# 保留 .emmyrc.json 作为编辑器配置, 但忽略 LuaAPI/ 与 EmmyLuaSnippetToolData/.
 !/.vscode/
 !/.vscode/settings.json
 !/.idea/
