@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<SettingOptions xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <GeneratePath>D:/GameWorkplace/Doing/P_GUN/LuaAPI/Unity/</GeneratePath>
-  <TargetNamespacesStr>UnityEngine Game.Core Game.Gameplay Game.Items Game.ItemEffects Game.Pooling Game.UI Game.Animation Game.Presentation XLua</TargetNamespacesStr>
-  <GlobalVariablesStr />
-  <FunctionCompatibleTypesStr>System.Action UnityEngine.Events.UnityAction</FunctionCompatibleTypesStr>
-  <GenerateCSAlias>true</GenerateCSAlias>
-  <SingleFileMaxLine>20000</SingleFileMaxLine>
-</SettingOptions>
