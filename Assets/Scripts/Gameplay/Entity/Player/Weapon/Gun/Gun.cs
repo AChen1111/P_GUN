@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using QFramework;
 using UnityEngine;
@@ -12,17 +13,22 @@ namespace Game.Gameplay
     /// </summary>
     [SerializeField] private string weaponId;
 
-    /// <summary>
-    /// 武器数据库。
-    /// </summary>
-    [SerializeField] private WeaponDatabase weaponDatabase;
-
     public string WeaponId => string.IsNullOrWhiteSpace(weaponId) ? GetType().Name : weaponId.Trim();
 
     /// <summary>
     /// 射击音频列表
     /// </summary>
     public List<AudioClip> shootSounds = new List<AudioClip>();
+
+    /// <summary>
+    /// 换弹音效地址, 来自 WeaponData.lua.
+    /// </summary>
+    private string reloadSoundAddress;
+
+    /// <summary>
+    /// 射击音效地址列表, 来自 WeaponData.lua.
+    /// </summary>
+    private readonly List<string> shootSoundAddresses = new List<string>();
 
     /// <summary>
     /// 子弹预制体
@@ -90,7 +96,8 @@ namespace Game.Gameplay
     /// </summary>
     protected virtual void Awake()
     {
-        ApplyDataFromDatabase();
+        ApplyDataFromLuaTable();
+        LoadSoundsAsync();
 
         if (clipSize != 0)
         {
@@ -99,34 +106,54 @@ namespace Game.Gameplay
             bulletBag = new BulletBag(MaxBulletBagNum);
         }
 
-        void ApplyDataFromDatabase()
+        void ApplyDataFromLuaTable()
         {
-            var database = weaponDatabase != null ? weaponDatabase : DataBaseManager.Instance?.Weapons;
-            if (database != null && database.TryGetById(WeaponId, out var data))
-            {
-                data.ApplyTo(this);
-            }
-            else
-            {
-                Debug.LogWarning($"Weapon {WeaponId} not found in database.");
-            }
+            // 数值来自 WeaponData.lua, 不再读 WeaponDatabase.
+            var config = LuaDataRuntime.GetWeaponConfig(WeaponId);
+            MinDamage = config.MinDamage;
+            MaxDamage = config.MaxDamage;
+            MaxBulletBagNum = config.MaxBulletBagNum;
+            clipSize = config.ClipSize;
+            shootInterval = config.ShootInterval;
+            bulletSpeed = config.BulletSpeed;
+            reloadSoundAddress = config.ReloadSoundAddress;
+            shootSoundAddresses = config.ShootSoundAddresses;
         }
 }
-    public void ApplyData(WeaponData data)
+
+    /// <summary>
+    /// 按 Addressables 地址异步加载射击与换弹音效.
+    /// </summary>
+    async void LoadSoundsAsync()
     {
-        shootSounds.Clear();
-        if (data.shootSounds != null)
+        try
         {
-            foreach (var sound in data.shootSounds)
+            var loader = AddressableLoader.Instance;
+            if (loader == null)
             {
-                if (sound != null)
+                throw new InvalidOperationException($"{GetType().Name} requires {nameof(AddressableLoader)} before loading sounds.");
+            }
+
+            shootSounds.Clear();
+            for (var i = 0; i < shootSoundAddresses.Count; i++)
+            {
+                var clip = await loader.LoadAssetAsync<AudioClip>(shootSoundAddresses[i]);
+                if (clip != null)
                 {
-                    shootSounds.Add(sound);
+                    shootSounds.Add(clip);
                 }
             }
-        }
 
-        ReloadSound = data.reloadSound;
+            if (!string.IsNullOrEmpty(reloadSoundAddress))
+            {
+                ReloadSound = await loader.LoadAssetAsync<AudioClip>(reloadSoundAddress);
+            }
+        }
+        catch (Exception exception)
+        {
+            Debug.LogError($"{GetType().Name}: 武器音效加载失败, WeaponId: {WeaponId}, Error: {exception.Message}", this);
+        }
+    }
         MinDamage = data.minDamage;
         MaxDamage = data.MaxDamage;
         MaxBulletBagNum = data.maxBulletBagNum;

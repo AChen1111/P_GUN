@@ -65,21 +65,10 @@ namespace Game.Gameplay.Save
                 return SaveOperationResult.Fail("读取失败, 槽位为空.");
             }
 
-            await EnsureDatabasesLoadedAsync();
+            // 玩法数值改由 Lua 数据表提供, 读档不再预载 ScriptableObject 数据库.
             pendingLoadData = data;
             SceneManager.LoadScene(GameplaySceneName);
             return SaveOperationResult.Ok("正在进入游戏场景并恢复存档.", data);
-        }
-
-        private static Task EnsureDatabasesLoadedAsync()
-        {
-            var manager = DataBaseManager.Instance;
-            if (manager == null)
-            {
-                throw new InvalidOperationException($"{nameof(DataBaseManager)} must exist before loading save.");
-            }
-
-            return manager.EnsureLoadedAsync();
         }
 
         public static SaveOperationResult DeleteSlot(int slotIndex)

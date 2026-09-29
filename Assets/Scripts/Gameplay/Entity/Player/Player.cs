@@ -120,10 +120,24 @@ namespace Game.Gameplay
         #region Unity Lifecycle
 
         /// <summary>
+        /// 从 PlayerData.lua 读取基础数值, 覆盖预制体上的序列化字段.
+        /// </summary>
+        void ApplyPlayerDataConfig()
+        {
+            var config = LuaDataRuntime.GetPlayerConfig();
+            maxHp = config.MaxHp;
+            moveSpeed = config.MoveSpeed;
+            bulletTimeEnemyScale = config.BulletTimeEnemyScale;
+            bulletTimeDuration = config.BulletTimeDuration;
+            bulletTimeCooldown = config.BulletTimeCooldown;
+        }
+
+        /// <summary>
         /// 初始化运行时依赖.
         /// </summary>
         void Awake()
         {
+            ApplyPlayerDataConfig();
             PlayerRegistry.Register(this);
             ResolveBuffManager();
             Restart();
