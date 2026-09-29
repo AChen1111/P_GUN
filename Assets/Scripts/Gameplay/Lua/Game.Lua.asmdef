@@ -5,7 +5,8 @@
     "Game.Core",
     "Game.Gameplay",
     "Game.Items",
-    "XLua.Runtime"
+    "XLua.Runtime",
+    "Game.LuaComponent"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],

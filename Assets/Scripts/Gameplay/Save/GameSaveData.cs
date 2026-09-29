@@ -13,7 +13,8 @@ namespace Game.Gameplay.Save
         public int version = 1;
         public string savedAtUtc;
         public string sceneName;
-        public string levelGraphAddress;
+        // 关卡 id 对应 LevelData.lua 的 levelId, 与种子一起重建同一张地图.
+        public string levelId;
         public int mapSeed;
         public string currentRoomId;
         public PlayerSaveData player = new PlayerSaveData();

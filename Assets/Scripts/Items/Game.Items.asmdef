@@ -7,7 +7,8 @@
     "Game.Animation",
     "Game.Presentation",
     "QFramework",
-    "QFramework.CoreKit"
+    "QFramework.CoreKit",
+    "Game.LuaComponent"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],

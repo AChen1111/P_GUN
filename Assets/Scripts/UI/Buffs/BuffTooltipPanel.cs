@@ -46,12 +46,12 @@ namespace Game.UI
 
             if (titleText != null)
             {
-                titleText.text = info.Buff.BuffName;
+                titleText.text = info.Config.Name;
             }
 
             if (descriptionText != null)
             {
-                descriptionText.text = info.Buff.Description;
+                descriptionText.text = info.Config.Description;
             }
 
             if (canvasGroup != null)

@@ -12,7 +12,8 @@
         "Edgar.Unity",
         "Game.Items",
         "Unity.Addressables",
-        "Unity.ResourceManager"
+        "Unity.ResourceManager",
+        "Game.LuaComponent"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

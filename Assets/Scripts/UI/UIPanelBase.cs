@@ -17,6 +17,9 @@ namespace Game.UI
         public CanvasGroup CanvasGroup => canvasGroup;
         public Button DefaultSelectedButton => defaultSelectedButton;
 
+        // 面板的 Lua 模块, 需要 Lua 逻辑的面板在预制体上挂 LuaComponet.
+        private LuaComponet panelLua;
+
         /// <summary>
         /// 初始化运行时依赖.
         /// </summary>
@@ -24,6 +27,7 @@ namespace Game.UI
         {
             // 运行时确保面板具备CanvasGroup, 后续才能统一控制显示和交互.
             ResolveCanvasGroup();
+            panelLua = GetComponent<LuaComponet>();
         }
 
         /// <summary>
@@ -36,15 +40,17 @@ namespace Game.UI
         }
         public void Open()
         {
-            // 公共打开流程, 先显示并恢复交互, 再执行子类打开逻辑.
+            // 公共打开流程, 先显示并恢复交互, 再执行子类打开逻辑, 最后交给 Lua 模块.
             SetVisible(true, true);
             OnOpen();
+            panelLua?.CallLuaFunction("OnOpen");
             FocusDefaultButton();
         }
         public void Close()
         {
-            // 公共关闭流程, 先执行子类清理逻辑, 再隐藏并停止交互.
+            // 公共关闭流程, 先执行子类清理逻辑, 再交给 Lua 模块, 最后隐藏并停止交互.
             OnClose();
+            panelLua?.CallLuaFunction("OnClose");
             SetVisible(false, false);
         }
         public void Pause()
@@ -52,12 +58,14 @@ namespace Game.UI
             // 公共暂停流程, 保留显示, 但禁止交互和射线.
             SetVisible(true, false);
             OnPause();
+            panelLua?.CallLuaFunction("OnPause");
         }
         public void Resume()
         {
             // 公共恢复流程, 重新启用交互, 再执行子类恢复逻辑.
             SetVisible(true, true);
             OnResume();
+            panelLua?.CallLuaFunction("OnResume");
             FocusDefaultButton();
         }
         protected virtual void OnOpen()

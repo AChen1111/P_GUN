@@ -1,0 +1,6 @@
+spawnTableId,kind,waveIndex,enemyId,count,itemId,weight
+normal_default,enemy,0,2,3,,
+normal_default,enemy,1,1,1,,
+normal_default,item,,,,,1,3
+normal_default,item,,,,,3,2
+normal_default,item,,,,,9,1

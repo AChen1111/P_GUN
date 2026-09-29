@@ -77,8 +77,10 @@ namespace Game.UI
 
                 if (detailIcon != null)
                 {
-                    detailIcon.sprite = hasStack ? stack.Data.icon : null;
-                    detailIcon.enabled = hasStack && stack.Data.icon != null;
+                    // 图标来自按 id 缓存的 Sprite, 加载完成后刷新事件会重建显示.
+                    var icon = hasStack ? ItemSpriteCache.GetSprite(stack.ItemId) : null;
+                    detailIcon.sprite = icon;
+                    detailIcon.enabled = hasStack && icon != null;
                 }
 
                 if (detailNameText != null)
