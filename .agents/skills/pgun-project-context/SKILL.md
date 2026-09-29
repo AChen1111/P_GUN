@@ -84,4 +84,4 @@ Read `references/project-architecture.md` for:
 - Current item, buff, weapon, enemy, UI, pooling, animation, and database implementation notes.
 - Excel2SO workflow.
 
-Read `references/enemy-navigation-plan.md` before changing how enemies chase the player. Shared chase uses a room flow field, individual last-known positions use A*, and local spacing uses separation inside `FollowPlayerWithBodySpace`.
+Read `references/enemy-navigation-plan.md` before changing enemy chase or attack movement. Replace the old `Follow` / `Attack` steering with `EnemyBrain`: room flow field while the player is visible, A* to the last seen cell after line of sight is lost, and separation so enemies do not overlap. Do not extend `FollowPlayerWithBodySpace`.
