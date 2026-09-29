@@ -83,3 +83,5 @@ Read `references/project-architecture.md` for:
 - Key classes and public APIs.
 - Current item, buff, weapon, enemy, UI, pooling, animation, and database implementation notes.
 - Excel2SO workflow.
+
+Read `references/enemy-navigation-plan.md` before changing how enemies chase the player. Shared chase uses a room flow field, individual last-known positions use A*, and local spacing uses separation inside `FollowPlayerWithBodySpace`.
