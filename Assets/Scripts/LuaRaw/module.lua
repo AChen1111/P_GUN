@@ -1,6 +1,12 @@
 --存放各种模块
 require("BaseUI")
 require("PoisonBehavior")
+require("BloodPactBehavior")
+require("BloodRageBehavior")
+require("LifestealBehavior")
+require("FrenzyBehavior")
+require("BandolierBehavior")
+require("WarDrumBehavior")
 require("PistolModule")
 require("AKModule")
 require("MP5Module")
@@ -22,6 +28,12 @@ require("ChestRoomModule")
 moduleList = {}
 moduleList["BaseUI"] = BaseUI
 moduleList["PoisonBehavior"] = PoisonBehavior
+moduleList["BloodPactBehavior"] = BloodPactBehavior
+moduleList["BloodRageBehavior"] = BloodRageBehavior
+moduleList["LifestealBehavior"] = LifestealBehavior
+moduleList["FrenzyBehavior"] = FrenzyBehavior
+moduleList["BandolierBehavior"] = BandolierBehavior
+moduleList["WarDrumBehavior"] = WarDrumBehavior
 moduleList["PistolModule"] = PistolModule
 moduleList["AKModule"] = AKModule
 moduleList["MP5Module"] = MP5Module
