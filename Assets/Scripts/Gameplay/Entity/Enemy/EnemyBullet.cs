@@ -151,12 +151,12 @@ namespace Game.Gameplay
         }
 
         /// <summary>
-        /// 敌人子弹结束生命周期时归还对象池，而不是 Destroy。
+        /// 敌人子弹结束生命周期时经 WeaponManager 归还对象池，而不是 Destroy。
         /// </summary>
         private void Recycle() {
             hasHit = true;
             StopMove();
-            EnemyBulletPool.Instance.Release(this);
+            WeaponManager.Instance.ReleaseEnemyBullet(this);
         }
 
         /// <summary>

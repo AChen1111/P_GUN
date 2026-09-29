@@ -213,10 +213,11 @@ namespace Game.Gameplay
         gunClip?.OnGunUsed();
     }
 
-    protected void PlayGunFire(Vector2 direction)
-    {
-        WeaponGlobal.Instance.PlayGunFire(FirePointPosition, direction);
-    }
+protected void PlayGunFire(Vector2 direction)
+        {
+            // 枪口火光经 WeaponManager 中转, Gun 不直接接触场景表现单例.
+            WeaponManager.Instance.PlayGunFire(FirePointPosition, direction);
+        }
 
     /// <summary>
     /// 尝试播放声音
@@ -258,26 +259,26 @@ namespace Game.Gameplay
         PlayerAudioSource.Play();
     }
 
-    /// <summary>
-    /// 获取子弹
-    /// </summary>
-    protected virtual PlayerBullet GetBullet(Vector2 dir)
-    {
-        if (BulletPrefab == null)
+/// <summary>
+        /// 获取子弹
+        /// </summary>
+        protected virtual PlayerBullet GetBullet(Vector2 dir)
         {
-            Debug.LogError($"{GetType().Name}: 子弹预制体为空,无法发射。", this);
-            return null;
-        }
+            if (BulletPrefab == null)
+            {
+                Debug.LogError($"{GetType().Name}: 子弹预制体为空,无法发射。", this);
+                return null;
+            }
 
-        var obj = PlayerBulletPool.Instance.Get(
-            BulletPrefab,
-            FirePointPosition,
-            FirePointRotation,
-            dir,
-            Damage,
-            bulletSpeed
-        );
-        return obj;
-    }
+            var obj = WeaponManager.Instance.SpawnPlayerBullet(
+                BulletPrefab,
+                FirePointPosition,
+                FirePointRotation,
+                dir,
+                Damage,
+                bulletSpeed
+            );
+            return obj;
+        }
     }
 }

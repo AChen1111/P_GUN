@@ -412,6 +412,14 @@ namespace Game.Gameplay
         #region Initialize
         void SelectInitialGun()
         {
+            // 装载结果同步登记到 WeaponManager, 之后取枪和发射都走它中转.
+            if (WeaponManager.Instance == null)
+            {
+                throw new InvalidOperationException($"{nameof(Player)} requires {nameof(WeaponManager)} in scene before weapon loadout.");
+            }
+
+            WeaponManager.Instance.RegisterPlayerGuns(guns, currentGunIndex);
+
             if (guns == null || guns.Count == 0)
             {
                 gun = null;
@@ -463,6 +471,7 @@ namespace Game.Gameplay
                 gun = guns[currentGunIndex];
                 gun.Show();
                 gun.OnGunUsed();
+                WeaponManager.Instance.SetCurrentGunIndex(currentGunIndex);
             }
 
             if (Input.GetKeyDown(KeyCode.E))
@@ -472,6 +481,7 @@ namespace Game.Gameplay
                 gun = guns[currentGunIndex];
                 gun.Show();
                 gun.OnGunUsed();
+                WeaponManager.Instance.SetCurrentGunIndex(currentGunIndex);
             }
 
             if (Input.GetMouseButtonDown(1))

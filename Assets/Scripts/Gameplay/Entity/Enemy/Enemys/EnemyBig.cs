@@ -143,7 +143,7 @@ namespace Game.Gameplay
                 var angle = angleStep * i * Mathf.Deg2Rad;
                 var direction = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)).normalized;
                 var spawnPosition = transform.position + (Vector3)(direction * radialBulletSpawnDistance);
-                EnemyBulletPool.Instance.Get(bulletPrefab, spawnPosition, Quaternion.identity, direction, AttackDamage);
+                WeaponManager.Instance.SpawnEnemyBullet(bulletPrefab, spawnPosition, direction, AttackDamage);
             }
 
             PlayShootSound();
@@ -171,7 +171,7 @@ namespace Game.Gameplay
             FaceDirection(direction);
 
             var spawnPosition = transform.position + (Vector3)(direction * aimedBulletSpawnDistance);
-            EnemyBulletPool.Instance.Get(bulletPrefab, spawnPosition, Quaternion.identity, direction, AttackDamage);
+            WeaponManager.Instance.SpawnEnemyBullet(bulletPrefab, spawnPosition, direction, AttackDamage);
             PlayShootSound();
         }
 

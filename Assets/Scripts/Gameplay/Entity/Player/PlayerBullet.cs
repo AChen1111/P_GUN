@@ -64,7 +64,7 @@ namespace Game.Gameplay
                 if (!hasHit)
                 {
                     hasHit = true;
-                    PlayerBulletPool.Instance.Release(this);
+                    WeaponManager.Instance.ReleasePlayerBullet(this);
                 }
             }
 }
@@ -131,7 +131,7 @@ namespace Game.Gameplay
                 DamageInfo damageInfo = new DamageInfo(finalDamage, dir);
 
                 target.GetComponent<EnemyBase>()?.Hurt(damageInfo);
-                PlayerBulletPool.Instance.Release(this);
+                WeaponManager.Instance.ReleasePlayerBullet(this);
                 return;
             }
 
@@ -141,7 +141,7 @@ namespace Game.Gameplay
                 hasHit = true;
                 // 墙体可能没有音效组件,缺少时只回收子弹.
                 target.GetComponent<AudioPlay>()?.Play();
-                PlayerBulletPool.Instance.Release(this);
+                WeaponManager.Instance.ReleasePlayerBullet(this);
             }
 
             void PlaySelfHitSound()

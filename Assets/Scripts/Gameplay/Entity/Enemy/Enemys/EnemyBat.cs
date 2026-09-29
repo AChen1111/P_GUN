@@ -126,7 +126,7 @@ namespace Game.Gameplay
             var spreadSign = i % 2 == 0 ? 1 : -1;
             var bulletAngle = i == 0 ? baseAngle : baseAngle + spreadSign * i * bulletSpreadStepAngle;
             var bulletDirection = bulletAngle.AngleToDirection2D().normalized;
-            EnemyBulletPool.Instance.Get(bulletPrefab, spawnPosition, Quaternion.identity, bulletDirection, AttackDamage);
+            WeaponManager.Instance.SpawnEnemyBullet(bulletPrefab, spawnPosition, bulletDirection, AttackDamage);
         }
 
         PlayShootSound();
