@@ -109,7 +109,7 @@ namespace Game.Gameplay
         float nextBulletTimeReadyTime;
         Coroutine bulletTimeCoroutine;
 
-        public int MaxHP => Mathf.Max(0, Mathf.RoundToInt(CalculateBuffedStat(StatType.MaxHp, maxHp)));
+        public int MaxHP => Mathf.Max(1, Mathf.RoundToInt(CalculateBuffedStat(StatType.MaxHp, maxHp)));
         public bool IsHPFull => HP >= MaxHP;
         public bool IsBulletTimeActive => isBulletTimeActive;
         public bool IsBulletTimeReady => !isBulletTimeActive && BulletTimeReadyRemainingTime <= 0f;
@@ -663,8 +663,10 @@ namespace Game.Gameplay
             StartHurtSlow();
             ApplyHurtKnockback(damageInfo.SourceDirection);
 
-            //扣血判断
-            HP = Mathf.Max(0, HP - Mathf.Max(1, damageInfo.Damage));
+            //扣血判断: Defense 按 Buff 公式结算后减伤, 结算后至少造成 1 点伤害.
+            var defense = Mathf.FloorToInt(CalculateBuffedStat(StatType.Defense, 0f));
+            var finalDamage = Mathf.Max(1, damageInfo.Damage - defense);
+            HP = Mathf.Max(0, HP - finalDamage);
             PublishHPChanged();
 
             if(HP <= 0)
@@ -772,6 +774,23 @@ namespace Game.Gameplay
             ResetBulletTimeState();
             HP = MaxHP;
             PublishHPChanged();
+        }
+
+        /// <summary>
+        /// 自伤入口: 不触发受击反馈, 无敌帧和击退, 供血怒和持续伤害类 Buff 使用.
+        /// </summary>
+        /// <param name="amount">自伤数值.</param>
+        public void SelfDamage(int amount)
+        {
+            if (amount <= 0 || HP <= 0) return;
+
+            HP = Mathf.Max(0, HP - amount);
+            PublishHPChanged();
+
+            if (HP <= 0)
+            {
+                EventCenter.Trigger(CoreEvents.PlayerDied);
+            }
         }
         private void HandleGameEnded()
         {
