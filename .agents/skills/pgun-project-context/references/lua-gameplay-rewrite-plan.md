@@ -4,11 +4,11 @@
 
 原来的 Lua 宿主全部移除，包括 Buff 的 `LuaFile` / `LuaBuffInstance` / `IBuffScriptInstance` / `BuffScriptRuntime`，道具的 `LuaManager.InvokeItemEffectMethod`，以及 xLua Hotfix、`hotfix/main` 和方法注入。不保留两套脚本入口。
 
-C# 继续持有对象池、刚体、动画组件、属性公式、存档、Addressables 和房间门控。这些类向 Lua 提供方法，不再在内部实现玩法分支。
+对象池留在 C#，不迁进 Lua。C# 还继续持有刚体、动画组件、属性公式、存档、Addressables 和房间门控。这些类向 Lua 提供方法，不再在内部实现玩法分支。
 
 ## 顺序
 
-1. 接入 `LuaComponet`，补上玩家和敌人需要的逐帧回调与时间源。场景里放框架自己的 `LuaManager`。
+1. 接入 `LuaComponet`，在组件上补充 `Update` 和 `FixedUpdate`。场景里放框架自己的 `LuaManager`。对象池仍用现有 C# 实现。
 2. 删除旧 Lua 宿主和热修入口。Buff、道具不再走返回 table 再由 C# 按 `OnAdd` / `OnPick` 调用的那条链路。
 3. 玩家行为迁到玩家预制体上的 `LuaComponet`。
 4. 敌人行为迁到各敌人预制体上的 `LuaComponet`。
@@ -51,11 +51,30 @@ flowchart TD
 - 其他方法用 `CallLuaFunction`，第一个参数是实例表。
 - `require` 只写文件名。`Assets/Scripts/LuaRaw/UI/BaseUI.lua` 对应 `require("BaseUI")`。编辑器读 `Assets/Scripts/LuaRaw` 源码；真机读 `Resources/LuaBundle.bytes`，打包入口是 `Tools/Lua/Build LuaBundle`。
 
-接入这套框架时要补的生命周期：
+### 框架内补充 `Update` 和 `FixedUpdate`
 
-- 当前组件没有 `Update` 和 `FixedUpdate`。玩家移动、敌人 FSM、Buff 间隔都依赖逐帧回调，因此在 `LuaComponet` 上增加这两次转发，仍然由组件调用 Lua，不另写一套脚本宿主。
-- 增加时间源。玩家、武器、界面使用普通 `deltaTime`。敌人使用 `GameplayTime.EnemyDeltaTime`。敌人模块不读取 `Time.deltaTime` 或 `Time.timeScale`。
-- 对象池复用不会再次调用 `Awake` 和 `Start`。取出和回收时由池调用 `OnEnable` / `OnDisable`，或显式 `CallLuaFunction("OnSpawn")` 与 `CallLuaFunction("OnRecycle")`。Lua 在回收时清掉计时、目标和攻击标记。
+`LuaComponet` 目前只转发 `Awake`、`Start`、`OnEnable`、`OnDisable`、`OnDestroy`。玩家移动、敌人状态和 Buff 间隔都在组件里补上逐帧转发，不另写脚本宿主，也不把逐帧循环放进 `PoolBase`。
+
+`InitOnFunctions` 与现有生命周期一样缓存这两个函数。模块没有对应函数时跳过，不补空实现。
+
+| Unity 回调 | Lua 函数 | 第二个参数 |
+| --- | --- | --- |
+| `Update` | `Update(self, deltaTime)` | 本帧增量时间 |
+| `FixedUpdate` | `FixedUpdate(self, fixedDeltaTime)` | 本次物理步进时间 |
+
+时间由组件传入，模块不再自己读 `Time.deltaTime`、`Time.fixedDeltaTime` 或 `Time.timeScale`。
+
+- 玩家、武器、界面、房间、Buff 行为物体的 `Update` 传入 `Time.deltaTime`，`FixedUpdate` 传入 `Time.fixedDeltaTime`。
+- 敌人的 `Update` 传入 `GameplayTime.EnemyDeltaTime`。`FixedUpdate` 传入 `Time.fixedDeltaTime * GameplayTime.EnemyTimeScale`。`GameplayTime` 仍只改敌人时间倍率，不改全局 `Time.timeScale`。
+- 现有 `CallLuaFunction` 只转发实例表。这两个回调使用带一个 `float` 参数的转发，函数名仍然是 `Update` 和 `FixedUpdate`。
+
+对象池复用不会再次调用 `Awake` 和 `Start`。取出和回收仍由 C# 的 `IPoolable.OnSpawnFromPool` / `OnRecycleToPool` 触发；其中再调用该物体上 `LuaComponet` 的 `OnSpawn` / `OnRecycle`。Lua 在 `OnRecycle` 清掉计时、目标和攻击标记。
+
+## 对象池
+
+对象池保持现有 C# 实现：`IPoolable`、`PoolBase<T>`，以及 `PlayerBulletPool`、`EnemyBulletPool`、`EnemyPool`、`ItemPool`、`VfxPool`。`Get`、`Release`、`Prewarm`、预制体分池和实例回池映射都不进入 Lua。
+
+Lua 模块不创建池，不调用 `Instantiate` 或 `Destroy` 来代替池。需要子弹、敌人、道具或 Buff 行为物体时，调用 C# 池的现有方法。池弹出的预制体上已经挂好 `LuaComponet`，弹出和回收时由 C# 把生命周期转过去。
 
 框架自己的 `LuaManager` 是 `PersistentMonoSingleton<LuaManager>`，负责创建 `LuaEnv`、执行 `require 'Main'`，并给 `LuaComponet` 提供 `GetLuaTable`。它放在 `Root` 场景里，执行顺序早于所有 `LuaComponet.Awake`。不走 `Instance` 为空时 `new GameObject` 再 `AddComponent` 的路径。
 
@@ -165,7 +184,7 @@ C# 向 Lua 提供移动、停止、翻转、播放攻击动画、从 `EnemyBulle
 
 ## 留在 C# 的部分
 
-- 对象池的创建、预热和 `IPoolable` 重置。Lua 只收到取出和回收回调。
+- 对象池整体留在 C#：创建、预热、分池、取出和回收都在 `PoolBase`。Lua 只在 C# 转发后执行 `OnSpawn` / `OnRecycle`。
 - `AddressableLoader`、`DataBaseManager`、存档读写。安全点禁止战斗中存档。
 - `GameplayTime` 的敌人时间倍率。它不改 `Time.timeScale`。
 - 伤害数字、DOTween、小地图、镜头。
@@ -183,10 +202,11 @@ C# 向 Lua 提供移动、停止、翻转、播放攻击动画、从 `EnemyBulle
 
 ## 验收
 
-1. 工程里不再存在 `LuaBuffInstance`、`BuffScriptRuntime`、道具 `InvokeItemEffectMethod` 和 `hotfix/main` 执行路径。
-2. 玩家预制体在未挂 `LuaComponet` 时启动失败；挂上之后，移动、瞄准和射击输入只由 Lua 模块执行。
-3. 四类敌人预制体都挂有 `LuaComponet`。子弹时间下追击和攻击变慢，回收后状态被清空，清波计数仍然正确。
-4. 纯属性 Buff 只改表。中毒和触发表现来自挂了 `LuaComponet` 的 Buff 预制体，属性仍由 `CalculateStat` 结算。
-5. 治疗、净化、施加 Buff、宝箱的消耗条件与迁移前一致，效果物体来自对象池。
-6. 散弹、激光、弓、火箭筒的弹数、角度、蓄力时间和射线层与迁移前一致。
-7. 战斗中安全点存档失败。已清空房间读档后不再刷怪。
+1. `LuaComponet` 会转发 `Update(self, deltaTime)` 和 `FixedUpdate(self, fixedDeltaTime)`。没有这两个函数的模块不会报错。敌人 `Update` 收到的是 `GameplayTime.EnemyDeltaTime`。对象池的 `Get` / `Release` 仍只在 C# 池中执行。
+2. 工程里不再存在 `LuaBuffInstance`、`BuffScriptRuntime`、道具 `InvokeItemEffectMethod` 和 `hotfix/main` 执行路径。
+3. 玩家预制体在未挂 `LuaComponet` 时启动失败；挂上之后，移动、瞄准和射击输入只由 Lua 模块执行。
+4. 四类敌人预制体都挂有 `LuaComponet`。子弹时间下追击和攻击变慢，回收后状态被清空，清波计数仍然正确。
+5. 纯属性 Buff 只改表。中毒和触发表现来自挂了 `LuaComponet` 的 Buff 预制体，属性仍由 `CalculateStat` 结算。
+6. 治疗、净化、施加 Buff、宝箱的消耗条件与迁移前一致，效果物体由 C# 对象池取出。
+7. 散弹、激光、弓、火箭筒的弹数、角度、蓄力时间和射线层与迁移前一致。
+8. 战斗中安全点存档失败。已清空房间读档后不再刷怪。

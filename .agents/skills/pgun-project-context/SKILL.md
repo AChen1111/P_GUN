@@ -82,4 +82,4 @@ Read `references/project-architecture.md` for:
 - Current item, buff, weapon, enemy, UI, pooling, animation, and database implementation notes.
 - Excel2SO workflow.
 
-Read `references/lua-gameplay-rewrite-plan.md` before moving gameplay or UI into Lua. Player, enemy, weapon, buff, item, room, and UI behaviors all use the `LuaComponet` framework from the TCGGameDem0 `Lua` branch. Any object that runs that Lua must have `LuaComponet` on the prefab or scene object. Remove the old Buff/item Lua host and xLua Hotfix instead of keeping them beside the new framework.
+Read `references/lua-gameplay-rewrite-plan.md` before moving gameplay or UI into Lua. Player, enemy, weapon, buff, item, room, and UI behaviors all use the `LuaComponet` framework from the TCGGameDem0 `Lua` branch. Any object that runs that Lua must have `LuaComponet` on the prefab or scene object. Extend `LuaComponet` with `Update` and `FixedUpdate`; do not add a second tick host. Object pools stay in C# (`IPoolable`, `PoolBase`). Remove the old Buff/item Lua host and xLua Hotfix instead of keeping them beside the new framework.
