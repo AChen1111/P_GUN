@@ -55,7 +55,7 @@ namespace Game.Gameplay.Save
         }
 
         /// <summary>
-        /// 异步读档入口, 主菜单读档前先确保全局数据库已经加载.
+        /// 异步读档入口, 读取槽位后进入游戏场景并恢复存档.
         /// </summary>
         public static async Task<SaveOperationResult> LoadFromSlotAsync(int slotIndex)
         {

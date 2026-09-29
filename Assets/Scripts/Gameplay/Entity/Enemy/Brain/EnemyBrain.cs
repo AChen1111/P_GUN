@@ -204,11 +204,19 @@ namespace Game.Gameplay
         }
 
         /// <summary>
-        /// 走流场方向, 没有流场时退化为直线方向.
+        /// 走流场方向; 缺可行走格时停住, 有格但流场没有该格时退化为直线方向.
         /// </summary>
         private void MoveWithFlow(Vector3 targetWorldPosition, Vector3 selfPosition)
         {
-            if (!TryGetFlowDirection(targetWorldPosition, selfPosition, out var direction))
+            var grid = ResolveWalkGrid();
+            if (grid == null)
+            {
+                // 缺可行走格时停住, 不做直线穿墙.
+                Stop();
+                return;
+            }
+
+            if (!TryGetFlowDirection(grid, targetWorldPosition, selfPosition, out var direction))
             {
                 var fallback = (Vector2)(targetWorldPosition - selfPosition);
                 direction = fallback.sqrMagnitude > 0.0001f ? fallback.normalized : Vector2.zero;
@@ -250,15 +258,8 @@ namespace Game.Gameplay
         /// <summary>
         /// 读取流场方向, 目标跨格时由格子重算.
         /// </summary>
-        private bool TryGetFlowDirection(Vector3 targetWorldPosition, Vector3 selfPosition, out Vector2 direction)
+        private bool TryGetFlowDirection(RoomWalkGrid grid, Vector3 targetWorldPosition, Vector3 selfPosition, out Vector2 direction)
         {
-            var grid = ResolveWalkGrid();
-            if (grid == null)
-            {
-                direction = Vector2.zero;
-                return false;
-            }
-
             grid.EnsureFlowField(targetWorldPosition);
             var cell = grid.GetCell(selfPosition);
             if (grid.TryGetFlowDirection(cell, out direction))

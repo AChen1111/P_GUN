@@ -28,7 +28,7 @@ namespace Game.Gameplay
     /// <summary>
     /// 射击音效地址列表, 来自 WeaponData.lua.
     /// </summary>
-    private readonly List<string> shootSoundAddresses = new List<string>();
+    private List<string> shootSoundAddresses = new List<string>();
 
     /// <summary>
     /// 子弹预制体
@@ -80,6 +80,11 @@ namespace Game.Gameplay
     /// 本枪的 Lua 行为组件, 开火规则在对应模块里.
     /// </summary>
     private LuaComponet gunLua;
+
+    /// <summary>
+    /// 基类开火缺少 Lua 组件时只警告一次, 避免逐帧刷屏.
+    /// </summary>
+    private bool reportedMissingGunLua;
 
     public virtual BulletBag BulletBag => bulletBag;
     public GunClip GunClip => gunClip;
@@ -160,19 +165,12 @@ namespace Game.Gameplay
             Debug.LogError($"{GetType().Name}: 武器音效加载失败, WeaponId: {WeaponId}, Error: {exception.Message}", this);
         }
     }
-        MinDamage = data.minDamage;
-        MaxDamage = data.MaxDamage;
-        MaxBulletBagNum = data.maxBulletBagNum;
-        clipSize = data.clipSize;
-        shootInterval = data.ShootInterval;
-        bulletSpeed = data.bulletSpeed;
-    }
 
     /// <summary>
     /// 鼠标按下, 转发给枪械 Lua 模块.
     /// </summary>
     public virtual void ShootDown(Vector2 dir) {
-        RequireGunLua().CallLuaFunction("ShootDown", dir);
+        ForwardToLua("ShootDown", dir);
     }
 
     /// <summary>
@@ -180,7 +178,7 @@ namespace Game.Gameplay
     /// </summary>
     public virtual void ShootUp(Vector2 dir)
     {
-        RequireGunLua().CallLuaFunction("ShootUp", dir);
+        ForwardToLua("ShootUp", dir);
     }
 
     /// <summary>
@@ -188,20 +186,44 @@ namespace Game.Gameplay
     /// </summary>
     public virtual void Shooting(Vector2 dir)
     {
-        RequireGunLua().CallLuaFunction("Shooting", dir, Time.deltaTime);
+        ForwardToLua("Shooting", dir, Time.deltaTime);
     }
 
     /// <summary>
-    /// 获取本枪的 Lua 组件, 预制体缺少时直接报错.
+    /// 把开火转发给 Lua 模块.
+    /// 未换绑的旧预制体走子类覆盖, 基类只警告一次并保持空操作, 换绑完成后不再走到这里.
     /// </summary>
-    private LuaComponet RequireGunLua()
+    private void ForwardToLua(string functionName, Vector2 dir)
     {
-        if (gunLua == null)
+        if (!EnsureGunLua()) return;
+
+        gunLua.CallLuaFunction(functionName, dir);
+    }
+
+    private void ForwardToLua(string functionName, Vector2 dir, float deltaTime)
+    {
+        if (!EnsureGunLua()) return;
+
+        gunLua.CallLuaFunction(functionName, dir, deltaTime);
+    }
+
+    /// <summary>
+    /// 校验 Lua 组件存在, 缺失时只警告一次并保持空操作.
+    /// </summary>
+    private bool EnsureGunLua()
+    {
+        if (gunLua != null)
         {
-            throw new InvalidOperationException($"{GetType().Name} 预制体缺少 LuaComponet, 无法执行开火规则.");
+            return true;
         }
 
-        return gunLua;
+        if (!reportedMissingGunLua)
+        {
+            Debug.LogWarning($"{GetType().Name} 未挂 LuaComponet, 基类开火保持空操作; 请按待办清单换绑枪械预制体.", this);
+            reportedMissingGunLua = true;
+        }
+
+        return false;
     }
 
     /// <summary>

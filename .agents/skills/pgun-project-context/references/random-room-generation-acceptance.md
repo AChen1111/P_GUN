@@ -100,6 +100,7 @@
 
 - [ ] GameScene 移除 `AddressableDungeonBootstrapper` 与 `DungeonGeneratorGrid2D`，挂 `RandomRoomGenerator`（`Assets/Scripts/Gameplay/Room/Generation/RandomRoomGenerator.cs`），`levelId` 填 `level1`。
 - [ ] 生成器 Inspector 拖入 `lrCorridorPrefab` 与 `udCorridorPrefab`（`Assets/Prefab/Room/CorridorTemplate/`）。
+- [ ] 生成器的 `minimapLayer` 填 MiniMap 图层（默认 0 会落到 Default 层, 小地图相机可能不渲染高亮）。
 - [ ] 五类房间预制体各补四个空子物体：`DoorAnchor_N`、`DoorAnchor_E`、`DoorAnchor_S`、`DoorAnchor_W`，放在对应墙边门口中心。
 - [ ] 房间预制体注册进 `Room` 分组，地址与 `LevelConfig.csv` 一致（`room/init`、`room/final`、`room/chest`、`room/save`、`room/normal`），标签带 `room;hot_update`。
 - [ ] 房间预制体确认有根 `BoxCollider2D`（外框）与名为 `Floor` 的 Tilemap，以及 `MinimapRoomData` 组件。
