@@ -1,6 +1,6 @@
 # Lua 玩法重写计划
 
-玩法规则按「一条内容一份脚本」迁入 Lua。C# 继续持有生命周期、对象池、物理、动画、属性公式、存档和资源加载。xLua Hotfix 只保留给已经进包的 C# 方法做紧急补丁，不作为新玩法的归属。
+玩法规则按「一条内容一份脚本」迁入 Lua。C# 继续持有生命周期、对象池、物理、动画、属性公式、存档和资源加载。不使用 xLua Hotfix，不注入 C# 方法，也不维护 `hotfix/main` 这条补丁链路。
 
 ## 顺序
 
@@ -25,26 +25,17 @@ flowchart TD
 
 阶段 1 和阶段 2 可以并行，因为 Buff 宿主与道具宿主已经分开。阶段 3 完成前不要改敌人的射击调用方式。阶段 4 完成前不要把房间清波规则改成脚本，否则生成、击杀计数和 AI 会同时变动。
 
-## 两条通道
+## 脚本宿主
 
-### 脚本宿主
-
-内容脚本返回一个 Lua table，C# 宿主在固定生命周期里调用其中的方法。
+内容脚本返回一个 Lua table，C# 宿主在固定生命周期里调用其中的方法。玩法重写只走这条路。
 
 | 内容 | 现状 | 程序集边界 |
 | --- | --- | --- |
 | Buff | `Buff.LuaFile` 返回 table，`LuaBuffInstance` 转发 `OnAdd`、`OnRemove`、`OnUpdate`、`OnInterval`、`OnTrigger` | `Game.Gameplay` 只依赖 `IBuffScriptInstance` 和 `BuffScriptRuntime`，`LuaManager` 在 `Game.Lua` 中注册工厂 |
 | 道具 | `LuaEffect` 在 `OnPick` 时调用 `LuaManager.InvokeItemEffectMethod` | `LuaEffect` 位于 `Game.ItemEffects`，通过场景中的 `LuaManager` 进入 xLua |
+| UI | 使用 [TCGGameDem0 `Lua` 分支](https://github.com/AChen1111/TCGGameDem0/tree/Lua) 的 `LuaComponet` | 界面物体必须挂 `LuaComponet`，由它按类型名创建模块实例并转发生命周期 |
 
-`Game.Gameplay` 不能引用 `XLua.Runtime`。新增武器、敌人脚本时沿用同一分割：玩法程序集定义接口和注册点，`Assets/Scripts/Gameplay/Lua` 下的 `Game.Lua` 实现 Lua table 缓存和调用。
-
-### xLua Hotfix
-
-`Assets/XLua/Editor/PgunHotfixConfig.cs` 已注入玩家、子弹、Buff 管理器、存档、房间、敌人、武器、道具和背包。启动时 `RootHotUpdateController` 调用 `StartupHotfixRuntime`，`LuaManager` 预加载标签 `hotfix` 的文本，再执行地址 `hotfix/main`。
-
-当前入口 `Assets/Scripts/Gameplay/Lua/Hotfix/MainHotfix.lua.txt` 只 `require("hotfix.player_bullet_reverse")`，该补丁替换 `PlayerBullet.Init`。这条链路用于修复已发布 C# 方法。用 `xlua.hotfix` 整段替换 `Gun`、`EnemyBase`、`FightRoom` 或 `Player`，没有独立生命周期，也和对象池重置、读档恢复缠在一起。
-
-热修注入列表保持不变。新玩法脚本不写入 `PgunHotfixConfig`。
+`Game.Gameplay` 不能引用 `XLua.Runtime`。新增武器、敌人脚本时沿用 Buff 的分割：玩法程序集定义接口和注册点，`Assets/Scripts/Gameplay/Lua` 下的 `Game.Lua` 实现 Lua table 缓存和调用。界面逻辑不塞进 Buff 或道具的 table，单独走下面的 UI 框架。
 
 ## 职责切分
 
@@ -57,9 +48,27 @@ flowchart TD
 | 敌人血量、受击、死亡、房间击杀通知、动画参数 | 清房后的额外结算，以及以后新增的遭遇规则 |
 | `GameplayTime` 的敌人时间倍率 | 脚本内部使用宿主传入的 `EnemyDeltaTime` |
 | 存档读写、安全点禁止战斗中存档 | 不迁 |
-| Addressables 加载、数据库、UI 栈、伤害数字、DOTween | 不迁 |
+| Addressables 加载、数据库、伤害数字、DOTween | 不迁 |
+| UI 栈的开关、暂停、层级 | 面板内部逻辑改由 `LuaComponet` 上的 Lua 模块处理 |
 
 Lua 不直接改玩家移速、攻击或最大生命字段。常规属性继续写在 Buff 表的 `modifiers` 列，格式为 `StatType:ModifierType:Value`，由 `BuffManager.CalculateStat` 结算。`Defense` 仍只保留枚举，在伤害减免规则确定前不接入 `Player.Hurt`。
+
+## UI 框架
+
+界面脚本使用 [TCGGameDem0 的 `Lua` 分支](https://github.com/AChen1111/TCGGameDem0/tree/Lua)。入口在 `Assets/Scripts/LuaComponet` 与 `Assets/Scripts/LuaRaw`。类名是 `LuaComponet`。
+
+要执行 Lua 界面逻辑的物体，必须在预制体或场景上挂 `LuaComponet`。没有这个组件的物体不会创建模块实例，也不会收到 `Awake`、`Start`、`OnEnable`、`OnDisable`、`OnDestroy`。不在运行时 `AddComponent` 补挂，也不靠代码生成一个带组件的空物体来代替预制体配置。
+
+`LuaComponet` 的工作方式：
+
+- `m_typeName` 是模块名，必须已经写进 `Assets/Scripts/LuaRaw/module.lua` 的 `moduleList`。`Main.Init` 按这个名字取出模块，建一张实例表，并把 `gameObject` 写到 `table.gameObject`。模块不存在时初始化失败并报错。
+- `ObjectReference` 按 `name` 把场景引用注入实例表。`DataReference` 按 `name` 注入 `Int`、`Float`、`String`、`Bool`。注入发生在调用 Lua `Awake` 之前。Lua 字段名和 Inspector 里的 `name` 必须一致，例如 `BaseUI` 读取的 `m_Button`。
+- 生命周期固定为 `Awake`、`Start`、`OnEnable`、`OnDisable`、`OnDestroy`。模块里没有对应函数时跳过，不补空实现。
+- 其他界面方法通过 `LuaComponet.CallLuaFunction` 按名字转发，第一个参数是实例表。
+- `require` 只写文件名，不写目录。`Assets/Scripts/LuaRaw/UI/BaseUI.lua` 对应 `require("BaseUI")`。编辑器从 `Assets/Scripts/LuaRaw` 读源码；真机从 `Resources/LuaBundle.bytes` 读字节码，打包入口是 `Tools/Lua/Build LuaBundle`。
+- 框架自己的 `LuaManager`（`PersistentMonoSingleton<LuaManager>`，由 `Main.lua` 提供 `Init`）先于任何 `LuaComponet.Awake` 完成初始化，并放在场景里。它和当前 Buff 用的 `Game.Gameplay.LuaManager` 不是同一个类。不使用 `MonoSingleton` 在访问 `Instance` 时 `new GameObject` 再 `AddComponent` 的那条路径。
+
+`UIStackManager` 继续负责 HUD 垫底、设置、胜利、失败面板的压栈，以及暂停时的 `Time.timeScale`。面板根物体在需要 Lua 逻辑时挂 `LuaComponet`，按钮、文本、图片引用通过 `ObjectReference` 注入，不再为同一块界面并行维护一套只存在于 Lua 里的显示数据。现有 `ComponentAutoBindTool` 前缀绑定继续服务仍由 C# 驱动的面板；改成 Lua 的面板以 `LuaComponet` 的引用注入为准。
 
 ## 阶段 1：Buff 特殊行为
 
@@ -193,7 +202,7 @@ AK、MP5、手枪的差异主要是音效循环，不是弹道。它们留到宿
 | `EnemyMelee` | 前方 `MeleeAttackDetector` 碰到玩家后进入攻击窗，冷却由 `attackCooldown` 控制 |
 | `EnemyBig` | 在环形弹幕和追踪点射之间循环，持续时间与子弹数量都在预制体字段上 |
 
-`EnemyBig` 没有出现在 `PgunHotfixConfig` 的注入列表里。它的行为脚本仍走新的脚本宿主，不补进热修列表。
+`EnemyBig` 与其他敌人一样走行为脚本宿主。
 
 ### 宿主形状
 
@@ -247,14 +256,15 @@ AK、MP5、手枪的差异主要是音效循环，不是弹道。它们留到宿
 
 ## 不进入重写的部分
 
-以下类型已经在热修注入列表中，出现线上问题时用 `hotfix/main` 下的补丁修改对应方法。不把它们改写成 Lua 玩法脚本。
+这些部分保持 C# 实现，不用 Lua 替换，也不使用 xLua Hotfix 替换方法体。
 
 - `Player`：移动、睡眠动画、自动瞄准、受击、治疗、武器异步装载、读档恢复。鼠标战斗仍先检查 `GameplayCursorState.BlocksMouseCombat`。
-- `PlayerBullet`：飞行和命中。现有反向补丁只是热修示例。
+- `PlayerBullet`：飞行和命中。
 - `SaveGameService`、`SaveDataBuilder`、`SaveDataRestorer`：3 个 JSON 槽、读档重载 `GameScene`、不保存地面掉落。
 - `BuffManager` 的属性结算和 Buff 容器。
 - `GameplayTime`：只写敌人时间倍率，不改 `Time.timeScale`。
-- 对象池、`AddressableLoader`、`DataBaseManager`、UI 栈、小地图、镜头、伤害数字和 DOTween。
+- 对象池、`AddressableLoader`、`DataBaseManager`、小地图、镜头、伤害数字和 DOTween。
+- UI 栈本身的压栈、暂停和鼠标占用。面板内部逻辑另走 `LuaComponet`。
 
 ## 每个阶段的共同约束
 
@@ -266,7 +276,8 @@ AK、MP5、手枪的差异主要是音效循环，不是弹道。它们留到宿
 - 对象池对象的脚本状态在 `OnRecycle` 清理。
 - 敌人脚本的时间参数使用宿主传入的敌人局部时间。
 - 每增加一类脚本宿主，把目录、职责和公开接口补进 `SKILL.md` 与 `references/project-architecture.md`。
-- 改完热修注入名单时才需要执行 `XLua/Generate Code` 和 `XLua/Hotfix Inject In Editor`。只新增普通 Lua 文本、不改注入类型时，不需要重新注入。
+- 不新增 `Hotfix` 特性，不执行 `XLua/Hotfix Inject In Editor`，不把玩法类型写进热修注入列表。
+- 改成 Lua 的界面物体在预制体上挂 `LuaComponet`，`m_typeName` 与 `moduleList` 中的名字一致，引用字段名与 `ObjectReference.name` 一致。
 
 ## 验收顺序
 

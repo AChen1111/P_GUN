@@ -84,4 +84,4 @@ Read `references/project-architecture.md` for:
 - Current item, buff, weapon, enemy, UI, pooling, animation, and database implementation notes.
 - Excel2SO workflow.
 
-Read `references/lua-gameplay-rewrite-plan.md` before moving gameplay rules into Lua. Buff special behavior and item effects come first; weapon fire patterns, enemy behavior, and room encounter rules follow. xLua Hotfix stays an emergency patch channel.
+Read `references/lua-gameplay-rewrite-plan.md` before moving gameplay rules into Lua. Buff special behavior and item effects come first; weapon fire patterns, enemy behavior, and room encounter rules follow. Do not use xLua Hotfix. UI logic uses the `LuaComponet` framework from the TCGGameDem0 `Lua` branch, and any object that runs that UI Lua must have `LuaComponet` on the prefab or scene object.
