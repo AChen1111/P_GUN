@@ -76,6 +76,11 @@ namespace Game.Gameplay
     protected GunClip gunClip;
     protected BulletBag bulletBag;
 
+    /// <summary>
+    /// 本枪的 Lua 行为组件, 开火规则在对应模块里.
+    /// </summary>
+    private LuaComponet gunLua;
+
     public virtual BulletBag BulletBag => bulletBag;
     public GunClip GunClip => gunClip;
     public void RestoreAmmo(int clipAmmo, int clipMaxAmmo, int bagAmmo, int bagMaxAmmo)
@@ -96,6 +101,7 @@ namespace Game.Gameplay
     /// </summary>
     protected virtual void Awake()
     {
+        gunLua = GetComponent<LuaComponet>();
         ApplyDataFromLuaTable();
         LoadSoundsAsync();
 
@@ -163,26 +169,116 @@ namespace Game.Gameplay
     }
 
     /// <summary>
-    /// 鼠标按下
+    /// 鼠标按下, 转发给枪械 Lua 模块.
     /// </summary>
     public virtual void ShootDown(Vector2 dir) {
-
+        RequireGunLua().CallLuaFunction("ShootDown", dir);
     }
 
     /// <summary>
-    /// 鼠标抬起
+    /// 鼠标抬起, 转发给枪械 Lua 模块.
     /// </summary>
     public virtual void ShootUp(Vector2 dir)
     {
-
+        RequireGunLua().CallLuaFunction("ShootUp", dir);
     }
 
     /// <summary>
-    /// 鼠标按住
+    /// 鼠标按住, 转发给枪械 Lua 模块, 并传入本帧时间.
     /// </summary>
     public virtual void Shooting(Vector2 dir)
     {
+        RequireGunLua().CallLuaFunction("Shooting", dir, Time.deltaTime);
+    }
 
+    /// <summary>
+    /// 获取本枪的 Lua 组件, 预制体缺少时直接报错.
+    /// </summary>
+    private LuaComponet RequireGunLua()
+    {
+        if (gunLua == null)
+        {
+            throw new InvalidOperationException($"{GetType().Name} 预制体缺少 LuaComponet, 无法执行开火规则.");
+        }
+
+        return gunLua;
+    }
+
+    /// <summary>
+    /// 尝试按射击间隔和弹药状态消耗一发, 供枪械 Lua 模块调用.
+    /// </summary>
+    public bool TryConsumeShot()
+    {
+        if (gunClip == null || shootDuration == null)
+        {
+            throw new InvalidOperationException($"{GetType().Name} 弹药组件未初始化.");
+        }
+
+        gunClip.CheckAmmo();
+        if (!shootDuration.CanShoot || !gunClip.CanShoot)
+        {
+            return false;
+        }
+
+        shootDuration.RecordShootTime();
+        gunClip.Shoot();
+        return true;
+    }
+
+    /// <summary>
+    /// 按方向发射一发子弹, 生成走 WeaponManager.
+    /// </summary>
+    public PlayerBullet FireBullet(Vector2 dir)
+    {
+        return GetBullet(dir);
+    }
+
+    /// <summary>
+    /// 播放射击音效, 供枪械 Lua 模块调用.
+    /// </summary>
+    public void PlayFireSound(bool loop = false)
+    {
+        TryPlaySound(loop);
+    }
+
+    /// <summary>
+    /// 播放指定音效, 例如抬起时的结束音.
+    /// </summary>
+    public void PlaySoundClip(AudioClip clip, bool loop = false)
+    {
+        TryPlaySound(clip, loop);
+    }
+
+    /// <summary>
+    /// 停止共用音源.
+    /// </summary>
+    public void StopFireSound()
+    {
+        PlayerAudioSource?.Stop();
+    }
+
+    /// <summary>
+    /// 播放枪口火光, 供枪械 Lua 模块调用.
+    /// </summary>
+    public void PlayFireVfx(Vector2 dir)
+    {
+        PlayGunFire(dir);
+    }
+
+    /// <summary>
+    /// 获取开火点位置, 供枪械 Lua 模块计算弹道.
+    /// </summary>
+    public Vector2 GetFirePointPosition()
+    {
+        return FirePointPosition;
+    }
+
+    /// <summary>
+    /// 获取射击间隔, 供枪械 Lua 模块使用.
+    /// </summary>
+    public float GetShootInterval()
+    {
+        return shootInterval;
     }
 
     /// <summary>

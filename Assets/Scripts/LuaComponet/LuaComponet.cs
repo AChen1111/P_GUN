@@ -83,6 +83,7 @@ public class LuaComponet : MonoBehaviour, IPoolable
     private readonly Dictionary<string, Action<LuaTable>> m_onFunctions = new Dictionary<string, Action<LuaTable>>();
     private readonly Dictionary<string, Action<LuaTable, Vector2>> m_onFunctionsVector2 = new Dictionary<string, Action<LuaTable, Vector2>>();
     private readonly Dictionary<string, Action<LuaTable, float>> m_onFunctionsFloat = new Dictionary<string, Action<LuaTable, float>>();
+    private readonly Dictionary<string, Action<LuaTable, GameObject>> m_onFunctionsGameObject = new Dictionary<string, Action<LuaTable, GameObject>>();
     private readonly Dictionary<string, Action<LuaTable, Vector2, float>> m_onFunctionsVector2Float = new Dictionary<string, Action<LuaTable, Vector2, float>>();
     private readonly Dictionary<string, Func<LuaTable, bool>> m_boolFunctions = new Dictionary<string, Func<LuaTable, bool>>();
 
@@ -214,6 +215,15 @@ public class LuaComponet : MonoBehaviour, IPoolable
     }
 
     /// <summary>
+    /// 调用带一个 GameObject 参数的 Lua 函数, 例如子弹命中的目标.
+    /// </summary>
+    public void CallLuaFunction(string functionName, GameObject arg1)
+    {
+        var func = GetCachedFunction(m_onFunctionsGameObject, functionName);
+        func?.Invoke(m_luaTable, arg1);
+    }
+
+    /// <summary>
     /// 调用带 Vector2 和 float 参数的 Lua 函数, 例如按住射击时的方向和本帧时间.
     /// </summary>
     public void CallLuaFunction(string functionName, Vector2 arg1, float arg2)
@@ -334,6 +344,7 @@ public class LuaComponet : MonoBehaviour, IPoolable
         m_onFunctions.Clear();
         m_onFunctionsVector2.Clear();
         m_onFunctionsFloat.Clear();
+        m_onFunctionsGameObject.Clear();
         m_onFunctionsVector2Float.Clear();
         m_boolFunctions.Clear();
         InitOnFunctions();
