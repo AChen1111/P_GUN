@@ -68,7 +68,7 @@ flowchart TD
 
 属性修正在 `BuffData` 里写成嵌套表，例如 `{ stat = "MaxHp", type = "PercentAdd", value = 0.2 }`。`BuffManager.CalculateStat` 仍用公式 `Final = (Base + FlatSum) * (1 + PercentAddSum) * FinalMulProduct`，输入来自这张表，不再来自 `StatModifier` 资源。Lua 不直接改玩家当前移速、攻击和生命。
 
-`Game.Lua` 提供读取接口，例如按模块名和 id 取整行、按字段取数字和字符串。缺表、缺 id、缺字段时报错。`Game.Gameplay` 只调用这个接口，不持有 `LuaTable`。
+`Game.Lua` 提供读取接口，例如按模块名和 id 取整行、按字段取数字和字符串。缺表、缺 id、缺字段时报错。`Game.Gameplay` 只调用这个接口，不持有 `LuaTable`。生成出的 Data Lua 带 `hot_update` 标签，和对应内容放进 `Buff`、`Item`、`Weapon`、`Enemy` 分组。
 
 玩家当前生命、换弹剩余、敌人当前血量仍是运行时状态，留在 C# 和存档里。配置值从对应 Lua 表读。`Player.MaxHP` 的基础值使用 `PlayerData.maxHp`，再交给 `CalculateStat`。敌人生成时用 `EnemyData` 的生命、移速和伤害覆盖预制体上的旧序列化值。枪械弹药上限和伤害从 `WeaponData` 读，不再调用 `WeaponDatabase.ApplyTo`。
 
