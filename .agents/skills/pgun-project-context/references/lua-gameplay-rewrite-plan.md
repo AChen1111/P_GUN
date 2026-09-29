@@ -8,44 +8,40 @@
 
 ## 顺序
 
-1. 收紧 `Assets/XLua/Editor/PgunHotfixConfig.cs`，只保留玩家、玩家子弹、敌人、敌人子弹。执行 `XLua/Generate Code` 和 `XLua/Hotfix Inject In Editor`。
-2. 接入 `LuaComponet` 和框架 `LuaManager`。不给这个组件加 Unity `Update` / `FixedUpdate`。
-3. 删除旧 Buff / 道具 Lua 宿主。
-4. 武器开火、Buff 特殊行为、道具效果改为挂 `LuaComponet` 的预制体。玩家 C# 在按下、按住、抬起时调用武器模块。
-5. 房间额外遭遇和界面面板改为 `LuaComponet`。
+1. 收紧 `Assets/XLua/Editor/PgunHotfixConfig.cs`，只保留玩家和敌人。枪械、子弹移出热修名单。执行 `XLua/Generate Code` 和 `XLua/Hotfix Inject In Editor`。
+2. 在游戏场景放 `WeaponManager`，作为玩家和敌人取得枪械、生成子弹的唯一入口。
+3. 接入 `LuaComponet` 和框架 `LuaManager`。不给这个组件加 Unity `Update` / `FixedUpdate`。
+4. 删除旧 Buff / 道具 Lua 宿主。枪械开火和子弹命中规则改为挂 `LuaComponet` 的预制体。
+5. Buff 特殊行为、道具、房间遭遇和界面面板改为 `LuaComponet`。
 
 ```mermaid
 flowchart TD
   hotfixList[阶段1 收紧热修名单]
-  framework[阶段2 接入LuaComponet]
-  removeOld[阶段3 移除旧Lua宿主]
-  contentLua[阶段4 武器Buff道具]
-  roomUi[阶段5 房间和界面]
-  hotfixList --> framework
-  framework --> removeOld
-  removeOld --> contentLua
-  contentLua --> roomUi
+  weaponMgr[阶段2 WeaponManager]
+  framework[阶段3 接入LuaComponet]
+  gunBullet[阶段4 枪械和子弹Lua]
+  contentLua[阶段5 Buff道具房间界面]
+  hotfixList --> weaponMgr
+  weaponMgr --> framework
+  framework --> gunBullet
+  gunBullet --> contentLua
 ```
 
 ## 玩家和敌人留在 C#
 
-`Player.Update` 继续负责移动、睡眠动画、自动瞄准、鼠标瞄准和射击输入。瞄准前仍查询 `GameplayCursorState.BlocksMouseCombat`。生命、治疗、`Hurt(DamageInfo)`、武器地址装载、`PlayerRegistry` 和读档字段留在 `Player`。装载完成前不把射击交给武器 Lua。
+`Player.Update` 继续负责移动、睡眠动画、自动瞄准、鼠标瞄准和射击输入。瞄准前仍查询 `GameplayCursorState.BlocksMouseCombat`。生命、治疗、`Hurt(DamageInfo)`、`PlayerRegistry` 和读档字段留在 `Player`。玩家不直接访问 `PlayerBulletPool`，也不在自己的脚本里查找具体枪。当前枪和发射都通过 `WeaponManager`。
 
-敌人 FSM 继续留在 `EnemyA`、`EnemyBat`、`EnemyMelee`、`EnemyBig`。追击、攻击窗、扇形弹、近战检测和环形弹幕仍是 C#。`EnemyBase` 继续负责血量、受击、死亡、掉落、`FightRoom.NotifyEnemyDefeated`、动画参数、`GameplayTime.EnemyDeltaTime` 和对象池重置。敌人模块不读取 `Time.deltaTime`。
-
-`PlayerBullet` 和 `EnemyBullet` 的飞行也留在 C#。它们和玩家、敌人一样每帧更新，不挂 `LuaComponet`。
+敌人 FSM 继续留在 `EnemyA`、`EnemyBat`、`EnemyMelee`、`EnemyBig`。追击、攻击窗和近战检测仍是 C#。`EnemyBase` 继续负责血量、受击、死亡、掉落、`FightRoom.NotifyEnemyDefeated`、动画参数、`GameplayTime.EnemyDeltaTime` 和对象池重置。敌人生成子弹只调用 `WeaponManager`，不调用 `EnemyBulletPool`。
 
 热修名单只保留这些类型：
 
 | 类型 | 原因 |
 | --- | --- |
-| `Player` | 移动、瞄准、受击、装载 |
-| `PlayerBullet` | 子弹飞行和命中 |
+| `Player` | 移动、瞄准、受击 |
 | `EnemyBase` | 受击、死亡、掉落、池重置 |
 | `EnemyA`、`EnemyBat`、`EnemyMelee`、`EnemyBig` | 各类敌人的追击和攻击 |
-| `EnemyBullet` | 敌人子弹飞行 |
 
-`BuffManager`、房间、存档、武器、道具、背包移出热修名单。前三类留在普通 C#，后三类改由 `LuaComponet` 更新，不再靠方法注入。
+`PlayerBullet`、`EnemyBullet`、`Gun` 及其子类、`BuffManager`、房间、存档、道具、背包不进入热修名单。枪械和子弹规则走 `LuaComponet`。
 
 `Assets/Scripts/Gameplay/Lua/Hotfix/MainHotfix.lua.txt` 仍然是地址 `hotfix/main` 的启动入口。默认不 `require` 示例补丁。`player_bullet_reverse` 只作注入是否生效的例子，不作为正式逻辑。真正的补丁按 `require("hotfix.xxx")` 加进入口，并放在 `Hotfix` 分组，标签含 `hotfix` 与 `hot_update`。
 
@@ -57,8 +53,8 @@ flowchart TD
 
 挂载规则：
 
-- 武器、Buff 行为物体、道具、房间、界面，只要规则在 Lua 里，预制体或场景物体上就必须有 `LuaComponet`。
-- 玩家、敌人、子弹不挂这个组件。
+- 武器、子弹、Buff 行为物体、道具、房间、界面，只要规则在 Lua 里，预制体或场景物体上就必须有 `LuaComponet`。
+- 玩家和敌人不挂这个组件。它们通过 `WeaponManager` 取枪和生成子弹。
 - 没有这个组件就不会创建模块实例。不在运行时 `AddComponent` 补挂，也不为了挂脚本去 `new GameObject`。
 - `m_typeName` 在预制体里配置，并写进 `module.lua` 的 `moduleList`。`Awake` 时按这个名字建实例。模块不存在时初始化失败并报错。类型名不在运行时改。
 
@@ -86,11 +82,30 @@ flowchart TD
 
 纯属性 Buff 只有 `StatModifier`，不配行为预制体。`PoisonBuff`、`HaHaBuff` 使用挂了 `LuaComponet` 的预制体：伤害仍走 `Player.Hurt`，文本仍走现有头顶消息。
 
-## 武器、道具、房间、界面
+## WeaponManager
+
+`WeaponManager` 放在游戏场景里，和对象池、`WeaponGlobal` 一起摆放，不在代码里创建。它是玩家、敌人和 Lua 取得枪械或子弹的唯一中转。
+
+| 调用方 | 能做的事 |
+| --- | --- |
+| `Player` | `GetCurrentGun`、`GetGun(weaponId)`、按输入把按下、按住、抬起转给当前枪的 `LuaComponet` |
+| 敌人 | `SpawnEnemyBullet`，传入预制体、位置、方向、伤害 |
+| 枪械 Lua | `SpawnPlayerBullet`，传入预制体、开火点、方向、伤害、弹速 |
+| 子弹 Lua | 不自己回池。命中或存活结束后调用 `WeaponManager` 回收 |
+
+`WeaponManager` 内部才调用 `PlayerBulletPool`、`EnemyBulletPool` 和 `WeaponGlobal.PlayGunFire`。枪口火光和共用音源仍留在现有 `WeaponGlobal`。弹夹、备弹、换弹和 `WeaponDatabase` 仍由枪械上的 C# 组件持有，Lua 通过 `WeaponManager` 拿到这把枪再读弹药，不把弹夹数据搬进 Lua。
+
+玩家武器地址装载仍由 C# 完成：`weapon/pistol`、`weapon/ak`、`weapon/awp`、`weapon/bow`、`weapon/laser`、`weapon/mp5`、`weapon/rocket_gun`、`weapon/shotgun`。装载结果登记到 `WeaponManager`。装载完成前，`GetCurrentGun` 失败并报错，不发射。读档恢复的 `currentGunIndex` 也通过 `WeaponManager` 切回对应枪。
+
+## 枪械和子弹
+
+枪械预制体和子弹预制体都挂 `LuaComponet`。开火弹道、命中效果、存活规则写在模块里。
+
+子弹上的 C# 只保留刚体速度写入和对象池重置：玩家子弹用普通 `deltaTime`，敌人子弹用 `GameplayTime.EnemyDeltaTime`。这一小段不进 Lua，避免每颗子弹都走 Lua `Update`。方向、速度、伤害、是否已命中由 Lua 在 `OnSpawn` 写入；碰到敌人、玩家或墙时，C# 调用该子弹的 `OnHit`。特殊弹道需要逐帧修正时，由这段 C# 把 `deltaTime` 传给 `OnMove`，仍然不给 `LuaComponet` 加 Unity `Update`。
+
+`Player.Update` 在按下、按住、抬起时调用当前枪的 `LuaComponet`，按住时传入 `deltaTime`。弓的 0.5 秒蓄力留在枪械模块里。
 
 ### 武器
-
-`Gun` 继续负责读表、弹夹、备弹、换弹、音效、开火点和 `PlayerBulletPool`。弹道在武器预制体的 Lua 模块里。`Player.Update` 在按下、按住、抬起时 `CallLuaFunction`，按住时把本帧 `deltaTime` 传进 `Shooting`。弓的 0.5 秒蓄力因此留在 Lua 模块内，不需要组件自己的 `Update`。
 
 | 枪 | 模块规则 | 批次 |
 | --- | --- | --- |
@@ -102,7 +117,7 @@ flowchart TD
 | `AK`、`MP5` | 按住循环音效并按间隔发射 | 第二批 |
 | `Pistol` | 按下打一发 | 第二批 |
 
-这些具体枪类在 Lua 模块接上后移出热修名单，随后删除对应 C# 开火覆盖。`Gun` 基类留在 C#，不进入热修名单。
+具体枪的开火覆盖改到 Lua 后删除。`Gun` 基类只留弹药、开火点和读表，不进入热修名单。发射一律走 `WeaponManager.SpawnPlayerBullet`。
 
 ### 道具
 
@@ -125,7 +140,9 @@ flowchart TD
 
 ## 留在 C# 的部分
 
-- 玩家、敌人、双方子弹的逐帧逻辑，以及它们的热修标记。
+- 玩家和敌人的逐帧逻辑，以及它们的热修标记。
+- `WeaponManager` 的查询、生成和回收转发。
+- 子弹刚体速度写入。命中和存活规则在 Lua。
 - 对象池。
 - `BuffManager` 的容器和属性公式。
 - `GameplayTime`。它不改 `Time.timeScale`。
@@ -137,17 +154,19 @@ flowchart TD
 
 - 新 C# 使用中文注释，注释为中文描述加英文标点。
 - 缺少 `LuaManager`、`LuaComponet`、模块名或预制体引用时直接报错。
-- 不在代码里创建管理器物体。
-- 新 Lua 放在 `Assets/Scripts/LuaRaw`，按武器、Buff、道具、房间、UI、hotfix 分子目录。文件名不能重复。
+- 不在代码里创建管理器物体。`WeaponManager` 和框架 `LuaManager` 都放在场景里。
+- 玩家、敌人和 Lua 模块不直接调用 `PlayerBulletPool` 或 `EnemyBulletPool`。
+- 新 Lua 放在 `Assets/Scripts/LuaRaw`，按武器、子弹、Buff、道具、房间、UI、hotfix 分子目录。文件名不能重复。
 - 内容脚本进入 `Buff`、`Item`、`Weapon`、`Room` 分组并带 `hot_update`。热修脚本进入 `Hotfix` 分组。
 - 接入后把 `LuaComponet` 的挂载规则和热修名单写进 `SKILL.md` 与 `references/project-architecture.md`。
 
 ## 验收
 
-1. 玩家和四类敌人的移动、瞄准、追击、攻击仍由 C# `Update` 执行。子弹时间只拖慢敌人侧。
-2. `PgunHotfixConfig` 只含玩家、玩家子弹、敌人、敌人子弹。`hotfix/main` 默认不改变射击方向。
-3. 工程里不再存在 `LuaBuffInstance`、`BuffScriptRuntime` 和道具 `InvokeItemEffectMethod`。
-4. 散弹、激光、弓、火箭筒的弹数、角度、蓄力时间和射线层与迁移前一致，并由武器上的 `LuaComponet` 执行。
-5. 纯属性 Buff 只改表。中毒和触发表现来自 Buff 行为预制体，间隔由 `BuffManager` 调用。
-6. 治疗、净化、施加 Buff、宝箱的消耗条件与迁移前一致，效果物体由 C# 对象池取出。
-7. 战斗中安全点存档失败。已清空房间读档后不再刷怪。
+1. 玩家和四类敌人的移动、瞄准、追击、攻击仍由 C# `Update` 执行。子弹时间只拖慢敌人侧，包括敌人子弹。
+2. 玩家和敌人都不直接访问子弹池。生成和回收都经过场景里的 `WeaponManager`。
+3. `PgunHotfixConfig` 只含玩家和敌人。`hotfix/main` 默认不改变射击方向。
+4. 工程里不再存在 `LuaBuffInstance`、`BuffScriptRuntime` 和道具 `InvokeItemEffectMethod`。
+5. 散弹、激光、弓、火箭筒的弹数、角度、蓄力时间和射线层与迁移前一致，并由武器上的 `LuaComponet` 执行。子弹命中效果由子弹上的 `LuaComponet` 执行。
+6. 纯属性 Buff 只改表。中毒和触发表现来自 Buff 行为预制体，间隔由 `BuffManager` 调用。
+7. 治疗、净化、施加 Buff、宝箱的消耗条件与迁移前一致，效果物体由 C# 对象池取出。
+8. 战斗中安全点存档失败。已清空房间读档后不再刷怪。

@@ -55,8 +55,9 @@ P_GUN is a Unity 2022.3 2D top-down shooter project. Runtime code is split by as
 - For databases, prefer `ScriptableObjectDatabase<TKey, TValue>` and `TryGetById` patterns instead of ad hoc list scans.
 - Addressables hot-update groups are limited to `Room`, `Buff`, `Item`, `Enemy`, `Weapon`, `Shared`, and `Hotfix`; these groups keep `Prevent Updates` enabled, and all startup predownload entries must carry the shared `hot_update` label. `Hotfix` only stores xLua patches for the injected player and enemy types. `Shared` only stores duplicated cross-group dependencies such as common bullet prefabs, gun sprites, audio, fonts, and shared render assets.
 - `Root` must stay first in Build Settings and explicitly owns `DataBaseManager`, the framework `LuaManager`, `AddressableLoader`, and `RootHotUpdateController`; do not create these singleton GameObjects from code.
-- Player, enemy, and bullet frame logic stay in C#. Those types stay in `PgunHotfixConfig` so released builds can patch short methods. Do not replace `Update` or `FixedUpdate` with `xlua.hotfix`.
-- Weapon, buff behavior, item, room encounter, and UI rules use `LuaComponet` from the TCGGameDem0 `Lua` branch. Those objects must carry the component on the prefab or scene object. See `references/lua-gameplay-rewrite-plan.md`.
+- Player and enemy frame logic stay in C#. Those types stay in `PgunHotfixConfig` so released builds can patch short methods. Do not replace `Update` or `FixedUpdate` with `xlua.hotfix`.
+- Gun fire rules and bullet hit rules use `LuaComponet`. Player and enemy obtain guns and bullets only through the scene `WeaponManager`; they do not call bullet pools directly. See `references/lua-gameplay-rewrite-plan.md`.
+- Buff behavior, item, room encounter, and UI rules also use `LuaComponet`. Those objects must carry the component on the prefab or scene object.
 - Do not add or extend the old Buff/item Lua host (`IBuffScriptInstance`, `BuffScriptRuntime`, `LuaBuffInstance`, `LuaEffect` method invoke). Remove it while migrating onto `LuaComponet`.
 - `Game.Gameplay` must not reference `XLua.Runtime`. Gameplay code calls `LuaComponet.CallLuaFunction` and does not hold `LuaTable`.
 - `AddressableLoader` lives in `Assets/Scripts/Core/HotUpdate`; it is the only runtime Addressables asset loader singleton, and gameplay objects decide which address to request through `LoadAssetAsync<T>()`.
@@ -83,4 +84,4 @@ Read `references/project-architecture.md` for:
 - Current item, buff, weapon, enemy, UI, pooling, animation, and database implementation notes.
 - Excel2SO workflow.
 
-Read `references/lua-gameplay-rewrite-plan.md` before moving gameplay or UI into Lua. Player and enemy ticks stay in C# and keep xLua Hotfix marks. Weapon, buff behavior, item, room, and UI rules use `LuaComponet`. Object pools stay in C#.
+Read `references/lua-gameplay-rewrite-plan.md` before moving gameplay or UI into Lua. Player and enemy ticks stay in C# and keep xLua Hotfix marks. Guns, bullets, buff behavior, items, rooms, and UI rules use `LuaComponet`. Player and enemy get guns and bullets through `WeaponManager`. Object pools stay in C#.
