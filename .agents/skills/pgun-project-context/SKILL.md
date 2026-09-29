@@ -83,3 +83,5 @@ Read `references/project-architecture.md` for:
 - Key classes and public APIs.
 - Current item, buff, weapon, enemy, UI, pooling, animation, and database implementation notes.
 - Excel2SO workflow.
+
+Read `references/random-room-generation-plan.md` before replacing Edgar room layout. Level size and room prefabs come from `Assets/csv/LevelConfig.csv`. Placement is a seeded four-direction random walk over existing room prefabs, with straight `LRCorridor` and `UDCorridor` segments between door anchors.
