@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-using QFramework;
 using Game.Core;
 using Game.Pooling;
 using Game.Animation;
@@ -10,154 +9,104 @@ using Game.Items;
 namespace Game.Gameplay
 {
     /// <summary>
-    /// 蝙蝠远程敌人, 先追踪玩家, 计时结束后播放攻击动画并发射子弹.
+    /// 蝙蝠远程敌人: 进入射程且冷却结束后停步, 延迟向玩家发射扇形弹.
     /// </summary>
-    public class EnemyBat : EnemyBase
+    public class EnemyBat : EnemyBase, IEnemyAttack
     {
         [Header("攻击资源")]
         [SerializeField] private EnemyBullet bulletPrefab;
         [SerializeField] private List<AudioClip> shootSounds = new List<AudioClip>();
 
         [Header("攻击参数")]
-        [SerializeField] private float followBeforeAttackTime = 1.5f;
-        [SerializeField] private float playerSafeDistance = 3f;
         [SerializeField] private float attackShootDelay = 0.15f;
         [SerializeField] private float attackLockDuration = 0.35f;
         [SerializeField] private float bulletSpawnDistance = 0.5f;
         [SerializeField] private int bulletCount = 5;
         [SerializeField] private float bulletSpreadStepAngle = 2f;
 
-        private float stateTimer;
+        [Header("旧走位参数, 待手感核对后删除")]
+        [SerializeField] private float followBeforeAttackTime = 1.5f;
+        [SerializeField] private float playerSafeDistance = 3f;
+
+        private float attackTimer;
         private bool hasShot;
+        private float nextAttackTime;
 
         protected override WeaponType WeaponType => WeaponType.Gun;
+        protected override IEnemyAttack AttackModule => this;
+
         protected override void OnInit()
         {
-            OwnerFightRoom = FightRoom.currentFightRoom;
-            stateTimer = 0f;
+            attackTimer = 0f;
+            hasShot = false;
+            nextAttackTime = 0f;
+        }
+
+        /// <summary>
+        /// 射程内, 有视线, 且攻击冷却结束才出手.
+        /// </summary>
+        public bool CanAttack(EnemyAttackContext context)
+        {
+            return context.HasSight
+                && context.DistanceToPlayer <= BrainAttackRange
+                && EnemyTime >= nextAttackTime;
+        }
+
+        public void BeginAttack(EnemyAttackContext context)
+        {
+            attackTimer = 0f;
+            hasShot = false;
+            nextAttackTime = EnemyTime + BrainAttackInterval;
+            PlayAttackAnimation();
+        }
+
+        public void TickAttack(EnemyAttackContext context, float enemyDeltaTime)
+        {
+            attackTimer += enemyDeltaTime;
+            if (hasShot || attackTimer < attackShootDelay) return;
+
+            hasShot = true;
+            // 墙挡住视线时不发射.
+            if (!context.HasSight) return;
+            ShootFan(context.DirectionToPlayer);
+        }
+
+        public void EndAttack()
+        {
+            attackTimer = 0f;
             hasShot = false;
         }
-        protected override void RegisterFSM(FSM<EnemyState> fsm)
+
+        /// <summary>
+        /// 扇形弹攻击要求停步.
+        /// </summary>
+        public bool LocksMovement => true;
+
+        public float AttackLockDuration => Mathf.Max(0.01f, attackLockDuration);
+
+        private void ShootFan(Vector2 baseDirection)
         {
-            fsm.State(EnemyState.Follow)
-                .OnEnter(() => stateTimer = 0f)
-                .OnUpdate(UpdateFollow)
-                .OnExit(() => stateTimer = 0f);
+            if (bulletPrefab == null || baseDirection.sqrMagnitude <= 0.0001f) return;
 
-            fsm.State(EnemyState.Attack)
-                .OnEnter(BeginAttack)
-                .OnUpdate(UpdateAttack)
-                .OnExit(EndAttack);
-
-            fsm.StartState(EnemyState.Follow);
-
-            void EndAttack()
+            var spawnPosition = transform.position + (Vector3)(baseDirection * bulletSpawnDistance);
+            // 参考霰弹枪散射规则, 中心一发, 其余子弹按左右交替角度偏移.
+            var baseAngle = Mathf.Atan2(baseDirection.y, baseDirection.x) * Mathf.Rad2Deg;
+            var count = Mathf.Max(1, bulletCount);
+            for (var i = 0; i < count; i++)
             {
-                stateTimer = 0f;
-                hasShot = false;
+                var spreadSign = i % 2 == 0 ? 1 : -1;
+                var bulletAngle = i == 0 ? baseAngle : baseAngle + spreadSign * i * bulletSpreadStepAngle;
+                var rad = bulletAngle * Mathf.Deg2Rad;
+                var bulletDirection = new Vector2(Mathf.Cos(rad), Mathf.Sin(rad)).normalized;
+                WeaponManager.Instance.SpawnEnemyBullet(bulletPrefab, spawnPosition, bulletDirection, AttackDamage);
             }
 
-            void UpdateAttack()
-            {
-                stateTimer += EnemyDeltaTime;
-                if (!hasShot && stateTimer >= attackShootDelay)
-                {
-                    hasShot = true;
-                    ShootAtPlayer();
-                }
-
-                if (stateTimer >= attackLockDuration)
-                {
-                    FSM.ChangeState(EnemyState.Follow);
-                }
-            }
-
-            void BeginAttack()
-            {
-                stateTimer = 0f;
-                hasShot = false;
-                StopMove();
-                SetAnimatorSpeed(0f);
-                PlayAttackAnimation();
-            }
-
-            void UpdateFollow()
-            {
-                stateTimer += EnemyDeltaTime;
-                if (TryEnterAttackWhenSafe())
-                    return;
-
-                DoFollow();
-                if (stateTimer >= followBeforeAttackTime)
-                {
-                    FSM.ChangeState(EnemyState.Attack);
-                }
-            }
-
-    bool TryEnterAttackWhenSafe()
-    {
-        if (PlayerRegistry.Current == null)
-            return false;
-
-        var toPlayer = (Vector2)(PlayerRegistry.Current.transform.position - transform.position);
-        var safeDistance = Mathf.Max(0f, playerSafeDistance);
-        if (toPlayer.sqrMagnitude > safeDistance * safeDistance)
-            return false;
-
-        StopMove();
-        SetAnimatorSpeed(0f);
-        FaceDirection(toPlayer);
-        // 进入安全距离后立刻切攻击状态, 避免继续贴近玩家.
-        FSM.ChangeState(EnemyState.Attack);
-        return true;
-    }
-
-    void ShootAtPlayer()
-    {
-        if (bulletPrefab == null || PlayerRegistry.Current == null)
-            return;
-        var direction = ((Vector2)(PlayerRegistry.Current.transform.position - transform.position)).normalized;
-        var spawnPosition = transform.position + (Vector3)(direction * bulletSpawnDistance);
-        // 参考霰弹枪散射规则, 中心一发, 其余子弹按左右交替角度偏移.
-        var baseAngle = direction.ToAngle();
-        var count = Mathf.Max(1, bulletCount);
-        for (var i = 0; i < count; i++)
-        {
-            var spreadSign = i % 2 == 0 ? 1 : -1;
-            var bulletAngle = i == 0 ? baseAngle : baseAngle + spreadSign * i * bulletSpreadStepAngle;
-            var bulletDirection = bulletAngle.AngleToDirection2D().normalized;
-            EnemyBulletPool.Instance.Get(bulletPrefab, spawnPosition, Quaternion.identity, bulletDirection, AttackDamage);
+            PlayShootSound();
         }
 
-        PlayShootSound();
-    }
-
-    void DoFollow()
-    {
-        if (!FollowPlayerWithBodySpace(out var direction))
+        private void PlayShootSound()
         {
-            StopMove();
-            SetAnimatorSpeed(0f);
-            return;
+            audioPlay.Play();
         }
-
-        FaceDirection(direction);
-    }
-
-    void FaceDirection(Vector2 direction)
-    {
-        if (Sr == null)
-            return;
-        if (direction.x < 0f)
-            Sr.flipX = true;
-        else if (direction.x > 0f)
-            Sr.flipX = false;
-    }
-
-    void PlayShootSound()
-    {
-        audioPlay.Play();
-    }
-}
     }
 }

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using Edgar.Unity;
 using QFramework;
 using Game.Core;
 using Game.Pooling;
@@ -37,6 +36,11 @@ namespace Game.Gameplay
 		protected List<Door> doorsList = new List<Door>();
 		private string cachedSaveRoomId;
 
+		// 随机生成的格子坐标, 由 RandomRoomGenerator 在实例化后写入.
+		private Vector2Int? gridCell;
+		// 有邻居的方向集合, 决定哪些墙边开门.
+		private readonly HashSet<Vector2Int> openDoorDirections = new HashSet<Vector2Int>();
+
 		public event Action<Room> RoomInitialized;
 		public event Action<Room, Collider2D> PlayerEnteredRoom;
 		public event Action<Room, Collider2D> PlayerExitedRoom;
@@ -52,16 +56,14 @@ namespace Game.Gameplay
 					return cachedSaveRoomId;
 				}
 
-				if (TryGetComponent<RoomInfoGrid2D>(out var roomInfo) && roomInfo.RoomInstance != null)
+				// 随机生成的房间用 格子坐标 做 id, 同关卡同种子的地图 id 稳定.
+				if (gridCell.HasValue)
 				{
-					var position = roomInfo.RoomInstance.Position;
-					var template = roomInfo.RoomInstance.RoomTemplatePrefab;
-					var templateName = template != null ? template.name : gameObject.name;
-					cachedSaveRoomId = $"{GetType().Name}_{position.x}_{position.y}_{templateName}";
+					cachedSaveRoomId = $"{GetType().Name}_{gridCell.Value.x}_{gridCell.Value.y}";
 					return cachedSaveRoomId;
 				}
 
-				// 直接运行场景时可能没有 Edgar 房间信息, 使用场景位置生成调试用 id.
+				// 直接运行场景时没有生成上下文, 使用场景位置生成调试用 id.
 				var roundedX = Mathf.RoundToInt(transform.position.x);
 				var roundedY = Mathf.RoundToInt(transform.position.y);
 				cachedSaveRoomId = $"{GetType().Name}_{roundedX}_{roundedY}_{gameObject.name}";
@@ -129,61 +131,76 @@ namespace Game.Gameplay
 			OnRoomInitialized();
 			RoomInitialized?.Invoke(this);
 
-			//如果需要生成门，则生成门
-			if (needGenerateDoors)
-			{
-				GenerateDoors();
-			}
+//如果需要生成门，则生成门
+		if (needGenerateDoors)
+		{
+			GenerateDoors();
+		}
 
-		    void GenerateDoors()
-		    {
-		        if (doorsGenerated || doorPrefab == null)
-		            return;
-		        var spawnPositions = GetDoorSpawnPositionsFromEdgar();
-		        foreach (var position in spawnPositions)
-		        {
-		            var door = Instantiate(doorPrefab, position, Quaternion.identity);
-		            door.gameObject.SetActive(true);
-		            door.SetDoorState(this.doorStateIsOpen);
-		            doorsList.Add(door);
-		        }
+	    void GenerateDoors()
+	    {
+	        if (doorsGenerated || doorPrefab == null)
+	            return;
 
-		        doorsGenerated = true;
-		    }
+	        if (!gridCell.HasValue)
+	        {
+	            Debug.LogError($"{nameof(Room)}: 未写入生成上下文, 无法按锚点生成门.", this);
+	            return;
+	        }
 
-    List<Vector3> GetDoorSpawnPositionsFromEdgar()
-    {
-        var result = new List<Vector3>();
-        if (!TryGetComponent<RoomInfoGrid2D>(out var roomInfo) || roomInfo.RoomInstance == null)
-        {
-            return result;
-        }
+	        foreach (var direction in openDoorDirections)
+	        {
+	            var anchor = GetDoorAnchor(direction);
+	            if (anchor == null)
+	            {
+	                Debug.LogError($"{nameof(Room)}: 缺少门锚点 {AnchorName(direction)}, 无法生成门.", this);
+	                continue;
+	            }
 
-        var roomTemplateInstance = roomInfo.RoomInstance.RoomTemplateInstance;
-        if (roomTemplateInstance == null)
-        {
-            return result;
-        }
+	            var door = Instantiate(doorPrefab, anchor.position, Quaternion.identity);
+	            door.gameObject.SetActive(true);
+	            door.SetDoorState(this.doorStateIsOpen);
+	            doorsList.Add(door);
+	        }
 
-        //Debug.Log($"房间 {gameObject.name} Edgar门数量: {roomInfo.RoomInstance.Doors.Count}");
-        var addedTiles = new HashSet<Vector3Int>();
-        foreach (var door in roomInfo.RoomInstance.Doors)
-        {
-            foreach (var point in door.DoorLine.GetPoints())
-            {
-                var tile = new Vector3Int(point.x, point.y, point.z);
-                if (!addedTiles.Add(tile))
-                    continue;
-                var localCenter = new Vector3(tile.x + 0.5f, tile.y + 0.5f, 0f);
-                var worldCenter = roomTemplateInstance.transform.TransformPoint(localCenter);
-                result.Add(worldCenter);
-            }
-        }
-
-        //Debug.Log($"房间 {gameObject.name} 生成门位: {result.Count}");
-        return result;
-    }
+	        doorsGenerated = true;
+	    }
 }
+
+		/// <summary>
+		/// 写入生成上下文: 格子坐标和有邻居的方向, 由 RandomRoomGenerator 在实例化后调用.
+		/// </summary>
+		/// <param name="cell">本房间的格子坐标.</param>
+		/// <param name="neighborDirections">有邻居的方向集合.</param>
+		public void InitializeGenerationContext(Vector2Int cell, IEnumerable<Vector2Int> neighborDirections)
+		{
+			gridCell = cell;
+			openDoorDirections.Clear();
+			foreach (var direction in neighborDirections)
+			{
+				openDoorDirections.Add(direction);
+			}
+		}
+
+		/// <summary>
+		/// 按方向取门锚点, 预制体上需要预置 DoorAnchor_N/E/S/W 四个空物体.
+		/// </summary>
+		public Transform GetDoorAnchor(Vector2Int direction)
+		{
+			return transform.Find(AnchorName(direction));
+		}
+
+		/// <summary>
+		/// 方向对应的锚点名.
+		/// </summary>
+		public static string AnchorName(Vector2Int direction)
+		{
+			if (direction == Vector2Int.up) return "DoorAnchor_N";
+			if (direction == Vector2Int.right) return "DoorAnchor_E";
+			if (direction == Vector2Int.down) return "DoorAnchor_S";
+			if (direction == Vector2Int.left) return "DoorAnchor_W";
+			throw new ArgumentException($"非法门方向: {direction}.", nameof(direction));
+		}
 
 
 

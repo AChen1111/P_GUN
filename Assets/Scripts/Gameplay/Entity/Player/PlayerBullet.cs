@@ -1,22 +1,26 @@
-using System.Collections;
+using System;
 using UnityEngine;
 using Game.Core;
-using Game.Pooling;
-using Game.Animation;
 using Game.Presentation;
-using Game.Items;
 
 namespace Game.Gameplay
 {
+    /// <summary>
+    /// 玩家子弹.
+    /// C# 只保留刚体速度写入和对象池重置, 命中与存活规则在预制体的 LuaComponet 模块里.
+    /// </summary>
     public class PlayerBullet : MonoBehaviour, Game.Pooling.IPoolable {
         public Vector2 dir;
         public float speed = 15f;
         public Rigidbody2D rb;
         public int damage;
-        [SerializeField] private float lifeTime = 3f;
+
+        [Header("子弹数据 id, 对应 BulletData.lua")]
+        [SerializeField] private string bulletId;
+        [SerializeField] private AudioPlay _audioPlay;
+
         private bool hasHit = false;
-        [SerializeField]private AudioPlay _audioPlay;
-        private Coroutine autoRecycleCoroutine;
+        private LuaComponet bulletLua;
 
         /// <summary>
         /// 初始化运行时依赖.
@@ -24,6 +28,7 @@ namespace Game.Gameplay
         private void Awake() {
             rb = GetComponent<Rigidbody2D>();
             _audioPlay = GetComponent<AudioPlay>();
+            bulletLua = GetComponent<LuaComponet>();
             ConfigureHitColliders();
             gameObject.layer = LayerMask.NameToLayer("PlayerBullet");
         }
@@ -41,120 +46,155 @@ namespace Game.Gameplay
         }
 
         /// <summary>
-        /// 每次从对象池取出子弹时调用，重置上一轮使用留下的方向、伤害、命中状态和生命周期
+        /// 从对象池取出后由 WeaponManager 调用, 写入本次发射参数并通知 Lua 模块.
         /// </summary>
         public void Init(Vector2 shootDir, int bulletDamage,int bulletSpeed) {
+            if (bulletLua == null)
+            {
+                throw new System.Exception($"{nameof(PlayerBullet)} 预制体缺少 LuaComponet, 无法初始化弹道规则.");
+            }
+
+            if (string.IsNullOrWhiteSpace(bulletId))
+            {
+                throw new System.Exception($"{nameof(PlayerBullet)} 未配置 bulletId, 无法读取 BulletData.");
+            }
+
+            var config = LuaDataRuntime.GetBulletConfig(bulletId);
             dir = shootDir;
             damage = bulletDamage;
             speed = bulletSpeed;
+
+            bulletLua.SetLuaField("bullet", this);
+            bulletLua.SetLuaField("bulletId", bulletId);
+            bulletLua.SetLuaField("dir", dir);
+            bulletLua.SetLuaField("damage", damage);
+            bulletLua.SetLuaField("speed", speed);
+            bulletLua.SetLuaField("lifeTime", config.LifeTime);
+            bulletLua.CallLuaFunction("OnSpawn");
         }
 
         /// <summary>
-        /// 从对象池取出子弹时调用
+        /// 从对象池取出子弹时调用.
         /// </summary>
         public void OnSpawnFromPool() {
             hasHit = false;
             _audioPlay?.Clear();
-            autoRecycleCoroutine = StartCoroutine(AutoRecycleIfNotHit());
-
-            IEnumerator AutoRecycleIfNotHit()
+            if (bulletLua != null)
             {
-                yield return new WaitForSeconds(lifeTime);
-                autoRecycleCoroutine = null;
-                if (!hasHit)
-                {
-                    hasHit = true;
-                    PlayerBulletPool.Instance.Release(this);
-                }
+                bulletLua.SetLuaField("lifeTimer", 0f);
+                bulletLua.SetLuaField("hitTarget", null);
+                bulletLua.CallLuaFunction("OnSpawnFromPool");
             }
-}
+        }
 
         /// <summary>
-        /// 回收子弹时调用
+        /// 回收子弹时调用.
         /// </summary>
         public void OnRecycleToPool() {
             hasHit = true;
-            StopAutoRecycleCoroutine();
             StopMove();
-
-            void StopAutoRecycleCoroutine()
+            if (bulletLua != null)
             {
-                if (autoRecycleCoroutine == null)
-                    return;
-                StopCoroutine(autoRecycleCoroutine);
-                autoRecycleCoroutine = null;
+                bulletLua.SetLuaField("lifeTimer", 0f);
+                bulletLua.SetLuaField("hitTarget", null);
+                bulletLua.CallLuaFunction("OnRecycle");
             }
+        }
 
-            void StopMove()
-            {
-                rb.velocity = Vector2.zero;
-            }
-}
+        /// <summary>
+        /// 逐帧驱动 Lua 模块, 存活计时由模块自己累计.
+        /// </summary>
+        private void Update() {
+            if (hasHit) return;
+            bulletLua?.CallLuaFunction("OnMove", Time.deltaTime);
+        }
 
-        ///<summary>
-        ///碰撞检测
-        ///</summary>
-        ///<param name="other">碰撞对象</param>
+        private void FixedUpdate() {
+            if (hasHit) return;
+            // 玩家子弹使用正常时间, 不受子弹时间影响.
+            rb.velocity = dir * speed;
+        }
+
+        /// <summary>
+        /// 碰撞检测, 命中规则转发给 Lua 模块.
+        /// </summary>
         private void OnCollisionEnter2D(Collision2D other) {
             HandleHit(other.gameObject);
         }
 
         /// <summary>
-        /// 处理 2D 触发进入事件.
+        /// 触发命中, 命中规则转发给 Lua 模块.
         /// </summary>
         private void OnTriggerEnter2D(Collider2D other) {
             HandleHit(other.gameObject);
         }
 
+        private void HandleHit(GameObject target) {
+            if (hasHit || target == null) return;
 
+            if (bulletLua == null)
+            {
+                throw new System.Exception($"{nameof(PlayerBullet)} 预制体缺少 LuaComponet, 无法处理命中.");
+            }
 
-        ///<summary>
-        ///固定更新
-        ///</summary>
-        private void FixedUpdate() {
-            rb.velocity = dir * speed;
+            bulletLua.SetLuaField("hitTarget", target);
+            bulletLua.CallLuaFunction("OnHit");
         }
 
+        /// <summary>
+        /// 修改弹道, 供特殊弹道的 Lua 模块调用.
+        /// </summary>
+        public void SetTrajectory(Vector2 newDir, float newSpeed) {
+            dir = newDir;
+            speed = newSpeed;
+        }
 
         /// <summary>
-        /// 处理碰撞
+        /// 获取当前伤害, 供 Lua 模块结算使用.
         /// </summary>
-        /// <param name="target"></param>
-        private void HandleHit(GameObject target) {
-            if(hasHit || target == null) return;
+        public int GetDamage() {
+            return damage;
+        }
 
-            if(target.CompareTag("Enemy")) {
-                hasHit = true;
+        /// <summary>
+        /// 获取飞行方向.
+        /// </summary>
+        public Vector2 GetDir() {
+            return dir;
+        }
 
-                PlaySelfHitSound();
-                var finalDamage = PlayerRegistry.Current != null ? PlayerRegistry.Current.CalculateBulletDamage(damage) : damage;
-                DamageInfo damageInfo = new DamageInfo(finalDamage, dir);
+        /// <summary>
+        /// 结束生命周期并归还对象池, 供 Lua 模块调用.
+        /// </summary>
+        public void Recycle() {
+            if (hasHit) return;
+            hasHit = true;
+            StopMove();
+            WeaponManager.Instance.ReleasePlayerBullet(this);
+        }
 
-                target.GetComponent<EnemyBase>()?.Hurt(damageInfo);
-                PlayerBulletPool.Instance.Release(this);
-                return;
-            }
+        /// <summary>
+        /// 对敌人结算本次命中伤害, 含命中音效和回池, 供 Lua 模块调用.
+        /// </summary>
+        public void ApplyEnemyDamage(GameObject target) {
+            if (hasHit || target == null) return;
+            hasHit = true;
 
-            var wallLayer = LayerMask.NameToLayer("Wall");
-            var isWall = target.CompareTag("Wall") || target.layer == wallLayer;
-            if(isWall) {
-                hasHit = true;
-                // 墙体可能没有音效组件,缺少时只回收子弹.
-                target.GetComponent<AudioPlay>()?.Play();
-                PlayerBulletPool.Instance.Release(this);
-            }
+            PlaySelfHitSound();
+            var finalDamage = PlayerRegistry.Current != null ? PlayerRegistry.Current.CalculateBulletDamage(damage) : damage;
+            var damageInfo = new DamageInfo(finalDamage, dir);
+            target.GetComponent<EnemyBase>()?.Hurt(damageInfo);
+            WeaponManager.Instance.ReleasePlayerBullet(this);
 
             void PlaySelfHitSound()
             {
-                if (_audioPlay == null)
-                {
-                    _audioPlay = GetComponent<AudioPlay>();
-                }
-
                 var clip = _audioPlay?.GetNextClip();
                 if (clip == null)
+                {
                     return;
-                // 子弹会立刻回收到对象池,命中音效交给全局音源播放.
+                }
+
+                // 子弹会立刻回收到对象池, 命中音效交给全局音源播放.
                 if (GlobalAudioPlay.Instance != null)
                 {
                     GlobalAudioPlay.Instance.PlayOneShot(clip);
@@ -163,7 +203,25 @@ namespace Game.Gameplay
 
                 AudioSource.PlayClipAtPoint(clip, transform.position);
             }
-}
+        }
 
+        /// <summary>
+        /// 命中墙壁时的表现与回池, 供 Lua 模块调用.
+        /// </summary>
+        public void ApplyWallHit(GameObject target) {
+            if (hasHit) return;
+            hasHit = true;
+
+            // 墙体可能没有音效组件, 缺少时只回收子弹.
+            target.GetComponent<AudioPlay>()?.Play();
+            WeaponManager.Instance.ReleasePlayerBullet(this);
+        }
+
+        /// <summary>
+        /// 清掉刚体速度, 避免回收后再次启用时继承旧速度.
+        /// </summary>
+        private void StopMove() {
+            rb.velocity = Vector2.zero;
+        }
     }
 }

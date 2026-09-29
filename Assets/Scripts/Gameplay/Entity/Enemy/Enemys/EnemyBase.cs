@@ -1,6 +1,5 @@
 using System;
 using UnityEngine;
-using QFramework;
 using DG.Tweening;
 using Game.Core;
 using Game.Pooling;
@@ -19,7 +18,7 @@ namespace Game.Gameplay
         #region 子类实现
         protected abstract void OnInit();
         protected abstract WeaponType WeaponType { get; }
-        protected abstract void RegisterFSM(FSM<EnemyState> fsm);
+        protected abstract IEnemyAttack AttackModule { get; }
         #endregion
 
         [Header("基础属性")]
@@ -73,10 +72,84 @@ namespace Game.Gameplay
         [Header("音频播放")]
         public AudioPlay audioPlay;
 
+        [Header("行为参数, 由 EnemyData.lua 在生成时写入")]
+        protected float visionRadius = 7f;
+        protected float visionAngle = 120f;
+        protected float searchTime = 2f;
+        protected float separationRadius = 1.8f;
+        protected float separationWeight = 1.5f;
+        protected float attackInterval = 1f;
+        protected float attackRange = 6f;
+
+        #region EnemyBrain 桥接成员
+        // EnemyBrain 在同一程序集内读取运行时状态与写入速度, 子类不得绕过这些成员直接写 velocity.
+        internal bool BrainIsDead => isDead;
+        internal float BrainMoveSpeed => MoveSpeed;
+        internal float BrainPlayerStopDistance => playerStopDistance;
+        internal float BrainVisionRadius => visionRadius;
+        internal float BrainVisionAngle => visionAngle;
+        internal float BrainSearchTime => searchTime;
+        internal float BrainSeparationRadius => separationRadius;
+        internal float BrainSeparationWeight => separationWeight;
+        internal float BrainAttackRange => attackRange;
+        internal float BrainAttackInterval => attackInterval;
+
         /// <summary>
-        /// 状态机
+        /// 面朝方向, 由精灵翻转得到, 朝右为正方向.
         /// </summary>
-        public FSM<EnemyState> FSM = new FSM<EnemyState>();
+        internal Vector2 BrainFacingDirection => new Vector2(sr != null && sr.flipX ? -1f : 1f, 0f);
+
+        /// <summary>
+        /// 行为层写入刚体速度的唯一入口.
+        /// </summary>
+        internal void ApplyBrainVelocity(Vector2 velocity)
+        {
+            if (rb != null)
+            {
+                rb.velocity = velocity;
+            }
+        }
+
+        /// <summary>
+        /// 行为层设置移动动画速度参数.
+        /// </summary>
+        internal void SetBrainAnimatorSpeed(float speed)
+        {
+            SetAnimatorSpeed(speed);
+        }
+
+        /// <summary>
+        /// 行为层设置面朝, 翻转精灵并通知子类刷新朝向相关组件.
+        /// </summary>
+        internal void SetBrainFacing(float directionX)
+        {
+            if (sr == null)
+            {
+                return;
+            }
+
+            if (directionX < 0f)
+            {
+                sr.flipX = true;
+            }
+            else if (directionX > 0f)
+            {
+                sr.flipX = false;
+            }
+
+            OnFacingChanged();
+        }
+
+        /// <summary>
+        /// 面朝变化后的钩子, 例如近战检测盒跟随翻转.
+        /// </summary>
+        protected virtual void OnFacingChanged() { }
+        #endregion
+
+        /// <summary>
+        /// 行为大脑, 由 Init 创建, 刚体速度只由它写入.
+        /// </summary>
+        private EnemyBrain brain;
 
         protected SpriteRenderer Sr => sr;
         protected Animator Animator => animator;
@@ -149,7 +222,7 @@ namespace Game.Gameplay
             if (isDead) return;
 
             ApplyAnimatorTimeScale();
-            FSM.Update();
+            brain?.Tick(EnemyDeltaTime);
             OnUpdate();
         }
         protected virtual void OnUpdate(){}
@@ -157,7 +230,6 @@ namespace Game.Gameplay
         {
             if (isDead) return;
 
-            FSM.FixedUpdate();
             OnFixedUpdate();
         }
         protected virtual void OnFixedUpdate(){}
@@ -168,11 +240,7 @@ namespace Game.Gameplay
         protected virtual void OnDestroy()
         {
             ResetAnimatorPlaybackSpeed();
-            OnFSMDestroy();
-            FSM.Clear();
-        }
-        protected virtual void OnFSMDestroy(){
-            FSM.Clear();
+            brain = null;
         }
 
 
@@ -234,6 +302,8 @@ namespace Game.Gameplay
             isDead = true;
             StopMove();
             SetAnimatorSpeed(0f);
+            // 死亡后强制离开行为状态, 清掉路径和视野记忆.
+            brain?.ResetForPoolOrDeath();
 
             if(col != null) {
                 col.enabled = false;
@@ -273,17 +343,18 @@ namespace Game.Gameplay
         }
 
         /// <summary>
-        /// 默认死亡逻辑, 负责通知房间并尝试掉落物品.
+        /// 默认死亡逻辑, 负责通知房间, 广播击杀事件并尝试掉落物品.
         /// </summary>
         protected virtual void OnDead() {
             FightRoom.NotifyEnemyDefeated(this);
+            EventCenter.Trigger(GameplayEvents.EnemyDefeated, new EnemyDefeatedEvent(this));
             TryDropItem();
 
             void TryDropItem()
             {
                 if (itemSpawner == null || itemDropChance <= 0f)
                     return;
-                if (itemSpawner.itemTable == null || itemSpawner.itemTable.Entries.Count == 0)
+                if (!itemSpawner.HasDropEntries)
                     return;
                 if (UnityEngine.Random.value > itemDropChance)
                     return;
@@ -309,8 +380,12 @@ namespace Game.Gameplay
         public void Init() {
             if(isInited) return;
             isInited = true;
+            // 房间归属优先用生成方写入的引用, 直接摆场景时回退到当前战斗房间.
+            if (OwnerFightRoom == null) {
+                OwnerFightRoom = FightRoom.currentFightRoom;
+            }
             OnInit();
-            RegisterFSM(FSM);
+            brain = new EnemyBrain(this, AttackModule);
             OnStart();
         }
         protected void ApplyDamage(int damage) {
@@ -332,11 +407,20 @@ namespace Game.Gameplay
         /// <summary>
         /// 应用数据库里的基础属性配置, 生成时调用以覆盖 prefab 默认值.
         /// </summary>
-        public void ApplyConfig(EnemyData enemyData) {
-            if(enemyData.maxHp > 0) MaxHp = enemyData.maxHp;
-            if(enemyData.moveSpeed > 0f) MoveSpeed = enemyData.moveSpeed;
-            if(enemyData.damage > 0) AttackDamage = enemyData.damage;
-            itemDropChance = Mathf.Clamp01(enemyData.itemDropChance);
+        public void ApplyConfig(EnemyConfig config) {
+            if(config.MaxHp > 0) MaxHp = config.MaxHp;
+            if(config.MoveSpeed > 0f) MoveSpeed = config.MoveSpeed;
+            if(config.Damage > 0) AttackDamage = config.Damage;
+            itemDropChance = Mathf.Clamp01(config.ItemDropChance);
+
+            // 视野与分离参数供行为层使用, 数值同样来自 EnemyData.lua.
+            visionRadius = config.VisionRadius;
+            visionAngle = config.VisionAngle;
+            searchTime = config.SearchTime;
+            separationRadius = config.SeparationRadius;
+            separationWeight = config.SeparationWeight;
+            attackInterval = config.AttackInterval;
+            attackRange = config.AttackRange;
 
             CurrentHp = MaxHp;
         }
@@ -349,6 +433,8 @@ namespace Game.Gameplay
             StopMove();
             ResetVisualState();
             OwnerFightRoom = null;
+            // 回池后清空行为状态, 复用出来的敌人不带上一次的记忆.
+            brain?.ResetForPoolOrDeath();
         }
 
         /// <summary>
@@ -358,7 +444,6 @@ namespace Game.Gameplay
             isDead = false;
             isInited = false;
             CurrentHp = MaxHp;
-            FSM.Clear();
             StopMove();
             ResetVisualState();
             ResetAnimatorState();
@@ -413,42 +498,6 @@ namespace Game.Gameplay
             if(animator == null) return;
 
             animator.speed = 1f;
-        }
-
-        /// <summary>
-        /// 追踪玩家时保留身体间距, 避免敌人持续把玩家顶进墙体.
-        /// </summary>
-        /// <param name="direction">敌人朝向玩家的方向.</param>
-        /// <returns>是否成功获得玩家并更新移动.</returns>
-        protected bool FollowPlayerWithBodySpace(out Vector2 direction) {
-            direction = Vector2.zero;
-            if(PlayerRegistry.Current == null) {
-                StopMove();
-                SetAnimatorSpeed(0f);
-                return false;
-            }
-
-            var toPlayer = (Vector2)(PlayerRegistry.Current.transform.position - transform.position);
-            var distance = toPlayer.magnitude;
-            if(distance <= 0.0001f) {
-                StopMove();
-                SetAnimatorSpeed(0f);
-                return true;
-            }
-
-            direction = toPlayer / distance;
-            if(distance <= Mathf.Max(0f, playerStopDistance)) {
-                StopMove();
-                SetAnimatorSpeed(0f);
-                return true;
-            }
-
-            if(rb != null) {
-                rb.velocity = direction * MoveSpeed * EnemyTimeScale;
-            }
-
-            SetAnimatorSpeed(MoveSpeed);
-            return true;
         }
 
         /// <summary>
