@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Game.Pooling;
 using UnityEngine;
 using XLua;
 
@@ -60,8 +61,9 @@ public class DataReference
 /// <summary>
 /// 挂在场景或预制体上, 按类型名创建 Lua 模块实例, 并负责引用注入与生命周期转发.
 /// 需要 Lua 逻辑的物体必须在预制体或场景上预先挂好本组件.
+/// 组件实现 IPoolable, 被对象池管理时把取出和回收转成 Lua 的 OnSpawn 与 OnRecycle.
 /// </summary>
-public class LuaComponet : MonoBehaviour
+public class LuaComponet : MonoBehaviour, IPoolable
 {
     [SerializeField]
     [Tooltip("lua类型名, 必须已写进 module.lua 的 moduleList.")]
@@ -257,6 +259,36 @@ public class LuaComponet : MonoBehaviour
         }
 
         return m_luaTable.Get<Action<LuaTable>>(functionName) != null;
+    }
+
+    /// <summary>
+    /// 向实例表写入运行时数据, 例如 Buff 的归属玩家和层数.
+    /// </summary>
+    public void SetLuaField(string fieldName, object value)
+    {
+        if (m_luaTable == null)
+        {
+            Debug.LogError($"[LuaComponet] 实例表未创建, 无法写入 {fieldName}. TypeName: {m_typeName}.", this);
+            return;
+        }
+
+        m_luaTable.Set(fieldName, value);
+    }
+
+    /// <summary>
+    /// 对象池取出时回调, 转发给 Lua 的 OnSpawn.
+    /// </summary>
+    public void OnSpawnFromPool()
+    {
+        CallLuaFunction("OnSpawn");
+    }
+
+    /// <summary>
+    /// 对象池回收时回调, 转发给 Lua 的 OnRecycle.
+    /// </summary>
+    public void OnRecycleToPool()
+    {
+        CallLuaFunction("OnRecycle");
     }
 
     /// <summary>

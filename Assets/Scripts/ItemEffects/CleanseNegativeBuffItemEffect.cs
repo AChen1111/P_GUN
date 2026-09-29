@@ -23,7 +23,7 @@ namespace Game.ItemEffects
             var activeBuffs = manager.ActiveBuffs;
             for (int i = 0; i < activeBuffs.Count; i++)
             {
-                if (activeBuffs[i]?.Buff != null && activeBuffs[i].Buff.Tag == BuffTag.Negative)
+                if (activeBuffs[i] != null && activeBuffs[i].ParsedTag == BuffTag.Negative)
                 {
                     return true;
                 }

@@ -2,7 +2,8 @@
     "name": "Game.LuaComponent",
     "rootNamespace": "",
     "references": [
-        "XLua.Runtime"
+        "XLua.Runtime",
+        "Game.Pooling"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

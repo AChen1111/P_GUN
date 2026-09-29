@@ -115,11 +115,11 @@ namespace Game.Gameplay.Save
             for (var i = 0; i < activeBuffs.Count; i++)
             {
                 var info = activeBuffs[i];
-                if (info?.Buff == null) continue;
+                if (info?.Config == null) continue;
 
                 data.buffs.Add(new BuffSaveData
                 {
-                    buffId = info.Buff.Id,
+                    buffId = info.Config.Id,
                     remainingTime = info.RemainingTime,
                     stackCount = info.StackCount,
                     isPermanent = info.IsPermanent

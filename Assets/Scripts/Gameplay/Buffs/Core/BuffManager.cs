@@ -1,27 +1,22 @@
+using System;
 using System.Collections.Generic;
-using UnityEngine;
+using System.Threading.Tasks;
 using Game.Core;
 using Game.Gameplay.Save;
+using UnityEngine;
 
 namespace Game.Gameplay
 {
     /// <summary>
     /// 玩家身上的 Buff 运行时管理器.
-    /// 负责保存当前 Buff, 更新计时器, 并调度 Lua 生命周期.
+    /// 配置来自 BuffData.lua, 层数与持续时间的容器和属性公式留在本类,
+    /// 特殊生命周期由行为预制体上的 LuaComponet 承担.
     /// </summary>
     public class BuffManager : MonoBehaviour
     {
-        [SerializeField] private BuffDataBase dataBase = null;
-
-        /// <summary>
-        /// 当前生效的 Buff 列表, 用于每帧顺序更新.
-        /// </summary>
         private readonly List<BuffRuntimeInfo> buffs = new List<BuffRuntimeInfo>();
-
-        /// <summary>
-        /// Buff id 到运行时信息的映射, 用于快速查找和去重.
-        /// </summary>
         private readonly Dictionary<int, BuffRuntimeInfo> buffInfoMap = new Dictionary<int, BuffRuntimeInfo>();
+        private readonly Dictionary<int, LuaComponet> behaviorPrefabsById = new Dictionary<int, LuaComponet>();
 
         private Player owner;
 
@@ -34,6 +29,7 @@ namespace Game.Gameplay
         {
             owner = GetComponent<Player>();
         }
+
         private void Update()
         {
             var deltaTime = Time.deltaTime;
@@ -51,12 +47,11 @@ namespace Game.Gameplay
 
                     if (info.RemainingTime <= 0f)
                     {
-                        RemoveBuffById(info.Buff.Id);
+                        RemoveBuffById(info.Config.Id);
                         return;
                     }
                 }
 
-                TriggerOnUpdate(info, frameDeltaTime);
                 TriggerInterval(info, frameDeltaTime);
             }
 
@@ -66,7 +61,7 @@ namespace Game.Gameplay
 
                 info.IntervalTimer += frameDeltaTime;
 
-                while (info.IntervalTimer >= info.Interval && buffInfoMap.ContainsKey(info.Buff.Id))
+                while (info.IntervalTimer >= info.Interval && buffInfoMap.ContainsKey(info.Config.Id))
                 {
                     info.IntervalTimer -= info.Interval;
                     TriggerOnInterval(info);
@@ -82,13 +77,13 @@ namespace Game.Gameplay
             ClearBuffs();
         }
 
-    #region Public API
+        #region Public API
 
         /// <summary>
-        /// 通过 id 添加 Buff.
+        /// 通过 id 添加 Buff, 配置从 BuffData.lua 读取, 缺行直接报错.
         /// </summary>
-        /// <param name="buffId">Buff id</param>
-        /// <returns>Buff 运行时信息</returns>
+        /// <param name="buffId">Buff id.</param>
+        /// <returns>Buff 运行时信息.</returns>
         public BuffRuntimeInfo AddBuffById(int buffId)
         {
             return AddBuffById(buffId, null);
@@ -102,49 +97,36 @@ namespace Game.Gameplay
         /// <returns>Buff 运行时信息.</returns>
         public BuffRuntimeInfo AddBuffById(int buffId, UnityEngine.Object source)
         {
-            var database = dataBase != null ? dataBase : DataBaseManager.Instance?.Buffs;
-            if (database == null)
-            {
-                Debug.LogWarning($"{nameof(BuffManager)}: 未设置 {nameof(BuffDataBase)}, 无法通过 id 添加 Buff.", this);
-                return null;
-            }
-
-            return database.TryGetById(buffId, out var buff) ? AddBuff(buff, source) : null;
+            var config = LuaDataRuntime.GetBuffConfig(buffId);
+            return AddBuff(config, source);
         }
 
         /// <summary>
-        /// 直接添加 Buff. 如果 Buff 已存在, 只重置持续时间并触发 OnAdd.
+        /// 直接添加 Buff 配置. 如果 Buff 已存在, 永久 Buff 叠层, 非永久 Buff 重置持续时间.
         /// </summary>
-        /// <param name="buff">Buff 配置</param>
-        /// <returns>Buff 运行时信息</returns>
-        public BuffRuntimeInfo AddBuff(Buff buff)
-        {
-            return AddBuff(buff, null);
-        }
-
-        /// <summary>
-        /// 直接添加 Buff. 如果 Buff 已存在, 只重置持续时间并触发 OnAdd.
-        /// </summary>
-        /// <param name="buff">Buff 配置.</param>
+        /// <param name="config">Buff 配置.</param>
         /// <param name="source">Buff 来源对象.</param>
         /// <returns>Buff 运行时信息.</returns>
-        public BuffRuntimeInfo AddBuff(Buff buff, UnityEngine.Object source)
+        public BuffRuntimeInfo AddBuff(BuffConfig config, UnityEngine.Object source)
         {
-            if (buff == null) return null;
+            if (config == null)
+            {
+                throw new ArgumentNullException(nameof(config));
+            }
 
             var previousMaxHp = GetOwnerMaxHp();
-            if (buffInfoMap.TryGetValue(buff.Id, out var existing))
+            if (buffInfoMap.TryGetValue(config.Id, out var existing))
             {
-                if (buff.IsPermanent)
+                if (config.IsPermanent)
                 {
-                    // 永久 Buff 重复获得时只增加层数, 保留 Lua 运行时状态.
+                    // 永久 Buff 重复获得时只增加层数.
                     existing.Source = source;
                     existing.StackCount += 1;
                     existing.IsPermanent = true;
                 }
                 else
                 {
-                    ResetBuffRuntimeInfo(existing, buff, source);
+                    ResetBuffRuntimeInfo(existing, config, source);
                 }
 
                 TriggerOnAdd(existing);
@@ -153,56 +135,14 @@ namespace Game.Gameplay
                 return existing;
             }
 
-            var info = CreateBuffRuntimeInfo(buff, source);
-            if (info == null) return null;
-
+            var info = CreateBuffRuntimeInfo(config, source);
             info.Index = buffs.Count;
             buffs.Add(info);
-            buffInfoMap[buff.Id] = info;
+            buffInfoMap[config.Id] = info;
             TriggerOnAdd(info);
             NotifyOwnerStatsChanged(previousMaxHp);
             NotifyBuffsChanged();
             return info;
-
-            BuffRuntimeInfo CreateBuffRuntimeInfo(Buff targetBuff, UnityEngine.Object buffSource)
-            {
-                var scriptFactory = BuffScriptRuntime.Factory;
-                if (scriptFactory == null)
-                {
-                    Debug.LogError($"{nameof(BuffManager)}: Root 场景未注册 Buff 脚本工厂, 无法创建 Buff 脚本实例.", this);
-                    return null;
-                }
-
-                var scriptInstance = scriptFactory.Invoke(targetBuff);
-                if (scriptInstance == null)
-                {
-                    Debug.LogError($"{nameof(BuffManager)}: 创建 Buff 脚本实例失败, Buff: {targetBuff.BuffName}.", this);
-                    return null;
-                }
-
-                var runtimeInfo = new BuffRuntimeInfo
-                {
-                    owner = owner != null ? owner : PlayerRegistry.Current,
-                    Source = buffSource,
-                    Buff = targetBuff,
-                    ScriptInstance = scriptInstance
-                };
-
-                ResetBuffRuntimeInfo(runtimeInfo, targetBuff, buffSource);
-                return runtimeInfo;
-            }
-        }
-
-        /// <summary>
-        /// 移除 Buff.
-        /// </summary>
-        /// <param name="buff">Buff</param>
-        /// <returns>是否成功移除</returns>
-        public bool RemoveBuff(Buff buff)
-        {
-            if (buff == null) return false;
-
-            return RemoveBuffById(buff.Id);
         }
 
         /// <summary>
@@ -216,7 +156,7 @@ namespace Game.Gameplay
 
             var previousMaxHp = GetOwnerMaxHp();
             TriggerOnRemove(info);
-            DisposeScriptInstance(info);
+            RemoveBehaviorObject(info);
             RemoveAt(info.Index);
             NotifyOwnerStatsChanged(previousMaxHp);
             NotifyBuffsChanged();
@@ -236,10 +176,10 @@ namespace Game.Gameplay
             for (var i = buffs.Count - 1; i >= 0; i--)
             {
                 var info = buffs[i];
-                if (info.Buff.Tag != tag) continue;
+                if (info.ParsedTag != tag) continue;
 
                 TriggerOnRemove(info);
-                DisposeScriptInstance(info);
+                RemoveBehaviorObject(info);
                 RemoveAt(info.Index);
                 removedCount++;
             }
@@ -272,7 +212,7 @@ namespace Game.Gameplay
             for (var i = buffs.Count - 1; i >= 0; i--)
             {
                 TriggerOnRemove(buffs[i]);
-                DisposeScriptInstance(buffs[i]);
+                RemoveBehaviorObject(buffs[i]);
                 RemoveAt(i);
             }
 
@@ -280,6 +220,7 @@ namespace Game.Gameplay
             NotifyOwnerStatsChanged(previousMaxHp);
             NotifyBuffsChanged();
         }
+
         public void RestoreSaveData(IEnumerable<BuffSaveData> savedBuffs, UnityEngine.Object source)
         {
             ClearBuffs();
@@ -292,7 +233,7 @@ namespace Game.Gameplay
                 var info = AddBuffById(savedBuff.buffId, source);
                 if (info == null) continue;
 
-                // 添加后覆盖计时和层数, 保留 Lua 实例初始化流程.
+                // 添加后覆盖计时和层数, 保留行为预制体的初始化流程.
                 info.RemainingTime = Mathf.Max(0f, savedBuff.remainingTime);
                 info.StackCount = Mathf.Max(1, savedBuff.stackCount);
                 info.IsPermanent = savedBuff.isPermanent;
@@ -316,11 +257,11 @@ namespace Game.Gameplay
             for (var i = 0; i < buffs.Count; i++)
             {
                 var stackCount = Mathf.Max(1, buffs[i].StackCount);
-                var modifiers = buffs[i].Buff.Modifiers;
+                var modifiers = buffs[i].ParsedModifiers;
                 for (var j = 0; j < modifiers.Count; j++)
                 {
                     var modifier = modifiers[j];
-                    if (modifier == null || modifier.StatType != statType) continue;
+                    if (modifier.StatType != statType) continue;
 
                     // 同一属性按固定值, 百分比, 最终倍率三个分区累计.
                     switch (modifier.ModifierType)
@@ -344,34 +285,177 @@ namespace Game.Gameplay
             return (baseValue + flat) * (1f + percentAdd) * finalMul;
         }
 
-    #endregion
+        #endregion
 
-    #region Create And Reset
+        #region Create And Reset
+
+        /// <summary>
+        /// 创建运行时信息, 解析标签和属性修正, 并异步挂接行为预制体.
+        /// </summary>
+        private BuffRuntimeInfo CreateBuffRuntimeInfo(BuffConfig config, UnityEngine.Object source)
+        {
+            var info = new BuffRuntimeInfo
+            {
+                owner = owner != null ? owner : PlayerRegistry.Current,
+                Source = source,
+                Config = config,
+            };
+
+            ParseTagAndModifiers(config, info);
+            ResetBuffRuntimeInfo(info, config, source);
+            AttachBehaviorObjectAsync(info);
+            return info;
+        }
+
+        /// <summary>
+        /// 把配置里的字符串枚举转换成本地枚举, 非法值直接报错.
+        /// </summary>
+        private static void ParseTagAndModifiers(BuffConfig config, BuffRuntimeInfo info)
+        {
+            if (!Enum.TryParse(config.Tag, out BuffTag tag))
+            {
+                throw new InvalidOperationException($"Buff {config.Id} 的 tag 非法: {config.Tag}.");
+            }
+
+            info.ParsedTag = tag;
+
+            for (var i = 0; i < config.Modifiers.Count; i++)
+            {
+                var entry = config.Modifiers[i];
+                if (!Enum.TryParse(entry.Stat, out StatType statType))
+                {
+                    throw new InvalidOperationException($"Buff {config.Id} 的 stat 非法: {entry.Stat}.");
+                }
+
+                if (!Enum.TryParse(entry.ModifierType, out ModifierType modifierType))
+                {
+                    throw new InvalidOperationException($"Buff {config.Id} 的 modifierType 非法: {entry.ModifierType}.");
+                }
+
+                info.ParsedModifiers.Add(new ParsedStatModifier
+                {
+                    StatType = statType,
+                    ModifierType = modifierType,
+                    Value = entry.Value,
+                });
+            }
+        }
 
         /// <summary>
         /// 重置 Buff 运行时计时数据.
         /// </summary>
-        /// <param name="info">Buff 运行时信息</param>
-        /// <param name="buff">Buff 配置</param>
-        private void ResetBuffRuntimeInfo(BuffRuntimeInfo info, Buff buff, UnityEngine.Object source)
+        private static void ResetBuffRuntimeInfo(BuffRuntimeInfo info, BuffConfig config, UnityEngine.Object source)
         {
             info.Source = source;
-            info.Duration = buff.Duration;
-            info.RemainingTime = buff.Duration;
-            info.Interval = buff.Interval;
+            info.Duration = config.Duration;
+            info.RemainingTime = config.Duration;
+            info.Interval = config.Interval;
             info.IntervalTimer = 0f;
-            info.IsPermanent = buff.IsPermanent;
+            info.IsPermanent = config.IsPermanent;
             info.StackCount = 1;
         }
 
-    #endregion
+        #endregion
 
-    #region Stat Change
+        #region Behavior Object
+
+        /// <summary>
+        /// 异步加载行为预制体并挂接到 Buff 上, 加载期间 Buff 已被移除则立即回池.
+        /// </summary>
+        private async void AttachBehaviorObjectAsync(BuffRuntimeInfo info)
+        {
+            if (string.IsNullOrEmpty(info.Config.BehaviorPrefabAddress)) return;
+
+            try
+            {
+                var behavior = await GetBehaviorObjectAsync(info.Config);
+                if (!buffInfoMap.TryGetValue(info.Config.Id, out var current) || current != info)
+                {
+                    ReleaseBehaviorObject(behavior);
+                    return;
+                }
+
+                info.Behavior = behavior;
+                TriggerOnAdd(info);
+            }
+            catch (Exception exception)
+            {
+                Debug.LogError($"{nameof(BuffManager)}: Buff 行为预制体加载失败, Buff: {info.Config.Name}, Error: {exception.Message}", this);
+            }
+        }
+
+        /// <summary>
+        /// 取出或加载行为预制体, 并从对象池取一个实例.
+        /// </summary>
+        private async Task<LuaComponet> GetBehaviorObjectAsync(BuffConfig config)
+        {
+            var pool = BuffBehaviorPool.Instance;
+            if (pool == null)
+            {
+                throw new InvalidOperationException($"{nameof(BuffBehaviorPool)} 必须摆放在游戏场景中.");
+            }
+
+            var loader = AddressableLoader.Instance;
+            if (loader == null)
+            {
+                throw new InvalidOperationException($"{nameof(AddressableLoader)} 必须先初始化.");
+            }
+
+            if (!behaviorPrefabsById.TryGetValue(config.Id, out var prefab))
+            {
+                var prefabGameObject = await loader.LoadAssetAsync<GameObject>(config.BehaviorPrefabAddress);
+                prefab = prefabGameObject != null ? prefabGameObject.GetComponent<LuaComponet>() : null;
+                if (prefab == null)
+                {
+                    throw new InvalidOperationException($"Buff 行为预制体缺少 LuaComponet, 地址: {config.BehaviorPrefabAddress}.");
+                }
+
+                behaviorPrefabsById[config.Id] = prefab;
+            }
+
+            return pool.Get(prefab);
+        }
+
+        /// <summary>
+        /// 把行为对象归还对象池.
+        /// </summary>
+        private void RemoveBehaviorObject(BuffRuntimeInfo info)
+        {
+            var behavior = info.Behavior;
+            info.Behavior = null;
+            if (behavior == null) return;
+
+            var pool = BuffBehaviorPool.Instance;
+            if (pool == null)
+            {
+                Debug.LogError($"{nameof(BuffManager)}: {nameof(BuffBehaviorPool)} 不存在, 无法回收 Buff 行为对象.", this);
+                return;
+            }
+
+            pool.Release(behavior);
+        }
+
+        /// <summary>
+        /// 把归属玩家, Buff id 和层数写进行为对象的实例表.
+        /// </summary>
+        private static void InjectBehaviorFields(BuffRuntimeInfo info)
+        {
+            var behavior = info.Behavior;
+            if (behavior == null) return;
+
+            behavior.SetLuaField("owner", info.Owner);
+            behavior.SetLuaField("buffId", info.Config.Id);
+            behavior.SetLuaField("buffName", info.Config.Name);
+            behavior.SetLuaField("stackCount", Mathf.Max(1, info.StackCount));
+        }
+
+        #endregion
+
+        #region Stat Change
 
         /// <summary>
         /// 获取属性变化前的玩家最大生命, 用于变化后刷新 UI.
         /// </summary>
-        /// <returns>玩家当前最大生命.</returns>
         private int GetOwnerMaxHp()
         {
             var target = owner != null ? owner : PlayerRegistry.Current;
@@ -381,7 +465,6 @@ namespace Game.Gameplay
         /// <summary>
         /// 通知玩家 Buff 属性已经变化.
         /// </summary>
-        /// <param name="previousMaxHp">变化前的最大生命.</param>
         private void NotifyOwnerStatsChanged(int previousMaxHp)
         {
             var target = owner != null ? owner : PlayerRegistry.Current;
@@ -396,74 +479,53 @@ namespace Game.Gameplay
             EventCenter.Trigger(GameplayEvents.PlayerBuffsChanged);
         }
 
-    #endregion
+        #endregion
 
-    #region Trigger
+        #region Trigger
 
         /// <summary>
-        /// 触发 Buff 的添加回调.
+        /// 触发行为对象的添加回调, 并刷新注入数据.
         /// </summary>
-        /// <param name="info">Buff 运行时信息</param>
         private static void TriggerOnAdd(BuffRuntimeInfo info)
         {
-            info.ScriptInstance?.OnAdd(info);
+            InjectBehaviorFields(info);
+            info.Behavior?.CallLuaFunction("OnAdd");
         }
 
         /// <summary>
-        /// 触发 Buff 的移除回调.
+        /// 触发行为对象的移除回调.
         /// </summary>
-        /// <param name="info">Buff 运行时信息</param>
         private static void TriggerOnRemove(BuffRuntimeInfo info)
         {
-            info.ScriptInstance?.OnRemove(info);
+            info.Behavior?.CallLuaFunction("OnRemove");
         }
 
         /// <summary>
-        /// 触发 Buff 的每帧脚本回调.
+        /// 触发行为对象的固定间隔回调, 每次触发前刷新层数.
         /// </summary>
-        /// <param name="info">Buff 运行时信息.</param>
-        /// <param name="deltaTime">时间增量.</param>
-        private static void TriggerOnUpdate(BuffRuntimeInfo info, float deltaTime)
-        {
-            info.ScriptInstance?.OnUpdate(info, deltaTime);
-        }
-
-        /// <summary>
-        /// 触发 Buff 的固定间隔脚本回调.
-        /// </summary>
-        /// <param name="info">Buff 运行时信息.</param>
         private static void TriggerOnInterval(BuffRuntimeInfo info)
         {
-            info.ScriptInstance?.OnInterval(info);
+            if (info.Behavior == null) return;
+
+            InjectBehaviorFields(info);
+            info.Behavior.CallLuaFunction("OnInterval");
         }
 
         /// <summary>
-        /// 触发 Buff 的主动脚本回调.
+        /// 触发行为对象的主动回调.
         /// </summary>
-        /// <param name="info">Buff 运行时信息.</param>
         private static void TriggerOnTrigger(BuffRuntimeInfo info)
         {
-            info.ScriptInstance?.OnTrigger(info);
+            info.Behavior?.CallLuaFunction("OnTrigger");
         }
 
-        /// <summary>
-        /// 释放 Buff 持有的脚本实例.
-        /// </summary>
-        /// <param name="info">Buff 运行时信息.</param>
-        private static void DisposeScriptInstance(BuffRuntimeInfo info)
-        {
-            info.ScriptInstance?.Dispose();
-            info.ScriptInstance = null;
-        }
+        #endregion
 
-    #endregion
-
-    #region Remove Helpers
+        #region Remove Helpers
 
         /// <summary>
         /// 使用尾部交换的方式移除指定索引的 Buff.
         /// </summary>
-        /// <param name="index">索引</param>
         private void RemoveAt(int index)
         {
             var lastIndex = buffs.Count - 1;
@@ -480,9 +542,9 @@ namespace Game.Gameplay
             }
 
             buffs.RemoveAt(lastIndex);
-            buffInfoMap.Remove(removedInfo.Buff.Id);
+            buffInfoMap.Remove(removedInfo.Config.Id);
         }
 
-    #endregion
+        #endregion
     }
 }
