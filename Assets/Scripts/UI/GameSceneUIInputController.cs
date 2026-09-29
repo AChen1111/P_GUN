@@ -468,8 +468,8 @@ namespace Game.UI
             GUILayout.Label(BuildRuntimeTitle(info));
             if (GUILayout.Button("移除", GUILayout.Width(removeButtonWidth)))
             {
-                manager.RemoveBuffById(info.Buff.Id);
-                statusText = $"已移除 {info.Buff.BuffName}.";
+                manager.RemoveBuffById(info.Config.Id);
+                statusText = $"已移除 {info.Config.Name}.";
             }
 
             GUILayout.EndHorizontal();
@@ -531,7 +531,7 @@ namespace Game.UI
     static string BuildRuntimeTitle(BuffRuntimeInfo info)
     {
         string timeText = info.IsPermanent ? $"层数 {info.StackCount}" : $"剩余 {info.RemainingTime:0.0}s";
-        return $"[{info.Buff.Id}] {info.Buff.BuffName} | {BuildTagText(info.Buff.Tag)} | {timeText}";
+        return $"[{info.Config.Id}] {info.Config.Name} | {BuildTagText(info.ParsedTag)} | {timeText}";
     }
 
     static string BuildBuffTitle(Buff buff)
@@ -542,8 +542,9 @@ namespace Game.UI
 
     void TryAddBuff(BuffManager manager, Buff buff, Object source)
     {
-        BuffRuntimeInfo info = manager.AddBuff(buff, source);
-        statusText = info != null ? $"已添加 {info.Buff.BuffName}." : $"添加失败, Buff: {buff.BuffName}.";
+        // 数据库列表仅作调试索引, 实际添加按 BuffData.lua 的行进行.
+        BuffRuntimeInfo info = manager.AddBuffById(buff.Id, source);
+        statusText = info != null ? $"已添加 {info.Config.Name}." : $"添加失败, ID: {buff.Id}.";
     }
 
     void TryAddBuffById(BuffManager manager, Object source)
@@ -555,7 +556,7 @@ namespace Game.UI
         }
 
         BuffRuntimeInfo info = manager.AddBuffById(buffId, source);
-        statusText = info != null ? $"已添加 {info.Buff.BuffName}." : $"添加失败, ID: {buffId}.";
+        statusText = info != null ? $"已添加 {info.Config.Name}." : $"添加失败, ID: {buffId}.";
     }
 }
         private static string BuildTagText(BuffTag tag)

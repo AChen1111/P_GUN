@@ -29,11 +29,5 @@ namespace Game.Gameplay
         public string DisplayName => string.IsNullOrWhiteSpace(displayName) ? weaponId : displayName;
         public int MaxDamage => Mathf.Max(minDamage, maxDamage);
         public float ShootInterval => Mathf.Max(0f, shootInterval);
-        public void ApplyTo(Gun gun)
-        {
-            if (gun == null) return;
-
-            gun.ApplyData(this);
-        }
     }
 }

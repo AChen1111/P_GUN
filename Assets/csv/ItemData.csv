@@ -1,0 +1,10 @@
+itemId,itemName,description,iconAddress,effectPrefabAddress,prefabAddress
+1,心,回复一点生命值,Assets/Assets/Items/Potion Asset.png,item/effect/heal,item/prefab/heal
+2,奇特的药水,获取奇特的效果,Assets/Assets/Items/Potion Asset.png,item/effect/mystery,item/prefab/mystery
+3,加速药水,加速,Assets/Assets/Items/Potion Asset.png,item/effect/speed,item/prefab/speed
+4,增伤药水,增加伤害,Assets/Assets/Items/Potion Asset.png,item/effect/damage,item/prefab/damage
+5,净化药水,移除所有负面Buff,Assets/Assets/Items/Potion Asset.png,item/effect/cleanse,item/prefab/cleanse
+6,血契宝典,攻击永久提升2点;生命上限永久降低1点(可叠加),Assets/Assets/Items/Potion Asset.png,item/effect/blood_tome,item/prefab/blood_tome
+7,护盾发生器,10秒内受到的伤害降低3点,Assets/Assets/Items/Potion Asset.png,item/effect/shield_generator,item/prefab/shield_generator
+8,战鼓,60秒内击杀敌人回复1点生命,Assets/Assets/Items/Potion Asset.png,item/effect/war_drum,item/prefab/war_drum
+9,弹药补给箱,立刻补满当前枪械的弹夹与备弹,Assets/Assets/Items/Potion Asset.png,item/effect/ammo_crate,item/prefab/ammo_crate

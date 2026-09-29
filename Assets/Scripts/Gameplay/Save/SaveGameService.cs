@@ -55,7 +55,7 @@ namespace Game.Gameplay.Save
         }
 
         /// <summary>
-        /// 异步读档入口, 主菜单读档前先确保全局数据库已经加载.
+        /// 异步读档入口, 读取槽位后进入游戏场景并恢复存档.
         /// </summary>
         public static async Task<SaveOperationResult> LoadFromSlotAsync(int slotIndex)
         {
@@ -65,21 +65,10 @@ namespace Game.Gameplay.Save
                 return SaveOperationResult.Fail("读取失败, 槽位为空.");
             }
 
-            await EnsureDatabasesLoadedAsync();
+            // 玩法数值改由 Lua 数据表提供, 读档不再预载 ScriptableObject 数据库.
             pendingLoadData = data;
             SceneManager.LoadScene(GameplaySceneName);
             return SaveOperationResult.Ok("正在进入游戏场景并恢复存档.", data);
-        }
-
-        private static Task EnsureDatabasesLoadedAsync()
-        {
-            var manager = DataBaseManager.Instance;
-            if (manager == null)
-            {
-                throw new InvalidOperationException($"{nameof(DataBaseManager)} must exist before loading save.");
-            }
-
-            return manager.EnsureLoadedAsync();
         }
 
         public static SaveOperationResult DeleteSlot(int slotIndex)
@@ -90,17 +79,18 @@ namespace Game.Gameplay.Save
                 : SaveOperationResult.Fail("删除失败, 槽位为空.");
         }
 
-        public static void ApplyPendingGenerationSettings(AddressableDungeonBootstrapper bootstrapper, DungeonGeneratorGrid2D dungeonGenerator)
+        /// <summary>
+        /// 生成前把存档中的关卡 id 和种子写入随机房间生成器, 确保重建同一张地图.
+        /// </summary>
+        /// <param name="generator">场景中的随机房间生成器.</param>
+        public static void ApplyPendingGenerationSettings(RandomRoomGenerator generator)
         {
-            if (pendingLoadData == null || dungeonGenerator == null)
+            if (pendingLoadData == null || generator == null)
             {
                 return;
             }
 
-            // 生成前写入存档中的地图配方, 确保 Edgar 重建同一张地图.
-            bootstrapper?.OverrideLevelGraphAddress(pendingLoadData.levelGraphAddress);
-            dungeonGenerator.UseRandomSeed = false;
-            dungeonGenerator.RandomGeneratorSeed = pendingLoadData.mapSeed;
+            generator.OverrideLevel(pendingLoadData.levelId, pendingLoadData.mapSeed);
         }
 
         /// <summary>

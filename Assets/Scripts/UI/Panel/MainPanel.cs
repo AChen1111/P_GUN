@@ -55,7 +55,8 @@ namespace Game.UI
             isStartingGame = true;
             try
             {
-                await EnsureDatabasesLoadedAsync();
+                // 玩法数值改由 Lua 数据表提供, 进入 GameScene 不再预载 ScriptableObject 数据库.
+                await Task.Yield();
 			    SceneManager.LoadScene("GameScene");
             }
             catch (Exception exception)
@@ -65,20 +66,6 @@ namespace Game.UI
                 throw;
             }
 		}
-
-        /// <summary>
-        /// 进入 GameScene 前加载全局数据库.
-        /// </summary>
-        private static Task EnsureDatabasesLoadedAsync()
-        {
-            var manager = DataBaseManager.Instance;
-            if (manager == null)
-            {
-                throw new InvalidOperationException($"{nameof(DataBaseManager)} must exist before entering GameScene.");
-            }
-
-            return manager.EnsureLoadedAsync();
-        }
 		public void ExitGame()
 		{
 			Application.Quit();

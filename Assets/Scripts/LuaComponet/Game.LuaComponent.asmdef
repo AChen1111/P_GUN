@@ -1,0 +1,17 @@
+{
+    "name": "Game.LuaComponent",
+    "rootNamespace": "",
+    "references": [
+        "XLua.Runtime",
+        "Game.Pooling"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
