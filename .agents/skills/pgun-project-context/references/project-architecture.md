@@ -204,30 +204,22 @@ If a non-permanent buff already exists, adding it resets duration and triggers `
 
 `BuffTag` has `Positive` and `Negative`. Buff CSV uses a `tag` column with those enum names. Purge/cleanse item effects should call `RemoveBuffsByTag(BuffTag.Negative)` instead of scanning UI state.
 
-`LuaBuffInstance` caches optional Lua methods:
+Lua 行为走 `LuaComponet` 框架（`Assets/Scripts/LuaComponet`），行为脚本在 `Assets/Scripts/LuaRaw` 并按文件名注册进 `module.lua` 的 `moduleList`. `BuffManager` 按 `BuffData.lua` 的行创建 `BuffRuntimeInfo`；带 `behaviorPrefabAddress` 的 Buff 从 `BuffBehaviorPool` 取行为预制体，间隔到时调用其 LuaComponet 的 `OnInterval`，归属玩家和层数通过 `SetLuaField` 注入（`owner`, `buffId`, `buffName`, `stackCount`）。
 
-- `OnAdd(BuffRuntimeInfo info)`
-- `OnRemove(BuffRuntimeInfo info)`
-- `OnUpdate(BuffRuntimeInfo info, float deltaTime)`
-- `OnInterval(BuffRuntimeInfo info)`
-- `OnTrigger(BuffRuntimeInfo info)`
+配置读取在 `Game.Core` 的 `LuaDataRuntime`，由 `Game.Lua` 里的 `FrameworkLuaDataProvider` 实现，`PgunLuaRuntimeBootstrap`（Root 场景组件）负责注册并执行 `hotfix/main`. 缺表，缺行或缺字段直接抛错。
 
-Lua failures are caught and logged, so C# callers should still validate missing or invalid Lua assets early where possible.
-
-`LuaManager` and `LuaBuffInstance` are compiled by `Game.Lua`, not `Game.Gameplay`. `LuaManager` registers `CreateBuffInstance` through `BuffScriptRuntime.RegisterFactory()` and registers startup hotfix through `StartupHotfixRuntime.RegisterRunner()` in `Awake`, then unregisters both on destroy. `BuffManager` creates script instances through the `BuffScriptRuntime.Factory` delegate; `RootHotUpdateController` executes startup hotfix through `StartupHotfixRuntime.ExecuteStartupHotfixAsync()` before loading `StartScene`. Do not reintroduce a direct `XLua.Runtime` reference into `Game.Gameplay`, because xLua Hotfix generated bridge code needs to reference gameplay assemblies from `XLua.Runtime`.
-
-xLua Hotfix target classes are listed in `Assets/XLua/Editor/PgunHotfixConfig.cs`. The asmdef-compatible workflow is:
+xLua Hotfix target classes are listed in `Assets/XLua/Editor/PgunHotfixConfig.cs`，当前只注入 `Player` 与 `EnemyBase`. The asmdef-compatible workflow is:
 
 1. Keep xLua tools under project `Tools/`.
 2. Run `XLua/Generate Code`.
 3. Wait for Unity compilation to finish.
 4. Run `XLua/Hotfix Inject In Editor`.
 
-The current injected target assemblies are `Game.Gameplay.dll` and `Game.Items.dll`; `Game.Lua` itself is not a hotfix target because it depends on `XLua.Runtime`.
+`Game.Lua` itself is not a hotfix target because it depends on `XLua.Runtime`. Do not reintroduce a direct `XLua.Runtime` reference into `Game.Gameplay`, because xLua Hotfix generated bridge code needs to reference gameplay assemblies from `XLua.Runtime`.
 
-The startup hotfix entry asset is `Assets/Scripts/Gameplay/Lua/Hotfix/MainHotfix.lua.txt`, with Addressables address `hotfix/main` and labels `hotfix;lua`. Keep this file as the small entry script that requires or executes concrete patch scripts.
+The startup hotfix entry asset is `Assets/Scripts/Gameplay/Lua/Hotfix/MainHotfix.lua.txt`, with Addressables address `hotfix/main` and labels `hotfix;lua`. It requires no patches by default; real patches are added as `require("hotfix.some_patch")` entries with the `hotfix;lua` labels.
 
-Before executing `hotfix/main`, `LuaManager` preloads all Addressables `TextAsset` entries with label `hotfix` into an in-memory Lua module cache and registers an xLua custom loader. Hotfix scripts can use `require("hotfix.some_patch")` when the script has an address such as `hotfix/some_patch` and the `hotfix;lua` labels. The custom loader is synchronous and must only read from this preloaded cache, not start Addressables requests from inside `AddLoader`.
+Before executing `hotfix/main`, `PgunLuaRuntimeBootstrap` preloads all Addressables `TextAsset` entries with label `hotfix` into an in-memory Lua module cache and registers an xLua custom loader on the framework `LuaManager`'s env. The custom loader is synchronous and must only read from this preloaded cache, not start Addressables requests from inside `AddLoader`.
 
 ## Player And Weapons
 
