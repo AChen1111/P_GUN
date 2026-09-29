@@ -816,7 +816,7 @@ namespace Game.Gameplay
             transform.position = data.position.ToVector3();
 
             RestoreBuffs(data);
-            await RestoreInventoryAsync(data);
+            RestoreInventory(data);
             await EnsureWeaponLoadoutReadyAsync();
             RestoreWeapons(data);
 
@@ -868,9 +868,9 @@ namespace Game.Gameplay
         }
 
         /// <summary>
-        /// 恢复背包数据并按需加载物品效果.
+        /// 恢复背包数据, 效果预制体按 ItemData.lua 的地址预载.
         /// </summary>
-        private async Task RestoreInventoryAsync(PlayerSaveData data)
+        private void RestoreInventory(PlayerSaveData data)
         {
             var inventory = GetComponent<PlayerInventory>();
             if (inventory == null)
@@ -879,40 +879,13 @@ namespace Game.Gameplay
             }
 
             inventory.Clear();
-            var database = DataBaseManager.Instance != null ? DataBaseManager.Instance.Items : ItemDatabase.RuntimeDatabase;
             for (var i = 0; i < data.inventory.Count; i++)
             {
                 var stack = data.inventory[i];
                 if (stack == null)
                     continue;
-                inventory.RestoreStack(stack.itemId, stack.count, database, await ResolveItemEffectsAsync(stack.itemId));
+                inventory.RestoreStack(stack.itemId, stack.count);
             }
-        }
-
-        /// <summary>
-        /// 通过物品 Addressables 地址加载背包效果配置.
-        /// </summary>
-        private static async Task<IReadOnlyList<ItemEffectBase>> ResolveItemEffectsAsync(int itemId)
-        {
-            if (!AddressableItemAddressCatalog.TryGetAddress(itemId, out var address))
-            {
-                throw new InvalidOperationException($"Missing addressable item address, ItemId: {itemId}.");
-            }
-
-            var loader = AddressableLoader.Instance;
-            if (loader == null)
-            {
-                throw new InvalidOperationException($"{nameof(AddressableLoader)} must exist before restoring inventory effects.");
-            }
-
-            var prefab = await loader.LoadAssetAsync<GameObject>(address);
-            var item = prefab.GetComponent<Item>();
-            if (item == null)
-            {
-                throw new InvalidOperationException($"Item prefab missing {nameof(Item)} component, Address: {address}.");
-            }
-
-            return item.Effects;
         }
         private void PublishHPChanged()
         {

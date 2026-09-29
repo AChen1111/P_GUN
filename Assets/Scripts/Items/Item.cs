@@ -19,7 +19,6 @@ namespace Game.Items
 
         [Header("物品数据")]
         [SerializeField] private int itemId;
-        [SerializeField] private ItemDatabase itemDatabase;
         [SerializeField] private SpriteRenderer iconRenderer;
 
         [Header("拾取状态")]
@@ -344,19 +343,19 @@ namespace Game.Items
         }
         private bool TryResolveItemData(out ItemData data)
         {
-            if (itemDatabase != null && itemDatabase.TryGetById(itemId, out data))
+            // 显示数据来自 ItemData.lua, 图标取自按 id 缓存的 Sprite.
+            try
             {
+                var config = LuaDataRuntime.GetItemConfig(itemId);
+                data = new ItemData(itemId, config.Name, config.Description, ItemSpriteCache.GetSprite(itemId));
                 return true;
             }
-
-            var runtimeDatabase = ItemDatabase.RuntimeDatabase;
-            if (runtimeDatabase != null && runtimeDatabase.TryGetById(itemId, out data))
+            catch (System.Exception exception)
             {
-                return true;
+                Debug.LogError($"{nameof(Item)}: 读取 ItemData 失败, itemId={itemId}, Error: {exception.Message}", this);
+                data = default;
+                return false;
             }
-
-            data = default;
-            return false;
         }
         private static bool IsPlayer(Collider2D other)
         {

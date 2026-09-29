@@ -11,6 +11,13 @@ require("BowModule")
 require("LaserModule")
 require("PlayerBulletModule")
 require("EnemyBulletModule")
+require("HealEffectModule")
+require("SpeedPotionModule")
+require("DamagePotionModule")
+require("CleansePotionModule")
+require("MysteryPotionModule")
+require("RoomRewardModule")
+require("ChestRoomModule")
 
 moduleList = {}
 moduleList["BaseUI"] = BaseUI
@@ -25,3 +32,10 @@ moduleList["BowModule"] = BowModule
 moduleList["LaserModule"] = LaserModule
 moduleList["PlayerBulletModule"] = PlayerBulletModule
 moduleList["EnemyBulletModule"] = EnemyBulletModule
+moduleList["HealEffectModule"] = HealEffectModule
+moduleList["SpeedPotionModule"] = SpeedPotionModule
+moduleList["DamagePotionModule"] = DamagePotionModule
+moduleList["CleansePotionModule"] = CleansePotionModule
+moduleList["MysteryPotionModule"] = MysteryPotionModule
+moduleList["RoomRewardModule"] = RoomRewardModule
+moduleList["ChestRoomModule"] = ChestRoomModule

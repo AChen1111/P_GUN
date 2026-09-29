@@ -73,6 +73,15 @@ namespace Game.Gameplay
         [Header("音频播放")]
         public AudioPlay audioPlay;
 
+        [Header("行为参数, 由 EnemyData.lua 在生成时写入")]
+        protected float visionRadius = 7f;
+        protected float visionAngle = 120f;
+        protected float searchTime = 2f;
+        protected float separationRadius = 1.8f;
+        protected float separationWeight = 1.5f;
+        protected float attackInterval = 1f;
+        protected float attackRange = 6f;
+
         /// <summary>
         /// 状态机
         /// </summary>
@@ -332,11 +341,20 @@ namespace Game.Gameplay
         /// <summary>
         /// 应用数据库里的基础属性配置, 生成时调用以覆盖 prefab 默认值.
         /// </summary>
-        public void ApplyConfig(EnemyData enemyData) {
-            if(enemyData.maxHp > 0) MaxHp = enemyData.maxHp;
-            if(enemyData.moveSpeed > 0f) MoveSpeed = enemyData.moveSpeed;
-            if(enemyData.damage > 0) AttackDamage = enemyData.damage;
-            itemDropChance = Mathf.Clamp01(enemyData.itemDropChance);
+        public void ApplyConfig(EnemyConfig config) {
+            if(config.MaxHp > 0) MaxHp = config.MaxHp;
+            if(config.MoveSpeed > 0f) MoveSpeed = config.MoveSpeed;
+            if(config.Damage > 0) AttackDamage = config.Damage;
+            itemDropChance = Mathf.Clamp01(config.ItemDropChance);
+
+            // 视野与分离参数供行为层使用, 数值同样来自 EnemyData.lua.
+            visionRadius = config.VisionRadius;
+            visionAngle = config.VisionAngle;
+            searchTime = config.SearchTime;
+            separationRadius = config.SeparationRadius;
+            separationWeight = config.SeparationWeight;
+            attackInterval = config.AttackInterval;
+            attackRange = config.AttackRange;
 
             CurrentHp = MaxHp;
         }
