@@ -78,7 +78,7 @@ flowchart TD
 新代码放在 `Assets/Scripts/Gameplay/Room/Generation`，由场景里的组件驱动，不在代码里创建管理器。
 
 - `RoomGraph`：格子、类型、四个邻居。
-- `RandomRoomGenerator`：读取 `Assets/csv/LevelConfig.csv` 的关卡行，再游走、摆房间、摆走廊、把门锚点交给 `Room`。
+- `RandomRoomGenerator`：通过 Lua 数据接口读取 `LevelData` 的关卡行，再游走、摆房间、摆走廊、把门锚点交给 `Room`。
 - `GameScene` 上用它替换 `AddressableDungeonBootstrapper` 里的 `dungeonGenerator.Generate()`。Edgar 组件先留在工程里，这条生成路径不再调用它。
 - 小地图不再走 `MinimapHighlightPostProcess` 的 Edgar 回调，改为用每个房间 `Floor` Tilemap 的格子填 `MinimapRoomData`。
 
