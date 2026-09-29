@@ -40,6 +40,16 @@
 - [ ] 放进 `Buff` 分组, Addressables 地址设为 `buff/poison_behavior`, 标签带 `buff;hot_update`.
 - [ ] 如需 `HaHaBuff`: 先在 `Assets/csv/BuffData.csv` 加数据行, 再建行为预制体并配地址, 然后重跑 CSV 导入.
 
+契约系与击杀系行为预制体, 同样是空预制体加 `LuaComponet`, 都放进 `Buff` 分组并带 `buff;hot_update`:
+
+- [ ] `buff/blood_pact_behavior`, `m_typeName` = `BloodPactBehavior`.
+- [ ] `buff/blood_rage_behavior`, `m_typeName` = `BloodRageBehavior`.
+- [ ] `buff/lifesteal_behavior`, `m_typeName` = `LifestealBehavior`.
+- [ ] `buff/frenzy_behavior`, `m_typeName` = `FrenzyBehavior`.
+- [ ] `buff/bandolier_behavior`, `m_typeName` = `BandolierBehavior`.
+- [ ] `buff/war_drum_behavior`, `m_typeName` = `WarDrumBehavior`.
+- [ ] 皮糙肉厚、破甲、护盾、缓速、血契是纯属性 Buff, 不需要行为预制体.
+
 ## 6. 道具效果预制体
 
 五个预制体, 全部挂 `LuaComponet`, 放进 `Item` 分组, 标签带 `item;hot_update`:
@@ -48,7 +58,19 @@
 - [ ] `item/effect/speed`, `m_typeName` = `SpeedPotionModule`, DataReference 加 `buffId`, Int, 0.
 - [ ] `item/effect/damage`, `m_typeName` = `DamagePotionModule`, DataReference 加 `buffId`, Int, 1.
 - [ ] `item/effect/cleanse`, `m_typeName` = `CleansePotionModule`.
-- [ ] `item/effect/mystery`, `m_typeName` = `MysteryPotionModule`. 效果定义后改模块内容.
+- [ ] `item/effect/mystery`, `m_typeName` = `MysteryPotionModule`. 效果已定义为随机触发一种已有效果.
+- [ ] `item/effect/blood_tome`, `m_typeName` = `BloodTomeModule`.
+- [ ] `item/effect/shield_generator`, `m_typeName` = `ShieldGeneratorModule`.
+- [ ] `item/effect/war_drum`, `m_typeName` = `WarDrumModule`.
+- [ ] `item/effect/ammo_crate`, `m_typeName` = `AmmoCrateModule`.
+
+## 6b. 元素弹预制体
+
+两种新子弹是现有敌人子弹的复制体, 挂 `LuaComponet` 并填 `bulletId`:
+
+- [ ] 冰晶弹预制体: `m_typeName` = `EnemyBulletModule`, `bulletId` = `frost_bullet`, 放进 `Enemy` 分组.
+- [ ] 诅咒弹预制体: `m_typeName` = `EnemyBulletModule`, `bulletId` = `curse_bullet`, 放进 `Enemy` 分组.
+- [ ] 敌人换弹种时替换敌人预制体上的子弹引用即可, 命中 Buff 由 `BulletData.lua` 的 `hitBuffId` 决定.
 
 ## 7. 房间预制体
 
