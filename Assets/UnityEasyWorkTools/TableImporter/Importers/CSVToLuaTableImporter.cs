@@ -200,7 +200,7 @@ public static class CSVToLuaTableImporter
     /// <summary>
     /// 校验表头并返回列名到下标的映射.
     /// </summary>
-    private static Dictionary<string, int> BuildColumnIndex(TableSpec spec, List<string> headers, string csvPath)
+    private static Dictionary<string, int> BuildColumnIndex(TableSpec spec, IReadOnlyList<string> headers, string csvPath)
     {
         var columnIndex = new Dictionary<string, int>();
         for (var i = 0; i < headers.Count; i++)
@@ -449,7 +449,7 @@ public static class CSVToLuaTableImporter
                     builder.AppendLine($"{indent}{column.LuaField} = {LuaNumber(ParseFloat(raw, csvPath, rowNumber, column.CsvColumn))},");
                     break;
                 case ColumnType.Bool:
-                    builder.AppendLine($"{indent}{column.LuaField} = {ParseBool(raw, csvPath, rowNumber, column.CsvColumn) ? "true" : "false"},");
+                    builder.AppendLine($"{indent}{column.LuaField} = {(ParseBool(raw, csvPath, rowNumber, column.CsvColumn) ? "true" : "false")},");
                     break;
                 case ColumnType.String:
                     if (string.IsNullOrWhiteSpace(raw) && !column.AllowEmpty)

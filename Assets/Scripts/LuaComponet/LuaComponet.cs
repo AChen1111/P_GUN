@@ -63,7 +63,7 @@ public class DataReference
 /// 需要 Lua 逻辑的物体必须在预制体或场景上预先挂好本组件.
 /// 组件实现 IPoolable, 被对象池管理时把取出和回收转成 Lua 的 OnSpawn 与 OnRecycle.
 /// </summary>
-public class LuaComponet : MonoBehaviour, IPoolable
+public class LuaComponet : LuaBehaviourHost
 {
     [SerializeField]
     [Tooltip("lua类型名, 必须已写进 module.lua 的 moduleList.")]
@@ -85,9 +85,8 @@ public class LuaComponet : MonoBehaviour, IPoolable
     private readonly Dictionary<string, Action<LuaTable, float>> m_onFunctionsFloat = new Dictionary<string, Action<LuaTable, float>>();
     private readonly Dictionary<string, Action<LuaTable, GameObject>> m_onFunctionsGameObject = new Dictionary<string, Action<LuaTable, GameObject>>();
     private readonly Dictionary<string, Action<LuaTable, Vector2, float>> m_onFunctionsVector2Float = new Dictionary<string, Action<LuaTable, Vector2, float>>();
-    private readonly Dictionary<string, Func<LuaTable, bool>> m_boolFunctions = new Dictionary<string, Func<LuaTable, bool>>();
 
-    public string TypeName => m_typeName;
+    public override string TypeName => m_typeName;
 
     /// <summary>
     /// 初始化运行时依赖.
@@ -175,7 +174,7 @@ public class LuaComponet : MonoBehaviour, IPoolable
     /// <summary>
     /// 按名称调用 Lua 函数, 第一个参数是实例表. 模块未定义该函数时跳过.
     /// </summary>
-    public void CallLuaFunction(string functionName)
+    public override void CallLuaFunction(string functionName)
     {
         if (m_luaTable == null || m_onFunctions == null)
         {
@@ -199,7 +198,7 @@ public class LuaComponet : MonoBehaviour, IPoolable
     /// <summary>
     /// 调用带一个 Vector2 参数的 Lua 函数, 例如武器开火方向.
     /// </summary>
-    public void CallLuaFunction(string functionName, Vector2 arg1)
+    public override void CallLuaFunction(string functionName, Vector2 arg1)
     {
         var func = GetCachedFunction(m_onFunctionsVector2, functionName);
         func?.Invoke(m_luaTable, arg1);
@@ -208,7 +207,7 @@ public class LuaComponet : MonoBehaviour, IPoolable
     /// <summary>
     /// 调用带一个 float 参数的 Lua 函数, 例如时间增量.
     /// </summary>
-    public void CallLuaFunction(string functionName, float arg1)
+    public override void CallLuaFunction(string functionName, float arg1)
     {
         var func = GetCachedFunction(m_onFunctionsFloat, functionName);
         func?.Invoke(m_luaTable, arg1);
@@ -217,7 +216,7 @@ public class LuaComponet : MonoBehaviour, IPoolable
     /// <summary>
     /// 调用带一个 GameObject 参数的 Lua 函数, 例如子弹命中的目标.
     /// </summary>
-    public void CallLuaFunction(string functionName, GameObject arg1)
+    public override void CallLuaFunction(string functionName, GameObject arg1)
     {
         var func = GetCachedFunction(m_onFunctionsGameObject, functionName);
         func?.Invoke(m_luaTable, arg1);
@@ -226,7 +225,7 @@ public class LuaComponet : MonoBehaviour, IPoolable
     /// <summary>
     /// 调用带 Vector2 和 float 参数的 Lua 函数, 例如按住射击时的方向和本帧时间.
     /// </summary>
-    public void CallLuaFunction(string functionName, Vector2 arg1, float arg2)
+    public override void CallLuaFunction(string functionName, Vector2 arg1, float arg2)
     {
         var func = GetCachedFunction(m_onFunctionsVector2Float, functionName);
         func?.Invoke(m_luaTable, arg1, arg2);
@@ -235,7 +234,7 @@ public class LuaComponet : MonoBehaviour, IPoolable
     /// <summary>
     /// 调用返回 bool 的 Lua 函数, 用于 CanUse 这类判断. 模块缺少该函数时报错并返回 false.
     /// </summary>
-    public bool CallLuaFunctionBool(string functionName)
+    public override bool CallLuaFunctionBool(string functionName)
     {
         if (m_luaTable == null)
         {
@@ -243,25 +242,28 @@ public class LuaComponet : MonoBehaviour, IPoolable
             return false;
         }
 
-        if (!m_boolFunctions.TryGetValue(functionName, out var func))
-        {
-            func = m_luaTable.Get<Func<LuaTable, bool>>(functionName);
-            m_boolFunctions[functionName] = func;
-        }
-
+        // bool 回调直接通过 LuaFunction 调用, 避免新增 xLua 生成委托后旧桥接代码缺失.
+        var func = m_luaTable.Get<LuaFunction>(functionName);
         if (func == null)
         {
             Debug.LogError($"[LuaComponet] Lua 模块缺少 {functionName} 函数. TypeName: {m_typeName}.", this);
             return false;
         }
 
-        return func.Invoke(m_luaTable);
+        try
+        {
+            return func.Func<LuaTable, bool>(m_luaTable);
+        }
+        finally
+        {
+            func.Dispose();
+        }
     }
 
     /// <summary>
     /// 判断模块是否定义了指定函数, 不触发调用.
     /// </summary>
-    public bool HasLuaFunction(string functionName)
+    public override bool HasLuaFunction(string functionName)
     {
         if (m_luaTable == null)
         {
@@ -274,7 +276,7 @@ public class LuaComponet : MonoBehaviour, IPoolable
     /// <summary>
     /// 向实例表写入运行时数据, 例如 Buff 的归属玩家和层数.
     /// </summary>
-    public void SetLuaField(string fieldName, object value)
+    public override void SetLuaField(string fieldName, object value)
     {
         if (m_luaTable == null)
         {
@@ -288,7 +290,7 @@ public class LuaComponet : MonoBehaviour, IPoolable
     /// <summary>
     /// 对象池取出时回调, 转发给 Lua 的 OnSpawn.
     /// </summary>
-    public void OnSpawnFromPool()
+    public override void OnSpawnFromPool()
     {
         CallLuaFunction("OnSpawn");
     }
@@ -296,7 +298,7 @@ public class LuaComponet : MonoBehaviour, IPoolable
     /// <summary>
     /// 对象池回收时回调, 转发给 Lua 的 OnRecycle.
     /// </summary>
-    public void OnRecycleToPool()
+    public override void OnRecycleToPool()
     {
         CallLuaFunction("OnRecycle");
     }
@@ -346,7 +348,6 @@ public class LuaComponet : MonoBehaviour, IPoolable
         m_onFunctionsFloat.Clear();
         m_onFunctionsGameObject.Clear();
         m_onFunctionsVector2Float.Clear();
-        m_boolFunctions.Clear();
         InitOnFunctions();
         InitComponent();
     }

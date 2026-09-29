@@ -51,7 +51,8 @@ namespace Game.Gameplay
                     continue;
                 }
 
-                separation += (1f - distance / separationRadius) * (toNeighbor / distance);
+                // 远离邻居而非朝向邻居, 距离越近推开越强.
+                separation -= (1f - distance / separationRadius) * (toNeighbor / distance);
             }
 
             return separation;

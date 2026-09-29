@@ -1,5 +1,36 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &2130625810458009853
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8110573738714649156}
+  m_Layer: 0
+  m_Name: FirePoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8110573738714649156
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2130625810458009853}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.523, y: 0.098, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5722130623628035507}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &3320538286939619650
 GameObject:
   m_ObjectHideFlags: 0
@@ -10,9 +41,10 @@ GameObject:
   m_Component:
   - component: {fileID: 5722130623628035507}
   - component: {fileID: 5980171846526034052}
-  - component: {fileID: 5464761118430002349}
   - component: {fileID: 4444031068190148130}
   - component: {fileID: 1479721954311172869}
+  - component: {fileID: 7800431209270702006}
+  - component: {fileID: 115597957733052613}
   m_Layer: 0
   m_Name: MP5
   m_TagString: Untagged
@@ -35,6 +67,7 @@ Transform:
   m_Children:
   - {fileID: 8036611020411187223}
   - {fileID: 5047975390998751030}
+  - {fileID: 8110573738714649156}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &5980171846526034052
@@ -53,39 +86,6 @@ MonoBehaviour:
   CustomComponentName: MP5
   CustomComment: 
   mComponentName: QFramework.ViewController
---- !u!114 &5464761118430002349
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3320538286939619650}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4d1f8d37755826846a74ede51b64fb8e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Namespace: QFramework.Example
-  ScriptName: MP5
-  ScriptsFolder: Assets\Scripts\Gameplay\Entity\Player\Weapon\Gun
-  GeneratePrefab: 0
-  PrefabFolder: Assets/Art/Prefab
-  ArchitectureFullTypeName: 
-  ViewControllerFullTypeName: 
-  weaponId: MP5
-  weaponDatabase: {fileID: 11400000, guid: 6d6e0a3a98503714c899e24a2384c459, type: 2}
-  shootSounds:
-  - {fileID: 8300000, guid: 7f5ebb3ad6679da4793726201cea6868, type: 3}
-  firePoint: {fileID: 5047975390998751030}
-  ReloadSound: {fileID: 8300000, guid: 14adb12de103ab64582403089e31a746, type: 3}
-  MinDamage: 0
-  MaxDamage: 0
-  MaxBulletBagNum: 0
-  clipSize: 0
-  shootInterval: 0
-  bulletSpeed: 0
-  PlayerBullet: {fileID: 8883869366757948090, guid: 576871a843cdcfa4facd211562818436, type: 3}
-  SelfAudioSource: {fileID: 1479721954311172869}
 --- !u!114 &4444031068190148130
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -112,6 +112,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 374010033509238546, guid: 569809b44565dc442ba3ee727965ff13, type: 2}
   m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
@@ -197,6 +198,52 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &7800431209270702006
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3320538286939619650}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c2b694a9ab0ce6c4a9df47d9f8ab862c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Namespace: QFramework.Example
+  ScriptName: MP5
+  ScriptsFolder: Assets\Scripts\Gameplay\Entity\Player\Weapon\Gun
+  GeneratePrefab: 0
+  PrefabFolder: Assets/Art/Prefab
+  ArchitectureFullTypeName: 
+  ViewControllerFullTypeName: 
+  weaponId: MP5
+  shootSounds:
+  - {fileID: 8300000, guid: 7f5ebb3ad6679da4793726201cea6868, type: 3}
+  firePoint: {fileID: 8110573738714649156}
+  ReloadSound: {fileID: 8300000, guid: 14adb12de103ab64582403089e31a746, type: 3}
+  MinDamage: 0
+  MaxDamage: 0
+  MaxBulletBagNum: 0
+  clipSize: 0
+  shootInterval: 0
+  bulletSpeed: 0
+  bulletPrefab: {fileID: 8883869366757948090, guid: 576871a843cdcfa4facd211562818436, type: 3}
+--- !u!114 &115597957733052613
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3320538286939619650}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d8682f06ec2c26f4092b11f83922c8f1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game.LuaComponent::LuaComponet
+  m_typeName: MP5Module
+  m_objectReferences: []
+  m_dataReferences: []
 --- !u!1 &5515826007039413427
 GameObject:
   m_ObjectHideFlags: 0
@@ -231,6 +278,7 @@ Transform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &6197847062936491725
 SpriteRenderer:
+  serializedVersion: 2
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -246,6 +294,11 @@ SpriteRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -267,9 +320,11 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: f1ac879a30b0c4c4897ed49c5c9ee059, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -279,7 +334,6 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
-  m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!1 &8833404894800193653
 GameObject:
@@ -315,6 +369,7 @@ Transform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &8630219676000001829
 SpriteRenderer:
+  serializedVersion: 2
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -330,6 +385,11 @@ SpriteRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -351,9 +411,11 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 1
+  m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: e80c7e6080d1edf46a3126017004c41f, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -363,5 +425,4 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
-  m_MaskInteraction: 0
   m_SpriteSortPoint: 0

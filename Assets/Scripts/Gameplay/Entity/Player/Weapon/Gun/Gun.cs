@@ -1,3 +1,4 @@
+using Game.Pooling;
 using System;
 using System.Collections.Generic;
 using QFramework;
@@ -40,9 +41,14 @@ namespace Game.Gameplay
     /// </summary>
     [SerializeField] private Transform firePoint;
 
-    protected Vector2 FirePointPosition => firePoint != null ? firePoint.Position2D() : BulletPrefab.Position2D();
+    // 枪口必须由武器预制体明确绑定, 避免把子弹预制体的原点当成世界坐标.
+    protected Vector2 FirePointPosition => RequiredFirePoint.Position2D();
 
-    protected Quaternion FirePointRotation => firePoint != null ? firePoint.rotation : BulletPrefab.transform.rotation;
+    protected Quaternion FirePointRotation => RequiredFirePoint.rotation;
+
+    private Transform RequiredFirePoint => firePoint != null
+        ? firePoint
+        : throw new InvalidOperationException($"{name} 未绑定枪口 firePoint.");
 
     /// <summary>
     /// 音频源,所有武器公用一个
@@ -60,7 +66,7 @@ namespace Game.Gameplay
     [Header("伤害设置")]
     public int MinDamage;
     public int MaxDamage;
-    public int Damage => Random.Range(MinDamage, MaxDamage + 1);
+    public int Damage => UnityEngine.Random.Range(MinDamage, MaxDamage + 1);
 
 
     [Header("备弹设置")]
@@ -79,7 +85,7 @@ namespace Game.Gameplay
     /// <summary>
     /// 本枪的 Lua 行为组件, 开火规则在对应模块里.
     /// </summary>
-    private LuaComponet gunLua;
+    private LuaBehaviourHost gunLua;
 
     /// <summary>
     /// 基类开火缺少 Lua 组件时只警告一次, 避免逐帧刷屏.
@@ -106,7 +112,7 @@ namespace Game.Gameplay
     /// </summary>
     protected virtual void Awake()
     {
-        gunLua = GetComponent<LuaComponet>();
+        gunLua = GetComponent<LuaBehaviourHost>();
         ApplyDataFromLuaTable();
         LoadSoundsAsync();
 
@@ -398,7 +404,7 @@ protected void PlayGunFire(Vector2 direction)
 
         //播放新声音
         int n = shootSounds.Count;
-        int index = Random.Range(0, n);
+        int index = UnityEngine.Random.Range(0, n);
         PlayerAudioSource.clip = shootSounds[index];
         PlayerAudioSource.loop = loop;
         PlayerAudioSource.Play();

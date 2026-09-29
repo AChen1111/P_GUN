@@ -2,7 +2,8 @@
     "name": "Game.LuaComponent.Editor",
     "rootNamespace": "",
     "references": [
-        "Game.LuaComponent"
+        "Game.LuaComponent",
+        "XLua.Runtime"
     ],
     "includePlatforms": [
         "Editor"

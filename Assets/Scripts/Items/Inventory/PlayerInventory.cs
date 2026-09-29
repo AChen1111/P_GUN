@@ -1,3 +1,4 @@
+using Game.Pooling;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -13,7 +14,7 @@ namespace Game.Items
     public class PlayerInventory : MonoBehaviour
     {
         // 效果预制体和图标缓存的是资源而非场景实例, 跨场景保留是安全的.
-        private static readonly Dictionary<int, LuaComponet> effectPrefabsById = new Dictionary<int, LuaComponet>();
+        private static readonly Dictionary<int, LuaBehaviourHost> effectPrefabsById = new Dictionary<int, LuaBehaviourHost>();
 
         private readonly Dictionary<int, InventoryItemStack> stacksById = new Dictionary<int, InventoryItemStack>();
         private readonly List<InventoryItemStack> orderedStacks = new List<InventoryItemStack>();
@@ -171,7 +172,7 @@ namespace Game.Items
                 if (!effectPrefabsById.ContainsKey(itemId))
                 {
                     var prefabGameObject = await loader.LoadAssetAsync<GameObject>(config.EffectPrefabAddress);
-                    var prefab = prefabGameObject != null ? prefabGameObject.GetComponent<LuaComponet>() : null;
+                    var prefab = prefabGameObject != null ? prefabGameObject.GetComponent<LuaBehaviourHost>() : null;
                     if (prefab == null)
                     {
                         throw new InvalidOperationException($"道具效果预制体缺少 LuaComponet, 地址: {config.EffectPrefabAddress}.");

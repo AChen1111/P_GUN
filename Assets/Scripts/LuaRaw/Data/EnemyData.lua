@@ -4,7 +4,7 @@
 return {
     ["1"] = {
         displayName = "Bat",
-        prefabAddress = "Assets/Prefab/Enemy/Bat.prefab",
+        prefabAddress = "enemy/bat",
         maxHp = 10,
         moveSpeed = 2.5,
         damage = 1,
@@ -19,7 +19,7 @@ return {
     },
     ["2"] = {
         displayName = "Slime",
-        prefabAddress = "Assets/Prefab/Enemy/Slime.prefab",
+        prefabAddress = "enemy/slime",
         maxHp = 3,
         moveSpeed = 2.5,
         damage = 1,
@@ -31,5 +31,20 @@ return {
         separationWeight = 1.5,
         attackInterval = 1,
         attackRange = 1,
+    },
+    ["3"] = {
+        displayName = "Big_enemy",
+        prefabAddress = "enemy/big_enemy",
+        maxHp = 35,
+        moveSpeed = 1.6,
+        damage = 2,
+        itemDropChance = 1,
+        visionRadius = 8,
+        visionAngle = 120,
+        searchTime = 3,
+        separationRadius = 2.2,
+        separationWeight = 1.5,
+        attackInterval = 1.5,
+        attackRange = 8,
     },
 }

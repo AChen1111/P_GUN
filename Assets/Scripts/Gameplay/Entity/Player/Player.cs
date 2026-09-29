@@ -78,8 +78,8 @@ namespace Game.Gameplay
         [SerializeField] private float hurtSlowTimeScale = 0.9f;
         [SerializeField] private float hurtSlowDuration = 0.18f;
         [SerializeField] private float hurtInvincibleDuration = 1f;
-        [SerializeField] private float hurtKnockbackDistance = 0.65f;
-        [SerializeField] private float hurtKnockbackDuration = 0.12f;
+        [SerializeField] private float hurtKnockbackDistance = 0.18f;
+        [SerializeField] private float hurtKnockbackDuration = 0.1f;
 
         [Header("子弹时间")]
         // 子弹时间只减慢敌人, 不修改全局 Time.timeScale, 这样玩家移动和开火保持正常.
@@ -334,22 +334,22 @@ namespace Game.Gameplay
 
             if (hurtKnockbackTimer > 0f)
             {
-                // 受击后退使用真实时间计时, 避免慢动作影响后退距离.
-                hurtKnockbackTimer -= Time.unscaledDeltaTime;
-                rb.velocity = hurtKnockbackTimer > 0f ? hurtKnockbackVelocity : Vector2.zero;
+                // 受击位移按物理步长计时, 保持实际位移与配置距离一致.
+                hurtKnockbackTimer -= Time.fixedDeltaTime;
+                rb.linearVelocity = hurtKnockbackTimer > 0f ? hurtKnockbackVelocity : Vector2.zero;
             }
             else
             {
-                rb.velocity = new Vector2(horizontal, vertical).normalized * CurrentMoveSpeed;
+                rb.linearVelocity = new Vector2(horizontal, vertical).normalized * CurrentMoveSpeed;
             }
 
             if (animator != null)
             {
-                animator.SetFloat("Speed", rb.velocity.magnitude);
+                animator.SetFloat("Speed", rb.linearVelocity.magnitude);
             }
 
             #region 睡眠状态检测
-            var hasMotionInput = rb.velocity.magnitude >= 0.01f;
+            var hasMotionInput = rb.linearVelocity.magnitude >= 0.01f;
             if(!hasMotionInput && !isSleep) {
                 sleepTimer += Time.deltaTime;
                 if(sleepTimer >= SleepDuration) {

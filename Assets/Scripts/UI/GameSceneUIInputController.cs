@@ -459,7 +459,7 @@ namespace Game.UI
         for (int i = 0; i < activeBuffs.Count; i++)
         {
             BuffRuntimeInfo info = activeBuffs[i];
-            if (info?.Buff == null)
+            if (info?.Config == null)
             {
                 continue;
             }

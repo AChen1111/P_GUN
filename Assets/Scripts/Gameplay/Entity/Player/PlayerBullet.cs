@@ -1,3 +1,4 @@
+using Game.Pooling;
 using System;
 using UnityEngine;
 using Game.Core;
@@ -20,7 +21,7 @@ namespace Game.Gameplay
         [SerializeField] private AudioPlay _audioPlay;
 
         private bool hasHit = false;
-        private LuaComponet bulletLua;
+        private LuaBehaviourHost bulletLua;
 
         /// <summary>
         /// 初始化运行时依赖.
@@ -28,7 +29,7 @@ namespace Game.Gameplay
         private void Awake() {
             rb = GetComponent<Rigidbody2D>();
             _audioPlay = GetComponent<AudioPlay>();
-            bulletLua = GetComponent<LuaComponet>();
+            bulletLua = GetComponent<LuaBehaviourHost>();
             ConfigureHitColliders();
             gameObject.layer = LayerMask.NameToLayer("PlayerBullet");
         }
@@ -112,7 +113,7 @@ namespace Game.Gameplay
         private void FixedUpdate() {
             if (hasHit) return;
             // 玩家子弹使用正常时间, 不受子弹时间影响.
-            rb.velocity = dir * speed;
+            rb.linearVelocity = dir * speed;
         }
 
         /// <summary>
@@ -221,7 +222,7 @@ namespace Game.Gameplay
         /// 清掉刚体速度, 避免回收后再次启用时继承旧速度.
         /// </summary>
         private void StopMove() {
-            rb.velocity = Vector2.zero;
+            rb.linearVelocity = Vector2.zero;
         }
     }
 }

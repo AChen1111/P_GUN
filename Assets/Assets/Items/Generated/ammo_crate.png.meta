@@ -1,0 +1,780 @@
+fileFormatVersion: 2
+guid: c33faf6f8f47ba64c861ace482466381
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 2332234592649753085
+    second: ammo_crate_0
+  - first:
+      213: -4109606411956074045
+    second: ammo_crate_1
+  - first:
+      213: 381292320714414215
+    second: ammo_crate_2
+  - first:
+      213: -1631948990263863617
+    second: ammo_crate_3
+  - first:
+      213: -5301059945744741658
+    second: ammo_crate_4
+  - first:
+      213: -8394533990916537168
+    second: ammo_crate_5
+  - first:
+      213: 8945584677771065580
+    second: ammo_crate_6
+  - first:
+      213: -8967625371501408181
+    second: ammo_crate_7
+  - first:
+      213: -6865517048864977277
+    second: ammo_crate_8
+  - first:
+      213: -911478287590866591
+    second: ammo_crate_9
+  - first:
+      213: -1582248235024975659
+    second: ammo_crate_10
+  - first:
+      213: 1792615533098342660
+    second: ammo_crate_11
+  - first:
+      213: -7582915492287696495
+    second: ammo_crate_12
+  - first:
+      213: -6761103269394102090
+    second: ammo_crate_13
+  - first:
+      213: -7471825013357573947
+    second: ammo_crate_14
+  - first:
+      213: 8982243993680845402
+    second: ammo_crate_15
+  - first:
+      213: 7452506115511837711
+    second: ammo_crate_16
+  - first:
+      213: 2866647028896448041
+    second: ammo_crate_17
+  - first:
+      213: 5733584097688847814
+    second: ammo_crate_18
+  - first:
+      213: 6529901437560687145
+    second: ammo_crate_19
+  - first:
+      213: 1928571148924543711
+    second: ammo_crate_20
+  - first:
+      213: -7641378222958284476
+    second: ammo_crate_21
+  - first:
+      213: -5398877300392965486
+    second: ammo_crate_22
+  - first:
+      213: 5347284990864232261
+    second: ammo_crate_23
+  - first:
+      213: -7605043812335085672
+    second: ammo_crate_24
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 1
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 1000
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: ammo_crate_0
+      rect:
+        serializedVersion: 2
+        x: 112
+        y: 0
+        width: 1337
+        height: 990
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: df134cb5103cd5020800000000000000
+      internalID: 2332234592649753085
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ammo_crate_1
+      rect:
+        serializedVersion: 2
+        x: 830
+        y: 951
+        width: 7
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3c9c0b0fdbeb7f6c0800000000000000
+      internalID: -4109606411956074045
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ammo_crate_2
+      rect:
+        serializedVersion: 2
+        x: 838
+        y: 947
+        width: 15
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 78854c3785f9a4500800000000000000
+      internalID: 381292320714414215
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ammo_crate_3
+      rect:
+        serializedVersion: 2
+        x: 1198
+        y: 668
+        width: 17
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fb6d3cf2a072a59e0800000000000000
+      internalID: -1631948990263863617
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ammo_crate_4
+      rect:
+        serializedVersion: 2
+        x: 1240
+        y: 671
+        width: 7
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6ea45d8c01ade66b0800000000000000
+      internalID: -5301059945744741658
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ammo_crate_5
+      rect:
+        serializedVersion: 2
+        x: 1200
+        y: 656
+        width: 7
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0b44a78bfcf908b80800000000000000
+      internalID: -8394533990916537168
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ammo_crate_6
+      rect:
+        serializedVersion: 2
+        x: 1222
+        y: 637
+        width: 19
+        height: 27
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ce8b8b26ed9152c70800000000000000
+      internalID: 8945584677771065580
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ammo_crate_7
+      rect:
+        serializedVersion: 2
+        x: 1228
+        y: 613
+        width: 7
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b40d0e4bc389c8380800000000000000
+      internalID: -8967625371501408181
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ammo_crate_8
+      rect:
+        serializedVersion: 2
+        x: 1238
+        y: 601
+        width: 11
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 38ec30f7e98c8b0a0800000000000000
+      internalID: -6865517048864977277
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ammo_crate_9
+      rect:
+        serializedVersion: 2
+        x: 1239
+        y: 534
+        width: 16
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1614aaf9357c953f0800000000000000
+      internalID: -911478287590866591
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ammo_crate_10
+      rect:
+        serializedVersion: 2
+        x: 1262
+        y: 543
+        width: 16
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5d8f8d40d99ba0ae0800000000000000
+      internalID: -1582248235024975659
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ammo_crate_11
+      rect:
+        serializedVersion: 2
+        x: 1240
+        y: 465
+        width: 7
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4099c256456a0e810800000000000000
+      internalID: 1792615533098342660
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ammo_crate_12
+      rect:
+        serializedVersion: 2
+        x: 254
+        y: 435
+        width: 13
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 191b268298214c690800000000000000
+      internalID: -7582915492287696495
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ammo_crate_13
+      rect:
+        serializedVersion: 2
+        x: 264
+        y: 374
+        width: 23
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6b8480af56cbb22a0800000000000000
+      internalID: -6761103269394102090
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ammo_crate_14
+      rect:
+        serializedVersion: 2
+        x: 1238
+        y: 383
+        width: 9
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5c881fedcbebe4890800000000000000
+      internalID: -7471825013357573947
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ammo_crate_15
+      rect:
+        serializedVersion: 2
+        x: 280
+        y: 358
+        width: 7
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a5a9b31825757ac70800000000000000
+      internalID: 8982243993680845402
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ammo_crate_16
+      rect:
+        serializedVersion: 2
+        x: 1214
+        y: 351
+        width: 17
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f046285b3de9c6760800000000000000
+      internalID: 7452506115511837711
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ammo_crate_17
+      rect:
+        serializedVersion: 2
+        x: 1198
+        y: 281
+        width: 19
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 92e3dcdd84068c720800000000000000
+      internalID: 2866647028896448041
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ammo_crate_18
+      rect:
+        serializedVersion: 2
+        x: 494
+        y: 65
+        width: 139
+        height: 85
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6c58298eb58c19f40800000000000000
+      internalID: 5733584097688847814
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ammo_crate_19
+      rect:
+        serializedVersion: 2
+        x: 648
+        y: 95
+        width: 7
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 92a0e14b2cede9a50800000000000000
+      internalID: 6529901437560687145
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ammo_crate_20
+      rect:
+        serializedVersion: 2
+        x: 1022
+        y: 94
+        width: 15
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fd2e6bfed39a3ca10800000000000000
+      internalID: 1928571148924543711
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ammo_crate_21
+      rect:
+        serializedVersion: 2
+        x: 638
+        y: 62
+        width: 25
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4417a22fdfe54f590800000000000000
+      internalID: -7641378222958284476
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ammo_crate_22
+      rect:
+        serializedVersion: 2
+        x: 1014
+        y: 64
+        width: 15
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 29a482423b55315b0800000000000000
+      internalID: -5398877300392965486
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ammo_crate_23
+      rect:
+        serializedVersion: 2
+        x: 1087
+        y: 53
+        width: 14
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 54f8d393e5f553a40800000000000000
+      internalID: 5347284990864232261
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ammo_crate_24
+      rect:
+        serializedVersion: 2
+        x: 660
+        y: 35
+        width: 31
+        height: 27
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8971c7822f4757690800000000000000
+      internalID: -7605043812335085672
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      ammo_crate_0: 2332234592649753085
+      ammo_crate_1: -4109606411956074045
+      ammo_crate_10: -1582248235024975659
+      ammo_crate_11: 1792615533098342660
+      ammo_crate_12: -7582915492287696495
+      ammo_crate_13: -6761103269394102090
+      ammo_crate_14: -7471825013357573947
+      ammo_crate_15: 8982243993680845402
+      ammo_crate_16: 7452506115511837711
+      ammo_crate_17: 2866647028896448041
+      ammo_crate_18: 5733584097688847814
+      ammo_crate_19: 6529901437560687145
+      ammo_crate_2: 381292320714414215
+      ammo_crate_20: 1928571148924543711
+      ammo_crate_21: -7641378222958284476
+      ammo_crate_22: -5398877300392965486
+      ammo_crate_23: 5347284990864232261
+      ammo_crate_24: -7605043812335085672
+      ammo_crate_3: -1631948990263863617
+      ammo_crate_4: -5301059945744741658
+      ammo_crate_5: -8394533990916537168
+      ammo_crate_6: 8945584677771065580
+      ammo_crate_7: -8967625371501408181
+      ammo_crate_8: -6865517048864977277
+      ammo_crate_9: -911478287590866591
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

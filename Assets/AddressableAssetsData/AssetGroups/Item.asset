@@ -17,53 +17,345 @@ MonoBehaviour:
     m_SerializedData: []
   m_GUID: d2b216c749b463c44bdf7f47574230f5
   m_SerializeEntries:
+  - m_GUID: 03e52094c5625064ab7e4acb183afe12
+    m_Address: item/prefab/buff_crystal_8
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 0d97b75cf6914479889ba297b299cc12
     m_Address: item/purify
     m_ReadOnly: 0
     m_SerializedLabels:
+    - hot_update
     - item
     - prefab
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0f318e21560029444ace0783067f4820
+    m_Address: Assets/Assets/Item/HP1.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    - item
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 11aa93244758d7348ad59c98bc43cc82
+    m_Address: item/prefab/shield_generator
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    - item
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 11f6507fd965d7f4e85d73af483cafde
+    m_Address: item/prefab/buff_crystal_10
+    m_ReadOnly: 0
+    m_SerializedLabels:
     - hot_update
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 11f80f59cb4fd3c4f8e371ff95409cb6
     m_Address: item/harm_up
     m_ReadOnly: 0
     m_SerializedLabels:
+    - hot_update
     - item
     - prefab
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1e51c7106d7647a479f4949b8df2c811
+    m_Address: item/prefab/buff_crystal_6
+    m_ReadOnly: 0
+    m_SerializedLabels:
     - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 20aae47e48bf76c43990c9a2fd1f2a4e
+    m_Address: Assets/Assets/Items/Flasks/Flasks_Big/flask_big_green.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    - item
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 25bc3176d1e3f7443834d48c6d997568
+    m_Address: item/prefab/buff_crystal_14
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 2c1629b52e7c04a4a95984e480fc0b3d
+    m_Address: item/prefab/buff_crystal_4
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 2e4393c55e26fa04d89f7c08c971b215
+    m_Address: item/prefab/buff_crystal_12
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 342acc70da6d023439ac0e356d5946f3
+    m_Address: Assets/Assets/Items/Generated/shield_generator.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    - item
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 43626c4fd35b8cc4d8811ddaf0ed9a32
+    m_Address: Assets/Assets/Items/Generated/blood_tome.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    - item
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 478a4517b4c7e8645ac14a1fa93a46ff
+    m_Address: Assets/Assets/Items/Flasks/Flasks_Big/flask_big_blue.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    - item
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4a8a680ae32833840b1808f0d35f3ecc
+    m_Address: item/prefab/damage
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    - item
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5611fcb64851bac4d8fd25f861667541
+    m_Address: item/prefab/blood_tome
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    - item
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 56d9ee7e02b0d194da79f2c8365c8531
+    m_Address: item/prefab/buff_crystal_0
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 58ef2bb9a9c88b148930bcfd74e776c6
+    m_Address: item/prefab/ammo_crate
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    - item
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7512e8073820b814db75431107826eed
+    m_Address: item/effect/damage
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    - item
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7d2c55fc50b93b64691f18292e5e81a1
+    m_Address: item/prefab/buff_crystal_11
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7efbecaffd4af004b88190a18416c835
+    m_Address: item/effect/blood_tome
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    - item
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8023ee613cebcaf4b8d68f8b736da21b
+    m_Address: item/effect/cleanse
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    - item
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 82d25568967308f41b3d3801d80d2d4f
+    m_Address: item/effect/war_drum
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    - item
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8812a20bd4ab2464bab0ac13d0ee4adf
+    m_Address: item/effect/shield_generator
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    - item
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 90caddcf7815d6d429713c3b098d1fd1
+    m_Address: item/prefab/mystery
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    - item
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9698ebc88e969064285f017b5df0a339
+    m_Address: item/effect/heal
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    - item
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a4804175cbbe39f4c9e24dd752845298
+    m_Address: item/effect/speed
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    - item
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: a4f46db2f0b85564a81ad43c4f0b8880
     m_Address: item/heart
     m_ReadOnly: 0
     m_SerializedLabels:
+    - hot_update
     - item
     - prefab
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a91769e6914a3a24994b84276f07f85b
+    m_Address: item/prefab/speed
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    - item
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: aad82cac353f25d4082c314b81647ac6
+    m_Address: item/prefab/buff_crystal_9
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ab3de2ce327f7e9409c4460ad2189996
+    m_Address: item/prefab/cleanse
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    - item
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: acbdcae35c3dcf647b4d9882cdf1282d
+    m_Address: item/effect/ammo_crate
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    - item
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: af0fa65bbc3299b4080d743c5d8c4d57
+    m_Address: item/prefab/war_drum
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    - item
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b34ed1aab557abf4ea038bbe600e7b65
+    m_Address: Assets/Assets/Items/Flasks/Flasks_Big/flask_big_red.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    - item
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b47adb5e70b70834fb3ead6bbbd6f7bb
+    m_Address: item/prefab/buff_crystal_3
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b70449cda3219c24cae5608390728b58
+    m_Address: item/prefab/buff_crystal_2
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b790f34ed5b6d654885f4efc937727e6
+    m_Address: item/prefab/heal
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    - item
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ba780eaf0ff081c4f8f3fa058a6ef90c
+    m_Address: item/prefab/buff_crystal_1
+    m_ReadOnly: 0
+    m_SerializedLabels:
     - hot_update
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: bedc99d1d01a09b47a4db6c1717c43d1
     m_Address: item/power_up
     m_ReadOnly: 0
     m_SerializedLabels:
+    - hot_update
     - item
     - prefab
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: bf817939e9a0a3241b3cf68a375367e7
+    m_Address: Assets/Assets/Items/Potion Asset.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
     - hot_update
+    - item
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c33faf6f8f47ba64c861ace482466381
+    m_Address: Assets/Assets/Items/Generated/ammo_crate.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    - item
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d4618f92295b5124a89508da2c14e780
+    m_Address: item/prefab/buff_crystal_13
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d5919c71dacfb1a48937712e1df55296
+    m_Address: Assets/Assets/Items/Generated/war_drum.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    - item
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: d7289ca60b79f7849be1a94d4f3cb4be
     m_Address: ItemDatabase
     m_ReadOnly: 0
     m_SerializedLabels:
     - database
+    - hot_update
     - item
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: dc2f6dea7379aa74b8f776bbf50c3fc3
+    m_Address: item/prefab/buff_crystal_5
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e325fef7044b60249bfd8f59acaba856
+    m_Address: item/effect/buff_crystal
+    m_ReadOnly: 0
+    m_SerializedLabels:
     - hot_update
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: ec55b4f84b4c70f4e958efa2efb7d253
     m_Address: item/speed_up
     m_ReadOnly: 0
     m_SerializedLabels:
+    - hot_update
     - item
     - prefab
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f4358f337bc026743903234f6a99b356
+    m_Address: Assets/Assets/Items/Flasks/Flasks_Big/flask_big_yellow.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
     - hot_update
+    - item
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: fb3289104cd56a940836306308120d3e
+    m_Address: item/prefab/buff_crystal_7
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: fc460e68706fa644ca34bc06d7d16d34
+    m_Address: item/effect/mystery
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    - item
     FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 63af2ccf367b1c745b05c3dc480c23af, type: 2}

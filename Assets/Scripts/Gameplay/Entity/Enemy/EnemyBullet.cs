@@ -1,3 +1,4 @@
+using Game.Pooling;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -21,15 +22,15 @@ namespace Game.Gameplay
 
         [Header("击中玩家音效")]
         public List<AudioClip> hitSoundsOnPlayer = new List<AudioClip>();
-        private AudioClip hitSoundOnPlayer => hitSoundsOnPlayer.Count > 0 ? hitSoundsOnPlayer[Random.Range(0, hitSoundsOnPlayer.Count)] : null;
+        private AudioClip hitSoundOnPlayer => hitSoundsOnPlayer.Count > 0 ? hitSoundsOnPlayer[UnityEngine.Random.Range(0, hitSoundsOnPlayer.Count)] : null;
         [Header("击中墙壁音效")]
         public List<AudioClip> hitSoundsOnWall = new List<AudioClip>();
-        private AudioClip hitSoundOnWall => hitSoundsOnWall.Count > 0 ? hitSoundsOnWall[Random.Range(0, hitSoundsOnWall.Count)] : null;
+        private AudioClip hitSoundOnWall => hitSoundsOnWall.Count > 0 ? hitSoundsOnWall[UnityEngine.Random.Range(0, hitSoundsOnWall.Count)] : null;
 
         private int damage = 1;
         private int hitBuffId = -1;
         private bool hasHit;
-        private LuaComponet bulletLua;
+        private LuaBehaviourHost bulletLua;
 
         /// <summary>
         /// 初始化运行时依赖.
@@ -38,7 +39,7 @@ namespace Game.Gameplay
             rb = GetComponent<Rigidbody2D>();
             rb.bodyType = RigidbodyType2D.Kinematic;
             gameObject.layer = LayerMask.NameToLayer("EnemyBullet");
-            bulletLua = GetComponent<LuaComponet>();
+            bulletLua = GetComponent<LuaBehaviourHost>();
         }
 
         /// <summary>
@@ -115,7 +116,7 @@ namespace Game.Gameplay
         private void FixedUpdate() {
             if (hasHit) return;
             // 敌人子弹使用敌人局部时间倍率, 玩家子弹和玩家移动不受影响.
-            rb.velocity = dir * speed * GameplayTime.EnemyTimeScale;
+            rb.linearVelocity = dir * speed * GameplayTime.EnemyTimeScale;
         }
 
         /// <summary>
@@ -171,7 +172,6 @@ namespace Game.Gameplay
         /// </summary>
         public void ApplyPlayerHit(GameObject target) {
             if (hasHit || target == null) return;
-            hasHit = true;
 
             var player = target.GetComponent<Player>();
             var isDamageApplied = player != null && player.Hurt(new DamageInfo(damage, dir));
@@ -186,6 +186,7 @@ namespace Game.Gameplay
                 audioSource.PlayOneShot(hitSoundOnPlayer);
             }
 
+            // 由 Recycle 统一标记命中并回池, 避免提前标记导致回池被跳过.
             Recycle();
         }
 
@@ -194,7 +195,6 @@ namespace Game.Gameplay
         /// </summary>
         public void ApplyWallHit(GameObject target) {
             if (hasHit) return;
-            hasHit = true;
 
             if (hitSoundsOnWall.Count > 0 && GlobalAudioPlay.Instance != null)
             {
@@ -231,7 +231,7 @@ namespace Game.Gameplay
         /// </summary>
         public void StopMove() {
             if (rb != null) {
-                rb.velocity = Vector2.zero;
+                rb.linearVelocity = Vector2.zero;
             }
         }
 

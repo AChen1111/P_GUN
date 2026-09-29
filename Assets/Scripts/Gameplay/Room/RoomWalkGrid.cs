@@ -22,9 +22,11 @@ namespace Game.Gameplay
 
         // 最近可走格的环形搜索半径, 超出视为敌人完全卡在墙里.
         private const int NearestWalkableSearchRadius = 6;
+        private static readonly int WallLayerMask = LayerMask.GetMask("Wall");
 
         private readonly Tilemap floorTilemap;
         private readonly Tilemap wallsTilemap;
+        private readonly List<Vector2Int> walkableCells = new List<Vector2Int>();
         private readonly Dictionary<Vector2Int, Vector2Int> flowNextCell = new Dictionary<Vector2Int, Vector2Int>();
         private Vector2Int? lastFlowTargetCell;
 
@@ -32,6 +34,28 @@ namespace Game.Gameplay
         {
             this.floorTilemap = floorTilemap;
             this.wallsTilemap = wallsTilemap;
+            foreach (var cell in floorTilemap.cellBounds.allPositionsWithin)
+            {
+                var coordinate = new Vector2Int(cell.x, cell.y);
+                if (IsWalkable(coordinate)) walkableCells.Add(coordinate);
+            }
+        }
+
+        /// <summary>
+        /// 在当前房间选一处可达的散步目标, 保持目标与脚下有适当距离.
+        /// </summary>
+        public bool TryPickPatrolTarget(Vector2Int origin, out Vector2Int target)
+        {
+            for (var attempt = 0; attempt < 24 && walkableCells.Count > 0; attempt++)
+            {
+                var candidate = walkableCells[UnityEngine.Random.Range(0, walkableCells.Count)];
+                var distance = Mathf.Abs(candidate.x - origin.x) + Mathf.Abs(candidate.y - origin.y);
+                if (distance < 3 || distance > 9 || !IsWalkable(candidate)) continue;
+                target = candidate;
+                return true;
+            }
+            target = default;
+            return false;
         }
 
         /// <summary>
@@ -81,6 +105,15 @@ namespace Game.Gameplay
             }
 
             if (wallsTilemap.HasTile(floorCell))
+            {
+                return false;
+            }
+
+            // 门只在房间边界, 战斗关闭时把门碰撞器视作不可走格.
+            var bounds = floorTilemap.cellBounds;
+            var onRoomEdge = cell.x == bounds.xMin || cell.x == bounds.xMax - 1 ||
+                cell.y == bounds.yMin || cell.y == bounds.yMax - 1;
+            if (onRoomEdge && Physics2D.OverlapPoint(floorTilemap.GetCellCenterWorld(floorCell), WallLayerMask) != null)
             {
                 return false;
             }
@@ -194,6 +227,16 @@ namespace Game.Gameplay
 
             direction = delta.normalized;
             return true;
+        }
+
+        /// <summary>
+        /// 取流场下一格的格心, 敌人从偏离格心的位置也能先对齐通道再转弯.
+        /// </summary>
+        public bool TryGetFlowNextCell(Vector2Int cell, out Vector2Int nextCell)
+        {
+            if (flowNextCell.TryGetValue(cell, out nextCell) && nextCell != cell) return true;
+            nextCell = default;
+            return false;
         }
 
         /// <summary>

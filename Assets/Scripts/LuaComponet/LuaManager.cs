@@ -7,6 +7,7 @@ using XLua;
 /// 框架 Lua 管理器, 负责初始化 Lua 环境并把生命周期转发到 Main.lua.
 /// 实例来自 Root 场景的显式摆放, 不在代码里自动创建.
 /// </summary>
+[DefaultExecutionOrder(-200)]
 public class LuaManager : PersistentMonoSingleton<LuaManager>
 {
     private LuaEnvironment m_luaEnvironment;

@@ -68,9 +68,9 @@ MonoBehaviour:
       - m_Id: 17ae66b1c05d0474d8afddf8f751f4fd
         m_Value: '[UnityEngine.AddressableAssets.Addressables.BuildPath]/[BuildTarget]'
       - m_Id: 3970390c4918b4549ad1dda7fc041144
-        m_Value: ServerData/P_GUN/[BuildTarget]
+        m_Value: 'ServerData/P_GUN/[BuildTarget]'
       - m_Id: 512effbb7b6e748408ff7ad71f8fa048
-        m_Value: https://achen1o1.xyz/AB/P_GUN/[BuildTarget]
+        m_Value: 'https://achen1o1.xyz/AB/P_GUN/[BuildTarget]'
       - m_Id: ce6d36d51b1872d4a99543e94df9c265
         m_Value: '[UnityEditor.EditorUserBuildSettings.activeBuildTarget]'
     m_ProfileEntryNames:

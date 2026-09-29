@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Game.Core;
 using UnityEngine;
 
 namespace Game.Gameplay
@@ -30,7 +31,7 @@ namespace Game.Gameplay
     }
 
     /// <summary>
-    /// 房间图: 带种子的四方向随机游走生成一棵连通树, 再按关卡配置分配类型.
+    /// 房间图: 带种子的紧凑分支生长生成一棵连通树, 再按关卡配置分配类型.
     /// 全程只用同一个 System.Random, 同一关卡配置加同一颗种子得到同一张图.
     /// </summary>
     public sealed class RoomGraph
@@ -73,61 +74,52 @@ namespace Game.Gameplay
 
             var rng = new System.Random(seed);
             var graph = new RoomGraph();
-            WalkCells(graph, config.RoomCount, rng);
+            GrowCompactCells(graph, config.RoomCount, rng);
             AssignTypes(graph, config, rng);
             return graph;
         }
 
         /// <summary>
-        /// 四方向随机游走, 直到生成目标数量的房间.
+        /// 从已生成房间的边界扩展, 优先选靠近起点且能形成分支的位置.
         /// </summary>
-        private static void WalkCells(RoomGraph graph, int roomCount, System.Random rng)
+        private static void GrowCompactCells(RoomGraph graph, int roomCount, System.Random rng)
         {
             var origin = Vector2Int.zero;
             graph.CreateNode(origin);
-            var current = origin;
+            var depths = new Dictionary<Vector2Int, int> { [origin] = 0 };
+            var radius = Mathf.CeilToInt((Mathf.Sqrt(roomCount) - 1f) * 0.5f);
 
             while (graph.nodesByCell.Count < roomCount)
             {
-                var step = FindEmptyNeighbor(graph, current, rng);
-                if (step == null)
+                var candidates = new List<(Vector2Int parent, Vector2Int cell, int score)>();
+                foreach (var parent in graph.nodesByCell.Keys)
                 {
-                    // 四周占满时退回到还有空位的已生成房间, 再继续走.
-                    var backtrackCells = graph.nodesByCell.Keys
-                        .Where(cell => Directions.Any(dir => !graph.nodesByCell.ContainsKey(cell + dir)))
-                        .ToList();
-                    if (backtrackCells.Count == 0)
+                    foreach (var direction in Directions)
                     {
-                        throw new InvalidOperationException("随机游走无法继续, 已生成房间没有空邻居.");
-                    }
+                        var cell = parent + direction;
+                        if (graph.nodesByCell.ContainsKey(cell) ||
+                            Mathf.Abs(cell.x) > radius || Mathf.Abs(cell.y) > radius) continue;
 
-                    current = backtrackCells[rng.Next(backtrackCells.Count)];
+                        // 曼哈顿距离约束外扩, 深度与已有连接数抑制单条长链.
+                        var score = (Mathf.Abs(cell.x) + Mathf.Abs(cell.y)) * 4
+                            + depths[parent] * 3 + graph.nodesByCell[parent].Neighbors.Count * 2;
+                        candidates.Add((parent, cell, score));
+                    }
+                }
+
+                if (candidates.Count == 0)
+                {
+                    radius++;
                     continue;
                 }
 
-                var next = step.Value;
-                graph.CreateNode(next);
-                graph.Connect(current, next);
-                current = next;
+                var bestScore = candidates.Min(candidate => candidate.score);
+                var best = candidates.Where(candidate => candidate.score == bestScore).ToList();
+                var selected = best[rng.Next(best.Count)];
+                graph.CreateNode(selected.cell);
+                graph.Connect(selected.parent, selected.cell);
+                depths[selected.cell] = depths[selected.parent] + 1;
             }
-        }
-
-        /// <summary>
-        /// 打乱方向后取第一个空邻居.
-        /// </summary>
-        private static Vector2Int? FindEmptyNeighbor(RoomGraph graph, Vector2Int cell, System.Random rng)
-        {
-            var directions = Directions.OrderBy(_ => rng.Next()).ToArray();
-            foreach (var dir in directions)
-            {
-                var candidate = cell + dir;
-                if (!graph.nodesByCell.ContainsKey(candidate))
-                {
-                    return candidate;
-                }
-            }
-
-            return null;
         }
 
         /// <summary>

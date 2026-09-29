@@ -16,7 +16,8 @@ namespace Game.Gameplay
         [SerializeField] private Player playerPrefab;
         protected override void OnRoomInitialized()
         {
-            needGenerateDoors = false;
+            // 初始房间也要为已连接的走廊生成门, 避免只有走廊而没有门实例.
+            needGenerateDoors = true;
             PlacePlayerAtSpawn();
 
             void PlacePlayerAtSpawn()

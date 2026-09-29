@@ -1,3 +1,4 @@
+using Game.Pooling;
 using System.Collections.Generic;
 using Game.Items;
 using UnityEngine;
@@ -23,7 +24,7 @@ namespace Game.Gameplay
         {
             if(hasDone)return;
 
-            var roomLua = GetComponent<LuaComponet>();
+            var roomLua = GetComponent<LuaBehaviourHost>();
             if (roomLua == null)
             {
                 Debug.LogError($"{nameof(ChestRoom)}: 房间未挂 LuaComponet, 无法执行进入生成.", this);

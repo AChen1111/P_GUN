@@ -1,3 +1,4 @@
+using Game.Pooling;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -18,7 +19,7 @@ namespace Game.UI
         public Button DefaultSelectedButton => defaultSelectedButton;
 
         // 面板的 Lua 模块, 需要 Lua 逻辑的面板在预制体上挂 LuaComponet.
-        private LuaComponet panelLua;
+        private LuaBehaviourHost panelLua;
 
         /// <summary>
         /// 初始化运行时依赖.
@@ -27,7 +28,7 @@ namespace Game.UI
         {
             // 运行时确保面板具备CanvasGroup, 后续才能统一控制显示和交互.
             ResolveCanvasGroup();
-            panelLua = GetComponent<LuaComponet>();
+            panelLua = GetComponent<LuaBehaviourHost>();
         }
 
         /// <summary>

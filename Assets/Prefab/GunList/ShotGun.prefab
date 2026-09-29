@@ -10,8 +10,9 @@ GameObject:
   m_Component:
   - component: {fileID: 8812285166366954893}
   - component: {fileID: 2968553758901501502}
-  - component: {fileID: 465086573499548629}
   - component: {fileID: 6202844698316131186}
+  - component: {fileID: 1377980453918648501}
+  - component: {fileID: 8986175176700008412}
   m_Layer: 0
   m_Name: ShotGun
   m_TagString: Untagged
@@ -34,6 +35,7 @@ Transform:
   m_Children:
   - {fileID: 578633306931416671}
   - {fileID: 7079153308986165606}
+  - {fileID: 7702693232670729321}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!82 &2968553758901501502
@@ -47,6 +49,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 374010033509238546, guid: 569809b44565dc442ba3ee727965ff13, type: 2}
   m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
@@ -132,42 +135,6 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!114 &465086573499548629
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1681939207406572060}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 63a18faafeaa6b0429074751b27def89, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Namespace: QFramework.Example
-  ScriptName: ShotGun
-  ScriptsFolder: Assets\Scripts\Gameplay\Entity\Player\Weapon\Gun
-  GeneratePrefab: 0
-  PrefabFolder: Assets/Prefab
-  ArchitectureFullTypeName: 
-  ViewControllerFullTypeName: 
-  weaponId: ShotGun
-  weaponDatabase: {fileID: 11400000, guid: 6d6e0a3a98503714c899e24a2384c459, type: 2}
-  shootSounds:
-  - {fileID: 8300000, guid: 2cc471f384c90af4f8e0e063fe6c0ddf, type: 3}
-  - {fileID: 8300000, guid: 8782fb9d1e84d5c46bc9e257fb1b99b9, type: 3}
-  - {fileID: 8300000, guid: 6d8e4595e1d5ac44faf8f72551d23276, type: 3}
-  firePoint: {fileID: 7079153308986165606}
-  ReloadSound: {fileID: 8300000, guid: d4ce39efc317eb845a6d13ff273a5a31, type: 3}
-  MinDamage: 0
-  MaxDamage: 0
-  MaxBulletBagNum: 0
-  clipSize: 0
-  shootInterval: 0
-  bulletSpeed: 0
-  SR: {fileID: 8067500290940751689}
-  PlayerBullet: {fileID: 8883869366757948090, guid: 576871a843cdcfa4facd211562818436, type: 3}
-  SelfAudioSource: {fileID: 2968553758901501502}
 --- !u!114 &6202844698316131186
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -183,6 +150,54 @@ MonoBehaviour:
   Binds:
   - MemberName: SelfAudioSource
     Object: {fileID: 2968553758901501502}
+--- !u!114 &1377980453918648501
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1681939207406572060}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c2b694a9ab0ce6c4a9df47d9f8ab862c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Namespace: QFramework.Example
+  ScriptName: ShotGun
+  ScriptsFolder: Assets\Scripts\Gameplay\Entity\Player\Weapon\Gun
+  GeneratePrefab: 0
+  PrefabFolder: Assets/Prefab
+  ArchitectureFullTypeName: 
+  ViewControllerFullTypeName: 
+  weaponId: ShotGun
+  shootSounds:
+  - {fileID: 8300000, guid: 2cc471f384c90af4f8e0e063fe6c0ddf, type: 3}
+  - {fileID: 8300000, guid: 8782fb9d1e84d5c46bc9e257fb1b99b9, type: 3}
+  - {fileID: 8300000, guid: 6d8e4595e1d5ac44faf8f72551d23276, type: 3}
+  firePoint: {fileID: 7702693232670729321}
+  ReloadSound: {fileID: 8300000, guid: d4ce39efc317eb845a6d13ff273a5a31, type: 3}
+  MinDamage: 0
+  MaxDamage: 0
+  MaxBulletBagNum: 0
+  clipSize: 0
+  shootInterval: 0
+  bulletSpeed: 0
+  bulletPrefab: {fileID: 8883869366757948090, guid: 576871a843cdcfa4facd211562818436, type: 3}
+--- !u!114 &8986175176700008412
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1681939207406572060}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d8682f06ec2c26f4092b11f83922c8f1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game.LuaComponent::LuaComponet
+  m_typeName: ShotGunModule
+  m_objectReferences: []
+  m_dataReferences: []
 --- !u!1 &3517244439982922828
 GameObject:
   m_ObjectHideFlags: 0
@@ -218,6 +233,7 @@ Transform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &8067500290940751689
 SpriteRenderer:
+  serializedVersion: 2
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -233,6 +249,11 @@ SpriteRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -254,9 +275,11 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 1
+  m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: 277985b7cfc3c954a9449e86c21cceed, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -266,7 +289,6 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
-  m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!114 &1954468532899284347
 MonoBehaviour:
@@ -312,6 +334,37 @@ Transform:
   m_LocalPosition: {x: 0.519, y: 0.044, z: 0}
   m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_ConstrainProportionsScale: 1
+  m_Children: []
+  m_Father: {fileID: 8812285166366954893}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &5225752406423266295
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7702693232670729321}
+  m_Layer: 0
+  m_Name: FirePoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7702693232670729321
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5225752406423266295}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.519, y: 0.044, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8812285166366954893}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

@@ -93,11 +93,14 @@ namespace Game.Gameplay
         internal float BrainSeparationWeight => separationWeight;
         internal float BrainAttackRange => attackRange;
         internal float BrainAttackInterval => attackInterval;
+        internal Vector2 BrainCollisionCenter => col != null ? col.bounds.center : transform.position;
+        internal float BrainCollisionRadius => col != null ? Mathf.Min(col.bounds.extents.x, col.bounds.extents.y) : 0.3f;
 
         /// <summary>
         /// 面朝方向, 由精灵翻转得到, 朝右为正方向.
         /// </summary>
-        internal Vector2 BrainFacingDirection => new Vector2(sr != null && sr.flipX ? -1f : 1f, 0f);
+        private Vector2 brainFacingDirection = Vector2.right;
+        internal Vector2 BrainFacingDirection => brainFacingDirection;
 
         /// <summary>
         /// 行为层写入刚体速度的唯一入口.
@@ -106,7 +109,7 @@ namespace Game.Gameplay
         {
             if (rb != null)
             {
-                rb.velocity = velocity;
+                rb.linearVelocity = velocity;
             }
         }
 
@@ -121,23 +124,58 @@ namespace Game.Gameplay
         /// <summary>
         /// 行为层设置面朝, 翻转精灵并通知子类刷新朝向相关组件.
         /// </summary>
-        internal void SetBrainFacing(float directionX)
+        internal void SetBrainFacing(Vector2 direction)
         {
-            if (sr == null)
+            if (direction.sqrMagnitude <= 0.0001f)
             {
                 return;
             }
 
-            if (directionX < 0f)
+            // 视野使用完整的二维朝向, 精灵仍按水平分量翻转.
+            brainFacingDirection = direction.normalized;
+            if (sr == null) return;
+
+            if (direction.x < 0f)
             {
                 sr.flipX = true;
             }
-            else if (directionX > 0f)
+            else if (direction.x > 0f)
             {
                 sr.flipX = false;
             }
 
             OnFacingChanged();
+        }
+
+        /// <summary>
+        /// 在 Scene 视图持续画出与运行时判定一致的扇形视野.
+        /// </summary>
+        private void OnDrawGizmos()
+        {
+#if UNITY_EDITOR
+            // 仅在 Scene 视图绘制, 避免 Game 视图打开 Gizmos 时遮挡战斗画面.
+            if (UnityEditor.SceneView.currentDrawingSceneView == null) return;
+#endif
+            if (visionRadius <= 0f || visionAngle <= 0f) return;
+            var sprite = sr != null ? sr : GetComponent<SpriteRenderer>();
+            var facing = Application.isPlaying ? brainFacingDirection
+                : sprite != null && sprite.flipX ? Vector2.left : Vector2.right;
+            var halfAngle = Mathf.Clamp(visionAngle * 0.5f, 0f, 180f);
+            var centerAngle = Mathf.Atan2(facing.y, facing.x) * Mathf.Rad2Deg;
+            var origin = transform.position;
+            var color = new Color(1f, 0.78f, 0.12f, 0.85f);
+            Gizmos.color = color;
+            Vector3 previous = origin;
+            const int segments = 32;
+            for (var index = 0; index <= segments; index++)
+            {
+                var angle = (centerAngle - halfAngle + visionAngle * index / segments) * Mathf.Deg2Rad;
+                var point = origin + new Vector3(Mathf.Cos(angle), Mathf.Sin(angle), 0f) * visionRadius;
+                if (index == 0) Gizmos.DrawLine(origin, point);
+                else Gizmos.DrawLine(previous, point);
+                if (index == segments) Gizmos.DrawLine(origin, point);
+                previous = point;
+            }
         }
 
         /// <summary>
@@ -446,6 +484,7 @@ namespace Game.Gameplay
             CurrentHp = MaxHp;
             StopMove();
             ResetVisualState();
+            brainFacingDirection = sr != null && sr.flipX ? Vector2.left : Vector2.right;
             ResetAnimatorState();
 
             if(col != null) {
@@ -480,7 +519,7 @@ namespace Game.Gameplay
         }
         protected void StopMove() {
             if(rb != null) {
-                rb.velocity = Vector2.zero;
+                rb.linearVelocity = Vector2.zero;
             }
         }
         /// <summary>

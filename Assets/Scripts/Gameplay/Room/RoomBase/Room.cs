@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 using QFramework;
 using Game.Core;
 using Game.Pooling;
@@ -139,8 +141,10 @@ namespace Game.Gameplay
 
 	    void GenerateDoors()
 	    {
-	        if (doorsGenerated || doorPrefab == null)
+            if (doorsGenerated)
 	            return;
+            if (doorPrefab == null)
+                throw new InvalidOperationException($"{name} 未绑定 Door 预制体.");
 
 	        if (!gridCell.HasValue)
 	        {
@@ -148,7 +152,11 @@ namespace Game.Gameplay
 	            return;
 	        }
 
-	        foreach (var direction in openDoorDirections)
+        var floor = GetComponentsInChildren<Tilemap>().FirstOrDefault(tilemap => tilemap.name == "Floor");
+        if (floor == null)
+            throw new InvalidOperationException($"{name} 缺少 Floor Tilemap, 无法按格子生成门.");
+        var bounds = floor.cellBounds;
+        foreach (var direction in openDoorDirections)
 	        {
 	            var anchor = GetDoorAnchor(direction);
 	            if (anchor == null)
@@ -157,10 +165,24 @@ namespace Game.Gameplay
 	                continue;
 	            }
 
-	            var door = Instantiate(doorPrefab, anchor.position, Quaternion.identity);
-	            door.gameObject.SetActive(true);
-	            door.SetDoorState(this.doorStateIsOpen);
-	            doorsList.Add(door);
+            // 两格宽门洞每格放一扇一格门, 战斗关门时不会只封住半边.
+            var horizontal = direction.x != 0;
+            var edge = horizontal
+                ? (direction.x > 0 ? bounds.xMax - 1 : bounds.xMin)
+                : (direction.y > 0 ? bounds.yMax - 1 : bounds.yMin);
+            var middle = horizontal
+                ? Mathf.FloorToInt((bounds.yMin + bounds.yMax - 1) * 0.5f)
+                : Mathf.FloorToInt((bounds.xMin + bounds.xMax - 1) * 0.5f);
+            for (var index = 0; index < 2; index++)
+            {
+                var cell = horizontal
+                    ? new Vector3Int(edge, middle + index, 0)
+                    : new Vector3Int(middle + index, edge, 0);
+                var door = Instantiate(doorPrefab, floor.GetCellCenterWorld(cell), Quaternion.identity);
+                door.gameObject.SetActive(true);
+                door.SetDoorState(doorStateIsOpen);
+                doorsList.Add(door);
+            }
 	        }
 
 	        doorsGenerated = true;
@@ -217,7 +239,10 @@ namespace Game.Gameplay
 				CurrentPlayerRoom = this;
 
 				if (TryGetComponent<MinimapRoomData>(out var minimapData))
+				{
+					minimapData.SetVisited(true);
 					minimapData.Highlight();
+				}
 
 				OnPlayerEnteredRoom(other);
 				PlayerEnteredRoom?.Invoke(this, other);
@@ -249,6 +274,8 @@ namespace Game.Gameplay
 		{
 			Visited = true;
 			CurrentPlayerRoom = this;
+			if (TryGetComponent<MinimapRoomData>(out var minimapData))
+				minimapData.SetVisited(true);
 		}
 		public virtual void RestoreSaveData(RoomSaveData data)
 		{
@@ -256,6 +283,8 @@ namespace Game.Gameplay
 
 			// 读档只覆盖安全点状态, 不重放房间生成或掉落逻辑.
 			Visited = data.visited;
+			if (TryGetComponent<MinimapRoomData>(out var minimapData))
+				minimapData.SetVisited(Visited);
 		}
 		protected void SetDoorsOpen(bool isOpen)
 		{

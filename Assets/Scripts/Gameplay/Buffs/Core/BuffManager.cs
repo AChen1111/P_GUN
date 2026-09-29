@@ -1,3 +1,4 @@
+using Game.Pooling;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -16,7 +17,7 @@ namespace Game.Gameplay
     {
         private readonly List<BuffRuntimeInfo> buffs = new List<BuffRuntimeInfo>();
         private readonly Dictionary<int, BuffRuntimeInfo> buffInfoMap = new Dictionary<int, BuffRuntimeInfo>();
-        private readonly Dictionary<int, LuaComponet> behaviorPrefabsById = new Dictionary<int, LuaComponet>();
+        private readonly Dictionary<int, LuaBehaviourHost> behaviorPrefabsById = new Dictionary<int, LuaBehaviourHost>();
 
         private Player owner;
 
@@ -399,7 +400,8 @@ namespace Game.Gameplay
                 var behavior = await GetBehaviorObjectAsync(info.Config);
                 if (!buffInfoMap.TryGetValue(info.Config.Id, out var current) || current != info)
                 {
-                    ReleaseBehaviorObject(behavior);
+                    // 异步加载完成前 Buff 已移除, 将实例立即归还行为池.
+                    BuffBehaviorPool.Instance.Release(behavior);
                     return;
                 }
 
@@ -415,7 +417,7 @@ namespace Game.Gameplay
         /// <summary>
         /// 取出或加载行为预制体, 并从对象池取一个实例.
         /// </summary>
-        private async Task<LuaComponet> GetBehaviorObjectAsync(BuffConfig config)
+        private async Task<LuaBehaviourHost> GetBehaviorObjectAsync(BuffConfig config)
         {
             var pool = BuffBehaviorPool.Instance;
             if (pool == null)
@@ -432,7 +434,7 @@ namespace Game.Gameplay
             if (!behaviorPrefabsById.TryGetValue(config.Id, out var prefab))
             {
                 var prefabGameObject = await loader.LoadAssetAsync<GameObject>(config.BehaviorPrefabAddress);
-                prefab = prefabGameObject != null ? prefabGameObject.GetComponent<LuaComponet>() : null;
+                prefab = prefabGameObject != null ? prefabGameObject.GetComponent<LuaBehaviourHost>() : null;
                 if (prefab == null)
                 {
                     throw new InvalidOperationException($"Buff 行为预制体缺少 LuaComponet, 地址: {config.BehaviorPrefabAddress}.");

@@ -24,10 +24,12 @@ namespace Game.Gameplay
     {
         // 到达格中心的判定距离平方.
         private const float ArriveCellSqrDistance = 0.04f;
+        private static readonly int WallLayerMask = LayerMask.GetMask("Wall");
 
         private readonly EnemyBase owner;
         private readonly IEnemyAttack attack;
         private readonly List<Vector2Int> searchPath = new List<Vector2Int>();
+        private readonly List<Vector2Int> patrolPath = new List<Vector2Int>();
 
         private EnemyBrainState state = EnemyBrainState.Idle;
         private Vector3? lastSeenPosition;
@@ -35,6 +37,8 @@ namespace Game.Gameplay
         private float attackLockTimer;
         private Vector2Int lastSearchTargetCell;
         private bool reportedMissingGrid;
+        private float patrolWaitTimer = 1f;
+        private Vector2Int? flowWaypointCell;
 
         public EnemyBrain(EnemyBase owner, IEnemyAttack attack)
         {
@@ -66,7 +70,7 @@ namespace Game.Gameplay
             switch (state)
             {
                 case EnemyBrainState.Idle:
-                    TickIdle(player, hasSight);
+                    TickIdle(player, hasSight, enemyDeltaTime);
                     break;
                 case EnemyBrainState.Chase:
                     TickChase(player, selfPosition, hasSight);
@@ -81,16 +85,56 @@ namespace Game.Gameplay
         }
 
         /// <summary>
-        /// 待机: 没看见也没在追踪, 速度为零.
+        /// 待机: 没看见玩家时在所属房间内随机散步, 发现玩家立即追击.
         /// </summary>
-        private void TickIdle(Player player, bool hasSight)
+        private void TickIdle(Player player, bool hasSight, float enemyDeltaTime)
         {
-            Stop();
             if (hasSight)
             {
+                patrolPath.Clear();
                 lastSeenPosition = player.transform.position;
                 Enter(EnemyBrainState.Chase);
+                return;
             }
+
+            var grid = ResolveWalkGrid();
+            if (grid == null)
+            {
+                Stop();
+                return;
+            }
+
+            if (patrolPath.Count == 0)
+            {
+                MoveSeparationOnly();
+                patrolWaitTimer -= enemyDeltaTime;
+                if (patrolWaitTimer > 0f) return;
+
+                var from = grid.GetCell(owner.transform.position);
+                if (!grid.TryPickPatrolTarget(from, out var target) ||
+                    !grid.TryFindPath(from, target, patrolPath) || patrolPath.Count == 0)
+                {
+                    patrolWaitTimer = 1f;
+                    return;
+                }
+            }
+
+            while (patrolPath.Count > 0)
+            {
+                var stepCenter = grid.GetCellCenterWorld(patrolPath[0]);
+                if (((Vector2)(stepCenter - owner.transform.position)).sqrMagnitude > ArriveCellSqrDistance) break;
+                patrolPath.RemoveAt(0);
+            }
+            if (patrolPath.Count == 0)
+            {
+                MoveSeparationOnly();
+                patrolWaitTimer = UnityEngine.Random.Range(0.8f, 2.5f);
+                return;
+            }
+
+            var direction = (Vector2)(grid.GetCellCenterWorld(patrolPath[0]) - owner.transform.position);
+            ApplyMovement(direction.normalized, owner.transform.position, false);
+            FaceTowards(direction);
         }
 
         /// <summary>
@@ -187,7 +231,7 @@ namespace Game.Gameplay
 
             if (attack.LocksMovement)
             {
-                Stop();
+                MoveSeparationOnly();
                 return;
             }
 
@@ -204,7 +248,7 @@ namespace Game.Gameplay
         }
 
         /// <summary>
-        /// 走流场方向; 缺可行走格时停住, 有格但流场没有该格时退化为直线方向.
+        /// 走流场的下一格格心; 路径缺失时停住, 避免直线冲向墙体.
         /// </summary>
         private void MoveWithFlow(Vector3 targetWorldPosition, Vector3 selfPosition)
         {
@@ -218,27 +262,25 @@ namespace Game.Gameplay
 
             if (!TryGetFlowDirection(grid, targetWorldPosition, selfPosition, out var direction))
             {
-                var fallback = (Vector2)(targetWorldPosition - selfPosition);
-                direction = fallback.sqrMagnitude > 0.0001f ? fallback.normalized : Vector2.zero;
+                Stop();
+                return;
             }
-
             ApplyMovement(direction, selfPosition);
         }
 
         /// <summary>
         /// 合成分离向量后写入速度, 距玩家小于停距时速度为零.
         /// </summary>
-        private void ApplyMovement(Vector2 direction, Vector3 selfPosition)
+        private void ApplyMovement(Vector2 direction, Vector3 selfPosition, bool respectPlayerStopDistance = true)
         {
             var player = PlayerRegistry.Current;
-            if (player != null)
+            if (respectPlayerStopDistance && player != null)
             {
                 var toPlayer = (Vector2)(player.transform.position - selfPosition);
                 if (toPlayer.magnitude <= Mathf.Max(0f, owner.BrainPlayerStopDistance))
                 {
                     // 距离过近时停住, 分离不能把敌人推进玩家.
-                    Stop();
-                    return;
+                    direction = Vector2.zero;
                 }
             }
 
@@ -250,9 +292,31 @@ namespace Game.Gameplay
                 return;
             }
 
-            var speed = owner.BrainMoveSpeed * GameplayTime.EnemyTimeScale;
-            owner.ApplyBrainVelocity(blended.normalized * speed);
+            // 分离推力不能让敌人持续顶墙; 路径方向能走时优先回到路径.
+            var moveDirection = blended.normalized;
+            if (HitsWall(moveDirection))
+            {
+                moveDirection = direction.normalized;
+                if (direction.sqrMagnitude <= 0.0001f || HitsWall(moveDirection))
+                {
+                    Stop();
+                    return;
+                }
+            }
+            var speed = owner.BrainMoveSpeed * GameplayTime.EnemyTimeScale * Mathf.Clamp01(blended.magnitude);
+            owner.ApplyBrainVelocity(moveDirection * speed);
             owner.SetBrainAnimatorSpeed(owner.BrainMoveSpeed);
+        }
+
+        private bool HitsWall(Vector2 direction)
+        {
+            var radius = Mathf.Max(0.1f, owner.BrainCollisionRadius - 0.04f);
+            return Physics2D.CircleCast(owner.BrainCollisionCenter, radius, direction, 0.18f, WallLayerMask).collider != null;
+        }
+
+        private void MoveSeparationOnly()
+        {
+            ApplyMovement(Vector2.zero, owner.transform.position, false);
         }
 
         /// <summary>
@@ -262,14 +326,28 @@ namespace Game.Gameplay
         {
             grid.EnsureFlowField(targetWorldPosition);
             var cell = grid.GetCell(selfPosition);
-            if (grid.TryGetFlowDirection(cell, out direction))
+            // 进入下一格边界时仍走到该格中心, 否则流场会提前拐弯并切进墙角.
+            if (flowWaypointCell.HasValue)
             {
+                var waypoint = (Vector2)(grid.GetCellCenterWorld(flowWaypointCell.Value) - selfPosition);
+                if (waypoint.sqrMagnitude > ArriveCellSqrDistance && grid.IsWalkable(flowWaypointCell.Value))
+                {
+                    direction = waypoint.normalized;
+                    return true;
+                }
+                flowWaypointCell = null;
+            }
+            if (grid.TryGetFlowNextCell(cell, out var next))
+            {
+                flowWaypointCell = next;
+                direction = ((Vector2)(grid.GetCellCenterWorld(next) - selfPosition)).normalized;
                 return true;
             }
 
-            // 脚下不可走时读最近的可走格.
-            if (grid.TryGetNearestWalkableCell(cell, out var nearest) && grid.TryGetFlowDirection(nearest, out direction))
+            // 脚下格子不可走时, 先回到最近可走格的中心.
+            if (!grid.IsWalkable(cell) && grid.TryGetNearestWalkableCell(cell, out var nearest))
             {
+                direction = ((Vector2)(grid.GetCellCenterWorld(nearest) - selfPosition)).normalized;
                 return true;
             }
 
@@ -392,7 +470,7 @@ namespace Game.Gameplay
             Enter(EnemyBrainState.Attack);
             if (attack.LocksMovement)
             {
-                Stop();
+                MoveSeparationOnly();
             }
         }
 
@@ -413,7 +491,7 @@ namespace Game.Gameplay
 
         private void FaceTowards(Vector3 toTarget)
         {
-            owner.SetBrainFacing(toTarget.x);
+            owner.SetBrainFacing((Vector2)toTarget);
         }
 
         private void Stop()
@@ -425,6 +503,12 @@ namespace Game.Gameplay
         private void Enter(EnemyBrainState nextState)
         {
             state = nextState;
+            if (nextState != EnemyBrainState.Chase && nextState != EnemyBrainState.Attack) flowWaypointCell = null;
+            if (nextState == EnemyBrainState.Idle)
+            {
+                patrolPath.Clear();
+                patrolWaitTimer = UnityEngine.Random.Range(0.8f, 2.5f);
+            }
         }
 
         /// <summary>
@@ -437,7 +521,10 @@ namespace Game.Gameplay
             searchTimer = 0f;
             attackLockTimer = 0f;
             searchPath.Clear();
+            patrolPath.Clear();
+            patrolWaitTimer = 1f;
             reportedMissingGrid = false;
+            flowWaypointCell = null;
             Stop();
         }
     }

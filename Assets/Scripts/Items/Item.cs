@@ -45,7 +45,8 @@ namespace Game.Items
         private bool pickupPresentationFinished;
         private PlayerInventory playerInventoryInRange;
         private Coroutine animatorFallbackCoroutine;
-        private LuaComponet itemLua;
+        private LuaBehaviourHost itemLua;
+        private Vector3 prefabLocalScale;
 
         public int ItemId => itemId;
 
@@ -54,6 +55,7 @@ namespace Game.Items
         /// </summary>
         private void Awake()
         {
+            prefabLocalScale = transform.localScale;
             if (_dotweenAnimation == null)
             {
                 _dotweenAnimation = GetComponent<GameDOTweenAnimation>();
@@ -65,7 +67,7 @@ namespace Game.Items
             }
 
             // 世界道具的拾取规则在预制体的 LuaComponet 模块里, 入背包的道具可以不挂.
-            itemLua = GetComponent<LuaComponet>();
+            itemLua = GetComponent<LuaBehaviourHost>();
         }
 
         /// <summary>
@@ -232,6 +234,9 @@ namespace Game.Items
         }
         public void OnSpawnFromPool()
         {
+            // 上次生成动画可能中途回池, 每次取出都恢复预制体缩放.
+            transform.DOKill(false);
+            transform.localScale = prefabLocalScale;
             ResetPoolRuntimeState();
             ResetAnimatorState();
 

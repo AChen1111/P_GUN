@@ -22,7 +22,7 @@ namespace Game.Gameplay
         [SerializeField] private float attackLockDuration = 0.35f;
         [SerializeField] private float bulletSpawnDistance = 0.5f;
         [SerializeField] private int bulletCount = 5;
-        [SerializeField] private float bulletSpreadStepAngle = 2f;
+        [SerializeField] private float bulletSpreadStepAngle = 10f;
 
         [Header("旧走位参数, 待手感核对后删除")]
         [SerializeField] private float followBeforeAttackTime = 1.5f;
@@ -89,13 +89,12 @@ namespace Game.Gameplay
             if (bulletPrefab == null || baseDirection.sqrMagnitude <= 0.0001f) return;
 
             var spawnPosition = transform.position + (Vector3)(baseDirection * bulletSpawnDistance);
-            // 参考霰弹枪散射规则, 中心一发, 其余子弹按左右交替角度偏移.
+            // 以瞄准方向为中心均匀展开扇形弹, 避免多发子弹挤成一束.
             var baseAngle = Mathf.Atan2(baseDirection.y, baseDirection.x) * Mathf.Rad2Deg;
             var count = Mathf.Max(1, bulletCount);
             for (var i = 0; i < count; i++)
             {
-                var spreadSign = i % 2 == 0 ? 1 : -1;
-                var bulletAngle = i == 0 ? baseAngle : baseAngle + spreadSign * i * bulletSpreadStepAngle;
+                var bulletAngle = baseAngle + (i - (count - 1) * 0.5f) * bulletSpreadStepAngle;
                 var rad = bulletAngle * Mathf.Deg2Rad;
                 var bulletDirection = new Vector2(Mathf.Cos(rad), Mathf.Sin(rad)).normalized;
                 WeaponManager.Instance.SpawnEnemyBullet(bulletPrefab, spawnPosition, bulletDirection, AttackDamage);

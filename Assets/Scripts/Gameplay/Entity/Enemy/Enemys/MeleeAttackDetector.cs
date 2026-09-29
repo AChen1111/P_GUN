@@ -76,7 +76,7 @@ namespace Game.Gameplay
             if (detectorCollider == null) return false;
 
             // 最后一帧以碰撞体实时重叠结果为准, 避免玩家离开后仍被缓存目标扣血.
-            var count = detectorCollider.OverlapCollider(new ContactFilter2D().NoFilter(), overlapResults);
+            var count = detectorCollider.Overlap(new ContactFilter2D().NoFilter(), overlapResults);
             for (var i = 0; i < count; i++)
             {
                 var result = overlapResults[i];

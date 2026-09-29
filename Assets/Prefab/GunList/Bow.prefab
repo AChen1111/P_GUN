@@ -11,7 +11,8 @@ GameObject:
   - component: {fileID: 5227532224138308355}
   - component: {fileID: 7609457125886288384}
   - component: {fileID: 1348510770317443411}
-  - component: {fileID: 3149202430478700654}
+  - component: {fileID: 670237788300885454}
+  - component: {fileID: 1223230331185971601}
   m_Layer: 0
   m_Name: Bow
   m_TagString: Untagged
@@ -35,6 +36,7 @@ Transform:
   - {fileID: 8625821110002072894}
   - {fileID: 1817490437116976433}
   - {fileID: 329057997544267524}
+  - {fileID: 1226167112741143973}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!82 &7609457125886288384
@@ -48,6 +50,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 374010033509238546, guid: 569809b44565dc442ba3ee727965ff13, type: 2}
   m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
@@ -148,7 +151,7 @@ MonoBehaviour:
   Binds:
   - MemberName: SelfAudioSource
     Object: {fileID: 7609457125886288384}
---- !u!114 &3149202430478700654
+--- !u!114 &670237788300885454
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -157,7 +160,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 754602514769843546}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 27e9c27725044c941ac0c5b5fa9aa3cf, type: 3}
+  m_Script: {fileID: 11500000, guid: c2b694a9ab0ce6c4a9df47d9f8ab862c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   Namespace: QFramework.Example
@@ -168,7 +171,6 @@ MonoBehaviour:
   ArchitectureFullTypeName: 
   ViewControllerFullTypeName: 
   weaponId: Bow
-  weaponDatabase: {fileID: 11400000, guid: 6d6e0a3a98503714c899e24a2384c459, type: 2}
   shootSounds:
   - {fileID: 8300000, guid: 34f8cb3e29ce529458352e5bd3fe3141, type: 3}
   - {fileID: 8300000, guid: 50b915a22dcd4244cb10082d3fd93846, type: 3}
@@ -178,7 +180,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 58508dbb4ef4e18478c3c64634e0667a, type: 3}
   - {fileID: 8300000, guid: 982334509bf96f549acadf7a5627f7c9, type: 3}
   - {fileID: 8300000, guid: 8024fdb37d66f634c85e57499069b28d, type: 3}
-  firePoint: {fileID: 329057997544267524}
+  firePoint: {fileID: 1226167112741143973}
   ReloadSound: {fileID: 8300000, guid: 70c6ba4eb93b17d4a9ce83cfb26c281f, type: 3}
   MinDamage: 0
   MaxDamage: 0
@@ -186,9 +188,55 @@ MonoBehaviour:
   clipSize: 0
   shootInterval: 0
   bulletSpeed: 0
-  PlayerBullet: {fileID: 6121020581885493579, guid: 509b372a670abc94c8dec5ddcce60e69, type: 3}
-  Arrow: {fileID: 3818672352476444957}
-  SelfAudioSource: {fileID: 7609457125886288384}
+  bulletPrefab: {fileID: 6121020581885493579, guid: 509b372a670abc94c8dec5ddcce60e69, type: 3}
+--- !u!114 &1223230331185971601
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 754602514769843546}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d8682f06ec2c26f4092b11f83922c8f1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game.LuaComponent::LuaComponet
+  m_typeName: BowModule
+  m_objectReferences:
+  - name: m_Arrow
+    value: {fileID: 3818672352476444957}
+  m_dataReferences: []
+--- !u!1 &2260205140343746639
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1226167112741143973}
+  m_Layer: 0
+  m_Name: FirePoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1226167112741143973
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2260205140343746639}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.519, y: 0.044, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5227532224138308355}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &3431150011091814042
 GameObject:
   m_ObjectHideFlags: 0
@@ -223,6 +271,7 @@ Transform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &1450731002242337618
 SpriteRenderer:
+  serializedVersion: 2
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -238,6 +287,11 @@ SpriteRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -259,9 +313,11 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 1
+  m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: 6e00296dcbf12324dac4fcfe2f416287, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -271,7 +327,6 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
-  m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!1 &8343792744657762002
 GameObject:
@@ -308,6 +363,7 @@ Transform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &3818672352476444957
 SpriteRenderer:
+  serializedVersion: 2
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -323,6 +379,11 @@ SpriteRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -344,9 +405,11 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 2
+  m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: 21548d9a6bfc5f243bf869ac2d4f86e6, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -356,7 +419,6 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
-  m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!114 &7091951636472402495
 MonoBehaviour:

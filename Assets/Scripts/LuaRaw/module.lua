@@ -28,6 +28,7 @@ require("BloodTomeModule")
 require("ShieldGeneratorModule")
 require("WarDrumModule")
 require("AmmoCrateModule")
+require("BuffCrystalModule")
 require("RoomRewardModule")
 require("ChestRoomModule")
 
@@ -61,5 +62,6 @@ moduleList["BloodTomeModule"] = BloodTomeModule
 moduleList["ShieldGeneratorModule"] = ShieldGeneratorModule
 moduleList["WarDrumModule"] = WarDrumModule
 moduleList["AmmoCrateModule"] = AmmoCrateModule
+moduleList["BuffCrystalModule"] = BuffCrystalModule
 moduleList["RoomRewardModule"] = RoomRewardModule
 moduleList["ChestRoomModule"] = ChestRoomModule

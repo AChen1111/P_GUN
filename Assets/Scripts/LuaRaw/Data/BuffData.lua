@@ -5,7 +5,7 @@ return {
     ["0"] = {
         buffName = "SpeedUpBuff",
         description = "移动速度提升40%.",
-        iconAddress = "Assets/Malicious_statusiconset1/escape icon.png",
+        iconAddress = "Assets/Malicious_statusiconset1/agility icon.png",
         tag = "Positive",
         duration = 5,
         isPermanent = false,
@@ -31,7 +31,7 @@ return {
     ["2"] = {
         buffName = "MaxHpUpBuff",
         description = "最大生命值提升2点",
-        iconAddress = "Assets/Malicious_statusiconset1/buff icon.png",
+        iconAddress = "Assets/Malicious_statusiconset1/health icon.png",
         tag = "Positive",
         duration = 0,
         isPermanent = true,
@@ -44,7 +44,7 @@ return {
     ["3"] = {
         buffName = "PoisonBuff",
         description = "永久中毒: 每隔10秒每层受到1点伤害",
-        iconAddress = "Assets/Malicious_statusiconset1/confusion icon.png",
+        iconAddress = "Assets/Malicious_statusiconset1/poison icon.png",
         tag = "Negative",
         duration = 0,
         isPermanent = true,
@@ -55,7 +55,7 @@ return {
     ["4"] = {
         buffName = "血偿",
         description = "攻击提升50%. 每5秒按层数受到1点伤害",
-        iconAddress = "Assets/Malicious_statusiconset1/attack icon.png",
+        iconAddress = "Assets/Malicious_statusiconset1/curse icon.png",
         tag = "Negative",
         duration = 0,
         isPermanent = true,
@@ -68,7 +68,7 @@ return {
     ["5"] = {
         buffName = "血怒",
         description = "立即消耗30%当前生命. 攻击提升40%持续20秒",
-        iconAddress = "Assets/Malicious_statusiconset1/attack icon.png",
+        iconAddress = "Assets/Malicious_statusiconset1/rage icon.png",
         tag = "Positive",
         duration = 20,
         isPermanent = false,
@@ -81,7 +81,7 @@ return {
     ["6"] = {
         buffName = "吸血",
         description = "击杀敌人时按层数回复生命",
-        iconAddress = "Assets/Malicious_statusiconset1/buff icon.png",
+        iconAddress = "Assets/Malicious_statusiconset1/death icon.png",
         tag = "Positive",
         duration = 0,
         isPermanent = true,
@@ -92,7 +92,7 @@ return {
     ["7"] = {
         buffName = "屠戮者",
         description = "击杀敌人后4秒内攻击提升30%",
-        iconAddress = "Assets/Malicious_statusiconset1/attack icon.png",
+        iconAddress = "Assets/Malicious_statusiconset1/strength icon.png",
         tag = "Positive",
         duration = 4,
         isPermanent = false,
@@ -105,7 +105,7 @@ return {
     ["8"] = {
         buffName = "弹夹大师",
         description = "30秒内弹夹容量提升50%",
-        iconAddress = "Assets/Malicious_statusiconset1/buff icon.png",
+        iconAddress = "Assets/Assets/Items/Generated/ammo_crate.png",
         tag = "Positive",
         duration = 30,
         isPermanent = false,
@@ -116,7 +116,7 @@ return {
     ["9"] = {
         buffName = "皮糙肉厚",
         description = "15秒内受到的伤害降低1点",
-        iconAddress = "Assets/Malicious_statusiconset1/buff icon.png",
+        iconAddress = "Assets/Malicious_statusiconset1/defense icon.png",
         tag = "Positive",
         duration = 15,
         isPermanent = false,
@@ -129,7 +129,7 @@ return {
     ["10"] = {
         buffName = "破甲",
         description = "5秒内受到的伤害提高2点",
-        iconAddress = "Assets/Malicious_statusiconset1/confusion icon.png",
+        iconAddress = "Assets/Malicious_statusiconset1/debuff icon.png",
         tag = "Negative",
         duration = 5,
         isPermanent = false,
@@ -142,7 +142,7 @@ return {
     ["11"] = {
         buffName = "血契",
         description = "攻击提升2点. 生命上限降低1点",
-        iconAddress = "Assets/Malicious_statusiconset1/attack icon.png",
+        iconAddress = "Assets/Assets/Items/Generated/blood_tome.png",
         tag = "Positive",
         duration = 0,
         isPermanent = true,
@@ -156,7 +156,7 @@ return {
     ["12"] = {
         buffName = "护盾",
         description = "10秒内受到的伤害降低3点",
-        iconAddress = "Assets/Malicious_statusiconset1/buff icon.png",
+        iconAddress = "Assets/Assets/Items/Generated/shield_generator.png",
         tag = "Positive",
         duration = 10,
         isPermanent = false,
@@ -169,7 +169,7 @@ return {
     ["13"] = {
         buffName = "战鼓",
         description = "60秒内击杀敌人回复1点生命",
-        iconAddress = "Assets/Malicious_statusiconset1/buff icon.png",
+        iconAddress = "Assets/Assets/Items/Generated/war_drum.png",
         tag = "Positive",
         duration = 60,
         isPermanent = false,
@@ -180,7 +180,7 @@ return {
     ["14"] = {
         buffName = "缓速",
         description = "移动速度降低30%持续3秒",
-        iconAddress = "Assets/Malicious_statusiconset1/confusion icon.png",
+        iconAddress = "Assets/Malicious_statusiconset1/paralysis icon.png",
         tag = "Negative",
         duration = 3,
         isPermanent = false,

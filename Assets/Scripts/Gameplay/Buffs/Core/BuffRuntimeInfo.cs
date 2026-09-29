@@ -1,3 +1,4 @@
+using Game.Pooling;
 using System.Collections.Generic;
 using Game.Core;
 using UnityEngine;
@@ -24,7 +25,7 @@ namespace Game.Gameplay
         public Player Owner => owner;
         public Object Source;
         public BuffConfig Config;
-        public LuaComponet Behavior;
+        public LuaBehaviourHost Behavior;
         public BuffTag ParsedTag;
         public List<ParsedStatModifier> ParsedModifiers = new List<ParsedStatModifier>();
         public float Duration;

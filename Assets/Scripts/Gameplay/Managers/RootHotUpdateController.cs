@@ -22,6 +22,9 @@ namespace Game.Gameplay
 
         [Header("启动流程")]
         [SerializeField] private string nextSceneName = "StartScene";
+        [SerializeField] private bool useLocalContentForAcceptance;
+
+        private const string LocalContentArgument = "-pgun-local-content";
 
         [Header("更新界面")]
         [SerializeField] private Text statusText;
@@ -58,14 +61,34 @@ namespace Game.Gameplay
             SetStatus("初始化资源系统...");
             SetProgress(0f);
             await InitializeAddressablesAsync();
-            await TryUpdateRemoteContentAsync();
+            if (!ShouldUseLocalContent())
+            {
+                await TryUpdateRemoteContentAsync();
+            }
+            else
+            {
+                // 验收模式只使用包体内的资源目录, 跳过远端 Catalog 检查.
+                SetStatus("使用本地内容...");
+                SetProgress(0.9f);
+            }
             SetStatus("应用本地音频设置...");
             await ApplySavedAudioSettingsAsync();
-            SetStatus("应用热修补丁...");
+            SetStatus("加载内置 Lua...");
             await StartupHotfixRuntime.ExecuteStartupHotfixAsync();
             SetStatus("进入主菜单...");
             SetProgress(1f);
             SceneManager.LoadScene(nextSceneName);
+        }
+
+        private bool ShouldUseLocalContent()
+        {
+            if (useLocalContentForAcceptance)
+            {
+                return true;
+            }
+
+            // 普通构建可通过启动参数进入本地内容验收模式.
+            return Array.IndexOf(Environment.GetCommandLineArgs(), LocalContentArgument) >= 0;
         }
 
         /// <summary>

@@ -9,7 +9,7 @@
     "Unity.TextMeshPro",
     "QFramework",
     "QFramework.CoreKit",
-    "Game.LuaComponent"
+    "Game.Pooling"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],

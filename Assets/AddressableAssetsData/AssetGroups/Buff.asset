@@ -17,6 +17,13 @@ MonoBehaviour:
     m_SerializedData: []
   m_GUID: 4de99d2d7748c3a4092527ae6ee96f74
   m_SerializeEntries:
+  - m_GUID: 02c8ff8c0bc47984fb86ba8d5852dc10
+    m_Address: Assets/Malicious_statusiconset1/magic icon.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - buff
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 0ba30ec915a74a50a3b00b0e798dc227
     m_Address: BuffDataBase
     m_ReadOnly: 0
@@ -25,12 +32,82 @@ MonoBehaviour:
     - database
     - hot_update
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1303efc9353781040b963f0e6dbc5a55
+    m_Address: Assets/Malicious_statusiconset1/escape icon.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - buff
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1c52cf8355572f04f8ca918371af3e21
+    m_Address: buff/blood_pact_behavior
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - buff
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 224314d5b7da4af4f830c7d0ab350b62
+    m_Address: buff/war_drum_behavior
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - buff
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 2d4c93aa1465d33499a2174f838e2ebf
+    m_Address: Assets/Malicious_statusiconset1/poison icon.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - buff
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4547708ba0340c942b068d7eb7228d40
+    m_Address: Assets/Malicious_statusiconset1/defense icon.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - buff
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 481e164eb8e5b2044bbe4ee2451ad349
+    m_Address: Assets/Malicious_statusiconset1/buff icon.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - buff
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 58f68f223988f1e478f13f9aa8974e45
+    m_Address: Assets/Malicious_statusiconset1/agility icon.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - buff
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 610b6e0c4a028bb49bb86885f0167dd6
+    m_Address: buff/bandolier_behavior
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - buff
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 648678a33bef4bec9cd2e901e934f017
     m_Address: buff/lua/speed
     m_ReadOnly: 0
     m_SerializedLabels:
     - buff
+    - hot_update
     - lua
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 717c1661204c47848ae71e4b36b7424c
+    m_Address: Assets/Malicious_statusiconset1/confusion icon.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - buff
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 71c7daf7d6c79e540ae531707b8594e8
+    m_Address: Assets/Malicious_statusiconset1/health icon.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - buff
     - hot_update
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 87662b07a2474434950e657708d1bada
@@ -38,15 +115,29 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels:
     - buff
-    - lua
     - hot_update
+    - lua
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 921073a9ab0a469886c62babb3cfbd9c
     m_Address: buff/lua/poison
     m_ReadOnly: 0
     m_SerializedLabels:
     - buff
+    - hot_update
     - lua
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9792280a23761574e820932cfc215f89
+    m_Address: Assets/Malicious_statusiconset1/attack icon.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - buff
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b0b1e4ef3c38a3a488f41b399b6a7ffa
+    m_Address: Assets/Malicious_statusiconset1/will icon.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - buff
     - hot_update
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: bfef84428f614290a92f0716f6fd7171
@@ -54,7 +145,84 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels:
     - buff
+    - hot_update
     - lua
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c904bc3d2dc42f34d85a4718f608d6c9
+    m_Address: Assets/Malicious_statusiconset1/rage icon.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - buff
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c92e835002a6da949b7f1d8d1b4ea1b9
+    m_Address: Assets/Malicious_statusiconset1/strength icon.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - buff
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ce2df05a06ddb754db186597fc47a3c6
+    m_Address: Assets/Malicious_statusiconset1/block icon.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - buff
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d13a7737508e5dc479d794f7f7b28990
+    m_Address: Assets/Malicious_statusiconset1/paralysis icon.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - buff
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d20b3d0da4598244f96ff81e28a0a664
+    m_Address: buff/poison_behavior
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - buff
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d3ff981743b1cb6418e7981c69cc8112
+    m_Address: buff/frenzy_behavior
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - buff
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d6bc40b3b63989b44b977570d4fccd1e
+    m_Address: Assets/Malicious_statusiconset1/curse icon.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - buff
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: dc572a1d185013e43be827f3350ad82e
+    m_Address: Assets/Malicious_statusiconset1/debuff icon.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - buff
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ead98e1717cbfcb4fba00f159e60bef1
+    m_Address: Assets/Malicious_statusiconset1/death icon.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - buff
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f112bb3f09b3edb42820275130cdfdb7
+    m_Address: buff/blood_rage_behavior
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - buff
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ff71437f0a7c147408f0ed457e02d435
+    m_Address: buff/lifesteal_behavior
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - buff
     - hot_update
     FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
