@@ -343,10 +343,11 @@ namespace Game.Gameplay
         }
 
         /// <summary>
-        /// 默认死亡逻辑, 负责通知房间并尝试掉落物品.
+        /// 默认死亡逻辑, 负责通知房间, 广播击杀事件并尝试掉落物品.
         /// </summary>
         protected virtual void OnDead() {
             FightRoom.NotifyEnemyDefeated(this);
+            EventCenter.Trigger(GameplayEvents.EnemyDefeated, new EnemyDefeatedEvent(this));
             TryDropItem();
 
             void TryDropItem()

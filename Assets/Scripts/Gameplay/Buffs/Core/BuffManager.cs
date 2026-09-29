@@ -30,6 +30,34 @@ namespace Game.Gameplay
             owner = GetComponent<Player>();
         }
 
+        /// <summary>
+        /// 注册击杀事件监听.
+        /// </summary>
+        private void OnEnable()
+        {
+            EventCenter.AddListener(GameplayEvents.EnemyDefeated, HandleEnemyDefeated);
+        }
+
+        /// <summary>
+        /// 注销击杀事件监听.
+        /// </summary>
+        private void OnDisable()
+        {
+            EventCenter.RemoveListener(GameplayEvents.EnemyDefeated, HandleEnemyDefeated);
+        }
+
+        /// <summary>
+        /// 把击杀事件转发给每个带行为预制体的 Buff 的 OnKill.
+        /// </summary>
+        private void HandleEnemyDefeated(EnemyDefeatedEvent payload)
+        {
+            var enemyGameObject = payload != null && payload.Enemy != null ? payload.Enemy.gameObject : null;
+            for (var i = 0; i < buffs.Count; i++)
+            {
+                buffs[i].Behavior?.CallLuaFunction("OnKill", enemyGameObject);
+            }
+        }
+
         private void Update()
         {
             var deltaTime = Time.deltaTime;
