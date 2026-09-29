@@ -1,5 +1,3 @@
-require("BuffBase")
-
 PoisonBehavior = {}
 PoisonBehavior.__index = PoisonBehavior
 setmetatable(PoisonBehavior, {__index = BuffBase})

@@ -1,5 +1,3 @@
-require("BuffBase")
-
 BandolierBehavior = {}
 BandolierBehavior.__index = BandolierBehavior
 setmetatable(BandolierBehavior, {__index = BuffBase})

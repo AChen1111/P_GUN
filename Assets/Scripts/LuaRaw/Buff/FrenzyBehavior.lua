@@ -1,5 +1,3 @@
-require("BuffBase")
-
 FrenzyBehavior = {}
 FrenzyBehavior.__index = FrenzyBehavior
 setmetatable(FrenzyBehavior, {__index = BuffBase})

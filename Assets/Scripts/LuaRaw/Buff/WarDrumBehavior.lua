@@ -1,5 +1,3 @@
-require("BuffBase")
-
 WarDrumBehavior = {}
 WarDrumBehavior.__index = WarDrumBehavior
 setmetatable(WarDrumBehavior, {__index = BuffBase})

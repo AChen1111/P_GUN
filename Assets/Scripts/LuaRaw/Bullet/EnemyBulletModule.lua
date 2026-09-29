@@ -1,5 +1,3 @@
-require("EnemyBulletBase")
-
 EnemyBulletModule = {}
 EnemyBulletModule.__index = EnemyBulletModule
 setmetatable(EnemyBulletModule, {__index = EnemyBulletBase})

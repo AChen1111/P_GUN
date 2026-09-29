@@ -1,5 +1,3 @@
-require("BuffBase")
-
 BloodRageBehavior = {}
 BloodRageBehavior.__index = BloodRageBehavior
 setmetatable(BloodRageBehavior, {__index = BuffBase})

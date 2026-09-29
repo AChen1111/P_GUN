@@ -1,5 +1,3 @@
-require("BuffBase")
-
 LifestealBehavior = {}
 LifestealBehavior.__index = LifestealBehavior
 setmetatable(LifestealBehavior, {__index = BuffBase})

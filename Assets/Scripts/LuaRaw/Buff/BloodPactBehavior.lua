@@ -1,5 +1,3 @@
-require("BuffBase")
-
 BloodPactBehavior = {}
 BloodPactBehavior.__index = BloodPactBehavior
 setmetatable(BloodPactBehavior, {__index = BuffBase})
