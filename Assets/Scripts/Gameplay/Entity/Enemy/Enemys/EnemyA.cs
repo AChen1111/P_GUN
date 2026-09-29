@@ -1,6 +1,5 @@
-using UnityEngine;
-using QFramework;
 using System.Collections.Generic;
+using UnityEngine;
 using Game.Core;
 using Game.Pooling;
 using Game.Animation;
@@ -9,7 +8,10 @@ using Game.Items;
 
 namespace Game.Gameplay
 {
-    public class EnemyA : EnemyBase
+    /// <summary>
+    /// 远程敌人: 射程内且有视线时按间隔朝玩家点射, 攻击期间不停步.
+    /// </summary>
+    public class EnemyA : EnemyBase, IEnemyAttack
     {
         [Header("攻击资源")]
         [SerializeField] private GameObject bulletPrefab;
@@ -17,95 +19,77 @@ namespace Game.Gameplay
 
         [Header("攻击参数")]
         [SerializeField] private float shootInterval = 0.2f;
+
+        [Header("旧走位参数, 待手感核对后删除")]
         [SerializeField] private float followDuration = 1f;
         [SerializeField] private float attackDuration = 0.1f;
 
         private ShootDuration shootDuration;
-        private float stateTimer = 0f;
+        private bool hasFired;
 
         protected override WeaponType WeaponType => WeaponType.Gun;
+        protected override IEnemyAttack AttackModule => this;
+
         protected override void OnInit()
         {
             // 远程敌人的射击间隔使用敌人局部时钟, 玩家武器仍保留正常时钟.
             shootDuration = new ShootDuration(shootInterval, () => EnemyTime);
-            OwnerFightRoom = FightRoom.currentFightRoom;
         }
-        protected override void RegisterFSM(FSM<EnemyState> fsm)
+
+        /// <summary>
+        /// 射程与视线由行为大脑判定, 间隔沿用敌人局部时钟.
+        /// </summary>
+        public bool CanAttack(EnemyAttackContext context)
         {
-            // ── Follow 状态：追踪玩家，计时到达后切换到 Attack ──
-            fsm.State(EnemyState.Follow)
-                .OnEnter(() => stateTimer = 0f)
-                .OnUpdate(() =>
-                {
-                    stateTimer += EnemyDeltaTime;
-                    DoFollow();
-                    if (stateTimer >= followDuration)
-                        fsm.ChangeState(EnemyState.Attack);
-                })
-                .OnExit(() => stateTimer = 0f);
-
-            // ── Attack 状态：原地射击，计时到达后切换回 Follow ──
-            fsm.State(EnemyState.Attack)
-                .OnEnter(() =>
-                {
-                    stateTimer = 0f;
-                    if (Rb != null) Rb.velocity = Vector2.zero;
-                    if (shootDuration != null) shootDuration.Duration = shootInterval;
-                })
-                .OnUpdate(() =>
-                {
-                    stateTimer += EnemyDeltaTime;
-                    TryShootByInterval();
-                    if (stateTimer >= attackDuration)
-                        fsm.ChangeState(EnemyState.Follow);
-                })
-                .OnExit(() => stateTimer = 0f);
-
-            fsm.StartState(EnemyState.Follow);
-
-            void TryShootByInterval()
-            {
-                if (shootDuration == null)
-                    return;
-                if (!shootDuration.CanShoot)
-                    return;
-                shootDuration.RecordShootTime();
-                DoShoot();
-            }
-
-            void DoFollow()
-            {
-                if (IsDead)
-                {
-                    if (Rb != null)
-                        Rb.velocity = Vector2.zero;
-                    return;
-                }
-
-                if (FollowPlayerWithBodySpace(out var dir) && Sr != null)
-                {
-                    if (dir.x < 0f)
-                        Sr.flipX = true;
-                    else if (dir.x > 0f)
-                        Sr.flipX = false;
-                }
-            }
-
-    void DoShoot()
-    {
-        if (bulletPrefab == null || PlayerRegistry.Current == null)
-            return;
-        //Debug.Log("DoShoot");
-        var dirToPlayer = (PlayerRegistry.Current.transform.position - transform.position).normalized;
-        var spawnPos = transform.position + (Vector3)(dirToPlayer * 0.5f);
-        var bullet = WeaponManager.Instance.SpawnEnemyBullet(bulletPrefab, spawnPos, dirToPlayer, AttackDamage);
-        if (bullet == null)
-            return;
-        if (AudioSource != null && shootSounds != null && shootSounds.Count > 0)
-        {
-            AudioSource.PlayOneShot(shootSounds[Random.Range(0, shootSounds.Count)]);
+            return context.HasSight
+                && context.DistanceToPlayer <= BrainAttackRange
+                && shootDuration != null
+                && shootDuration.CanShoot;
         }
-    }
-}
+
+        public void BeginAttack(EnemyAttackContext context)
+        {
+            hasFired = false;
+            shootDuration.RecordShootTime();
+        }
+
+        public void TickAttack(EnemyAttackContext context, float enemyDeltaTime)
+        {
+            if (hasFired) return;
+
+            hasFired = true;
+            // 看不见玩家时不开枪.
+            if (!context.HasSight) return;
+            Fire(context.DirectionToPlayer);
+        }
+
+        public void EndAttack()
+        {
+            hasFired = false;
+        }
+
+        /// <summary>
+        /// 攻击时不强制停步, 走位继续由行为大脑驱动.
+        /// </summary>
+        public bool LocksMovement => false;
+
+        public float AttackLockDuration => Mathf.Max(0.01f, attackDuration);
+
+        private void Fire(Vector2 direction)
+        {
+            if (bulletPrefab == null || direction.sqrMagnitude <= 0.0001f) return;
+
+            var spawnPosition = transform.position + (Vector3)(direction * 0.5f);
+            WeaponManager.Instance.SpawnEnemyBullet(bulletPrefab, spawnPosition, direction, AttackDamage);
+            PlayShootSound();
+        }
+
+        private void PlayShootSound()
+        {
+            if (AudioSource != null && shootSounds != null && shootSounds.Count > 0)
+            {
+                AudioSource.PlayOneShot(shootSounds[UnityEngine.Random.Range(0, shootSounds.Count)]);
+            }
+        }
     }
 }
