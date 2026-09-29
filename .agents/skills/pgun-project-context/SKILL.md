@@ -83,3 +83,5 @@ Read `references/project-architecture.md` for:
 - Key classes and public APIs.
 - Current item, buff, weapon, enemy, UI, pooling, animation, and database implementation notes.
 - Excel2SO workflow.
+
+Read `references/lua-gameplay-rewrite-plan.md` before moving gameplay rules into Lua. Buff special behavior and item effects come first; weapon fire patterns, enemy behavior, and room encounter rules follow. xLua Hotfix stays an emergency patch channel.
