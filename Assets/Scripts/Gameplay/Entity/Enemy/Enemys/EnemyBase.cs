@@ -82,6 +82,63 @@ namespace Game.Gameplay
         protected float attackInterval = 1f;
         protected float attackRange = 6f;
 
+        #region EnemyBrain 桥接成员
+        // EnemyBrain 在同一程序集内读取运行时状态与写入速度, 子类不得绕过这些成员直接写 velocity.
+        internal bool BrainIsDead => isDead;
+        internal float BrainMoveSpeed => MoveSpeed;
+        internal float BrainPlayerStopDistance => playerStopDistance;
+        internal float BrainVisionRadius => visionRadius;
+        internal float BrainVisionAngle => visionAngle;
+        internal float BrainSearchTime => searchTime;
+        internal float BrainSeparationRadius => separationRadius;
+        internal float BrainSeparationWeight => separationWeight;
+        internal float BrainAttackRange => attackRange;
+        internal float BrainAttackInterval => attackInterval;
+
+        /// <summary>
+        /// 面朝方向, 由精灵翻转得到, 朝右为正方向.
+        /// </summary>
+        internal Vector2 BrainFacingDirection => new Vector2(sr != null && sr.flipX ? -1f : 1f, 0f);
+
+        /// <summary>
+        /// 行为层写入刚体速度的唯一入口.
+        /// </summary>
+        internal void ApplyBrainVelocity(Vector2 velocity)
+        {
+            if (rb != null)
+            {
+                rb.velocity = velocity;
+            }
+        }
+
+        /// <summary>
+        /// 行为层设置面朝, 翻转精灵并通知子类刷新朝向相关组件.
+        /// </summary>
+        internal void SetBrainFacing(float directionX)
+        {
+            if (sr == null)
+            {
+                return;
+            }
+
+            if (directionX < 0f)
+            {
+                sr.flipX = true;
+            }
+            else if (directionX > 0f)
+            {
+                sr.flipX = false;
+            }
+
+            OnFacingChanged();
+        }
+
+        /// <summary>
+        /// 面朝变化后的钩子, 例如近战检测盒跟随翻转.
+        /// </summary>
+        protected virtual void OnFacingChanged() { }
+        #endregion
+
         /// <summary>
         /// 状态机
         /// </summary>
