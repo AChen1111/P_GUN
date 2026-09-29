@@ -1,5 +1,3 @@
-require("ItemBase")
-
 HealEffectModule = {}
 HealEffectModule.__index = HealEffectModule
 setmetatable(HealEffectModule, {__index = ItemBase})

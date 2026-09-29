@@ -32,4 +32,28 @@ return {
         iconAddress = "Assets/Assets/Items/Potion Asset.png",
         effectPrefabAddress = "item/effect/cleanse",
     },
+    ["6"] = {
+        itemName = "血契宝典",
+        description = "攻击永久提升2点;生命上限永久降低1点(可叠加)",
+        iconAddress = "Assets/Assets/Items/Potion Asset.png",
+        effectPrefabAddress = "item/effect/blood_tome",
+    },
+    ["7"] = {
+        itemName = "护盾发生器",
+        description = "10秒内受到的伤害降低3点",
+        iconAddress = "Assets/Assets/Items/Potion Asset.png",
+        effectPrefabAddress = "item/effect/shield_generator",
+    },
+    ["8"] = {
+        itemName = "战鼓",
+        description = "60秒内击杀敌人回复1点生命",
+        iconAddress = "Assets/Assets/Items/Potion Asset.png",
+        effectPrefabAddress = "item/effect/war_drum",
+    },
+    ["9"] = {
+        itemName = "弹药补给箱",
+        description = "立刻补满当前枪械的弹夹与备弹",
+        iconAddress = "Assets/Assets/Items/Potion Asset.png",
+        effectPrefabAddress = "item/effect/ammo_crate",
+    },
 }

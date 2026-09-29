@@ -1,5 +1,3 @@
-require("ItemBase")
-
 SpeedPotionModule = {}
 SpeedPotionModule.__index = SpeedPotionModule
 setmetatable(SpeedPotionModule, {__index = ItemBase})

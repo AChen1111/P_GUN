@@ -1,5 +1,3 @@
-require("ItemBase")
-
 CleansePotionModule = {}
 CleansePotionModule.__index = CleansePotionModule
 setmetatable(CleansePotionModule, {__index = ItemBase})

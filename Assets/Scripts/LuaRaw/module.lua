@@ -22,6 +22,10 @@ require("SpeedPotionModule")
 require("DamagePotionModule")
 require("CleansePotionModule")
 require("MysteryPotionModule")
+require("BloodTomeModule")
+require("ShieldGeneratorModule")
+require("WarDrumModule")
+require("AmmoCrateModule")
 require("RoomRewardModule")
 require("ChestRoomModule")
 
@@ -49,5 +53,9 @@ moduleList["SpeedPotionModule"] = SpeedPotionModule
 moduleList["DamagePotionModule"] = DamagePotionModule
 moduleList["CleansePotionModule"] = CleansePotionModule
 moduleList["MysteryPotionModule"] = MysteryPotionModule
+moduleList["BloodTomeModule"] = BloodTomeModule
+moduleList["ShieldGeneratorModule"] = ShieldGeneratorModule
+moduleList["WarDrumModule"] = WarDrumModule
+moduleList["AmmoCrateModule"] = AmmoCrateModule
 moduleList["RoomRewardModule"] = RoomRewardModule
 moduleList["ChestRoomModule"] = ChestRoomModule

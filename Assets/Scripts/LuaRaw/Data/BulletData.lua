@@ -14,4 +14,16 @@ return {
         hitPlayerSoundAddress = "",
         hitWallSoundAddress = "",
     },
+    ["frost_bullet"] = {
+        lifeTime = 3,
+        hitBuffId = 14,
+        hitPlayerSoundAddress = "",
+        hitWallSoundAddress = "",
+    },
+    ["curse_bullet"] = {
+        lifeTime = 3,
+        hitBuffId = 3,
+        hitPlayerSoundAddress = "",
+        hitWallSoundAddress = "",
+    },
 }
