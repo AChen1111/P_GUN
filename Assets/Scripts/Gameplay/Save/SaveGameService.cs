@@ -79,17 +79,18 @@ namespace Game.Gameplay.Save
                 : SaveOperationResult.Fail("删除失败, 槽位为空.");
         }
 
-        public static void ApplyPendingGenerationSettings(AddressableDungeonBootstrapper bootstrapper, DungeonGeneratorGrid2D dungeonGenerator)
+        /// <summary>
+        /// 生成前把存档中的关卡 id 和种子写入随机房间生成器, 确保重建同一张地图.
+        /// </summary>
+        /// <param name="generator">场景中的随机房间生成器.</param>
+        public static void ApplyPendingGenerationSettings(RandomRoomGenerator generator)
         {
-            if (pendingLoadData == null || dungeonGenerator == null)
+            if (pendingLoadData == null || generator == null)
             {
                 return;
             }
 
-            // 生成前写入存档中的地图配方, 确保 Edgar 重建同一张地图.
-            bootstrapper?.OverrideLevelGraphAddress(pendingLoadData.levelGraphAddress);
-            dungeonGenerator.UseRandomSeed = false;
-            dungeonGenerator.RandomGeneratorSeed = pendingLoadData.mapSeed;
+            generator.OverrideLevel(pendingLoadData.levelId, pendingLoadData.mapSeed);
         }
 
         /// <summary>

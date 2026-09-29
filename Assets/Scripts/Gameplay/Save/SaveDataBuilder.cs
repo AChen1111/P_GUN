@@ -10,15 +10,20 @@ namespace Game.Gameplay.Save
     {
         public static GameSaveData Build(Player player, int saveVersion)
         {
-            var bootstrapper = AddressableDungeonBootstrapper.Active;
+            var generator = RandomRoomGenerator.Active;
+            if (generator == null)
+            {
+                throw new InvalidOperationException($"{nameof(RandomRoomGenerator)} must exist before building save data.");
+            }
+
             var currentRoom = ResolveCurrentRoom(player);
             return new GameSaveData
             {
                 version = saveVersion,
                 savedAtUtc = DateTime.UtcNow.ToString("o"),
                 sceneName = SceneManager.GetActiveScene().name,
-                levelGraphAddress = bootstrapper != null ? bootstrapper.LevelGraphAddress : string.Empty,
-                mapSeed = bootstrapper != null ? bootstrapper.LastGeneratedSeed : 0,
+                levelId = generator.LevelId,
+                mapSeed = generator.LastGeneratedSeed,
                 currentRoomId = currentRoom != null ? currentRoom.SaveRoomId : string.Empty,
                 player = CapturePlayer(player),
                 rooms = CaptureRooms()
