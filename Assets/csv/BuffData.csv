@@ -1,0 +1,5 @@
+buffId,buffName,description,iconAddress,tag,duration,isPermanent,interval,modifiers,behaviorPrefabAddress
+0,SpeedUpBuff,移动速度提升40%.,Assets/Malicious_statusiconset1/escape icon.png,Positive,5,FALSE,1,MoveSpeed:PercentAdd:0.4,
+1,PowerUpBuff,子弹伤害提升50%.,Assets/Malicious_statusiconset1/attack icon.png,Positive,5,FALSE,1,Attack:PercentAdd:0.5,
+2,MaxHpUpBuff,最大生命值提升2点,Assets/Malicious_statusiconset1/buff icon.png,Positive,0,TRUE,1,MaxHp:Flat:2,
+3,PoisonBuff,永久中毒: 每隔10秒每层受到1点伤害,Assets/Malicious_statusiconset1/confusion icon.png,Negative,0,TRUE,10,,buff/poison_behavior

@@ -1,0 +1,6 @@
+itemId,itemName,description,iconAddress,effectPrefabAddress
+1,心,回复一点生命值,Assets/Assets/Items/Potion Asset.png,item/effect/heal
+2,奇特的药水,获取奇特的效果,Assets/Assets/Items/Potion Asset.png,item/effect/mystery
+3,加速药水,加速,Assets/Assets/Items/Potion Asset.png,item/effect/speed
+4,增伤药水,增加伤害,Assets/Assets/Items/Potion Asset.png,item/effect/damage
+5,净化药水,移除所有负面Buff,Assets/Assets/Items/Potion Asset.png,item/effect/cleanse
