@@ -73,34 +73,27 @@ namespace Game.Gameplay
         public AudioPlay audioPlay;
 
         [Header("行为参数, 由 EnemyData.lua 在生成时写入")]
-        protected float visionRadius = 7f;
-        protected float visionAngle = 120f;
-        protected float searchTime = 2f;
+        // 序列化默认值供编辑模式绘制视锥, 运行时仍由 EnemyData 覆盖.
+        [SerializeField] protected float attackAngle = 120f;
         protected float separationRadius = 1.8f;
         protected float separationWeight = 1.5f;
         protected float attackInterval = 1f;
-        protected float attackRange = 6f;
+        [SerializeField] protected float attackRange = 6f;
 
         #region EnemyBrain 桥接成员
         // EnemyBrain 在同一程序集内读取运行时状态与写入速度, 子类不得绕过这些成员直接写 velocity.
         internal bool BrainIsDead => isDead;
         internal float BrainMoveSpeed => MoveSpeed;
         internal float BrainPlayerStopDistance => playerStopDistance;
-        internal float BrainVisionRadius => visionRadius;
-        internal float BrainVisionAngle => visionAngle;
-        internal float BrainSearchTime => searchTime;
         internal float BrainSeparationRadius => separationRadius;
         internal float BrainSeparationWeight => separationWeight;
         internal float BrainAttackRange => attackRange;
+        internal float BrainAttackAngle => attackAngle;
+        private Vector2 brainFacingDirection = Vector2.right;
+        internal Vector2 BrainFacingDirection => brainFacingDirection;
         internal float BrainAttackInterval => attackInterval;
         internal Vector2 BrainCollisionCenter => col != null ? col.bounds.center : transform.position;
         internal float BrainCollisionRadius => col != null ? Mathf.Min(col.bounds.extents.x, col.bounds.extents.y) : 0.3f;
-
-        /// <summary>
-        /// 面朝方向, 由精灵翻转得到, 朝右为正方向.
-        /// </summary>
-        private Vector2 brainFacingDirection = Vector2.right;
-        internal Vector2 BrainFacingDirection => brainFacingDirection;
 
         /// <summary>
         /// 行为层写入刚体速度的唯一入口.
@@ -131,7 +124,7 @@ namespace Game.Gameplay
                 return;
             }
 
-            // 视野使用完整的二维朝向, 精灵仍按水平分量翻转.
+            // 攻击视锥使用完整二维朝向, 精灵按水平分量翻转.
             brainFacingDirection = direction.normalized;
             if (sr == null) return;
 
@@ -148,7 +141,7 @@ namespace Game.Gameplay
         }
 
         /// <summary>
-        /// 在 Scene 视图持续画出与运行时判定一致的扇形视野.
+        /// 在 Scene 视图持续画出与出手判定一致的攻击视锥.
         /// </summary>
         private void OnDrawGizmos()
         {
@@ -156,11 +149,11 @@ namespace Game.Gameplay
             // 仅在 Scene 视图绘制, 避免 Game 视图打开 Gizmos 时遮挡战斗画面.
             if (UnityEditor.SceneView.currentDrawingSceneView == null) return;
 #endif
-            if (visionRadius <= 0f || visionAngle <= 0f) return;
+            if (attackRange <= 0f || attackAngle <= 0f) return;
             var sprite = sr != null ? sr : GetComponent<SpriteRenderer>();
             var facing = Application.isPlaying ? brainFacingDirection
                 : sprite != null && sprite.flipX ? Vector2.left : Vector2.right;
-            var halfAngle = Mathf.Clamp(visionAngle * 0.5f, 0f, 180f);
+            var halfAngle = Mathf.Clamp(attackAngle * 0.5f, 0f, 180f);
             var centerAngle = Mathf.Atan2(facing.y, facing.x) * Mathf.Rad2Deg;
             var origin = transform.position;
             var color = new Color(1f, 0.78f, 0.12f, 0.85f);
@@ -169,8 +162,8 @@ namespace Game.Gameplay
             const int segments = 32;
             for (var index = 0; index <= segments; index++)
             {
-                var angle = (centerAngle - halfAngle + visionAngle * index / segments) * Mathf.Deg2Rad;
-                var point = origin + new Vector3(Mathf.Cos(angle), Mathf.Sin(angle), 0f) * visionRadius;
+                var angle = (centerAngle - halfAngle + attackAngle * index / segments) * Mathf.Deg2Rad;
+                var point = origin + new Vector3(Mathf.Cos(angle), Mathf.Sin(angle), 0f) * attackRange;
                 if (index == 0) Gizmos.DrawLine(origin, point);
                 else Gizmos.DrawLine(previous, point);
                 if (index == segments) Gizmos.DrawLine(origin, point);
@@ -451,14 +444,12 @@ namespace Game.Gameplay
             if(config.Damage > 0) AttackDamage = config.Damage;
             itemDropChance = Mathf.Clamp01(config.ItemDropChance);
 
-            // 视野与分离参数供行为层使用, 数值同样来自 EnemyData.lua.
-            visionRadius = config.VisionRadius;
-            visionAngle = config.VisionAngle;
-            searchTime = config.SearchTime;
+            // 攻击视锥与分离参数供行为层使用, 数值同样来自 EnemyData.lua.
             separationRadius = config.SeparationRadius;
             separationWeight = config.SeparationWeight;
             attackInterval = config.AttackInterval;
             attackRange = config.AttackRange;
+            attackAngle = config.AttackAngle;
 
             CurrentHp = MaxHp;
         }
@@ -484,8 +475,8 @@ namespace Game.Gameplay
             CurrentHp = MaxHp;
             StopMove();
             ResetVisualState();
-            brainFacingDirection = sr != null && sr.flipX ? Vector2.left : Vector2.right;
             ResetAnimatorState();
+            brainFacingDirection = sr != null && sr.flipX ? Vector2.left : Vector2.right;
 
             if(col != null) {
                 col.enabled = true;

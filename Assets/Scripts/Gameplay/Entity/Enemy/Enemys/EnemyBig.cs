@@ -64,11 +64,11 @@ namespace Game.Gameplay
         }
 
         /// <summary>
-        /// 射程内, 有视线, 且攻击冷却结束才进入两段循环.
+        /// 玩家位于攻击视锥内且冷却结束才进入两段循环.
         /// </summary>
         public bool CanAttack(EnemyAttackContext context)
         {
-            return context.HasSight
+            return context.IsPlayerInAttackCone
                 && context.DistanceToPlayer <= BrainAttackRange
                 && EnemyTime >= nextAttackTime;
         }
@@ -140,7 +140,7 @@ namespace Game.Gameplay
         }
 
         /// <summary>
-        /// 点射段: 按间隔朝有视线的玩家点射, 没有视线就只移动.
+        /// 点射段: 玩家在攻击视锥内时按间隔点射, 离开视锥后继续移动追击.
         /// </summary>
         private void TickAimedPhase(EnemyAttackContext context, float enemyDeltaTime)
         {
@@ -151,7 +151,7 @@ namespace Game.Gameplay
             }
 
             aimedShotTimer = 0f;
-            if (!context.HasSight || context.DirectionToPlayer.sqrMagnitude <= 0.0001f)
+            if (!context.IsPlayerInAttackCone || context.DirectionToPlayer.sqrMagnitude <= 0.0001f)
             {
                 return;
             }

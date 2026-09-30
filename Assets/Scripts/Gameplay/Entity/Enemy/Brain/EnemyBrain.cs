@@ -12,13 +12,13 @@ namespace Game.Gameplay
     {
         Idle,
         Chase,
-        Search,
-        Attack
+        // 保留攻击状态的既有数值, 避免热修代码中的枚举值变化.
+        Attack = 3
     }
 
     /// <summary>
-    /// 敌人行为大脑: 每帧按感知, 寻路, 分离, 攻击的顺序执行.
-    /// 看得见走流场, 丢视线后用 A* 走向最后已知位置, 刚体速度只由本类写入.
+    /// 敌人行为大脑: 每帧追踪玩家, 执行寻路, 分离和攻击.
+    /// 战斗中持续追踪玩家当前位置, 沿流场绕墙, 刚体速度只由本类写入.
     /// </summary>
     public sealed class EnemyBrain
     {
@@ -28,14 +28,10 @@ namespace Game.Gameplay
 
         private readonly EnemyBase owner;
         private readonly IEnemyAttack attack;
-        private readonly List<Vector2Int> searchPath = new List<Vector2Int>();
         private readonly List<Vector2Int> patrolPath = new List<Vector2Int>();
 
         private EnemyBrainState state = EnemyBrainState.Idle;
-        private Vector3? lastSeenPosition;
-        private float searchTimer;
         private float attackLockTimer;
-        private Vector2Int lastSearchTargetCell;
         private bool reportedMissingGrid;
         private float patrolWaitTimer = 1f;
         private Vector2Int? flowWaypointCell;
@@ -59,44 +55,30 @@ namespace Game.Gameplay
             }
 
             var player = PlayerRegistry.Current;
-            var selfPosition = owner.transform.position;
-            var hasSight = EnemyPerception.CanSeePlayer(
-                selfPosition,
-                owner.BrainFacingDirection,
-                player,
-                owner.BrainVisionRadius,
-                owner.BrainVisionAngle);
-
-            switch (state)
+            // 生成的敌人只追踪所属战斗房间的玩家, 无角度或距离发现条件.
+            var hasTarget = player != null && owner.OwnerFightRoom != null &&
+                owner.OwnerFightRoom == FightRoom.currentFightRoom;
+            if (!hasTarget)
             {
-                case EnemyBrainState.Idle:
-                    TickIdle(player, hasSight, enemyDeltaTime);
-                    break;
-                case EnemyBrainState.Chase:
-                    TickChase(player, selfPosition, hasSight);
-                    break;
-                case EnemyBrainState.Search:
-                    TickSearch(player, selfPosition, hasSight, enemyDeltaTime);
-                    break;
-                case EnemyBrainState.Attack:
-                    TickAttack(player, selfPosition, hasSight, enemyDeltaTime);
-                    break;
-            }
-        }
-
-        /// <summary>
-        /// 待机: 没看见玩家时在所属房间内随机散步, 发现玩家立即追击.
-        /// </summary>
-        private void TickIdle(Player player, bool hasSight, float enemyDeltaTime)
-        {
-            if (hasSight)
-            {
-                patrolPath.Clear();
-                lastSeenPosition = player.transform.position;
-                Enter(EnemyBrainState.Chase);
+                if (state == EnemyBrainState.Attack) attack.EndAttack();
+                if (state != EnemyBrainState.Idle) Enter(EnemyBrainState.Idle);
+                TickIdle(enemyDeltaTime);
                 return;
             }
 
+            if (state == EnemyBrainState.Idle) Enter(EnemyBrainState.Chase);
+            var selfPosition = owner.transform.position;
+            if (state == EnemyBrainState.Attack)
+                TickAttack(player, selfPosition, enemyDeltaTime);
+            else
+                TickChase(player, selfPosition);
+        }
+
+        /// <summary>
+        /// 待机: 所属房间未战斗或玩家不存在时在房间内随机散步.
+        /// </summary>
+        private void TickIdle(float enemyDeltaTime)
+        {
             var grid = ResolveWalkGrid();
             if (grid == null)
             {
@@ -138,28 +120,11 @@ namespace Game.Gameplay
         }
 
         /// <summary>
-        /// 追击: 看得见玩家, 走流场并保持面朝.
+        /// 追击: 始终读取玩家当前位置, 用流场绕墙并保持面朝.
         /// </summary>
-        private void TickChase(Player player, Vector3 selfPosition, bool hasSight)
+        private void TickChase(Player player, Vector3 selfPosition)
         {
-            if (player == null)
-            {
-                Stop();
-                return;
-            }
-
-            if (!hasSight)
-            {
-                // 丢失视线, 记下位置进入追踪.
-                searchTimer = 0f;
-                RebuildSearchPath(selfPosition);
-                Enter(EnemyBrainState.Search);
-                return;
-            }
-
-            lastSeenPosition = player.transform.position;
-
-            var context = BuildContext(player, selfPosition, hasSight);
+            var context = BuildContext(player, selfPosition);
             if (attack.CanAttack(context))
             {
                 BeginAttack(context);
@@ -171,80 +136,25 @@ namespace Game.Gameplay
         }
 
         /// <summary>
-        /// 追踪: 走向最后已知位置, 重新看见回追击, 超时或到达后回待机.
+        /// 攻击: 锁定结束后继续追击, 墙体只阻挡攻击路线而不丢失目标.
         /// </summary>
-        private void TickSearch(Player player, Vector3 selfPosition, bool hasSight, float enemyDeltaTime)
-        {
-            searchTimer += enemyDeltaTime;
-
-            if (hasSight)
-            {
-                lastSeenPosition = player.transform.position;
-                Enter(EnemyBrainState.Chase);
-                return;
-            }
-
-            if (player != null)
-            {
-                var context = BuildContext(player, selfPosition, hasSight);
-                if (attack.CanAttack(context))
-                {
-                    BeginAttack(context);
-                    return;
-                }
-            }
-
-            if (searchTimer >= owner.BrainSearchTime)
-            {
-                Enter(EnemyBrainState.Idle);
-                return;
-            }
-
-            FollowSearchPath(selfPosition);
-        }
-
-        /// <summary>
-        /// 攻击: 由攻击模块决定停步或边走边打, 锁定结束回追击或追踪.
-        /// </summary>
-        private void TickAttack(Player player, Vector3 selfPosition, bool hasSight, float enemyDeltaTime)
+        private void TickAttack(Player player, Vector3 selfPosition, float enemyDeltaTime)
         {
             attackLockTimer += enemyDeltaTime;
-
-            var context = player != null ? BuildContext(player, selfPosition, hasSight) : default;
-            attack.TickAttack(context, enemyDeltaTime);
-
+            FaceTowards(player.transform.position - selfPosition);
+            attack.TickAttack(BuildContext(player, selfPosition), enemyDeltaTime);
             if (attackLockTimer >= attack.AttackLockDuration)
             {
                 attackLockTimer = 0f;
                 attack.EndAttack();
-                if (hasSight)
-                {
-                    Enter(EnemyBrainState.Chase);
-                    return;
-                }
-
-                searchTimer = 0f;
-                RebuildSearchPath(selfPosition);
-                Enter(EnemyBrainState.Search);
+                Enter(EnemyBrainState.Chase);
                 return;
             }
 
             if (attack.LocksMovement)
-            {
                 MoveSeparationOnly();
-                return;
-            }
-
-            // 允许边走边打的攻击沿用追击的移动规则.
-            if (hasSight && player != null)
-            {
-                MoveWithFlow(player.transform.position, selfPosition);
-                FaceTowards(player.transform.position - selfPosition);
-            }
             else
-            {
-                FollowSearchPath(selfPosition);
-            }
+                MoveWithFlow(player.transform.position, selfPosition);
         }
 
         /// <summary>
@@ -356,96 +266,6 @@ namespace Game.Gameplay
         }
 
         /// <summary>
-        /// 沿 A* 路径走向最后已知位置.
-        /// </summary>
-        private void FollowSearchPath(Vector3 selfPosition)
-        {
-            var grid = ResolveWalkGrid();
-            if (grid == null || !lastSeenPosition.HasValue)
-            {
-                Stop();
-                Enter(EnemyBrainState.Idle);
-                return;
-            }
-
-            var targetCell = grid.GetCell(lastSeenPosition.Value);
-            var currentCell = grid.GetCell(selfPosition);
-            if (currentCell == targetCell)
-            {
-                // 走到最后已知位置仍未看见, 结束本段追踪.
-                Stop();
-                Enter(EnemyBrainState.Idle);
-                return;
-            }
-
-            // 目标格变化, 或路径为空, 或下一格被堵住时重新搜索.
-            if (targetCell != lastSearchTargetCell || searchPath.Count == 0 || !grid.IsWalkable(searchPath[0]))
-            {
-                RebuildSearchPath(selfPosition);
-            }
-
-            if (searchPath.Count == 0)
-            {
-                // 没有路径, 本段追踪结束.
-                Stop();
-                Enter(EnemyBrainState.Idle);
-                return;
-            }
-
-            // 到达格中心则弹出下一步.
-            while (searchPath.Count > 0)
-            {
-                var nextCenter = grid.GetCellCenterWorld(searchPath[0]);
-                if (((Vector2)(nextCenter - selfPosition)).sqrMagnitude <= ArriveCellSqrDistance)
-                {
-                    searchPath.RemoveAt(0);
-                    continue;
-                }
-
-                break;
-            }
-
-            if (searchPath.Count == 0)
-            {
-                Stop();
-                Enter(EnemyBrainState.Idle);
-                return;
-            }
-
-            var stepCenter = grid.GetCellCenterWorld(searchPath[0]);
-            var stepDirection = (Vector2)(stepCenter - selfPosition);
-            if (stepDirection.sqrMagnitude <= 0.0001f)
-            {
-                Stop();
-                return;
-            }
-
-            ApplyMovement(stepDirection.normalized, selfPosition);
-            FaceTowards(stepDirection);
-        }
-
-        /// <summary>
-        /// 重建到最后已知位置的 A* 路径.
-        /// </summary>
-        private void RebuildSearchPath(Vector3 selfPosition)
-        {
-            searchPath.Clear();
-            var grid = ResolveWalkGrid();
-            if (grid == null || !lastSeenPosition.HasValue)
-            {
-                return;
-            }
-
-            var from = grid.GetCell(selfPosition);
-            var to = grid.GetCell(lastSeenPosition.Value);
-            lastSearchTargetCell = to;
-            if (!grid.TryFindPath(from, to, searchPath))
-            {
-                searchPath.Clear();
-            }
-        }
-
-        /// <summary>
         /// 取所属战斗房间的可行走格, 缺格时只报错一次.
         /// </summary>
         private RoomWalkGrid ResolveWalkGrid()
@@ -477,13 +297,15 @@ namespace Game.Gameplay
         /// <summary>
         /// 构建攻击判定上下文.
         /// </summary>
-        private static EnemyAttackContext BuildContext(Player player, Vector3 selfPosition, bool hasSight)
+        private EnemyAttackContext BuildContext(Player player, Vector3 selfPosition)
         {
             var toPlayer = (Vector2)(player.transform.position - selfPosition);
             var distance = toPlayer.magnitude;
             return new EnemyAttackContext
             {
-                HasSight = hasSight,
+                // 视锥只决定出手, 玩家在范围外或墙后仍会被持续追踪.
+                IsPlayerInAttackCone = EnemyAttackCone.ContainsPlayer(selfPosition, owner.BrainFacingDirection,
+                    player, owner.BrainAttackRange, owner.BrainAttackAngle),
                 DistanceToPlayer = distance,
                 DirectionToPlayer = distance > 0.0001f ? toPlayer / distance : Vector2.zero,
             };
@@ -512,15 +334,12 @@ namespace Game.Gameplay
         }
 
         /// <summary>
-        /// 死亡或回池时清空全部行为状态, 复用后的敌人没有上一次的路径和视野记忆.
+        /// 死亡或回池时清空全部行为状态, 复用后的敌人没有上一次的路径和攻击状态.
         /// </summary>
         public void ResetForPoolOrDeath()
         {
             state = EnemyBrainState.Idle;
-            lastSeenPosition = null;
-            searchTimer = 0f;
             attackLockTimer = 0f;
-            searchPath.Clear();
             patrolPath.Clear();
             patrolWaitTimer = 1f;
             reportedMissingGrid = false;

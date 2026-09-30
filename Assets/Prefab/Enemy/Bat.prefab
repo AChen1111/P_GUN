@@ -159,6 +159,8 @@ MonoBehaviour:
   itemSpawner: {fileID: 7837503422260755806}
   OwnerFightRoom: {fileID: 0}
   audioPlay: {fileID: 3543157380447102985}
+  attackAngle: 120
+  attackRange: 6
   bulletPrefab: {fileID: 2362813725672043019, guid: aabf385d907f77c4eb2e64fb37c90c52, type: 3}
   shootSounds:
   - {fileID: 8300000, guid: d6a1e1dba80eb484386bf50f97ec2560, type: 3}

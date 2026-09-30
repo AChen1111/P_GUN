@@ -43,11 +43,11 @@ namespace Game.Gameplay
         }
 
         /// <summary>
-        /// 射程内, 有视线, 且攻击冷却结束才出手.
+        /// 玩家位于攻击视锥内且冷却结束才出手.
         /// </summary>
         public bool CanAttack(EnemyAttackContext context)
         {
-            return context.HasSight
+            return context.IsPlayerInAttackCone
                 && context.DistanceToPlayer <= BrainAttackRange
                 && EnemyTime >= nextAttackTime;
         }
@@ -66,8 +66,8 @@ namespace Game.Gameplay
             if (hasShot || attackTimer < attackShootDelay) return;
 
             hasShot = true;
-            // 墙挡住视线时不发射.
-            if (!context.HasSight) return;
+            // 玩家离开攻击视锥或攻击路线被墙挡住时不发射.
+            if (!context.IsPlayerInAttackCone) return;
             ShootFan(context.DirectionToPlayer);
         }
 

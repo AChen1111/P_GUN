@@ -9,7 +9,7 @@ using Game.Items;
 namespace Game.Gameplay
 {
     /// <summary>
-    /// 远程敌人: 射程内且有视线时按间隔朝玩家点射, 攻击期间不停步.
+    /// 远程敌人: 玩家位于攻击视锥内时按间隔点射, 攻击期间不停步.
     /// </summary>
     public class EnemyA : EnemyBase, IEnemyAttack
     {
@@ -41,7 +41,7 @@ namespace Game.Gameplay
         /// </summary>
         public bool CanAttack(EnemyAttackContext context)
         {
-            return context.HasSight
+            return context.IsPlayerInAttackCone
                 && context.DistanceToPlayer <= BrainAttackRange
                 && shootDuration != null
                 && shootDuration.CanShoot;
@@ -58,8 +58,8 @@ namespace Game.Gameplay
             if (hasFired) return;
 
             hasFired = true;
-            // 看不见玩家时不开枪.
-            if (!context.HasSight) return;
+            // 玩家离开攻击视锥或攻击路线被墙挡住时不开枪.
+            if (!context.IsPlayerInAttackCone) return;
             Fire(context.DirectionToPlayer);
         }
 

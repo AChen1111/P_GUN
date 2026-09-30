@@ -7,13 +7,13 @@ namespace Game.Gameplay
     /// </summary>
     public struct EnemyAttackContext
     {
-        /// <summary>本帧是否看得见玩家.</summary>
-        public bool HasSight;
+        /// <summary>玩家是否在面朝攻击视锥内, 且攻击路线没有墙体遮挡.</summary>
+        public bool IsPlayerInAttackCone;
 
         /// <summary>与玩家的距离.</summary>
         public float DistanceToPlayer;
 
-        /// <summary>指向玩家的单位方向, 看不见时为零向量.</summary>
+        /// <summary>指向玩家当前位置的单位方向.</summary>
         public Vector2 DirectionToPlayer;
     }
 
@@ -23,7 +23,7 @@ namespace Game.Gameplay
     public interface IEnemyAttack
     {
         /// <summary>
-        /// 是否满足出手条件, 例如射程, 视线, 冷却或近战检测.
+        /// 是否满足出手条件, 例如射程, 攻击路线, 冷却或近战检测.
         /// </summary>
         bool CanAttack(EnemyAttackContext context);
 

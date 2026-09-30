@@ -57,11 +57,11 @@ namespace Game.Gameplay
 }
 
         /// <summary>
-        /// 近战以检测器命中为出手条件, 不要求视线, 冷却沿用敌人局部时钟.
+        /// 近战要求玩家处于攻击视锥并被检测器命中, 冷却沿用敌人局部时钟.
         /// </summary>
         public bool CanAttack(EnemyAttackContext context)
         {
-            if (attackDetector == null || EnemyTime < nextAttackTime) return false;
+            if (!context.IsPlayerInAttackCone || attackDetector == null || EnemyTime < nextAttackTime) return false;
             return attackDetector.TryGetPlayerInRange(out _);
         }
 

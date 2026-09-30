@@ -779,9 +779,8 @@ public static class CSVToLuaTableImporter
                     new ColumnSpec("moveSpeed", "moveSpeed", ColumnType.Float),
                     new ColumnSpec("damage", "damage", ColumnType.Int),
                     new ColumnSpec("itemDropChance", "itemDropChance", ColumnType.Float),
-                    new ColumnSpec("visionRadius", "visionRadius", ColumnType.Float),
-                    new ColumnSpec("visionAngle", "visionAngle", ColumnType.Float),
-                    new ColumnSpec("searchTime", "searchTime", ColumnType.Float),
+                    // 攻击视锥半径使用 attackRange, 这里只导入角度, 追击不需要感知参数.
+                    new ColumnSpec("attackAngle", "attackAngle", ColumnType.Float),
                     new ColumnSpec("separationRadius", "separationRadius", ColumnType.Float),
                     new ColumnSpec("separationWeight", "separationWeight", ColumnType.Float),
                     new ColumnSpec("attackInterval", "attackInterval", ColumnType.Float),

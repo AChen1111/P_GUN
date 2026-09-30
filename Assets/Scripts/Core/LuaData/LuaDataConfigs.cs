@@ -73,7 +73,7 @@ namespace Game.Core
 
     /// <summary>
     /// 敌人配置, 来自 EnemyData.lua, 按 enemyId 取行.
-    /// 视野与分离参数供敌人行为层使用.
+    /// 分离与攻击参数供敌人行为层使用.
     /// </summary>
     public sealed class EnemyConfig
     {
@@ -84,9 +84,7 @@ namespace Game.Core
         public float MoveSpeed;
         public int Damage;
         public float ItemDropChance;
-        public float VisionRadius;
-        public float VisionAngle;
-        public float SearchTime;
+        public float AttackAngle;
         public float SeparationRadius;
         public float SeparationWeight;
         public float AttackInterval;
