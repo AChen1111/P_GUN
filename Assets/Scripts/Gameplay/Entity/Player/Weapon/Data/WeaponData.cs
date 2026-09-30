@@ -1,3 +1,4 @@
+using UnityEngine.Serialization;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -14,8 +15,12 @@ namespace Game.Gameplay
     {
         public string weaponId;
         public string displayName;
-        public List<AudioClip> shootSounds;
-        public AudioClip reloadSound;
+        // 配置保存短名, 资源来自阶段预加载缓存.
+        [SerializeField, AddressableKey(AddressableAssetKind.AudioClip)] public List<string> shootSoundsKeys;
+        public List<AudioClip> shootSounds => AddressableAssetAccess.List<AudioClip>(shootSoundsKeys);
+        // 配置保存短名, 资源来自阶段预加载缓存.
+        [SerializeField, AddressableKey(AddressableAssetKind.AudioClip)] public string reloadSoundKey;
+        public AudioClip reloadSound => AddressableAssetAccess.Get<AudioClip>(reloadSoundKey);
         public int bulletSpeed;
         [Header("Damage")]
         public int minDamage;

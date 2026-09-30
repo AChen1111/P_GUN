@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: RoomEndTable
   m_EditorClassIdentifier: 
   entries:
-  - prefab: {fileID: 5069590999830702722, guid: 06bc0eb67725be6489936e8feba3f252, type: 3}
+  - prefabKey: HeartAdd
     weight: 1
     spawnAnimEffect: 2
     spawnAnimDuration: 1.5

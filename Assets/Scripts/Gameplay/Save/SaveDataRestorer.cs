@@ -1,3 +1,4 @@
+using Game.Core;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -16,7 +17,7 @@ namespace Game.Gameplay.Save
 
             if (SceneManager.GetActiveScene().name != gameplaySceneName)
             {
-                SceneManager.LoadScene(gameplaySceneName);
+                await AddressableLoader.Instance.LoadSceneAsync(gameplaySceneName);
                 return SaveOperationResult.Fail("读档恢复等待游戏场景.");
             }
 

@@ -1,3 +1,5 @@
+using UnityEngine.Serialization;
+using Game.Core;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -28,7 +30,9 @@ namespace Game.Gameplay
         [SerializeField] private string buffName = string.Empty;
 
         [Tooltip("Buff 在状态栏中显示的图标.")]
-        [SerializeField] private Sprite icon = null;
+        // 配置保存短名, 资源来自阶段预加载缓存.
+        [SerializeField, AddressableKey(AddressableAssetKind.Sprite)] public string iconKey = string.Empty;
+        private Sprite icon => AddressableAssetAccess.Get<Sprite>(iconKey);
 
         [TextArea]
         [Tooltip("Buff 的 UI 描述文本.")]
@@ -38,7 +42,9 @@ namespace Game.Gameplay
         [SerializeField] private BuffTag tag = BuffTag.Positive;
 
         [Tooltip("Buff 绑定的 Lua 文件, 文件需要返回包含生命周期方法的 table.")]
-        [SerializeField] private TextAsset luaFile = null;
+        // 配置保存短名, 资源来自阶段预加载缓存.
+        [SerializeField, AddressableKey(AddressableAssetKind.TextAsset)] public string luaFileKey = string.Empty;
+        private TextAsset luaFile => AddressableAssetAccess.Get<TextAsset>(luaFileKey);
 
         [Header("Lifetime")]
         [Tooltip("Buff 的持续时间, 单位为秒. 当不是永久 Buff 时生效.")]

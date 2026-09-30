@@ -18,16 +18,16 @@ namespace Game.Gameplay
     [RequireComponent(typeof(Rigidbody2D), typeof(CircleCollider2D))]
     public class Player : ViewController
     {
-        private static readonly string[] AddressableWeaponAddresses =
+        private static readonly string[] AddressableWeaponKeys =
         {
-            "weapon/pistol",
-            "weapon/ak",
-            "weapon/awp",
-            "weapon/bow",
-            "weapon/laser",
-            "weapon/mp5",
-            "weapon/rocket_gun",
-            "weapon/shotgun"
+            "Pistol",
+            "AK",
+            "AWP",
+            "Bow",
+            "Laser",
+            "MP5",
+            "RocketGun",
+            "ShotGun"
         };
         public UnityEngine.TextMesh DisPlayText;
         private Rigidbody2D rb;
@@ -212,7 +212,7 @@ namespace Game.Gameplay
         }
 
         /// <summary>
-        /// 按玩家自己的武器地址列表加载并实例化武器.
+        /// 按玩家的武器短名列表加载并实例化武器.
         /// </summary>
         private async Task ApplyAddressableWeaponLoadoutAsync()
         {
@@ -228,9 +228,9 @@ namespace Game.Gameplay
             }
 
             ClearCurrentGunInstances();
-            foreach (var address in AddressableWeaponAddresses)
+            foreach (var key in AddressableWeaponKeys)
             {
-                var prefab = await loader.LoadAssetAsync<GameObject>(address);
+                var prefab = await loader.LoadAssetAsync<GameObject>(key);
                 var instance = Instantiate(prefab, Weapon);
                 instance.name = prefab.name;
                 // 武器装载完成前保持隐藏, 避免加载过程中多把枪同时出现在玩家身上.
@@ -322,20 +322,20 @@ namespace Game.Gameplay
             {
                 // 受击后退使用真实时间计时, 避免慢动作影响后退距离.
                 hurtKnockbackTimer -= Time.unscaledDeltaTime;
-                rb.velocity = hurtKnockbackTimer > 0f ? hurtKnockbackVelocity : Vector2.zero;
+                rb.linearVelocity = hurtKnockbackTimer > 0f ? hurtKnockbackVelocity : Vector2.zero;
             }
             else
             {
-                rb.velocity = new Vector2(horizontal, vertical).normalized * CurrentMoveSpeed;
+                rb.linearVelocity = new Vector2(horizontal, vertical).normalized * CurrentMoveSpeed;
             }
 
             if (animator != null)
             {
-                animator.SetFloat("Speed", rb.velocity.magnitude);
+                animator.SetFloat("Speed", rb.linearVelocity.magnitude);
             }
 
             #region 睡眠状态检测
-            var hasMotionInput = rb.velocity.magnitude >= 0.01f;
+            var hasMotionInput = rb.linearVelocity.magnitude >= 0.01f;
             if(!hasMotionInput && !isSleep) {
                 sleepTimer += Time.deltaTime;
                 if(sleepTimer >= SleepDuration) {
@@ -866,13 +866,13 @@ namespace Game.Gameplay
         }
 
         /// <summary>
-        /// 通过物品 Addressables 地址加载背包效果配置.
+        /// 通过物品短名加载背包效果配置.
         /// </summary>
         private static async Task<IReadOnlyList<ItemEffectBase>> ResolveItemEffectsAsync(int itemId)
         {
-            if (!AddressableItemAddressCatalog.TryGetAddress(itemId, out var address))
+            if (!AddressableItemAddressCatalog.TryGetKey(itemId, out var key))
             {
-                throw new InvalidOperationException($"Missing addressable item address, ItemId: {itemId}.");
+                throw new InvalidOperationException($"Missing addressable item key, ItemId: {itemId}.");
             }
 
             var loader = AddressableLoader.Instance;
@@ -881,11 +881,11 @@ namespace Game.Gameplay
                 throw new InvalidOperationException($"{nameof(AddressableLoader)} must exist before restoring inventory effects.");
             }
 
-            var prefab = await loader.LoadAssetAsync<GameObject>(address);
+            var prefab = await loader.LoadAssetAsync<GameObject>(key);
             var item = prefab.GetComponent<Item>();
             if (item == null)
             {
-                throw new InvalidOperationException($"Item prefab missing {nameof(Item)} component, Address: {address}.");
+                throw new InvalidOperationException($"Item prefab missing {nameof(Item)} component, Key: {key}.");
             }
 
             return item.Effects;

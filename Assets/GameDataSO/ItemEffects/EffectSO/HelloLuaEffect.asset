@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 38b70f90f3b3e2e4abc4314f35cf6295, type: 3}
   m_Name: HelloLuaEffect
   m_EditorClassIdentifier: 
-  luaScript: {fileID: 4900000, guid: f33a2f122076c3546a3f9e073573c04e, type: 3}
+  luaScriptKey: HelloItemEffect

@@ -1,3 +1,5 @@
+using UnityEngine.Serialization;
+using Game.Core;
 using System.Collections.Generic;
 using System;
 using Game.Gameplay.Save;
@@ -12,7 +14,9 @@ namespace Game.UI.Save
     public class SaveSlotPanel : UIPanelBase
     {
         [Header("槽位列表")]
-        [SerializeField] private SaveSlotItem slotPrefab;
+        // 配置保存短名, 资源来自阶段预加载缓存.
+        [SerializeField, AddressableKey(AddressableAssetKind.Prefab)] public string slotPrefabKey = string.Empty;
+        private SaveSlotItem slotPrefab => AddressableAssetAccess.Component<SaveSlotItem>(slotPrefabKey);
         [SerializeField] private Transform slotRoot;
 
         [Header("文本")]

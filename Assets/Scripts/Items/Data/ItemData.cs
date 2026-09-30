@@ -1,3 +1,4 @@
+using UnityEngine.Serialization;
 using System;
 using UnityEngine;
 using Game.Core;
@@ -16,14 +17,16 @@ namespace Game.Items
         [TextArea(2, 4)]
         public string description;
 
-        public Sprite icon;
+        // 配置保存短名, 资源来自阶段预加载缓存.
+        [SerializeField, AddressableKey(AddressableAssetKind.Sprite)] public string iconKey;
+        public Sprite icon => AddressableAssetAccess.Get<Sprite>(iconKey);
 
-        public ItemData(int itemId, string itemName, string description, Sprite icon)
+        public ItemData(int itemId, string itemName, string description, string iconKey)
         {
             this.itemId = itemId;
             this.itemName = itemName;
             this.description = description;
-            this.icon = icon;
+            this.iconKey = iconKey;
         }
     }
 }

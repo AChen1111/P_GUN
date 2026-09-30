@@ -1,3 +1,5 @@
+using UnityEngine.Serialization;
+using Game.Core;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -28,7 +30,9 @@ namespace Game.Gameplay
     [CreateAssetMenu(fileName = "EnemySpawnTable", menuName = "PG/Enemy/Enemy Spawn Table", order = 1)]
     public class EnemySpawnTableSO : ScriptableObject
     {
-        [SerializeField] private EnemyDatabase enemyDatabase;
+        // 资源通过短名预加载, 业务读取已就绪的缓存.
+        [SerializeField, AddressableKey(AddressableAssetKind.ScriptableObject)] public string enemyDatabaseKey = string.Empty;
+        private EnemyDatabase enemyDatabase => AddressableAssetAccess.Get<EnemyDatabase>(enemyDatabaseKey);
         [SerializeField] private List<EnemySpawnWave> waves = new List<EnemySpawnWave>();
 
         public IReadOnlyList<EnemySpawnWave> Waves => waves;

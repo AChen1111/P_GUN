@@ -1,0 +1,108 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c65dd8a50498c4140a77cfa345b2abc1, type: 3}
+  m_Name: TextAssetCatalog
+  m_EditorClassIdentifier: Game.Core::Game.Core.AddressableCatalog
+  kind: 4
+  entries:
+  - key: player_bullet_reverse
+    reference:
+      m_AssetGUID: 67153f50d179cc94286c695fd1454098
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: hotfix/player_bullet_reverse
+    labels:
+    - hotfix
+    - lua
+    - hot_update
+  - key: MainHotfix
+    reference:
+      m_AssetGUID: d704d1e8bf33dcd41a4f9ff5a1a30808
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: hotfix/main
+    labels:
+    - hotfix
+    - lua
+    - hot_update
+  - key: SpeedBuff
+    reference:
+      m_AssetGUID: 648678a33bef4bec9cd2e901e934f017
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - buff
+    - lua
+    - hot_update
+  - key: MaxHpUpBuff
+    reference:
+      m_AssetGUID: 87662b07a2474434950e657708d1bada
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - buff
+    - lua
+    - hot_update
+  - key: PoisonBuff
+    reference:
+      m_AssetGUID: 921073a9ab0a469886c62babb3cfbd9c
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - buff
+    - lua
+    - hot_update
+  - key: DamageUpBuff
+    reference:
+      m_AssetGUID: bfef84428f614290a92f0716f6fd7171
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - buff
+    - lua
+    - hot_update
+  - key: ChestEffect
+    reference:
+      m_AssetGUID: 76f11a329f7cb7b4695cbe30df24940a
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: HelloItemEffect
+    reference:
+      m_AssetGUID: f33a2f122076c3546a3f9e073573c04e
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update

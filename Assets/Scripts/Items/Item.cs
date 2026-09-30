@@ -1,3 +1,4 @@
+using UnityEngine.Serialization;
 using System.Collections.Generic;
 using System.Collections;
 using DG.Tweening;
@@ -19,7 +20,9 @@ namespace Game.Items
 
         [Header("物品数据")]
         [SerializeField] private int itemId;
-        [SerializeField] private ItemDatabase itemDatabase;
+        // 配置保存短名, 资源来自阶段预加载缓存.
+        [SerializeField, AddressableKey(AddressableAssetKind.ScriptableObject)] public string itemDatabaseKey = string.Empty;
+        private ItemDatabase itemDatabase => AddressableAssetAccess.Get<ItemDatabase>(itemDatabaseKey);
         [SerializeField] private SpriteRenderer iconRenderer;
 
         [Header("拾取状态")]
@@ -27,10 +30,15 @@ namespace Game.Items
         [Header("是否加入背包")]
         [SerializeField] private bool pickInBackBag = true;
         [Header("效果列表")]
-        [SerializeField] private List<ItemEffectBase> effects = new List<ItemEffectBase>();
+        // 配置保存短名, 资源来自阶段预加载缓存.
+        [SerializeField, AddressableKey(AddressableAssetKind.ScriptableObject)] public List<string> effectsKeys = new List<string>();
+        private List<ItemEffectBase> resolvedEffects;
+        private List<ItemEffectBase> effects => resolvedEffects ?? (resolvedEffects = AddressableAssetAccess.List<ItemEffectBase>(effectsKeys));
 
         [Header("拾取音效")]
-        [SerializeField] private AudioClip pickupAudio;
+        // 配置保存短名, 资源来自阶段预加载缓存.
+        [SerializeField, AddressableKey(AddressableAssetKind.AudioClip)] public string pickupAudioKey = string.Empty;
+        private AudioClip pickupAudio => AddressableAssetAccess.Get<AudioClip>(pickupAudioKey);
 
         [Header("DOTween动画器")]
         [SerializeField] private GameDOTweenAnimation _dotweenAnimation;

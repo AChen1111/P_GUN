@@ -1,3 +1,4 @@
+using Game.Core;
 using System;
 using System.Threading.Tasks;
 using Game.Gameplay;
@@ -47,7 +48,7 @@ namespace Game.UI
         }
         public async void StartGame()
 		{
-            if (isStartingGame)
+            if (isStartingGame || AddressableLoader.Instance.IsSceneTransitioning)
             {
                 return;
             }
@@ -56,7 +57,7 @@ namespace Game.UI
             try
             {
                 await EnsureDatabasesLoadedAsync();
-			    SceneManager.LoadScene("GameScene");
+			    await AddressableLoader.Instance.LoadSceneAsync("GameScene");
             }
             catch (Exception exception)
             {

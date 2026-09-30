@@ -14,8 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Position: {x: 448, y: 96}
   Name: SaveRoom
-  IndividualRoomTemplates:
-  - {fileID: 7403787295593108228, guid: 1d959031538d863408096fa52900ed46, type: 3}
+  IndividualRoomTemplates: []
   RoomTemplateSets: []
 --- !u!114 &-5960971452892642970
 MonoBehaviour:
@@ -46,8 +45,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Position: {x: 592, y: 96}
   Name: Final
-  IndividualRoomTemplates:
-  - {fileID: 7403787295593108228, guid: fd8d6940222a8bf40800d474d7a6228c, type: 3}
+  IndividualRoomTemplates: []
   RoomTemplateSets: []
 --- !u!114 &-5107574592618647459
 MonoBehaviour:
@@ -63,8 +61,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Position: {x: 48, y: -80}
   Name: Normal
-  IndividualRoomTemplates:
-  - {fileID: 7403787295593108228, guid: c3725d4757effc442acdafa92d4d4329, type: 3}
+  IndividualRoomTemplates: []
   RoomTemplateSets: []
 --- !u!114 &-4508185797055384207
 MonoBehaviour:
@@ -95,8 +92,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Position: {x: 48, y: 16}
   Name: Init
-  IndividualRoomTemplates:
-  - {fileID: 7403787295593108228, guid: 69e0cab51f1222e4bb3e4674e0348bc8, type: 3}
+  IndividualRoomTemplates: []
   RoomTemplateSets: []
 --- !u!114 &-3766286264075747968
 MonoBehaviour:
@@ -142,8 +138,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Position: {x: 544, y: -160}
   Name: SaveRoom
-  IndividualRoomTemplates:
-  - {fileID: 7403787295593108228, guid: 1d959031538d863408096fa52900ed46, type: 3}
+  IndividualRoomTemplates: []
   RoomTemplateSets: []
 --- !u!114 &-3157976356421574419
 MonoBehaviour:
@@ -159,8 +154,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Position: {x: 48, y: 112}
   Name: Normal
-  IndividualRoomTemplates:
-  - {fileID: 7403787295593108228, guid: c3725d4757effc442acdafa92d4d4329, type: 3}
+  IndividualRoomTemplates: []
   RoomTemplateSets: []
 --- !u!114 &-2067371403448744571
 MonoBehaviour:
@@ -216,9 +210,7 @@ MonoBehaviour:
   - {fileID: -3766286264075747968}
   - {fileID: -3372106315320928194}
   - {fileID: 1251926520527237161}
-  CorridorIndividualRoomTemplates:
-  - {fileID: 6295766628286017278, guid: d12f56f144e67244f9b540d241a530e7, type: 3}
-  - {fileID: 2707270387595432028, guid: 35efb202e0c0b4b439f45af81a36f5d5, type: 3}
+  CorridorIndividualRoomTemplates: []
   CorridorRoomTemplateSets: []
   DefaultIndividualRoomTemplates: []
   DefaultRoomTemplateSets: []
@@ -300,8 +292,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Position: {x: 544, y: -64}
   Name: Normal
-  IndividualRoomTemplates:
-  - {fileID: 7403787295593108228, guid: c3725d4757effc442acdafa92d4d4329, type: 3}
+  IndividualRoomTemplates: []
   RoomTemplateSets: []
 --- !u!114 &5089246938048204532
 MonoBehaviour:
@@ -317,8 +308,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Position: {x: 416, y: -64}
   Name: ChestRoom
-  IndividualRoomTemplates:
-  - {fileID: 7403787295593108228, guid: ca31e30b28898ed46b4474424b244285, type: 3}
+  IndividualRoomTemplates: []
   RoomTemplateSets: []
 --- !u!114 &5791091156481575449
 MonoBehaviour:
@@ -349,8 +339,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Position: {x: 288, y: -64}
   Name: Normal
-  IndividualRoomTemplates:
-  - {fileID: 7403787295593108228, guid: c3725d4757effc442acdafa92d4d4329, type: 3}
+  IndividualRoomTemplates: []
   RoomTemplateSets: []
 --- !u!114 &6783212533152397431
 MonoBehaviour:
@@ -366,8 +355,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Position: {x: 288, y: 16}
   Name: Normal
-  IndividualRoomTemplates:
-  - {fileID: 7403787295593108228, guid: c3725d4757effc442acdafa92d4d4329, type: 3}
+  IndividualRoomTemplates: []
   RoomTemplateSets: []
 --- !u!114 &8255770910706420906
 MonoBehaviour:
@@ -383,8 +371,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Position: {x: 288, y: 96}
   Name: ChestRoom
-  IndividualRoomTemplates:
-  - {fileID: 7403787295593108228, guid: ca31e30b28898ed46b4474424b244285, type: 3}
+  IndividualRoomTemplates: []
   RoomTemplateSets: []
 --- !u!114 &8738064239204013692
 MonoBehaviour:
@@ -400,8 +387,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Position: {x: 720, y: -64}
   Name: Normal
-  IndividualRoomTemplates:
-  - {fileID: 7403787295593108228, guid: c3725d4757effc442acdafa92d4d4329, type: 3}
+  IndividualRoomTemplates: []
   RoomTemplateSets: []
 --- !u!114 &9090954916799910139
 MonoBehaviour:

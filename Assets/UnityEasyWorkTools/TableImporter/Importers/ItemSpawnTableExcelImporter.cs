@@ -11,7 +11,7 @@ public sealed class ItemSpawnTableExcelImporter : Excel2SoListAssetImporter<Item
 
     protected override void Configure(Excel2SoMapping map)
     {
-        map.Column("prefab").To("prefab").AsAsset<GameObject>();
+        AddressableImportKeys.Map<GameObject>(map, "prefab", "prefabKey");
         map.Column("weight").To("weight").AsInt();
         map.Column("spawnAnimEffect").To("spawnAnimEffect").AsEnum<DOTweenAnimType>();
         map.Column("spawnAnimDuration").To("spawnAnimDuration").AsFloat();

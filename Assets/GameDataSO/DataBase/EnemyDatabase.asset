@@ -15,21 +15,21 @@ MonoBehaviour:
   enemies:
   - enemyId: 1
     displayName: Bat
-    prefab: {fileID: 557012345000001001, guid: c7689240beca890469aab85afd109862, type: 3}
+    prefabKey: Bat
     maxHp: 30
     moveSpeed: 3
     damage: 1
     itemDropChance: 1
   - enemyId: 2
     displayName: Slime
-    prefab: {fileID: 557012345000002001, guid: 62bf63f566fb06a44a78f17618a6b6cf, type: 3}
+    prefabKey: Slime
     maxHp: 3
     moveSpeed: 2.5
     damage: 1
     itemDropChance: 0
   - enemyId: 3
     displayName: Big_enemy
-    prefab: {fileID: 1979160110135435701, guid: 51b9ce51afd7dbb488f5c37c4797e0d6, type: 3}
+    prefabKey: Big_enemy
     maxHp: 100
     moveSpeed: 2
     damage: 1

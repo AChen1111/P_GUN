@@ -48,6 +48,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 374010033509238546, guid: 569809b44565dc442ba3ee727965ff13, type: 2}
   m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
@@ -168,25 +169,15 @@ MonoBehaviour:
   ArchitectureFullTypeName: 
   ViewControllerFullTypeName: 
   weaponId: Bow
-  weaponDatabase: {fileID: 11400000, guid: 6d6e0a3a98503714c899e24a2384c459, type: 2}
-  shootSounds:
-  - {fileID: 8300000, guid: 34f8cb3e29ce529458352e5bd3fe3141, type: 3}
-  - {fileID: 8300000, guid: 50b915a22dcd4244cb10082d3fd93846, type: 3}
-  - {fileID: 8300000, guid: 37eeb2ef0c716824c924f5c9dafcd444, type: 3}
-  - {fileID: 8300000, guid: 8323f9b267d5f95459ff77cb7de1fad7, type: 3}
-  - {fileID: 8300000, guid: 664dd2e9448910c47b2cc26e261fd5f2, type: 3}
-  - {fileID: 8300000, guid: 58508dbb4ef4e18478c3c64634e0667a, type: 3}
-  - {fileID: 8300000, guid: 982334509bf96f549acadf7a5627f7c9, type: 3}
-  - {fileID: 8300000, guid: 8024fdb37d66f634c85e57499069b28d, type: 3}
+  weaponDatabaseKey: WeaponDatabase
   firePoint: {fileID: 329057997544267524}
-  ReloadSound: {fileID: 8300000, guid: 70c6ba4eb93b17d4a9ce83cfb26c281f, type: 3}
   MinDamage: 0
   MaxDamage: 0
   MaxBulletBagNum: 0
   clipSize: 0
   shootInterval: 0
   bulletSpeed: 0
-  PlayerBullet: {fileID: 6121020581885493579, guid: 509b372a670abc94c8dec5ddcce60e69, type: 3}
+  PlayerBulletKey: ArrowBullet
   Arrow: {fileID: 3818672352476444957}
   SelfAudioSource: {fileID: 7609457125886288384}
 --- !u!1 &3431150011091814042
@@ -223,6 +214,7 @@ Transform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &1450731002242337618
 SpriteRenderer:
+  serializedVersion: 2
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -238,6 +230,11 @@ SpriteRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -259,9 +256,11 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 1
+  m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: 6e00296dcbf12324dac4fcfe2f416287, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -271,7 +270,6 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
-  m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!1 &8343792744657762002
 GameObject:
@@ -308,6 +306,7 @@ Transform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &3818672352476444957
 SpriteRenderer:
+  serializedVersion: 2
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -323,6 +322,11 @@ SpriteRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -344,9 +348,11 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 2
+  m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: 21548d9a6bfc5f243bf869ac2d4f86e6, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -356,7 +362,6 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
-  m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!114 &7091951636472402495
 MonoBehaviour:

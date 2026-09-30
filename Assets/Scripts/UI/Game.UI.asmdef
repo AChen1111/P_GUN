@@ -8,7 +8,8 @@
     "ComponentAutoBindTool.Runtime",
     "Unity.TextMeshPro",
     "QFramework",
-    "QFramework.CoreKit"
+    "QFramework.CoreKit",
+    "Unity.ResourceManager"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],

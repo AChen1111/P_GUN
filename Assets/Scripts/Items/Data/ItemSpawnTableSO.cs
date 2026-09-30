@@ -1,3 +1,5 @@
+using UnityEngine.Serialization;
+using Game.Core;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -9,7 +11,9 @@ namespace Game.Items
     [Serializable]
     public struct ItemSpawnEntry
     {
-        public GameObject prefab;
+        // 配置保存短名, 资源来自阶段预加载缓存.
+        [SerializeField, AddressableKey(AddressableAssetKind.Prefab)] public string prefabKey;
+        public GameObject prefab => AddressableAssetAccess.Get<GameObject>(prefabKey);
 
         [Min(0)]
         public int weight;
@@ -58,13 +62,13 @@ namespace Game.Items
         }
         public bool TryResolvePrefab(ItemSpawnEntry entry, out GameObject prefab)
         {
-            // 物品生成表只使用 Inspector 中直接引用的 prefab, 不再通过 Addressables 地址加载.
+            // 生成表保存短名, 运行时读取阶段预加载后的预制体缓存.
             prefab = entry.prefab;
             return prefab != null;
         }
 
         /// <summary>
-        /// 异步接口兼容旧调用, 实际只返回表中直接引用的 prefab.
+        /// 异步接口返回阶段已预加载的 key 资源.
         /// </summary>
         public Task<GameObject> TryResolvePrefabAsync(ItemSpawnEntry entry)
         {
@@ -106,7 +110,7 @@ namespace Game.Items
         }
         private static bool HasResolvablePrefab(ItemSpawnEntry entry)
         {
-            // 生成时必须显式绑定 prefab.
+            // 生成表必须显式配置 prefabKey.
             return entry.prefab != null;
         }
     }

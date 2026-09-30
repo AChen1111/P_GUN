@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: BatTable
   m_EditorClassIdentifier: 
   entries:
-  - prefab: {fileID: 5069590999830702722, guid: a4f46db2f0b85564a81ad43c4f0b8880, type: 3}
+  - prefabKey: Heart
     weight: 1
     spawnAnimEffect: 2
     spawnAnimDuration: 1.5

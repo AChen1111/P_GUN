@@ -19,8 +19,8 @@ public sealed class WeaponDatabaseExcelImporter : Excel2SoListAssetImporter<Weap
         map.Column("clipSize").To("clipSize").AsInt();
         map.Column("shootInterval").To("shootInterval").AsFloat();
         map.Column("bulletSpeed").To("bulletSpeed").AsInt();
-        map.Column("reloadSound").To("reloadSound").AsAsset<AudioClip>();
-        map.Column("shootSounds").To("shootSounds").AsAssetList<AudioClip>(";");
+        AddressableImportKeys.Map<AudioClip>(map, "reloadSound", "reloadSoundKey");
+        AddressableImportKeys.Map<AudioClip>(map, "shootSounds", "shootSoundsKeys", true);
     }
 
     protected override void OnAfterImportAsset(WeaponDatabase asset, ExcelTable table, Excel2SoImportReport report)

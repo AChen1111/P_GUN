@@ -1,3 +1,4 @@
+using UnityEngine.Serialization;
 using System.Collections.Generic;
 using System;
 using UnityEngine;
@@ -12,7 +13,9 @@ namespace Game.Gameplay
     public class NormalRoom : FightRoom
     {
         [Header("敌人生成表")]
-        [SerializeField] private EnemySpawnTableSO enemySpawnTable;
+        // 配置保存短名, 资源来自阶段预加载缓存.
+        [SerializeField, AddressableKey(AddressableAssetKind.ScriptableObject)] public string enemySpawnTableKey = string.Empty;
+        private EnemySpawnTableSO enemySpawnTable => AddressableAssetAccess.Get<EnemySpawnTableSO>(enemySpawnTableKey);
 
         [Header("敌人可能出现的位置坐标点")]
         [SerializeField] private List<Transform> enemyPoints = new List<Transform>();

@@ -1,3 +1,4 @@
+using UnityEngine.Serialization;
 using UnityEngine;
 using Game.Core;
 using Game.Pooling;
@@ -13,7 +14,9 @@ namespace Game.Gameplay
         [SerializeField] private Transform playerSpawnPoint;
 
         [Header("玩家预制体")]
-        [SerializeField] private Player playerPrefab;
+        // 配置保存短名, 资源来自阶段预加载缓存.
+        [SerializeField, AddressableKey(AddressableAssetKind.Prefab)] public string playerPrefabKey = string.Empty;
+        private Player playerPrefab => AddressableAssetAccess.Component<Player>(playerPrefabKey);
         protected override void OnRoomInitialized()
         {
             needGenerateDoors = false;

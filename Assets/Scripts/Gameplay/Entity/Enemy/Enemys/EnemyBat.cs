@@ -1,3 +1,4 @@
+using UnityEngine.Serialization;
 using System.Collections.Generic;
 using UnityEngine;
 using QFramework;
@@ -15,8 +16,13 @@ namespace Game.Gameplay
     public class EnemyBat : EnemyBase
     {
         [Header("攻击资源")]
-        [SerializeField] private EnemyBullet bulletPrefab;
-        [SerializeField] private List<AudioClip> shootSounds = new List<AudioClip>();
+        // 配置保存短名, 资源来自阶段预加载缓存.
+        [SerializeField, AddressableKey(AddressableAssetKind.Prefab)] public string bulletPrefabKey = string.Empty;
+        private EnemyBullet bulletPrefab => AddressableAssetAccess.Component<EnemyBullet>(bulletPrefabKey);
+        // 配置保存短名, 资源来自阶段预加载缓存.
+        [SerializeField, AddressableKey(AddressableAssetKind.AudioClip)] public List<string> shootSoundsKeys = new List<string>();
+        private List<AudioClip> resolvedShootSounds;
+        private List<AudioClip> shootSounds => resolvedShootSounds ?? (resolvedShootSounds = AddressableAssetAccess.List<AudioClip>(shootSoundsKeys));
 
         [Header("攻击参数")]
         [SerializeField] private float followBeforeAttackTime = 1.5f;

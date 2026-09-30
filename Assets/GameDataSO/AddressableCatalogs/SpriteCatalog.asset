@@ -1,0 +1,268 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c65dd8a50498c4140a77cfa345b2abc1, type: 3}
+  m_Name: SpriteCatalog
+  m_EditorClassIdentifier: Game.Core::Game.Core.AddressableCatalog
+  kind: 0
+  entries:
+  - key: Arrow
+    reference:
+      m_AssetGUID: 21548d9a6bfc5f243bf869ac2d4f86e6
+      m_SubObjectName: Arrow
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+    - shared
+  - key: ShotGun
+    reference:
+      m_AssetGUID: 277985b7cfc3c954a9449e86c21cceed
+      m_SubObjectName: ShotGun
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+    - shared
+  - key: AWP
+    reference:
+      m_AssetGUID: 406ef51de9dbb2f46be8cc1c646c5f93
+      m_SubObjectName: AWP
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+    - shared
+  - key: Bow
+    reference:
+      m_AssetGUID: 6e00296dcbf12324dac4fcfe2f416287
+      m_SubObjectName: Bow
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+    - shared
+  - key: RocketGun
+    reference:
+      m_AssetGUID: 7127fbc26c4ba0f49ac610f697dd5947
+      m_SubObjectName: RocketGun
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+    - shared
+  - key: Lazer
+    reference:
+      m_AssetGUID: 81af13a4162b539469c8f22e41efbdd6
+      m_SubObjectName: Lazer
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+    - shared
+  - key: LazerBullet
+    reference:
+      m_AssetGUID: b2e3e02936baca84d81f905285107f1e
+      m_SubObjectName: LazerBullet
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+    - shared
+  - key: AK
+    reference:
+      m_AssetGUID: c4f5774d1bbe5a04a9d2630a39f0abfc
+      m_SubObjectName: AK
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+    - shared
+  - key: RocketBullet
+    reference:
+      m_AssetGUID: e19648954dbfd1a40a67456fee495a8a
+      m_SubObjectName: RocketBullet
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+    - shared
+  - key: MP5
+    reference:
+      m_AssetGUID: e80c7e6080d1edf46a3126017004c41f
+      m_SubObjectName: MP5
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+    - shared
+  - key: Pistol
+    reference:
+      m_AssetGUID: ebd35303f0034ee4aab06bfced6d81de
+      m_SubObjectName: Pistol
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+    - shared
+  - key: PlayerBullet
+    reference:
+      m_AssetGUID: f1ac879a30b0c4c4897ed49c5c9ee059
+      m_SubObjectName: PlayerBullet
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+    - shared
+  - key: escape icon
+    reference:
+      m_AssetGUID: 1303efc9353781040b963f0e6dbc5a55
+      m_SubObjectName: escape icon
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: attack icon
+    reference:
+      m_AssetGUID: 9792280a23761574e820932cfc215f89
+      m_SubObjectName: attack icon
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: buff icon
+    reference:
+      m_AssetGUID: 481e164eb8e5b2044bbe4ee2451ad349
+      m_SubObjectName: buff icon
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: confusion icon
+    reference:
+      m_AssetGUID: 717c1661204c47848ae71e4b36b7424c
+      m_SubObjectName: confusion icon
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: Potion_Round_Red
+    reference:
+      m_AssetGUID: bf817939e9a0a3241b3cf68a375367e7
+      m_SubObjectName: Potion_Round_Red
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: Potion_Round_Purple
+    reference:
+      m_AssetGUID: bf817939e9a0a3241b3cf68a375367e7
+      m_SubObjectName: Potion_Round_Purple
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: Potion_Round_Blue
+    reference:
+      m_AssetGUID: bf817939e9a0a3241b3cf68a375367e7
+      m_SubObjectName: Potion_Round_Blue
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: Potion_Round_Teal
+    reference:
+      m_AssetGUID: bf817939e9a0a3241b3cf68a375367e7
+      m_SubObjectName: Potion_Round_Teal
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: Potion_Tall_Magenta
+    reference:
+      m_AssetGUID: bf817939e9a0a3241b3cf68a375367e7
+      m_SubObjectName: Potion_Tall_Magenta
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: heart_full
+    reference:
+      m_AssetGUID: 60320bc3c57e8b34f9b7b300e7dc6601
+      m_SubObjectName: heart_full
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: heart_half
+    reference:
+      m_AssetGUID: 5c0488210f8a4ba49a1a0033233204fa
+      m_SubObjectName: heart_half
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: heart_empty
+    reference:
+      m_AssetGUID: e9e10e27531cef6418454ca0c1cfb72d
+      m_SubObjectName: heart_empty
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update

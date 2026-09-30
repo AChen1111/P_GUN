@@ -1,3 +1,4 @@
+using UnityEngine.Serialization;
 using UnityEngine;
 using System.Collections.Generic;
 using Game.Core;
@@ -21,10 +22,16 @@ namespace Game.Gameplay
         private float lifeTimer;
 
         [Header("击中玩家音效")]
-        public List<AudioClip> hitSoundsOnPlayer = new List<AudioClip>();
+        // 配置保存短名, 资源来自阶段预加载缓存.
+        [SerializeField, AddressableKey(AddressableAssetKind.AudioClip)] public List<string> hitSoundsOnPlayerKeys = new List<string>();
+        private List<AudioClip> resolvedHitSoundsOnPlayer;
+        public List<AudioClip> hitSoundsOnPlayer => resolvedHitSoundsOnPlayer ?? (resolvedHitSoundsOnPlayer = AddressableAssetAccess.List<AudioClip>(hitSoundsOnPlayerKeys));
         private AudioClip hitSoundOnPlayer => hitSoundsOnPlayer[Random.Range(0, hitSoundsOnPlayer.Count)];
         [Header("击中墙壁音效")]
-        public List<AudioClip> hitSoundsOnWall = new List<AudioClip>();
+        // 配置保存短名, 资源来自阶段预加载缓存.
+        [SerializeField, AddressableKey(AddressableAssetKind.AudioClip)] public List<string> hitSoundsOnWallKeys = new List<string>();
+        private List<AudioClip> resolvedHitSoundsOnWall;
+        public List<AudioClip> hitSoundsOnWall => resolvedHitSoundsOnWall ?? (resolvedHitSoundsOnWall = AddressableAssetAccess.List<AudioClip>(hitSoundsOnWallKeys));
         private AudioClip hitSoundOnWall => hitSoundsOnWall[Random.Range(0, hitSoundsOnWall.Count)];
 
         /// <summary>
@@ -105,7 +112,7 @@ namespace Game.Gameplay
         private void FixedUpdate() {
             if (rb == null) return;
             // 敌人子弹使用敌人局部时间倍率, 玩家子弹和玩家移动不受影响.
-            rb.velocity = dir * speed * GameplayTime.EnemyTimeScale;
+            rb.linearVelocity = dir * speed * GameplayTime.EnemyTimeScale;
         }
         private void HandleHit(GameObject target) {
             if (hasHit || target == null) return;
@@ -164,7 +171,7 @@ namespace Game.Gameplay
         /// </summary>
         public void StopMove() {
             if (rb != null) {
-                rb.velocity = Vector2.zero;
+                rb.linearVelocity = Vector2.zero;
             }
         }
 

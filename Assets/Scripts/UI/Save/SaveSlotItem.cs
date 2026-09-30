@@ -63,7 +63,7 @@ namespace Game.UI.Save
 
                 if (loadButton != null)
                 {
-                    loadButton.interactable = summary.exists;
+                    loadButton.interactable = summary.exists && summary.compatible;
                 }
 
                 if (deleteButton != null)
@@ -95,7 +95,7 @@ namespace Game.UI.Save
 
                 if (summaryText != null)
                 {
-                    summaryText.text = FormatSavedTime(summary.savedAtUtc);
+                    summaryText.text = summary.compatible ? FormatSavedTime(summary.savedAtUtc) : "存档版本不兼容";
                 }
 
                 if (detailText != null)

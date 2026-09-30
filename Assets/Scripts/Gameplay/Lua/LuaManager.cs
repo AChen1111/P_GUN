@@ -13,7 +13,7 @@ namespace Game.Gameplay
     /// </summary>
     public sealed class LuaManager : MonoBehaviour, IStartupHotfixRunner
     {
-        private const string StartupHotfixAddress = "hotfix/main";
+        private const string StartupHotfixKey = "MainHotfix";
         private const string StartupHotfixLabel = "hotfix";
         private const string LuaFileExtension = ".lua";
 
@@ -23,6 +23,7 @@ namespace Game.Gameplay
         private readonly Dictionary<string, byte[]> hotfixLuaBytesByModulePath = new Dictionary<string, byte[]>();
 
         private LuaEnv luaEnv;
+        private LuaFunction shutdownHotfix;
         private bool startupHotfixExecuted;
 
         public static LuaManager Instance { get; private set; }
@@ -115,15 +116,18 @@ namespace Game.Gameplay
             }
 
             await PreloadHotfixLuaModulesAsync(loader);
-            var hotfixEntry = await loader.LoadAssetAsync<TextAsset>(StartupHotfixAddress);
+            var hotfixEntry = await loader.LoadAssetAsync<TextAsset>(StartupHotfixKey);
             if (hotfixEntry == null)
             {
-                throw new InvalidOperationException($"Startup hotfix asset is null. Address: {StartupHotfixAddress}.");
+                throw new InvalidOperationException($"Startup hotfix asset is null. Address: {StartupHotfixKey}.");
             }
 
-            luaEnv.DoString(hotfixEntry.text, hotfixEntry.name);
+            // 热修入口返回释放函数, 退出时先移除 C# 静态字段中的 Lua 回调.
+            var results = luaEnv.DoString(hotfixEntry.text, hotfixEntry.name);
+            shutdownHotfix = results.Length > 0 ? results[0] as LuaFunction : null;
+            if (shutdownHotfix == null) throw new InvalidOperationException("Startup hotfix must return its shutdown function.");
             startupHotfixExecuted = true;
-            Debug.Log($"{nameof(LuaManager)}: 启动热修入口执行完成, Address: {StartupHotfixAddress}.", this);
+            Debug.Log($"{nameof(LuaManager)}: 启动热修入口执行完成, Address: {StartupHotfixKey}.", this);
         }
 
         /// <summary>
@@ -257,6 +261,10 @@ namespace Game.Gameplay
 
             BuffScriptRuntime.UnregisterFactory(CreateBuffInstance);
             StartupHotfixRuntime.UnregisterRunner(this);
+
+            shutdownHotfix?.Call();
+            shutdownHotfix?.Dispose();
+            shutdownHotfix = null;
 
             foreach (var table in buffTableCache.Values)
             {

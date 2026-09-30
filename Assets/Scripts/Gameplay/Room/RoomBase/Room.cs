@@ -1,3 +1,4 @@
+using UnityEngine.Serialization;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -22,7 +23,9 @@ namespace Game.Gameplay
 
 		[Header("门设置")]
 		[SerializeField] protected bool needGenerateDoors = false;
-		[SerializeField] private Door doorPrefab;
+		// 配置保存短名, 资源来自阶段预加载缓存.
+		[SerializeField, AddressableKey(AddressableAssetKind.Prefab)] public string doorPrefabKey = string.Empty;
+		private Door doorPrefab => AddressableAssetAccess.Component<Door>(doorPrefabKey);
 		[SerializeField] protected bool doorStateIsOpen = true;
 
 		[Header("房间中心点")]

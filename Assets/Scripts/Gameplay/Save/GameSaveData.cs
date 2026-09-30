@@ -10,10 +10,10 @@ namespace Game.Gameplay.Save
     [Serializable]
     public class GameSaveData
     {
-        public int version = 1;
+        public int version = 2;
         public string savedAtUtc;
         public string sceneName;
-        public string levelGraphAddress;
+        public string levelGraphKey;
         public int mapSeed;
         public string currentRoomId;
         public PlayerSaveData player = new PlayerSaveData();

@@ -17,7 +17,7 @@ namespace Game.Gameplay.Save
                 version = saveVersion,
                 savedAtUtc = DateTime.UtcNow.ToString("o"),
                 sceneName = SceneManager.GetActiveScene().name,
-                levelGraphAddress = bootstrapper != null ? bootstrapper.LevelGraphAddress : string.Empty,
+                levelGraphKey = bootstrapper != null ? bootstrapper.LevelGraphKey : string.Empty,
                 mapSeed = bootstrapper != null ? bootstrapper.LastGeneratedSeed : 0,
                 currentRoomId = currentRoom != null ? currentRoom.SaveRoomId : string.Empty,
                 player = CapturePlayer(player),

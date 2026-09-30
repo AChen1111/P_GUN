@@ -1,3 +1,4 @@
+using UnityEngine.Serialization;
 using UnityEngine;
 using QFramework;
 using Game.Core;
@@ -10,7 +11,9 @@ namespace Game.Gameplay
 {
     public class MP5 : Gun
     {
-        public PlayerBullet PlayerBullet;
+        // 配置保存短名, 资源来自阶段预加载缓存.
+        [SerializeField, AddressableKey(AddressableAssetKind.Prefab)] public string PlayerBulletKey = string.Empty;
+        public PlayerBullet PlayerBullet => AddressableAssetAccess.Component<PlayerBullet>(PlayerBulletKey);
         public UnityEngine.AudioSource SelfAudioSource;
 
 		public override PlayerBullet BulletPrefab => PlayerBullet;

@@ -1,4 +1,7 @@
 -- 启动热修入口, 具体补丁通过 Hotfix AB 中的 Lua 模块加载.
-require("hotfix.player_bullet_reverse")
+local shutdownPlayerBullet = require("hotfix.player_bullet_reverse")
 
-return true
+-- 退出 Lua 环境前清除补丁回调, 避免静态热修字段继续引用已销毁的环境.
+return function()
+    shutdownPlayerBullet()
+end

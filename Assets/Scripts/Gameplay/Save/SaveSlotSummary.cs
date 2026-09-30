@@ -10,6 +10,7 @@ namespace Game.Gameplay.Save
     {
         public int slotIndex;
         public bool exists;
+        public bool compatible;
         public string savedAtUtc;
         public string sceneName;
         public int playerHp;

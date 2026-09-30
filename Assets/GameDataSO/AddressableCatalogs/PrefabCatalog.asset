@@ -1,0 +1,512 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c65dd8a50498c4140a77cfa345b2abc1, type: 3}
+  m_Name: PrefabCatalog
+  m_EditorClassIdentifier: Game.Core::Game.Core.AddressableCatalog
+  kind: 1
+  entries:
+  - key: UDCorridor
+    reference:
+      m_AssetGUID: 35efb202e0c0b4b439f45af81a36f5d5
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - corridor
+    - hot_update
+    - room
+  - key: InitRoom
+    reference:
+      m_AssetGUID: 69e0cab51f1222e4bb3e4674e0348bc8
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+    - room
+    - room_template
+  - key: NormalRoom
+    reference:
+      m_AssetGUID: c3725d4757effc442acdafa92d4d4329
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+    - room
+    - room_template
+  - key: LRCorridor
+    reference:
+      m_AssetGUID: d12f56f144e67244f9b540d241a530e7
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - corridor
+    - hot_update
+    - room
+  - key: FinalRoom
+    reference:
+      m_AssetGUID: fd8d6940222a8bf40800d474d7a6228c
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+    - room
+    - room_template
+  - key: Orc_Shaman
+    reference:
+      m_AssetGUID: 004ac3be59c89d34a84a8b12ab03d5d7
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - enemy
+    - prefab
+    - hot_update
+  - key: Orc_Masked
+    reference:
+      m_AssetGUID: 35827546b14bc8d48a139f245049f973
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - enemy
+    - prefab
+    - hot_update
+  - key: EnemyA
+    reference:
+      m_AssetGUID: 5997eda64fd4b9e46ab562272521a078
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - enemy
+    - prefab
+    - hot_update
+  - key: Slime
+    reference:
+      m_AssetGUID: 62bf63f566fb06a44a78f17618a6b6cf
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - enemy
+    - prefab
+    - hot_update
+  - key: Goblin
+    reference:
+      m_AssetGUID: 66cab04fd3d095d43a8c1ea2eae2f77d
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - enemy
+    - prefab
+    - hot_update
+  - key: Ogre
+    reference:
+      m_AssetGUID: 73085d0d90bddfc47afdd98cf9f84cd6
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - enemy
+    - prefab
+    - hot_update
+  - key: Orc_Warrior
+    reference:
+      m_AssetGUID: b78964bc8875e5142a36b88e05a23ac0
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - enemy
+    - prefab
+    - hot_update
+  - key: Bat
+    reference:
+      m_AssetGUID: c7689240beca890469aab85afd109862
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - enemy
+    - prefab
+    - hot_update
+  - key: Purify
+    reference:
+      m_AssetGUID: 0d97b75cf6914479889ba297b299cc12
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - item
+    - prefab
+    - hot_update
+  - key: HarmUp
+    reference:
+      m_AssetGUID: 11f80f59cb4fd3c4f8e371ff95409cb6
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - item
+    - prefab
+    - hot_update
+  - key: Heart
+    reference:
+      m_AssetGUID: a4f46db2f0b85564a81ad43c4f0b8880
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - item
+    - prefab
+    - hot_update
+  - key: PowerUp
+    reference:
+      m_AssetGUID: bedc99d1d01a09b47a4db6c1717c43d1
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - item
+    - prefab
+    - hot_update
+  - key: SpeedUp
+    reference:
+      m_AssetGUID: ec55b4f84b4c70f4e958efa2efb7d253
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - item
+    - prefab
+    - hot_update
+  - key: Player
+    reference:
+      m_AssetGUID: 0aedc682d273ead4f9a7a400aa3afe32
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+    - player
+    - shared
+  - key: ArrowBullet
+    reference:
+      m_AssetGUID: 509b372a670abc94c8dec5ddcce60e69
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+    - shared
+  - key: PlayerBullet
+    reference:
+      m_AssetGUID: 576871a843cdcfa4facd211562818436
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+    - shared
+  - key: Bow
+    reference:
+      m_AssetGUID: 0146e2e603c9931498cfa221d222fa9a
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - prefab
+    - weapon
+    - hot_update
+  - key: RocketGun
+    reference:
+      m_AssetGUID: 0a94435d9287e2b4b966018256ec5194
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - prefab
+    - weapon
+    - hot_update
+  - key: ShotGun
+    reference:
+      m_AssetGUID: 4ea89973311c6f94da169560abf23ef9
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - prefab
+    - weapon
+    - hot_update
+  - key: MP5
+    reference:
+      m_AssetGUID: 6468ba96de52d3a48ab7649bf7a8f5ca
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - prefab
+    - weapon
+    - hot_update
+  - key: Pistol
+    reference:
+      m_AssetGUID: 78d6bb99e24c4a94fa86f5dd50caddd6
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - prefab
+    - weapon
+    - hot_update
+  - key: AWP
+    reference:
+      m_AssetGUID: 8b4f120b8e657e54eaab0c7e3e76abc3
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - prefab
+    - weapon
+    - hot_update
+  - key: AK
+    reference:
+      m_AssetGUID: dd7733526380a19439e58ed60e12c1ad
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - prefab
+    - weapon
+    - hot_update
+  - key: Laser
+    reference:
+      m_AssetGUID: e03681111fe9cdb4b9482d45fab56849
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - prefab
+    - weapon
+    - hot_update
+  - key: SaveRoom
+    reference:
+      m_AssetGUID: 1d959031538d863408096fa52900ed46
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: ChestRoom
+    reference:
+      m_AssetGUID: ca31e30b28898ed46b4474424b244285
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: HeartRow
+    reference:
+      m_AssetGUID: a4ee411b70b775247a7675cd6341f81e
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: Big_enemy
+    reference:
+      m_AssetGUID: 51b9ce51afd7dbb488f5c37c4797e0d6
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: HeartAdd
+    reference:
+      m_AssetGUID: 06bc0eb67725be6489936e8feba3f252
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: DamageText
+    reference:
+      m_AssetGUID: 08da0453f2d8d6148be646576a1ff376
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: EnemyBuffBullet
+    reference:
+      m_AssetGUID: d13631114fea6f5448596d7d0280467f
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: EnemyBullet
+    reference:
+      m_AssetGUID: 10e246e394d07ef4ea3fe43c6de534c0
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: Laser_PlayerBullet
+    reference:
+      m_AssetGUID: 1d68049c6df2cee49b67b42cea633a5f
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: Door
+    reference:
+      m_AssetGUID: c7feca4fad691424783ee926ca98c9ae
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: InventorySlot
+    reference:
+      m_AssetGUID: 907ff7520642e854683c776ebb377032
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: SaveSlotItem
+    reference:
+      m_AssetGUID: 06837c4dd5d83de41b40d3f06f730308
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: PlayerHeart
+    reference:
+      m_AssetGUID: 63770e420f842664f9442791ca8f0550
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: BuffStatusIcon
+    reference:
+      m_AssetGUID: f7e2d29c73394f50bbf9bbdba9e8982e
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: BloodBurst
+    reference:
+      m_AssetGUID: 3752c64bcee20ed4ca0c96a5cc62c95d
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update

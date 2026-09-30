@@ -1,7 +1,9 @@
 {
   "name": "Game.Pooling",
   "rootNamespace": "Game.Pooling",
-  "references": [],
+  "references": [
+    "Game.Core"
+  ],
   "includePlatforms": [],
   "excludePlatforms": [],
   "allowUnsafeCode": false,

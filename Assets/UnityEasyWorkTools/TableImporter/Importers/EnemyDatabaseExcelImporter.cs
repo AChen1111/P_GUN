@@ -15,7 +15,7 @@ public sealed class EnemyDatabaseExcelImporter : Excel2SoListAssetImporter<Enemy
     {
         map.Column("enemyId").To("enemyId").AsInt();
         map.Column("displayName").To("displayName").AsString();
-        map.Column("prefab").To("prefab").AsAsset<EnemyBase>();
+        AddressableImportKeys.Map<UnityEngine.GameObject>(map, "prefab", "prefabKey");
         map.Column("maxHp").To("maxHp").AsInt();
         map.Column("moveSpeed").To("moveSpeed").AsFloat();
         map.Column("damage").To("damage").AsInt();

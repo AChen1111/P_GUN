@@ -7,4 +7,7 @@ xlua.hotfix(PlayerBullet,"Init",function (self,shootDir, bulletDamage, bulletSpe
     self.speed = bulletSpeed
 end)
 
-return true
+-- 热修拥有其静态回调的释放职责.
+return function()
+    xlua.hotfix(PlayerBullet, "Init", nil)
+end

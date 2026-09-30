@@ -1,3 +1,4 @@
+using Game.Core;
 using UnityEngine;
 using QFramework;
 using System.Collections.Generic;
@@ -8,7 +9,7 @@ namespace Game.Presentation
 {
     public class GlobalAudioPlay : ViewController
     {
-        private const string GunClipPath = "SFX/Gun/";
+        // 命名加载入口只接受 AudioClip Catalog 的短名.
 
         public UnityEngine.AudioSource SelfAudioSource;
 
@@ -43,7 +44,7 @@ namespace Game.Presentation
 			}
 			else
 			{
-				AudioClips[name] = Resources.Load<AudioClip>(GunClipPath + name);
+				AudioClips[name] = AddressableAssetAccess.Get<AudioClip>(name);
 				if(AudioClips[name] == null)
 				{
 					Debug.LogError("AudioClip not found: " + name);

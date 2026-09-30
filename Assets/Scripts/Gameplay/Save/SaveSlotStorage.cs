@@ -81,6 +81,7 @@ namespace Game.Gameplay.Save
                 return summary;
             }
 
+            summary.compatible = data.version == SaveGameService.SaveVersion;
             summary.savedAtUtc = data.savedAtUtc;
             summary.sceneName = data.sceneName;
             summary.playerHp = data.player != null ? data.player.hp : 0;

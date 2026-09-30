@@ -93,17 +93,20 @@ namespace Game.UI
                 Instance = null;
             }
         }
-        public void ResetGame()
+        public async void ResetGame()
         {
+            if (AddressableLoader.Instance.IsSceneTransitioning) return;
+            Time.timeScale = 1;
             PlayerRegistry.Current?.Restart();
-            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+            await AddressableLoader.Instance.ReloadSceneAsync(SceneManager.GetActiveScene().name);
             Time.timeScale = 1;
         }
-        public void ReturnToMainMenu()
+        public async void ReturnToMainMenu()
         {
             // 返回主菜单前恢复时间流速, 避免主菜单继承游戏结束暂停状态.
             Time.timeScale = 1;
-            SceneManager.LoadScene("StartScene");
+            if (AddressableLoader.Instance.IsSceneTransitioning) return;
+            await AddressableLoader.Instance.LoadSceneAsync("StartScene");
         }
         private void Update()
         {

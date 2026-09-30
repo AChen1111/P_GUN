@@ -19,7 +19,7 @@ namespace Game.Core
 
     public static class GameAudioSettingsStore
     {
-        public const string AudioMixerAddress = "shared/audio/audiomixer/audiomixer";
+        public const string AudioMixerKey = "AudioMixer";
         public const string MasterVolumeParameter = "Master";
         public const string MusicVolumeParameter = "BGM";
         public const string SfxVolumeParameter = "SFX";

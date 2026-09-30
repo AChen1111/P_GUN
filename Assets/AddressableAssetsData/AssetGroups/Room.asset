@@ -17,20 +17,24 @@ MonoBehaviour:
     m_SerializedData: []
   m_GUID: 3ffbe8d06de32b347bbef89eb72714b5
   m_SerializeEntries:
+  - m_GUID: 0fbed3fccfca7ba4789e2d5c1107a869
+    m_Address: Assets/Prefab/Room/LevelGraph/Level1Keyed.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1d959031538d863408096fa52900ed46
+    m_Address: Assets/Prefab/Room/RoomTemplate/SaveRoom.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 35efb202e0c0b4b439f45af81a36f5d5
     m_Address: room/corridor_ud
     m_ReadOnly: 0
     m_SerializedLabels:
     - corridor
     - hot_update
-    - room
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 55a2fdf4283883548a4042623e2f8635
-    m_Address: room/level1
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - hot_update
-    - level1
     - room
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 69e0cab51f1222e4bb3e4674e0348bc8
@@ -48,6 +52,12 @@ MonoBehaviour:
     - hot_update
     - room
     - room_template
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ca31e30b28898ed46b4474424b244285
+    m_Address: Assets/Prefab/Room/RoomTemplate/ChestRoom.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: d12f56f144e67244f9b540d241a530e7
     m_Address: room/corridor_lr

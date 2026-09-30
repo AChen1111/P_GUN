@@ -204,7 +204,7 @@ namespace Game.Gameplay
         {
             if (Rb != null)
             {
-                Rb.velocity = Vector2.zero;
+                Rb.linearVelocity = Vector2.zero;
             }
         }
         private void ConfigureDetector(bool applyDefaultShape)

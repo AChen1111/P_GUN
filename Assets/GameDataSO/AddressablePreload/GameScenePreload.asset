@@ -1,0 +1,233 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6680e1bb5491b8c408a382b89964bf11, type: 3}
+  m_Name: GameScenePreload
+  m_EditorClassIdentifier: Game.Core::Game.Core.AddressablePreloadManifest
+  resources:
+  - kind: 0
+    key: Potion_Round_Blue
+  - kind: 0
+    key: Potion_Round_Purple
+  - kind: 0
+    key: Potion_Round_Red
+  - kind: 0
+    key: Potion_Round_Teal
+  - kind: 0
+    key: Potion_Tall_Magenta
+  - kind: 0
+    key: attack icon
+  - kind: 0
+    key: buff icon
+  - kind: 0
+    key: confusion icon
+  - kind: 0
+    key: escape icon
+  - kind: 0
+    key: heart_empty
+  - kind: 0
+    key: heart_full
+  - kind: 0
+    key: heart_half
+  - kind: 1
+    key: AK
+  - kind: 1
+    key: AWP
+  - kind: 1
+    key: ArrowBullet
+  - kind: 1
+    key: Bat
+  - kind: 1
+    key: Big_enemy
+  - kind: 1
+    key: BloodBurst
+  - kind: 1
+    key: Bow
+  - kind: 1
+    key: BuffStatusIcon
+  - kind: 1
+    key: ChestRoom
+  - kind: 1
+    key: DamageText
+  - kind: 1
+    key: Door
+  - kind: 1
+    key: EnemyBuffBullet
+  - kind: 1
+    key: EnemyBullet
+  - kind: 1
+    key: FinalRoom
+  - kind: 1
+    key: HarmUp
+  - kind: 1
+    key: Heart
+  - kind: 1
+    key: HeartAdd
+  - kind: 1
+    key: HeartRow
+  - kind: 1
+    key: InitRoom
+  - kind: 1
+    key: InventorySlot
+  - kind: 1
+    key: LRCorridor
+  - kind: 1
+    key: Laser
+  - kind: 1
+    key: Laser_PlayerBullet
+  - kind: 1
+    key: MP5
+  - kind: 1
+    key: NormalRoom
+  - kind: 1
+    key: Pistol
+  - kind: 1
+    key: Player
+  - kind: 1
+    key: PlayerBullet
+  - kind: 1
+    key: PlayerHeart
+  - kind: 1
+    key: PowerUp
+  - kind: 1
+    key: Purify
+  - kind: 1
+    key: RocketGun
+  - kind: 1
+    key: SaveRoom
+  - kind: 1
+    key: SaveSlotItem
+  - kind: 1
+    key: ShotGun
+  - kind: 1
+    key: Slime
+  - kind: 1
+    key: SpeedUp
+  - kind: 1
+    key: UDCorridor
+  - kind: 3
+    key: AK47Reload
+  - kind: 3
+    key: AKShootEnd
+  - kind: 3
+    key: AKShooting
+  - kind: 3
+    key: AWPLaserReload
+  - kind: 3
+    key: AWPShoot
+  - kind: 3
+    key: BowReload
+  - kind: 3
+    key: BowShoot1
+  - kind: 3
+    key: BowShoot2
+  - kind: 3
+    key: BowShoot3
+  - kind: 3
+    key: BowShoot4
+  - kind: 3
+    key: BowShoot5
+  - kind: 3
+    key: BowShoot6
+  - kind: 3
+    key: BowShoot7
+  - kind: 3
+    key: BowShoot8
+  - kind: 3
+    key: BulletHitBody01
+  - kind: 3
+    key: BulletHitBody02
+  - kind: 3
+    key: BulletHitBody03
+  - kind: 3
+    key: BulletHitWall01
+  - kind: 3
+    key: BulletHitWall02
+  - kind: 3
+    key: BulletHitWall03
+  - kind: 3
+    key: BulletHitWall04
+  - kind: 3
+    key: DoorOpen
+  - kind: 3
+    key: EnemyShoot1
+  - kind: 3
+    key: EnemyShoot2
+  - kind: 3
+    key: EnemyShoot3
+  - kind: 3
+    key: LaserShoot
+  - kind: 3
+    key: MP5Reload
+  - kind: 3
+    key: MP5Shoot
+  - kind: 3
+    key: PistolReload
+  - kind: 3
+    key: PistolShoot1
+  - kind: 3
+    key: PistolShoot2
+  - kind: 3
+    key: PistolShoot3
+  - kind: 3
+    key: RocketGunShoot1
+  - kind: 3
+    key: RocketGunShoot2
+  - kind: 3
+    key: ShotGun1
+  - kind: 3
+    key: ShotGun2
+  - kind: 3
+    key: ShotGun3
+  - kind: 3
+    key: ShotGunRocketReload
+  - kind: 4
+    key: DamageUpBuff
+  - kind: 4
+    key: MaxHpUpBuff
+  - kind: 4
+    key: PoisonBuff
+  - kind: 4
+    key: SpeedBuff
+  - kind: 5
+    key: ApplyMaxHpUpBuff
+  - kind: 5
+    key: ApplyPoisonBuff
+  - kind: 5
+    key: ApplyPowerUpBuff
+  - kind: 5
+    key: ApplySpeedUpBuff
+  - kind: 5
+    key: BatTable
+  - kind: 5
+    key: BuffDataBase
+  - kind: 5
+    key: ChestRoomTable
+  - kind: 5
+    key: CleanseNegativeBuff
+  - kind: 5
+    key: EnemyDatabase
+  - kind: 5
+    key: EnemyDeadTable
+  - kind: 5
+    key: HaHaBuff
+  - kind: 5
+    key: HealItemEffect
+  - kind: 5
+    key: ItemDatabase
+  - kind: 5
+    key: Level1
+  - kind: 5
+    key: NormalRoomEnemySpawnTable
+  - kind: 5
+    key: RoomEndTable
+  - kind: 5
+    key: WeaponDatabase

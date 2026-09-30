@@ -1,0 +1,6 @@
+{
+  "name": "Game.Addressables.EditorTests",
+  "references": ["Game.Core", "Game.Gameplay", "Game.Items", "Game.Editor", "Edgar.Unity", "Unity.Addressables", "UnityEasyWorkTools.TableImporter.Importers.Editor", "Excel2SO.Editor"],
+  "includePlatforms": ["Editor"],
+  "optionalUnityReferences": ["TestAssemblies"]
+}

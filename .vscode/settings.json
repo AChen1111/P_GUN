@@ -76,5 +76,6 @@
         "other": "on",
         "comments": "off",
         "strings": "on"
-    }
+    },
+    "dotrush.roslyn.projectOrSolutionFiles": []
 }

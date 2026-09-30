@@ -19,10 +19,10 @@ public sealed class BuffDatabaseExcelImporter : Excel2SoListAssetImporter<BuffDa
     {
         map.Column("id").To("id").AsInt();
         map.Column("buffName").To("buffName").AsString();
-        map.Column("icon").To("icon").AsAsset<Sprite>();
+        AddressableImportKeys.Map<Sprite>(map, "icon", "iconKey");
         map.Column("description").To("description").AsString();
         map.Column("tag").To("tag").AsEnum<BuffTag>();
-        map.Column("luaFile").To("luaFile").AsAsset<TextAsset>();
+        AddressableImportKeys.Map<TextAsset>(map, "luaFile", "luaFileKey");
         map.Column("duration").To("duration").AsFloat();
         map.Column("isPermanent").To("isPermanent").AsBool();
         map.Column("interval").To("interval").AsFloat();

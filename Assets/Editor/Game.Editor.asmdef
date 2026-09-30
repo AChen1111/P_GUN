@@ -12,7 +12,11 @@
     "QFramework",
     "QFramework.CoreKit",
     "Unity.Addressables",
-    "Unity.Addressables.Editor"
+    "Unity.Addressables.Editor",
+    "Edgar.Unity",
+    "Game.UI",
+    "Unity.ResourceManager",
+    "Game.Pooling"
   ],
   "includePlatforms": [
     "Editor"

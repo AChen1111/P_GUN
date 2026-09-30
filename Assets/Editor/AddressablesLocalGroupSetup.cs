@@ -20,7 +20,7 @@ public static class AddressablesLocalGroupSetup
             "Room",
             new[]
             {
-                Entry("Assets/Prefab/Room/LevelGraph/Level1.asset", "room/level1", "room", "level1"),
+                Entry("Assets/Prefab/Room/LevelGraph/Level1Keyed.asset", "room/level1", "room", "level1"),
                 Entry("Assets/Prefab/Room/RoomTemplate/InitRoom.prefab", "room/init", "room", "room_template"),
                 Entry("Assets/Prefab/Room/RoomTemplate/NormalRoom.prefab", "room/normal", "room", "room_template"),
                 Entry("Assets/Prefab/Room/RoomTemplate/FinalRoom.prefab", "room/final", "room", "room_template"),
@@ -118,7 +118,10 @@ public static class AddressablesLocalGroupSetup
             {
                 Entry("Assets/Scripts/Gameplay/Lua/Hotfix/MainHotfix.lua.txt", "hotfix/main", "hotfix", "lua"),
                 Entry("Assets/Scripts/Gameplay/Lua/Hotfix/player_bullet_reverse.lua.txt", "hotfix/player_bullet_reverse", "hotfix", "lua")
-            })
+            }),
+        new HotUpdateGroupDefinition("Catalog", Array.Empty<HotUpdateEntryDefinition>()),
+        new HotUpdateGroupDefinition("Scene", Array.Empty<HotUpdateEntryDefinition>()),
+        new HotUpdateGroupDefinition("UI", Array.Empty<HotUpdateEntryDefinition>())
     };
 
     public static void CreateLocalGroups()
@@ -161,14 +164,17 @@ public static class AddressablesLocalGroupSetup
             else
             {
                 ConfigureAsLocalPackedGroup(settings, group);
+                // 两个场景分别打包, 切场景不要求同时加载另一个场景包.
+                if (definition.GroupName == "Scene")
+                    group.GetSchema<BundledAssetGroupSchema>().BundleMode = BundledAssetGroupSchema.BundlePackingMode.PackSeparately;
             }
 
-            ClearGroupEntries(settings, group);
+            // Catalog 注册条目必须保留, 这里只更新已有的基础条目.
             AddEntries(settings, group, definition.Entries);
             firstGroup ??= group;
         }
 
-        RemoveUnusedHotUpdateLabels(settings);
+        // Catalog 标签和阶段清单标签由注册工具维护.
 
         if (firstGroup != null)
         {
@@ -219,7 +225,7 @@ public static class AddressablesLocalGroupSetup
     {
         var keepNames = new HashSet<string>(HotUpdateGroups.Select(group => group.GroupName))
         {
-            "Built In Data"
+            "Built In Data", "Catalog", "Scene", "UI"
         };
 
         foreach (var group in settings.groups.Where(group => group != null && !keepNames.Contains(group.Name)).ToArray())
@@ -305,14 +311,6 @@ public static class AddressablesLocalGroupSetup
             && group.GetSchema<ContentUpdateGroupSchema>() != null;
     }
 
-    private static void ClearGroupEntries(AddressableAssetSettings settings, AddressableAssetGroup group)
-    {
-        foreach (var entry in group.entries.ToArray())
-        {
-            settings.RemoveAssetEntry(entry.guid, false);
-        }
-    }
-
     private static void AddEntries(AddressableAssetSettings settings, AddressableAssetGroup group, IReadOnlyList<HotUpdateEntryDefinition> entries)
     {
         foreach (var definition in entries)
@@ -326,25 +324,12 @@ public static class AddressablesLocalGroupSetup
             var entry = settings.CreateOrMoveEntry(guid, group, false, false);
             entry.address = definition.Address;
 
-            foreach (var oldLabel in entry.labels.ToArray())
-            {
-                entry.SetLabel(oldLabel, false, false, false);
-            }
-
+            // 保留 Catalog 注册工具添加的标签, 这里只补充基础业务标签.
             foreach (var label in definition.Labels)
             {
                 settings.AddLabel(label, false);
                 entry.SetLabel(label, true, false, false);
             }
-        }
-    }
-
-    private static void RemoveUnusedHotUpdateLabels(AddressableAssetSettings settings)
-    {
-        var usedLabels = new HashSet<string>(HotUpdateGroups.SelectMany(group => group.Entries).SelectMany(entry => entry.Labels));
-        foreach (var label in settings.GetLabels().Where(label => !usedLabels.Contains(label)).ToArray())
-        {
-            settings.RemoveLabel(label, false);
         }
     }
 

@@ -522,7 +522,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   canvasGroup: {fileID: 8651717084496505743}
   defaultSelectedButton: {fileID: 0}
-  slotPrefab: {fileID: 836041547324336100, guid: 06837c4dd5d83de41b40d3f06f730308, type: 3}
+  slotPrefabKey: SaveSlotItem
   slotRoot: {fileID: 382761988522955700}
   titleText: {fileID: 3612156226441390826}
   statusText: {fileID: 2934776416514901844}

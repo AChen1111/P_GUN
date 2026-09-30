@@ -1,3 +1,4 @@
+using UnityEngine.Serialization;
 using UnityEngine;
 using System.Collections.Generic;
 using Game.Core;
@@ -13,10 +14,13 @@ namespace Game.Gameplay
         [SerializeField] private AudioSource source;
 
         [Header("音频列表")]
-        [SerializeField] private List<AudioClip> clips;
+        // 资源通过短名预加载, 业务读取已就绪的缓存.
+        [SerializeField, AddressableKey(AddressableAssetKind.AudioClip)] public List<string> clipsKeys = new List<string>();
+        private List<AudioClip> resolvedclips;
+        private List<AudioClip> clips => resolvedclips ?? (resolvedclips = AddressableAssetAccess.List<AudioClip>(clipsKeys));
 
         [Header("当前播放的音源")]
-        [SerializeField] private AudioClip currentClip;
+        private AudioClip currentClip;
         [SerializeField] private int index = 0;
         AudioClip randomClip => clips[UnityEngine.Random.Range(0, clips.Count)];
 

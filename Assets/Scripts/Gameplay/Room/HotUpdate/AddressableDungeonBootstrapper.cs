@@ -15,7 +15,9 @@ namespace Game.Gameplay
     public sealed class AddressableDungeonBootstrapper : MonoBehaviour
     {
         [SerializeField] private DungeonGeneratorGrid2D dungeonGenerator;
-        [SerializeField] private string levelGraphAddress = "room/level1";
+        [UnityEngine.Serialization.FormerlySerializedAs("levelGraphAddress")]
+        [SerializeField, AddressableKey(AddressableAssetKind.ScriptableObject)] private string levelGraphKey = "Level1";
+        private readonly System.Collections.Generic.List<ScriptableObject> runtimeGraphObjects = new System.Collections.Generic.List<ScriptableObject>();
         [SerializeField] private bool generateOnStart = true;
 
         public static AddressableDungeonBootstrapper Active { get; private set; }
@@ -24,7 +26,7 @@ namespace Game.Gameplay
         private bool isGenerating;
         private int lastGeneratedSeed;
 
-        public string LevelGraphAddress => levelGraphAddress;
+        public string LevelGraphKey => levelGraphKey;
         public int LastGeneratedSeed => lastGeneratedSeed;
 
         /// <summary>
@@ -59,6 +61,8 @@ namespace Game.Gameplay
         /// </summary>
         private void OnDestroy()
         {
+            foreach (var owned in runtimeGraphObjects) Destroy(owned);
+            runtimeGraphObjects.Clear();
             if (Active == this)
             {
                 Active = null;
@@ -141,13 +145,14 @@ namespace Game.Gameplay
             }
 
             var fixedGraphSettings = dungeonGenerator.FixedLevelGraphConfig;
-            fixedGraphSettings.LevelGraph = await loader.LoadAssetAsync<LevelGraph>(levelGraphAddress);
+            var definition = await loader.LoadAssetAsync<KeyedLevelGraph>(levelGraphKey);
+            fixedGraphSettings.LevelGraph = definition.CreateRuntimeGraph(runtimeGraphObjects);
         }
-        public void OverrideLevelGraphAddress(string address)
+        public void OverrideLevelGraphKey(string key)
         {
-            if (string.IsNullOrWhiteSpace(address)) return;
+            if (string.IsNullOrWhiteSpace(key)) return;
 
-            levelGraphAddress = address;
+            levelGraphKey = key;
         }
         private void ResolveGenerator()
         {

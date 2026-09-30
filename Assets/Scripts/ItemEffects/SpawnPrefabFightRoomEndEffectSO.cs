@@ -1,3 +1,5 @@
+using UnityEngine.Serialization;
+using Game.Core;
 using System;
 using Game.Animation;
 using Game.Gameplay;
@@ -12,8 +14,12 @@ namespace Game.ItemEffects
     [CreateAssetMenu(fileName = "SpawnPrefabFightRoomEndEffect", menuName = "PG/Room/Fight End Effects/Spawn Prefab", order = 1)]
     public class SpawnPrefabFightRoomEndEffectSO : FightRoomEndEffectSO
     {
-        [SerializeField] private GameObject prefab;
-        [SerializeField] private ItemSpawnTableSO spawnTable;
+        // 配置保存短名, 资源来自阶段预加载缓存.
+        [SerializeField, AddressableKey(AddressableAssetKind.Prefab)] public string prefabKey = string.Empty;
+        private GameObject prefab => AddressableAssetAccess.Get<GameObject>(prefabKey);
+        // 配置保存短名, 资源来自阶段预加载缓存.
+        [SerializeField, AddressableKey(AddressableAssetKind.ScriptableObject)] public string spawnTableKey = string.Empty;
+        private ItemSpawnTableSO spawnTable => AddressableAssetAccess.Get<ItemSpawnTableSO>(spawnTableKey);
         [SerializeField] private Vector3 worldOffset = Vector3.zero;
         [SerializeField] private string animEffectKey = "Scale0To1";
         public override void Execute(FightRoom room)

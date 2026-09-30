@@ -1,3 +1,5 @@
+using UnityEngine.Serialization;
+using Game.Core;
 using System;
 using System.Collections.Generic;
 using QFramework;
@@ -11,8 +13,13 @@ namespace Game.Gameplay
     public class EnemyBig : EnemyBase
     {
         [Header("攻击资源")]
-        [SerializeField] private EnemyBullet bulletPrefab;
-        [SerializeField] private List<AudioClip> shootSounds = new List<AudioClip>();
+        // 资源通过短名预加载, 业务读取已就绪的缓存.
+        [SerializeField, AddressableKey(AddressableAssetKind.Prefab)] public string bulletPrefabKey = string.Empty;
+        private EnemyBullet bulletPrefab => AddressableAssetAccess.Component<EnemyBullet>(bulletPrefabKey);
+        // 资源通过短名预加载, 业务读取已就绪的缓存.
+        [SerializeField, AddressableKey(AddressableAssetKind.AudioClip)] public List<string> shootSoundsKeys = new List<string>();
+        private List<AudioClip> resolvedshootSounds;
+        private List<AudioClip> shootSounds => resolvedshootSounds ?? (resolvedshootSounds = AddressableAssetAccess.List<AudioClip>(shootSoundsKeys));
 
         [Header("动画参数")]
         [SerializeField] private string runBoolParameterName = "IsRun";
@@ -205,7 +212,7 @@ namespace Game.Gameplay
             var direction = toPlayer.normalized;
             if (Rb != null)
             {
-                Rb.velocity = direction * MoveSpeed * EnemyTimeScale;
+                Rb.linearVelocity = direction * MoveSpeed * EnemyTimeScale;
             }
 
             FaceDirection(direction);

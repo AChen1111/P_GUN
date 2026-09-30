@@ -1,3 +1,5 @@
+using UnityEngine.Serialization;
+using Game.Core;
 using UnityEngine;
 using Game.Gameplay;
 using Game.Items;
@@ -12,7 +14,9 @@ namespace Game.ItemEffects
     {
         [Tooltip("Lua脚本文本资产")]
         [Header("Lua Script")]
-        public TextAsset luaScript;
+        // 配置保存短名, 资源来自阶段预加载缓存.
+        [SerializeField, AddressableKey(AddressableAssetKind.TextAsset)] public string luaScriptKey = string.Empty;
+        public TextAsset luaScript => AddressableAssetAccess.Get<TextAsset>(luaScriptKey);
 
         public override void OnPick(ItemEffectContext ctx)
         {

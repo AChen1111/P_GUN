@@ -1,3 +1,4 @@
+using UnityEngine.Serialization;
 using System.Collections.Generic;
 using QFramework;
 using UnityEngine;
@@ -15,14 +16,16 @@ namespace Game.Gameplay
     /// <summary>
     /// 武器数据库。
     /// </summary>
-    [SerializeField] private WeaponDatabase weaponDatabase;
+    // 资源通过短名预加载, 业务读取已就绪的缓存.
+    [SerializeField, AddressableKey(AddressableAssetKind.ScriptableObject)] public string weaponDatabaseKey = string.Empty;
+    private WeaponDatabase weaponDatabase => AddressableAssetAccess.Get<WeaponDatabase>(weaponDatabaseKey);
 
     public string WeaponId => string.IsNullOrWhiteSpace(weaponId) ? GetType().Name : weaponId.Trim();
 
     /// <summary>
     /// 射击音频列表
     /// </summary>
-    public List<AudioClip> shootSounds = new List<AudioClip>();
+    [System.NonSerialized] public List<AudioClip> shootSounds = new List<AudioClip>();
 
     /// <summary>
     /// 子弹预制体
@@ -46,7 +49,7 @@ namespace Game.Gameplay
     /// <summary>
     /// 换子弹音频
     /// </summary>
-    public AudioClip ReloadSound;
+    [System.NonSerialized] public AudioClip ReloadSound;
 
     /// <summary>
     /// 伤害信息

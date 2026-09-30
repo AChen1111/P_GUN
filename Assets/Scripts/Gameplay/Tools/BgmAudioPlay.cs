@@ -1,3 +1,4 @@
+using UnityEngine.Serialization;
 using Game.Core;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -14,9 +15,17 @@ namespace Game.Gameplay
         private const string StartSceneName = "StartScene";
         private const string GameSceneName = "GameScene";
 
-        public AudioClip startSceneBgm;
-        public AudioClip mainSceneBgm;
-        public AudioClip playerDeadBgm;
+        // 资源通过短名预加载, 业务读取已就绪的缓存.
+
+        [SerializeField, AddressableKey(AddressableAssetKind.AudioClip)] public string startSceneBgmKey = string.Empty;
+
+        public AudioClip startSceneBgm => AddressableAssetAccess.Get<AudioClip>(startSceneBgmKey);
+        // 资源通过短名预加载, 业务读取已就绪的缓存.
+        [SerializeField, AddressableKey(AddressableAssetKind.AudioClip)] public string mainSceneBgmKey = string.Empty;
+        public AudioClip mainSceneBgm => AddressableAssetAccess.Get<AudioClip>(mainSceneBgmKey);
+        // 资源通过短名预加载, 业务读取已就绪的缓存.
+        [SerializeField, AddressableKey(AddressableAssetKind.AudioClip)] public string playerDeadBgmKey = string.Empty;
+        public AudioClip playerDeadBgm => AddressableAssetAccess.Get<AudioClip>(playerDeadBgmKey);
 
         public static BgmAudioPlay Instance { get; private set; }
 

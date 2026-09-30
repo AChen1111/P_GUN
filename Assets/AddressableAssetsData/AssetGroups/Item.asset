@@ -17,36 +17,90 @@ MonoBehaviour:
     m_SerializedData: []
   m_GUID: d2b216c749b463c44bdf7f47574230f5
   m_SerializeEntries:
+  - m_GUID: 06bc0eb67725be6489936e8feba3f252
+    m_Address: Assets/Prefab/Item/HeartAdd.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 071e3ca46ff24dcc95992fa991bbc635
+    m_Address: Assets/GameDataSO/ItemEffects/EffectSO/ApplyMaxHpUpBuff.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 0d97b75cf6914479889ba297b299cc12
     m_Address: item/purify
     m_ReadOnly: 0
     m_SerializedLabels:
+    - hot_update
     - item
     - prefab
-    - hot_update
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 11f80f59cb4fd3c4f8e371ff95409cb6
     m_Address: item/harm_up
     m_ReadOnly: 0
     m_SerializedLabels:
+    - hot_update
     - item
     - prefab
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3d14bb6b21114fed8f35e087335a4e85
+    m_Address: Assets/GameDataSO/ItemEffects/EffectSO/CleanseNegativeBuff.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5a02048b53f8482498e2d598fb78c5d9
+    m_Address: Assets/GameDataSO/ItemEffects/EffectSO/HaHaBuff.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 76f11a329f7cb7b4695cbe30df24940a
+    m_Address: Assets/Scripts/ItemEffects/Lua/ChestEffect.lua.txt
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 848b4c98119219943a20d9ec817e8e15
+    m_Address: Assets/GameDataSO/ItemSpawnerTable/ChestRoomTable.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
     - hot_update
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: a4f46db2f0b85564a81ad43c4f0b8880
     m_Address: item/heart
     m_ReadOnly: 0
     m_SerializedLabels:
+    - hot_update
     - item
     - prefab
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a91f84448cb779543b4d6e5023facf74
+    m_Address: Assets/GameDataSO/ItemEffects/EffectSO/ApplySpeedUpBuff.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ab28af5dd3214d5eae97b67a3f14b8d2
+    m_Address: Assets/GameDataSO/ItemEffects/EffectSO/ApplyPoisonBuff.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
     - hot_update
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: bedc99d1d01a09b47a4db6c1717c43d1
     m_Address: item/power_up
     m_ReadOnly: 0
     m_SerializedLabels:
+    - hot_update
     - item
     - prefab
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: bf817939e9a0a3241b3cf68a375367e7
+    m_Address: Assets/Assets/Items/Potion Asset.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
     - hot_update
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: d7289ca60b79f7849be1a94d4f3cb4be
@@ -54,15 +108,27 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels:
     - database
+    - hot_update
     - item
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e4ce6000bf6f8664495ad3266226322a
+    m_Address: Assets/GameDataSO/ItemEffects/EffectSO/ApplyPowerUpBuff.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
     - hot_update
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: ec55b4f84b4c70f4e958efa2efb7d253
     m_Address: item/speed_up
     m_ReadOnly: 0
     m_SerializedLabels:
+    - hot_update
     - item
     - prefab
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f33a2f122076c3546a3f9e073573c04e
+    m_Address: Assets/Scripts/ItemEffects/Lua/HelloItemEffect.lua.txt
+    m_ReadOnly: 0
+    m_SerializedLabels:
     - hot_update
     FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0

@@ -1,3 +1,5 @@
+using UnityEngine.Serialization;
+using Game.Core;
 using UnityEngine;
 using UnityEngine.Pool;
 using System.Collections.Generic;
@@ -28,7 +30,9 @@ namespace Game.Pooling
         [System.Serializable]
         private struct PrefabInfo
         {
-            public T prefab; //预制体
+            // 配置保存短名, 资源来自阶段预加载缓存.
+            [SerializeField, AddressableKey(AddressableAssetKind.Prefab)] public string prefabKey;
+            public T prefab => AddressableAssetAccess.Component<T>(prefabKey);
             public int prewarmCount; //预热数量
         }
     #endregion
@@ -124,6 +128,10 @@ namespace Game.Pooling
         /// <summary>
         /// 池子中只存一种prefab时调用
         /// </summary>
+        public T Get(string key) => Get(AddressableAssetAccess.Component<T>(key));
+
+        public T Get(string key, Vector3 position, Quaternion rotation) => Get(AddressableAssetAccess.Component<T>(key), position, rotation);
+
         public T Get() {
             return Get(defaultPrefab);
         }

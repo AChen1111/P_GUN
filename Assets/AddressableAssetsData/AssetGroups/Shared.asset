@@ -17,6 +17,24 @@ MonoBehaviour:
     m_SerializedData: []
   m_GUID: d71024e3a5ce28449bb9e1ce8a458a4e
   m_SerializeEntries:
+  - m_GUID: 0307d9bcd8d1f984aad6690168e6e390
+    m_Address: Assets/Audio/SFX/BulletHit/BulletHitWall02.wav
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 08da0453f2d8d6148be646576a1ff376
+    m_Address: Assets/Prefab/VFX/DamageText/DamageText.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 09f63d32f8a42f742b15ae6198b3c400
+    m_Address: Assets/Audio/SFX/Player/Gun/ReloadSFX/AWPLaserReload.mp3
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 0aedc682d273ead4f9a7a400aa3afe32
     m_Address: shared/prefab/player/player
     m_ReadOnly: 0
@@ -33,12 +51,36 @@ MonoBehaviour:
     - shared
     - spawn_table
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1278784ae907ba54386d676c440244af
+    m_Address: Assets/Audio/SFX/BulletHit/BulletHitWall03.wav
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1303efc9353781040b963f0e6dbc5a55
+    m_Address: Assets/Malicious_statusiconset1/escape icon.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 14adb12de103ab64582403089e31a746
+    m_Address: Assets/Audio/SFX/Player/Gun/ReloadSFX/MP5Reload.wav
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 1e108a665f3ec78488b43fa3772b48b3
     m_Address: shared/audio/sfx/player/gun/gunsfx/akshootend
     m_ReadOnly: 0
     m_SerializedLabels:
     - hot_update
     - shared
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1e3302f441835cb4ba46ceb235f3180a
+    m_Address: Assets/Audio/SFX/Player/Gun/GunSFX/PistolShoot2.wav
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 21548d9a6bfc5f243bf869ac2d4f86e6
     m_Address: shared/assets/player/gun/arrow
@@ -54,6 +96,60 @@ MonoBehaviour:
     - hot_update
     - shared
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 28c92310ee1990f46ac1304dadb37c7b
+    m_Address: Assets/Audio/SFX/Player/Gun/GunSFX/RocketGunShoot2.wav
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 2cc471f384c90af4f8e0e063fe6c0ddf
+    m_Address: Assets/Audio/SFX/Player/Gun/GunSFX/ShotGun1.wav
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 2d9b1824d200cea4cb091a2acfae9eed
+    m_Address: Assets/Audio/BGM/Fantasy_Wizard_Dragon.mp3
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 322a3dede8105894a8588a6e24b001b8
+    m_Address: Assets/Audio/SFX/Player/Gun/ReloadSFX/PistolReload.wav
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 34f8cb3e29ce529458352e5bd3fe3141
+    m_Address: Assets/Audio/SFX/Player/Gun/GunSFX/BowShoot1.wav
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3595009b13b4b404ca739c3ce80ab7fd
+    m_Address: Assets/Audio/SFX/Door/DoorOpen.wav
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3752c64bcee20ed4ca0c96a5cc62c95d
+    m_Address: Assets/Prefab/VFX/BloodBurst.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 37eeb2ef0c716824c924f5c9dafcd444
+    m_Address: Assets/Audio/SFX/Player/Gun/GunSFX/BowShoot3.wav
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 38a5caf6a3bd4324dbe2fbf779720caf
+    m_Address: Assets/Audio/SFX/Player/Gun/GunSFX/PistolShoot1.wav
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 406ef51de9dbb2f46be8cc1c646c5f93
     m_Address: shared/assets/player/gun/awp
     m_ReadOnly: 0
@@ -61,12 +157,24 @@ MonoBehaviour:
     - hot_update
     - shared
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 481e164eb8e5b2044bbe4ee2451ad349
+    m_Address: Assets/Malicious_statusiconset1/buff icon.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 509b372a670abc94c8dec5ddcce60e69
     m_Address: shared/prefab/bullet/arrowbullet
     m_ReadOnly: 0
     m_SerializedLabels:
     - hot_update
     - shared
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 50b915a22dcd4244cb10082d3fd93846
+    m_Address: Assets/Audio/SFX/Player/Gun/GunSFX/BowShoot2.wav
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 530afc5dd9ac460e99c893f4a4c57130
     m_Address: shared/gamedataso/enemyspawntable/normalroomenemyspawntable
@@ -90,6 +198,12 @@ MonoBehaviour:
     - hot_update
     - shared
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 58508dbb4ef4e18478c3c64634e0667a
+    m_Address: Assets/Audio/SFX/Player/Gun/GunSFX/BowShoot6.wav
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 5910836691605a847a7138b387ed0bb8
     m_Address: shared/audio/sfx/bullethit/bullethitbody01
     m_ReadOnly: 0
@@ -105,12 +219,30 @@ MonoBehaviour:
     - shared
     - spawn_table
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 664dd2e9448910c47b2cc26e261fd5f2
+    m_Address: Assets/Audio/SFX/Player/Gun/GunSFX/BowShoot5.wav
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6d8e4595e1d5ac44faf8f72551d23276
+    m_Address: Assets/Audio/SFX/Player/Gun/GunSFX/ShotGun3.wav
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 6e00296dcbf12324dac4fcfe2f416287
     m_Address: shared/assets/player/gun/bow
     m_ReadOnly: 0
     m_SerializedLabels:
     - hot_update
     - shared
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 70c6ba4eb93b17d4a9ce83cfb26c281f
+    m_Address: Assets/Audio/SFX/Player/Gun/ReloadSFX/BowReload.wav
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 7127fbc26c4ba0f49ac610f697dd5947
     m_Address: shared/assets/player/gun/rocketgun
@@ -119,6 +251,30 @@ MonoBehaviour:
     - hot_update
     - shared
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 717c1661204c47848ae71e4b36b7424c
+    m_Address: Assets/Malicious_statusiconset1/confusion icon.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 77caf2b882d6b964eac0fd11d2c01175
+    m_Address: Assets/Audio/BGM/sad_game_over.wav
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7f5ebb3ad6679da4793726201cea6868
+    m_Address: Assets/Audio/SFX/Player/Gun/GunSFX/MP5Shoot.wav
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8024fdb37d66f634c85e57499069b28d
+    m_Address: Assets/Audio/SFX/Player/Gun/GunSFX/BowShoot8.wav
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 81af13a4162b539469c8f22e41efbdd6
     m_Address: shared/assets/player/gun/lazer
     m_ReadOnly: 0
@@ -126,12 +282,54 @@ MonoBehaviour:
     - hot_update
     - shared
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8323f9b267d5f95459ff77cb7de1fad7
+    m_Address: Assets/Audio/SFX/Player/Gun/GunSFX/BowShoot4.wav
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8782fb9d1e84d5c46bc9e257fb1b99b9
+    m_Address: Assets/Audio/SFX/Player/Gun/GunSFX/ShotGun2.wav
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 92f1dce4686c87b4e97533920e9b48c3
+    m_Address: Assets/Audio/SFX/BulletHit/BulletHitWall04.wav
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 95a6a9ff9d3fe504b8e58db76ee90a4d
+    m_Address: Assets/Audio/SFX/Player/Gun/GunSFX/RocketGunShoot1.wav
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 95b2f6eb055766443ae1f8c9e647b3c2
     m_Address: shared/audio/sfx/bullethit/bullethitbody03
     m_ReadOnly: 0
     m_SerializedLabels:
     - hot_update
     - shared
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9792280a23761574e820932cfc215f89
+    m_Address: Assets/Malicious_statusiconset1/attack icon.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 982334509bf96f549acadf7a5627f7c9
+    m_Address: Assets/Audio/SFX/Player/Gun/GunSFX/BowShoot7.wav
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 98ed46cee309cdd44a4b35d7a853b8cd
+    m_Address: Assets/Audio/SFX/Player/Gun/GunSFX/AKShooting.mp3
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: a97c105638bdf8b4a8650670310a4cd3
     m_Address: shared/com.unity.render-pipelines.universal/runtime/materials/sprite-lit-default
@@ -168,6 +366,30 @@ MonoBehaviour:
     - hot_update
     - shared
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c7feca4fad691424783ee926ca98c9ae
+    m_Address: Assets/Prefab/Door/Door.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d4ce39efc317eb845a6d13ff273a5a31
+    m_Address: Assets/Audio/SFX/Player/Gun/ReloadSFX/ShotGunRocketReload.wav
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: dd3d170db2ba52f4ab2916ee2d37da13
+    m_Address: Assets/Audio/SFX/Player/Gun/GunSFX/LaserShoot.wav
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: df89cef0e87e61a4889501976dc3edc4
+    m_Address: Assets/Audio/SFX/Player/Gun/GunSFX/PistolShoot3.wav
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: e03d6ca3ecc84a24882f6d129b3049cc
     m_Address: shared/assets/player/gun/lazerm
     m_ReadOnly: 0
@@ -196,6 +418,12 @@ MonoBehaviour:
     - hot_update
     - shared
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e83829ac711cc4b46887d2c2030cf5d8
+    m_Address: Assets/Audio/SFX/Player/Gun/ReloadSFX/AK47Reload.mp3
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: ebd35303f0034ee4aab06bfced6d81de
     m_Address: shared/assets/player/gun/pistol
     m_ReadOnly: 0
@@ -209,6 +437,18 @@ MonoBehaviour:
     m_SerializedLabels:
     - hot_update
     - shared
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f38bbc0189220d24887634fb48b72bdf
+    m_Address: Assets/Audio/SFX/Player/Gun/GunSFX/AWPShoot.wav
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f8173cc7bc88cd247821d6465f5e9964
+    m_Address: Assets/Audio/BGM/Menu_.mp3
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: f8a228ed370da944eb682999dc6d1546
     m_Address: shared/gamedataso/itemspawnertable/battable

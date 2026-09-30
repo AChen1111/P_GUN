@@ -40,6 +40,7 @@ Transform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &268185623568728671
 SpriteRenderer:
+  serializedVersion: 2
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -55,6 +56,11 @@ SpriteRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -76,9 +82,11 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: 3c46e1c3dcbd4ed41bf424f7afdf48a0, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -88,11 +96,10 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
-  m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!95 &9133904380484107768
 Animator:
-  serializedVersion: 5
+  serializedVersion: 7
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -106,6 +113,7 @@ Animator:
   m_ApplyRootMotion: 0
   m_LinearVelocityBlending: 0
   m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
@@ -113,7 +121,7 @@ Animator:
   m_WriteDefaultValuesOnDisable: 0
 --- !u!50 &6155414935944645876
 Rigidbody2D:
-  serializedVersion: 4
+  serializedVersion: 5
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -124,8 +132,8 @@ Rigidbody2D:
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
   m_Mass: 1
-  m_LinearDrag: 0
-  m_AngularDrag: 0.05
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
   m_GravityScale: 0
   m_Material: {fileID: 0}
   m_IncludeLayers:
@@ -146,6 +154,7 @@ CapsuleCollider2D:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8683141597236010123}
   m_Enabled: 1
+  serializedVersion: 3
   m_Density: 1
   m_Material: {fileID: 0}
   m_IncludeLayers:
@@ -169,7 +178,8 @@ CapsuleCollider2D:
     m_Bits: 4294967295
   m_IsTrigger: 0
   m_UsedByEffector: 0
-  m_UsedByComposite: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
   m_Offset: {x: 0, y: -0.2}
   m_Size: {x: 1.4, y: 1.8}
   m_Direction: 0
@@ -184,6 +194,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
   m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
@@ -281,7 +292,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b7ba8308aff449a478c441a96611108f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  itemTable: {fileID: 11400000, guid: 0b78e19efc2cfbe45aeaae9e06e3b46f, type: 2}
+  itemTableKey: EnemyDeadTable
 --- !u!114 &1979160110135435701
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -315,25 +326,23 @@ MonoBehaviour:
   hurtFlashColor: {r: 1, g: 0.35, b: 0.35, a: 1}
   hurtFlashInterval: 0.06
   hurtFlashLoops: 4
-  damageTextPrefab: {fileID: 5634629950418986402, guid: 08da0453f2d8d6148be646576a1ff376, type: 3}
+  damageTextPrefabKey: DamageText
   damageTextOffset: {x: 0, y: 0.6, z: 0}
   deathRecycleDelay: 0
   itemSpawner: {fileID: 3413545666662805213}
   OwnerFightRoom: {fileID: 0}
   audioPlay: {fileID: 0}
-  bulletPrefab: {fileID: 8813529008298550284, guid: 10e246e394d07ef4ea3fe43c6de534c0, type: 3}
-  shootSounds:
-  - {fileID: 8300000, guid: d6a1e1dba80eb484386bf50f97ec2560, type: 3}
-  - {fileID: 8300000, guid: 4ce72a5102c96ac449defd59e5a058c4, type: 3}
-  - {fileID: 8300000, guid: 247c3d9a01e9b434899f18098abe4547, type: 3}
+  bulletPrefabKey: EnemyBullet
+  shootSoundsKeys:
+  - EnemyShoot1
+  - EnemyShoot2
+  - EnemyShoot3
   runBoolParameterName: IsRun
   radialStateDuration: 2
   radialBurstInterval: 0.75
   radialBulletCount: 12
   radialBulletSpawnDistance: 0.6
-  wanderStateDuration: 4
-  wanderRadius: 20
-  randomMoveRetargetInterval: 1
-  targetReachDistance: 0.2
+  chaseStateDuration: 4
+  playerSafeDistance: 3
   aimedShotInterval: 1.2
   aimedBulletSpawnDistance: 0.6

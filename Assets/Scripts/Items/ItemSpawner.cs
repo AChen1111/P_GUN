@@ -1,3 +1,5 @@
+using UnityEngine.Serialization;
+using Game.Core;
 using System.Threading.Tasks;
 using Game.Animation;
 using Game.Presentation;
@@ -12,7 +14,9 @@ namespace Game.Items
     {
         private const float DefaultSpawnAnimDuration = 1.5f;
 
-        public ItemSpawnTableSO itemTable;
+        // 配置保存短名, 资源来自阶段预加载缓存.
+        [SerializeField, AddressableKey(AddressableAssetKind.ScriptableObject)] public string itemTableKey = string.Empty;
+        public ItemSpawnTableSO itemTable => AddressableAssetAccess.Get<ItemSpawnTableSO>(itemTableKey);
 
         /// <summary>
         /// 生成物品, 只使用已加载或直接引用的预制体.

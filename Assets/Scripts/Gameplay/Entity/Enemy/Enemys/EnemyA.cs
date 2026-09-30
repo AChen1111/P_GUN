@@ -1,3 +1,4 @@
+using UnityEngine.Serialization;
 using UnityEngine;
 using QFramework;
 using System.Collections.Generic;
@@ -12,8 +13,13 @@ namespace Game.Gameplay
     public class EnemyA : EnemyBase
     {
         [Header("攻击资源")]
-        [SerializeField] private GameObject bulletPrefab;
-        [SerializeField] private List<AudioClip> shootSounds = new();
+        // 配置保存短名, 资源来自阶段预加载缓存.
+        [SerializeField, AddressableKey(AddressableAssetKind.Prefab)] public string bulletPrefabKey = string.Empty;
+        private GameObject bulletPrefab => AddressableAssetAccess.Get<GameObject>(bulletPrefabKey);
+        // 配置保存短名, 资源来自阶段预加载缓存.
+        [SerializeField, AddressableKey(AddressableAssetKind.AudioClip)] public List<string> shootSoundsKeys = new List<string>();
+        private List<AudioClip> resolvedShootSounds;
+        private List<AudioClip> shootSounds => resolvedShootSounds ?? (resolvedShootSounds = AddressableAssetAccess.List<AudioClip>(shootSoundsKeys));
 
         [Header("攻击参数")]
         [SerializeField] private float shootInterval = 0.2f;
@@ -49,7 +55,7 @@ namespace Game.Gameplay
                 .OnEnter(() =>
                 {
                     stateTimer = 0f;
-                    if (Rb != null) Rb.velocity = Vector2.zero;
+                    if (Rb != null) Rb.linearVelocity = Vector2.zero;
                     if (shootDuration != null) shootDuration.Duration = shootInterval;
                 })
                 .OnUpdate(() =>
@@ -78,7 +84,7 @@ namespace Game.Gameplay
                 if (IsDead)
                 {
                     if (Rb != null)
-                        Rb.velocity = Vector2.zero;
+                        Rb.linearVelocity = Vector2.zero;
                     return;
                 }
 

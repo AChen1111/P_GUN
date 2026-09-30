@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 8042861452943358869}
   - component: {fileID: 798435715286779976}
   - component: {fileID: 4829226237746944222}
+  - component: {fileID: 5219809287825959763}
   m_Layer: 7
   m_Name: EnemyA
   m_TagString: Enemy
@@ -51,22 +52,41 @@ MonoBehaviour:
   MaxHp: 10
   CurrentHp: 10
   MoveSpeed: 2.5
+  AttackDamage: 1
   isDead: 0
+  playerStopDistance: 0.9
   sr: {fileID: 8116403503347937743}
+  animator: {fileID: 0}
   rb: {fileID: 4829226237746944222}
   col: {fileID: 798435715286779976}
   audioSource: {fileID: 8042861452943358869}
+  speedParameterName: Speed
+  attackTriggerName: Attack
+  deadTriggerName: Dead
+  idleStateName: idle
+  moveStateName: run
+  attackStateName: attack
+  deadStateName: dead
+  hurtFlashColor: {r: 1, g: 0.35, b: 0.35, a: 1}
+  hurtFlashInterval: 0.06
+  hurtFlashLoops: 4
+  damageTextPrefabKey: 
+  damageTextOffset: {x: 0, y: 0.6, z: 0}
+  deathRecycleDelay: 3
+  itemSpawner: {fileID: 0}
   OwnerFightRoom: {fileID: 0}
-  bulletPrefab: {fileID: 0}
-  shootSounds:
-  - {fileID: 8300000, guid: d6a1e1dba80eb484386bf50f97ec2560, type: 3}
-  - {fileID: 8300000, guid: 4ce72a5102c96ac449defd59e5a058c4, type: 3}
-  - {fileID: 8300000, guid: 247c3d9a01e9b434899f18098abe4547, type: 3}
+  audioPlay: {fileID: 0}
+  bulletPrefabKey: 
+  shootSoundsKeys:
+  - EnemyShoot1
+  - EnemyShoot2
+  - EnemyShoot3
   shootInterval: 0.2
   followDuration: 1
   attackDuration: 0.4
 --- !u!212 &8116403503347937743
 SpriteRenderer:
+  serializedVersion: 2
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -82,6 +102,11 @@ SpriteRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -103,9 +128,11 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: -632766225
   m_SortingLayer: 3
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: e9a8075a034cb404db78c0de87f0eb36, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -115,7 +142,6 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
-  m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!82 &8042861452943358869
 AudioSource:
@@ -128,6 +154,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 374010033509238546, guid: 569809b44565dc442ba3ee727965ff13, type: 2}
   m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
@@ -221,6 +248,7 @@ CapsuleCollider2D:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1354463150124662322}
   m_Enabled: 1
+  serializedVersion: 3
   m_Density: 1
   m_Material: {fileID: 0}
   m_IncludeLayers:
@@ -244,13 +272,14 @@ CapsuleCollider2D:
     m_Bits: 4294967295
   m_IsTrigger: 0
   m_UsedByEffector: 0
-  m_UsedByComposite: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
   m_Offset: {x: -0.034508646, y: 0}
   m_Size: {x: 0.5690173, y: 1}
   m_Direction: 0
 --- !u!50 &4829226237746944222
 Rigidbody2D:
-  serializedVersion: 4
+  serializedVersion: 5
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -261,8 +290,8 @@ Rigidbody2D:
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
   m_Mass: 1
-  m_LinearDrag: 0
-  m_AngularDrag: 0.05
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
   m_GravityScale: 0
   m_Material: {fileID: 0}
   m_IncludeLayers:
@@ -275,3 +304,16 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
+--- !u!114 &5219809287825959763
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1354463150124662322}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b7ba8308aff449a478c441a96611108f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game.Items::Game.Items.ItemSpawner
+  itemTableKey: 

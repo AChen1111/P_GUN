@@ -16,24 +16,24 @@ MonoBehaviour:
   - itemId: 1
     itemName: "\u5FC3"
     description: "\u56DE\u590D\u4E00\u70B9\u751F\u547D\u503C."
-    icon: {fileID: 872467033, guid: bf817939e9a0a3241b3cf68a375367e7, type: 3}
+    iconKey: Potion_Round_Red
   - itemId: 2
     itemName: "\u5947\u7279\u7684\u836F\u6C34"
     description: "\u83B7\u53D6\u5947\u7279\u7684\u6548\u679C"
-    icon: {fileID: 747178361, guid: bf817939e9a0a3241b3cf68a375367e7, type: 3}
+    iconKey: Potion_Round_Purple
   - itemId: 3
     itemName: "\u52A0\u901F\u836F\u6C34"
     description: "\u52A0\u901F"
-    icon: {fileID: -19087736, guid: bf817939e9a0a3241b3cf68a375367e7, type: 3}
+    iconKey: Potion_Round_Blue
   - itemId: 4
     itemName: "\u589E\u4F24\u836F\u6C34"
     description: "\u589E\u52A0\u4F24\u5BB3"
-    icon: {fileID: -1427955363, guid: bf817939e9a0a3241b3cf68a375367e7, type: 3}
+    iconKey: Potion_Round_Teal
   - itemId: 5
     itemName: "\u51C0\u5316\u836F\u6C34"
     description: "\u79FB\u9664\u6240\u6709\u8D1F\u9762Buff"
-    icon: {fileID: 235883239, guid: bf817939e9a0a3241b3cf68a375367e7, type: 3}
+    iconKey: Potion_Tall_Magenta
   - itemId: 6
     itemName: "\u5FC3"
     description: "\u589E\u52A0\u4E00\u70B9\u751F\u547D\u4E0A\u9650"
-    icon: {fileID: 21300000, guid: 60320bc3c57e8b34f9b7b300e7dc6601, type: 3}
+    iconKey: heart_full

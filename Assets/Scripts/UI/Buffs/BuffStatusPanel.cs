@@ -1,3 +1,4 @@
+using UnityEngine.Serialization;
 using System.Collections.Generic;
 using Game.Core;
 using Game.Gameplay;
@@ -8,7 +9,9 @@ namespace Game.UI
     public class BuffStatusPanel : MonoBehaviour
     {
         [Header("Buff 状态配置")]
-        [SerializeField] private BuffStatusIcon iconPrefab;
+        // 配置保存短名, 资源来自阶段预加载缓存.
+        [SerializeField, AddressableKey(AddressableAssetKind.Prefab)] public string iconPrefabKey = string.Empty;
+        private BuffStatusIcon iconPrefab => AddressableAssetAccess.Component<BuffStatusIcon>(iconPrefabKey);
         [SerializeField] private Transform iconRoot;
         [SerializeField] private BuffTooltipPanel tooltipPanel;
 

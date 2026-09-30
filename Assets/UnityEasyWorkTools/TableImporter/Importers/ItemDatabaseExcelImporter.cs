@@ -14,7 +14,7 @@ public sealed class ItemDatabaseExcelImporter : Excel2SoListAssetImporter<ItemDa
         map.Column("itemId").To("itemId").AsInt();
         map.Column("itemName").To("itemName").AsString();
         map.Column("description").To("description").AsString();
-        map.Column("icon").To("icon").AsAsset<Sprite>();
+        AddressableImportKeys.Map<Sprite>(map, "icon", "iconKey");
     }
 
     protected override void OnAfterImportAsset(ItemDatabase asset, ExcelTable table, Excel2SoImportReport report)

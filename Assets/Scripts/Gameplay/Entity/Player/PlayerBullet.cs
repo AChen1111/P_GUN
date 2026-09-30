@@ -87,7 +87,7 @@ namespace Game.Gameplay
 
             void StopMove()
             {
-                rb.velocity = Vector2.zero;
+                rb.linearVelocity = Vector2.zero;
             }
 }
 
@@ -112,7 +112,7 @@ namespace Game.Gameplay
         ///固定更新
         ///</summary>
         private void FixedUpdate() {
-            rb.velocity = dir * speed;
+            rb.linearVelocity = dir * speed;
         }
 
 

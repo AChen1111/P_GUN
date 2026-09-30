@@ -22,7 +22,19 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels:
     - enemy
+    - hot_update
     - prefab
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 10e246e394d07ef4ea3fe43c6de534c0
+    m_Address: Assets/Prefab/Bullet/EnemyBullet.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 247c3d9a01e9b434899f18098abe4547
+    m_Address: Assets/Audio/SFX/Enemy/EnemyShoot3.wav
+    m_ReadOnly: 0
+    m_SerializedLabels:
     - hot_update
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 35827546b14bc8d48a139f245049f973
@@ -30,7 +42,19 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels:
     - enemy
+    - hot_update
     - prefab
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4ce72a5102c96ac449defd59e5a058c4
+    m_Address: Assets/Audio/SFX/Enemy/EnemyShoot2.wav
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 51b9ce51afd7dbb488f5c37c4797e0d6
+    m_Address: Assets/Prefab/Enemy/Big_enemy.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
     - hot_update
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 5997eda64fd4b9e46ab562272521a078
@@ -38,40 +62,40 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels:
     - enemy
-    - prefab
     - hot_update
+    - prefab
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 62bf63f566fb06a44a78f17618a6b6cf
     m_Address: enemy/slime
     m_ReadOnly: 0
     m_SerializedLabels:
     - enemy
-    - prefab
     - hot_update
+    - prefab
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 66cab04fd3d095d43a8c1ea2eae2f77d
     m_Address: enemy/goblin
     m_ReadOnly: 0
     m_SerializedLabels:
     - enemy
-    - prefab
     - hot_update
+    - prefab
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 73085d0d90bddfc47afdd98cf9f84cd6
     m_Address: enemy/ogre
     m_ReadOnly: 0
     m_SerializedLabels:
     - enemy
-    - prefab
     - hot_update
+    - prefab
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: b78964bc8875e5142a36b88e05a23ac0
     m_Address: enemy/orc_warrior
     m_ReadOnly: 0
     m_SerializedLabels:
     - enemy
-    - prefab
     - hot_update
+    - prefab
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: c42c8260bc4f449588c588d697b5211e
     m_Address: EnemyDatabase
@@ -86,7 +110,19 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels:
     - enemy
+    - hot_update
     - prefab
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d13631114fea6f5448596d7d0280467f
+    m_Address: Assets/Prefab/Bullet/EnemyBuffBullet.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d6a1e1dba80eb484386bf50f97ec2560
+    m_Address: Assets/Audio/SFX/Enemy/EnemyShoot1.wav
+    m_ReadOnly: 0
+    m_SerializedLabels:
     - hot_update
     FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0

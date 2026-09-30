@@ -1,3 +1,4 @@
+using UnityEngine.Serialization;
 using UnityEngine;
 using QFramework;
 using Game.Core;
@@ -11,7 +12,9 @@ namespace Game.Gameplay
     public class ShotGun : Gun
     {
         public SpriteRenderer SR;
-        public PlayerBullet PlayerBullet;
+        // 配置保存短名, 资源来自阶段预加载缓存.
+        [SerializeField, AddressableKey(AddressableAssetKind.Prefab)] public string PlayerBulletKey = string.Empty;
+        public PlayerBullet PlayerBullet => AddressableAssetAccess.Component<PlayerBullet>(PlayerBulletKey);
         public UnityEngine.AudioSource SelfAudioSource;
 
         public override PlayerBullet BulletPrefab => PlayerBullet;

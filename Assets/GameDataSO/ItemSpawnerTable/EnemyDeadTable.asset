@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: EnemyDeadTable
   m_EditorClassIdentifier: 
   entries:
-  - prefab: {fileID: 5069590999830702722, guid: 0d97b75cf6914479889ba297b299cc12, type: 3}
+  - prefabKey: Purify
     weight: 1
     spawnAnimEffect: 2
     spawnAnimDuration: 1.5

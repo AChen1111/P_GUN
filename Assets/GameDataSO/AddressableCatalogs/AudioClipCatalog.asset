@@ -1,0 +1,431 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c65dd8a50498c4140a77cfa345b2abc1, type: 3}
+  m_Name: AudioClipCatalog
+  m_EditorClassIdentifier: Game.Core::Game.Core.AddressableCatalog
+  kind: 3
+  entries:
+  - key: AKShootEnd
+    reference:
+      m_AssetGUID: 1e108a665f3ec78488b43fa3772b48b3
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+    - shared
+  - key: BulletHitBody01
+    reference:
+      m_AssetGUID: 5910836691605a847a7138b387ed0bb8
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+    - shared
+  - key: BulletHitBody03
+    reference:
+      m_AssetGUID: 95b2f6eb055766443ae1f8c9e647b3c2
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+    - shared
+  - key: BulletHitWall01
+    reference:
+      m_AssetGUID: b2dbfa8029e7085438df38aa4fb76b78
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+    - shared
+  - key: BulletHitBody02
+    reference:
+      m_AssetGUID: f968faf5cbe8f1049a54591745eac144
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+    - shared
+  - key: AKShooting
+    reference:
+      m_AssetGUID: 98ed46cee309cdd44a4b35d7a853b8cd
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: AWPShoot
+    reference:
+      m_AssetGUID: f38bbc0189220d24887634fb48b72bdf
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: BowShoot1
+    reference:
+      m_AssetGUID: 34f8cb3e29ce529458352e5bd3fe3141
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: BowShoot2
+    reference:
+      m_AssetGUID: 50b915a22dcd4244cb10082d3fd93846
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: BowShoot3
+    reference:
+      m_AssetGUID: 37eeb2ef0c716824c924f5c9dafcd444
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: BowShoot4
+    reference:
+      m_AssetGUID: 8323f9b267d5f95459ff77cb7de1fad7
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: BowShoot5
+    reference:
+      m_AssetGUID: 664dd2e9448910c47b2cc26e261fd5f2
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: BowShoot6
+    reference:
+      m_AssetGUID: 58508dbb4ef4e18478c3c64634e0667a
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: BowShoot7
+    reference:
+      m_AssetGUID: 982334509bf96f549acadf7a5627f7c9
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: BowShoot8
+    reference:
+      m_AssetGUID: 8024fdb37d66f634c85e57499069b28d
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: LaserShoot
+    reference:
+      m_AssetGUID: dd3d170db2ba52f4ab2916ee2d37da13
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: MP5Shoot
+    reference:
+      m_AssetGUID: 7f5ebb3ad6679da4793726201cea6868
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: PistolShoot1
+    reference:
+      m_AssetGUID: 38a5caf6a3bd4324dbe2fbf779720caf
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: PistolShoot2
+    reference:
+      m_AssetGUID: 1e3302f441835cb4ba46ceb235f3180a
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: PistolShoot3
+    reference:
+      m_AssetGUID: df89cef0e87e61a4889501976dc3edc4
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: RocketGunShoot1
+    reference:
+      m_AssetGUID: 95a6a9ff9d3fe504b8e58db76ee90a4d
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: RocketGunShoot2
+    reference:
+      m_AssetGUID: 28c92310ee1990f46ac1304dadb37c7b
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: ShotGun1
+    reference:
+      m_AssetGUID: 2cc471f384c90af4f8e0e063fe6c0ddf
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: ShotGun2
+    reference:
+      m_AssetGUID: 8782fb9d1e84d5c46bc9e257fb1b99b9
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: ShotGun3
+    reference:
+      m_AssetGUID: 6d8e4595e1d5ac44faf8f72551d23276
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: DoorOpen
+    reference:
+      m_AssetGUID: 3595009b13b4b404ca739c3ce80ab7fd
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: EnemyShoot1
+    reference:
+      m_AssetGUID: d6a1e1dba80eb484386bf50f97ec2560
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: EnemyShoot2
+    reference:
+      m_AssetGUID: 4ce72a5102c96ac449defd59e5a058c4
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: EnemyShoot3
+    reference:
+      m_AssetGUID: 247c3d9a01e9b434899f18098abe4547
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: BulletHitWall02
+    reference:
+      m_AssetGUID: 0307d9bcd8d1f984aad6690168e6e390
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: BulletHitWall03
+    reference:
+      m_AssetGUID: 1278784ae907ba54386d676c440244af
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: BulletHitWall04
+    reference:
+      m_AssetGUID: 92f1dce4686c87b4e97533920e9b48c3
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: AK47Reload
+    reference:
+      m_AssetGUID: e83829ac711cc4b46887d2c2030cf5d8
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: AWPLaserReload
+    reference:
+      m_AssetGUID: 09f63d32f8a42f742b15ae6198b3c400
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: BowReload
+    reference:
+      m_AssetGUID: 70c6ba4eb93b17d4a9ce83cfb26c281f
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: MP5Reload
+    reference:
+      m_AssetGUID: 14adb12de103ab64582403089e31a746
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: PistolReload
+    reference:
+      m_AssetGUID: 322a3dede8105894a8588a6e24b001b8
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: ShotGunRocketReload
+    reference:
+      m_AssetGUID: d4ce39efc317eb845a6d13ff273a5a31
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: Menu_
+    reference:
+      m_AssetGUID: f8173cc7bc88cd247821d6465f5e9964
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: Fantasy_Wizard_Dragon
+    reference:
+      m_AssetGUID: 2d9b1824d200cea4cb091a2acfae9eed
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: sad_game_over
+    reference:
+      m_AssetGUID: 77caf2b882d6b964eac0fd11d2c01175
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update

@@ -1,0 +1,79 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: UI
+  m_EditorClassIdentifier: Unity.Addressables.Editor::UnityEditor.AddressableAssets.Settings.AddressableAssetGroup
+  m_GroupName: UI
+  m_Data:
+    m_SerializedData: []
+  m_GUID: 1e228909b99718c43923338c2dfb5283
+  m_SerializeEntries:
+  - m_GUID: 06837c4dd5d83de41b40d3f06f730308
+    m_Address: Assets/Prefab/UI/Save/SaveSlotItem.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1d68049c6df2cee49b67b42cea633a5f
+    m_Address: Assets/Prefab/UI/GeneratedTemplates/Laser_PlayerBullet.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5c0488210f8a4ba49a1a0033233204fa
+    m_Address: Assets/Prefab/UI/PlayerHeart/heart_half.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 60320bc3c57e8b34f9b7b300e7dc6601
+    m_Address: Assets/Prefab/UI/PlayerHeart/heart_full.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 63770e420f842664f9442791ca8f0550
+    m_Address: Assets/Prefab/UI/PlayerHeart/Heart.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 907ff7520642e854683c776ebb377032
+    m_Address: Assets/Prefab/UI/Inventory/InventorySlot.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a4ee411b70b775247a7675cd6341f81e
+    m_Address: Assets/Prefab/UI/PlayerHeart/HeartRow.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e9e10e27531cef6418454ca0c1cfb72d
+    m_Address: Assets/Prefab/UI/PlayerHeart/heart_empty.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f7e2d29c73394f50bbf9bbdba9e8982e
+    m_Address: Assets/Prefab/UI/Buff/BuffStatusIcon.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 63af2ccf367b1c745b05c3dc480c23af, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: b579b0c3dcd6181478645d80899a01e9, type: 2}
+    - {fileID: 11400000, guid: d8d96a303d76f664c8fbb63e8a3d7752, type: 2}

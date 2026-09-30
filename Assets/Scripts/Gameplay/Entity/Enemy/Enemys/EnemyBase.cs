@@ -1,3 +1,4 @@
+using UnityEngine.Serialization;
 using System;
 using UnityEngine;
 using QFramework;
@@ -58,7 +59,9 @@ namespace Game.Gameplay
         [SerializeField] private int hurtFlashLoops = 4;
 
         [Header("伤害数字")]
-        [SerializeField] private DamageText damageTextPrefab;
+        // 配置保存短名, 资源来自阶段预加载缓存.
+        [SerializeField, AddressableKey(AddressableAssetKind.Prefab)] public string damageTextPrefabKey = string.Empty;
+        private DamageText damageTextPrefab => AddressableAssetAccess.Component<DamageText>(damageTextPrefabKey);
         [SerializeField] private Vector3 damageTextOffset = new Vector3(0f, 0.6f, 0f);
 
         [Header("死亡回收")]
@@ -395,7 +398,7 @@ namespace Game.Gameplay
         }
         protected void StopMove() {
             if(rb != null) {
-                rb.velocity = Vector2.zero;
+                rb.linearVelocity = Vector2.zero;
             }
         }
         /// <summary>
@@ -444,7 +447,7 @@ namespace Game.Gameplay
             }
 
             if(rb != null) {
-                rb.velocity = direction * MoveSpeed * EnemyTimeScale;
+                rb.linearVelocity = direction * MoveSpeed * EnemyTimeScale;
             }
 
             SetAnimatorSpeed(MoveSpeed);

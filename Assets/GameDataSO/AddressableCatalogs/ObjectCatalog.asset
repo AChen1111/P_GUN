@@ -1,0 +1,71 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c65dd8a50498c4140a77cfa345b2abc1, type: 3}
+  m_Name: ObjectCatalog
+  m_EditorClassIdentifier: Game.Core::Game.Core.AddressableCatalog
+  kind: 6
+  entries:
+  - key: AudioMixer
+    reference:
+      m_AssetGUID: 569809b44565dc442ba3ee727965ff13
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+    - shared
+  - key: SpriteLitDefaultMaterial
+    reference:
+      m_AssetGUID: a97c105638bdf8b4a8650670310a4cd3
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+    - shared
+  - key: VonwaonBitmap-16px
+    reference:
+      m_AssetGUID: aa945eefd1047034399d2d189e498e7c
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+    - shared
+  - key: LazerM
+    reference:
+      m_AssetGUID: e03d6ca3ecc84a24882f6d129b3049cc
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+    - shared
+  - key: SpriteLitDefaultShader
+    reference:
+      m_AssetGUID: e260cfa7296ee7642b167f1eb5be5023
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+    - shared

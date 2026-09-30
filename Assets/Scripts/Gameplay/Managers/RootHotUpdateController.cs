@@ -59,13 +59,18 @@ namespace Game.Gameplay
             SetProgress(0f);
             await InitializeAddressablesAsync();
             await TryUpdateRemoteContentAsync();
+            SetStatus("初始化资源目录...");
+            await AddressableLoader.Instance.InitializeAsync();
+            await AddressableLoader.Instance.PreloadAsync("RootPreload");
             SetStatus("应用本地音频设置...");
             await ApplySavedAudioSettingsAsync();
             SetStatus("应用热修补丁...");
             await StartupHotfixRuntime.ExecuteStartupHotfixAsync();
+            SetStatus("初始化数据库...");
+            await DataBaseManager.Instance.EnsureLoadedAsync();
             SetStatus("进入主菜单...");
             SetProgress(1f);
-            SceneManager.LoadScene(nextSceneName);
+            await AddressableLoader.Instance.LoadSceneAsync(nextSceneName);
         }
 
         /// <summary>
@@ -150,7 +155,7 @@ namespace Game.Gameplay
                 throw new InvalidOperationException($"{nameof(AddressableLoader)} must exist before applying audio settings.");
             }
 
-            AudioMixer audioMixer = await loader.LoadAssetAsync<AudioMixer>(GameAudioSettingsStore.AudioMixerAddress);
+            AudioMixer audioMixer = await loader.LoadAssetAsync<AudioMixer>(GameAudioSettingsStore.AudioMixerKey);
             GameAudioSettingsStore.Apply(audioMixer);
         }
 

@@ -35,6 +35,7 @@ Transform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &4322138692861771031
 SpriteRenderer:
+  serializedVersion: 2
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -50,6 +51,11 @@ SpriteRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -71,9 +77,11 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 1
+  m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: c4f5774d1bbe5a04a9d2630a39f0abfc, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -83,7 +91,6 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
-  m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!114 &7770793679963236443
 MonoBehaviour:
@@ -148,6 +155,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 374010033509238546, guid: 569809b44565dc442ba3ee727965ff13, type: 2}
   m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
@@ -248,8 +256,6 @@ MonoBehaviour:
   Binds:
   - MemberName: SelfAudioSource
     Object: {fileID: 6788132863477469686}
-  - MemberName: AKShootEnd
-    Object: {fileID: 8300000, guid: 1e108a665f3ec78488b43fa3772b48b3, type: 3}
 --- !u!114 &8293612997416178283
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -270,11 +276,8 @@ MonoBehaviour:
   ArchitectureFullTypeName: 
   ViewControllerFullTypeName: 
   weaponId: AK
-  weaponDatabase: {fileID: 11400000, guid: 6d6e0a3a98503714c899e24a2384c459, type: 2}
-  shootSounds:
-  - {fileID: 8300000, guid: 98ed46cee309cdd44a4b35d7a853b8cd, type: 3}
+  weaponDatabaseKey: WeaponDatabase
   firePoint: {fileID: 7052560199138315782}
-  ReloadSound: {fileID: 8300000, guid: e83829ac711cc4b46887d2c2030cf5d8, type: 3}
   MinDamage: 0
   MaxDamage: 0
   MaxBulletBagNum: 0
@@ -282,9 +285,9 @@ MonoBehaviour:
   shootInterval: 0
   bulletSpeed: 0
   SR: {fileID: 4322138692861771031}
-  PlayerBullet: {fileID: 8883869366757948090, guid: 576871a843cdcfa4facd211562818436, type: 3}
+  PlayerBulletKey: PlayerBullet
   SelfAudioSource: {fileID: 6788132863477469686}
-  AKShootEnd: {fileID: 8300000, guid: 1e108a665f3ec78488b43fa3772b48b3, type: 3}
+  AKShootEndKey: AKShootEnd
 --- !u!1 &9074132046847884278
 GameObject:
   m_ObjectHideFlags: 0

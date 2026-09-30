@@ -1,3 +1,4 @@
+using UnityEngine.Serialization;
 using System.Collections;
 using System.Collections.Generic;
 using Game.Core;
@@ -19,7 +20,9 @@ namespace Game.UI
         private const float UseBlockedRiseDistance = 18f;
 
         [Header("物品列表")]
-        [SerializeField] private InventorySlotView slotPrefab;
+        // 配置保存短名, 资源来自阶段预加载缓存.
+        [SerializeField, AddressableKey(AddressableAssetKind.Prefab)] public string slotPrefabKey = string.Empty;
+        private InventorySlotView slotPrefab => AddressableAssetAccess.Component<InventorySlotView>(slotPrefabKey);
         [SerializeField] private Transform slotRoot;
 
         [Header("使用提示")]

@@ -13,4 +13,3 @@ MonoBehaviour:
   m_Name: HealItemEffect
   m_EditorClassIdentifier: 
   healAmount: 1
-  maxHp: 3

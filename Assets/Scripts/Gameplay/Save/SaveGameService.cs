@@ -1,3 +1,4 @@
+using Game.Core;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -13,7 +14,9 @@ namespace Game.Gameplay.Save
     public static class SaveGameService
     {
         public const int SlotCount = 3;
-        internal const int SaveVersion = 1;
+        public const int SaveVersion = 2;
+        // 旧存档包含完整资源地址, 本版本只允许短名 key 存档.
+        public static bool IsCompatibleVersion(int version) => version == SaveVersion;
         internal const string GameplaySceneName = "GameScene";
 
         private static GameSaveData pendingLoadData;
@@ -65,9 +68,12 @@ namespace Game.Gameplay.Save
                 return SaveOperationResult.Fail("读取失败, 槽位为空.");
             }
 
+            if (!IsCompatibleVersion(data.version)) return SaveOperationResult.Fail("存档版本不兼容, 请使用新版本重新保存.");
+            if (AddressableLoader.Instance.IsSceneTransitioning) return SaveOperationResult.Fail("场景正在加载.");
             await EnsureDatabasesLoadedAsync();
             pendingLoadData = data;
-            SceneManager.LoadScene(GameplaySceneName);
+            // 游戏内读档也必须重建场景, 使种子和关卡 key 在生成前生效.
+            await AddressableLoader.Instance.ReloadSceneAsync(GameplaySceneName);
             return SaveOperationResult.Ok("正在进入游戏场景并恢复存档.", data);
         }
 
@@ -98,7 +104,7 @@ namespace Game.Gameplay.Save
             }
 
             // 生成前写入存档中的地图配方, 确保 Edgar 重建同一张地图.
-            bootstrapper?.OverrideLevelGraphAddress(pendingLoadData.levelGraphAddress);
+            bootstrapper?.OverrideLevelGraphKey(pendingLoadData.levelGraphKey);
             dungeonGenerator.UseRandomSeed = false;
             dungeonGenerator.RandomGeneratorSeed = pendingLoadData.mapSeed;
         }

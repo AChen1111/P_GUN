@@ -1,3 +1,4 @@
+using UnityEngine.Serialization;
 using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
@@ -14,10 +15,18 @@ namespace Game.UI
     public class HpSlider : MonoBehaviour
     {
         [Header("预制体与贴图")]
-        public GameObject HpPrefab;
-        public Sprite heartFull;
-        public Sprite heartHalf;
-        public Sprite heartEmpty;
+        // 配置保存短名, 资源来自阶段预加载缓存.
+        [SerializeField, AddressableKey(AddressableAssetKind.Prefab)] public string HpPrefabKey = string.Empty;
+        public GameObject HpPrefab => AddressableAssetAccess.Get<GameObject>(HpPrefabKey);
+        // 配置保存短名, 资源来自阶段预加载缓存.
+        [SerializeField, AddressableKey(AddressableAssetKind.Sprite)] public string heartFullKey = string.Empty;
+        public Sprite heartFull => AddressableAssetAccess.Get<Sprite>(heartFullKey);
+        // 配置保存短名, 资源来自阶段预加载缓存.
+        [SerializeField, AddressableKey(AddressableAssetKind.Sprite)] public string heartHalfKey = string.Empty;
+        public Sprite heartHalf => AddressableAssetAccess.Get<Sprite>(heartHalfKey);
+        // 配置保存短名, 资源来自阶段预加载缓存.
+        [SerializeField, AddressableKey(AddressableAssetKind.Sprite)] public string heartEmptyKey = string.Empty;
+        public Sprite heartEmpty => AddressableAssetAccess.Get<Sprite>(heartEmptyKey);
 
         [Header("布局")]
         [Tooltip("每行最大 heart 数，超出后自动换行。")]
@@ -25,7 +34,9 @@ namespace Game.UI
         [Tooltip("所有 heart 的统一缩放。")]
         public float heartScale = 1f;
         [Tooltip("行节点模板（可选）。为空时自动创建带 HorizontalLayoutGroup 的行节点。")]
-        public Transform LineTransform;
+        // 配置保存短名, 资源来自阶段预加载缓存.
+        [SerializeField, AddressableKey(AddressableAssetKind.Prefab)] public string LineTransformKey = string.Empty;
+        public Transform LineTransform => AddressableAssetAccess.Component<Transform>(LineTransformKey);
 
         [Header("初始化动画")]
         [Tooltip("初始化动画固定总时长（秒）。小于等于 0 时直接显示最终血量。")]
@@ -521,9 +532,7 @@ namespace Game.UI
                 }
                 else
                 {
-                    var rowGo = new GameObject($"HPRow_{_rows.Count}", typeof(RectTransform), typeof(HorizontalLayoutGroup));
-                    row = rowGo.transform;
-                    row.SetParent(transform, false);
+                    throw new System.InvalidOperationException("HpSlider requires a preloaded row prefab key.");
                 }
 
                 EnsureRowKeepsHeartSize(row);

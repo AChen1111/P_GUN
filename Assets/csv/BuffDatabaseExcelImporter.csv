@@ -1,5 +1,5 @@
-﻿id,buffName,icon,description,tag,luaFile,duration,isPermanent,interval
-0,SpeedUpBuff,Assets/Malicious_statusiconset1/escape icon.png,移动速度提升40%.1111,Positive,Assets/Scripts/Gameplay/Buffs/Buff/SpeedBuff.lua.txt,5,FALSE,1
-1,PowerUpBuff,Assets/Malicious_statusiconset1/attack icon.png,子弹伤害提升50%.,Positive,Assets/Scripts/Gameplay/Buffs/Buff/DamageUpBuff.lua.txt,5,FALSE,1
-2,MaxHpUpBuff,Assets/Malicious_statusiconset1/buff icon.png,最大生命值提升2点,Positive,Assets/Scripts/Gameplay/Buffs/Buff/MaxHpUpBuff.lua.txt,0,TRUE,1
-3,PoisonBuff,Assets/Malicious_statusiconset1/confusion icon.png,永久中毒: 每隔5秒每层受到1点伤害,Negative,Assets/Scripts/Gameplay/Buffs/Buff/PoisonBuff.lua.txt,0,TRUE,10
+id,buffName,icon,description,tag,luaFile,duration,isPermanent,interval
+0,SpeedUpBuff,escape icon,移动速度提升40%.1111,Positive,SpeedBuff,5,FALSE,1
+1,PowerUpBuff,attack icon,子弹伤害提升50%.,Positive,DamageUpBuff,5,FALSE,1
+2,MaxHpUpBuff,buff icon,最大生命值提升2点,Positive,MaxHpUpBuff,0,TRUE,1
+3,PoisonBuff,confusion icon,永久中毒: 每隔5秒每层受到1点伤害,Negative,PoisonBuff,0,TRUE,10
