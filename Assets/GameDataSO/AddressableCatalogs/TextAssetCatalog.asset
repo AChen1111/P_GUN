@@ -38,67 +38,9 @@ MonoBehaviour:
     - hotfix
     - lua
     - hot_update
-  - key: SpeedBuff
+  - key: LuaBundle
     reference:
-      m_AssetGUID: 648678a33bef4bec9cd2e901e934f017
-      m_SubObjectName: 
-      m_SubObjectType: 
-      m_EditorAssetChanged: 0
-    preloadManifestKey: 
-    luaModulePath: 
-    labels:
-    - buff
-    - lua
-    - hot_update
-  - key: MaxHpUpBuff
-    reference:
-      m_AssetGUID: 87662b07a2474434950e657708d1bada
-      m_SubObjectName: 
-      m_SubObjectType: 
-      m_EditorAssetChanged: 0
-    preloadManifestKey: 
-    luaModulePath: 
-    labels:
-    - buff
-    - lua
-    - hot_update
-  - key: PoisonBuff
-    reference:
-      m_AssetGUID: 921073a9ab0a469886c62babb3cfbd9c
-      m_SubObjectName: 
-      m_SubObjectType: 
-      m_EditorAssetChanged: 0
-    preloadManifestKey: 
-    luaModulePath: 
-    labels:
-    - buff
-    - lua
-    - hot_update
-  - key: DamageUpBuff
-    reference:
-      m_AssetGUID: bfef84428f614290a92f0716f6fd7171
-      m_SubObjectName: 
-      m_SubObjectType: 
-      m_EditorAssetChanged: 0
-    preloadManifestKey: 
-    luaModulePath: 
-    labels:
-    - buff
-    - lua
-    - hot_update
-  - key: ChestEffect
-    reference:
-      m_AssetGUID: 76f11a329f7cb7b4695cbe30df24940a
-      m_SubObjectName: 
-      m_SubObjectType: 
-      m_EditorAssetChanged: 0
-    preloadManifestKey: 
-    luaModulePath: 
-    labels:
-    - hot_update
-  - key: HelloItemEffect
-    reference:
-      m_AssetGUID: f33a2f122076c3546a3f9e073573c04e
+      m_AssetGUID: 4e7c85e857368184e95fce43b742c1a4
       m_SubObjectName: 
       m_SubObjectType: 
       m_EditorAssetChanged: 0

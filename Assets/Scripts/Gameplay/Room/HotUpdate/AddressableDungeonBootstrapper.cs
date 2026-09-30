@@ -97,7 +97,7 @@ namespace Game.Gameplay
                     throw new InvalidOperationException($"{nameof(AddressableDungeonBootstrapper)} requires {nameof(DungeonGeneratorGrid2D)}.");
                 }
 
-                SaveGameService.ApplyPendingGenerationSettings(this, dungeonGenerator);
+                // 随机房间生成已改走 RandomRoomGenerator; 这条 Edgar 入口仅保留生成能力, 不再按存档重建地图.
                 await ApplyAddressableLevelGraphAsync();
                 var fixedGraphSettings = dungeonGenerator.FixedLevelGraphConfig;
                 if (fixedGraphSettings.LevelGraph == null)

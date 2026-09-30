@@ -11,5 +11,19 @@ namespace Game.Gameplay
         public static readonly GameEventId<RoomWaveDisplayEvent> RoomWaveDisplayChanged = new GameEventId<RoomWaveDisplayEvent>(nameof(RoomWaveDisplayChanged));
         public static readonly GameEventId<Door> DoorOpened = new GameEventId<Door>(nameof(DoorOpened));
         public static readonly GameEventId<Door> DoorClosed = new GameEventId<Door>(nameof(DoorClosed));
+        public static readonly GameEventId<EnemyDefeatedEvent> EnemyDefeated = new GameEventId<EnemyDefeatedEvent>(nameof(EnemyDefeated));
+    }
+
+    /// <summary>
+    /// 敌人被击杀的事件载荷, 供吸血和屠戮类 Buff 回调使用.
+    /// </summary>
+    public class EnemyDefeatedEvent
+    {
+        public EnemyDefeatedEvent(EnemyBase enemy)
+        {
+            Enemy = enemy;
+        }
+
+        public EnemyBase Enemy { get; }
     }
 }

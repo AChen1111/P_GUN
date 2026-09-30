@@ -76,6 +76,8 @@ MonoBehaviour:
   itemSpawner: {fileID: 0}
   OwnerFightRoom: {fileID: 0}
   audioPlay: {fileID: 0}
+  attackAngle: 120
+  attackRange: 6
   bulletPrefabKey: 
   shootSoundsKeys:
   - EnemyShoot1
@@ -316,4 +318,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b7ba8308aff449a478c441a96611108f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Game.Items::Game.Items.ItemSpawner
-  itemTableKey: 
+  dropTableId: normal_default

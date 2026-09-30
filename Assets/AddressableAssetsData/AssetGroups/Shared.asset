@@ -57,14 +57,14 @@ MonoBehaviour:
     m_SerializedLabels:
     - hot_update
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 1303efc9353781040b963f0e6dbc5a55
-    m_Address: Assets/Malicious_statusiconset1/escape icon.png
+  - m_GUID: 14adb12de103ab64582403089e31a746
+    m_Address: Assets/Audio/SFX/Player/Gun/ReloadSFX/MP5Reload.wav
     m_ReadOnly: 0
     m_SerializedLabels:
     - hot_update
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 14adb12de103ab64582403089e31a746
-    m_Address: Assets/Audio/SFX/Player/Gun/ReloadSFX/MP5Reload.wav
+  - m_GUID: 1d68049c6df2cee49b67b42cea633a5f
+    m_Address: Assets/Prefab/Bullet/Generated/Laser_PlayerBullet.prefab
     m_ReadOnly: 0
     m_SerializedLabels:
     - hot_update
@@ -157,8 +157,8 @@ MonoBehaviour:
     - hot_update
     - shared
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 481e164eb8e5b2044bbe4ee2451ad349
-    m_Address: Assets/Malicious_statusiconset1/buff icon.png
+  - m_GUID: 4e7c85e857368184e95fce43b742c1a4
+    m_Address: Assets/LuaBundles/LuaBundle.bytes
     m_ReadOnly: 0
     m_SerializedLabels:
     - hot_update
@@ -251,12 +251,6 @@ MonoBehaviour:
     - hot_update
     - shared
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 717c1661204c47848ae71e4b36b7424c
-    m_Address: Assets/Malicious_statusiconset1/confusion icon.png
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - hot_update
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 77caf2b882d6b964eac0fd11d2c01175
     m_Address: Assets/Audio/BGM/sad_game_over.wav
     m_ReadOnly: 0
@@ -294,6 +288,12 @@ MonoBehaviour:
     m_SerializedLabels:
     - hot_update
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8802fd4ae66197445b79a3d506a89900
+    m_Address: Assets/Prefab/Bullet/Generated/LuaGun_PlayerBullet.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 92f1dce4686c87b4e97533920e9b48c3
     m_Address: Assets/Audio/SFX/BulletHit/BulletHitWall04.wav
     m_ReadOnly: 0
@@ -312,12 +312,6 @@ MonoBehaviour:
     m_SerializedLabels:
     - hot_update
     - shared
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 9792280a23761574e820932cfc215f89
-    m_Address: Assets/Malicious_statusiconset1/attack icon.png
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - hot_update
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 982334509bf96f549acadf7a5627f7c9
     m_Address: Assets/Audio/SFX/Player/Gun/GunSFX/BowShoot7.wav

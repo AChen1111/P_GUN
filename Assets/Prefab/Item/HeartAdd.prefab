@@ -93,14 +93,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemId: 6
-  itemDatabaseKey: ItemDatabase
   iconRenderer: {fileID: 4449328502507190729}
   isActive: 1
   pickInBackBag: 0
-  effectsKeys:
-  - ApplyMaxHpUpBuff
-  - HealItemEffect
-  - HealItemEffect
   pickupAudioKey: 
   _dotweenAnimation: {fileID: 0}
   _animator: {fileID: 0}

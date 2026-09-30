@@ -64,10 +64,38 @@ public sealed class AddressableKeyTests
     {
         var manifest = AssetDatabase.LoadAssetAtPath<AddressablePreloadManifest>("Assets/GameDataSO/AddressablePreload/GameScenePreload.asset");
         var prefabs = manifest.resources.Where(r => r.kind == AddressableAssetKind.Prefab).Select(r => r.key).ToArray();
-        foreach (var key in new[] { "Player", "PlayerBullet", "AK", "Heart", "PlayerHeart", "InventorySlot", "BuffStatusIcon", "SaveSlotItem", "NormalRoom" })
+        foreach (var key in new[] { "Player", "PlayerBullet", "AK", "heal", "PlayerHeart", "InventorySlot", "BuffStatusIcon", "SaveSlotItem", "NormalRoom", "PoisonBehavior", "BuffCrystalModule", "Big_enemy" })
             CollectionAssert.Contains(prefabs, key);
         Assert.IsTrue(manifest.resources.Any(r => r.kind == AddressableAssetKind.AudioClip));
-        Assert.IsTrue(manifest.resources.Any(r => r.kind == AddressableAssetKind.TextAsset));
+        Assert.IsFalse(manifest.resources.Any(r => r.key == "ItemDatabase" || r.key == "BuffDataBase"));
+        var root = AssetDatabase.LoadAssetAtPath<AddressablePreloadManifest>("Assets/GameDataSO/AddressablePreload/RootPreload.asset");
+        Assert.IsTrue(root.resources.Any(r => r.kind == AddressableAssetKind.TextAsset && r.key == "LuaBundle"));
+    }
+
+    [Test]
+    public void LuaCsvKeysAreRegisteredAndIncludedInGameplayPreload()
+    {
+        var manifest = AssetDatabase.LoadAssetAtPath<AddressablePreloadManifest>("Assets/GameDataSO/AddressablePreload/GameScenePreload.asset");
+        foreach (var path in CSVToLuaTableImporter.SourcePaths)
+        {
+            var rows = CSVToLuaTableImporter.ReadCsv(Path.GetFullPath(path));
+            for (var column = 0; column < rows[0].Length; column++)
+                if (CSVToLuaTableImporter.ResourceColumns.TryGetValue(rows[0][column], out var kind))
+                    foreach (var row in rows.Skip(1))
+                        foreach (var key in row[column].Split(';').Where(value => !string.IsNullOrWhiteSpace(value)))
+                        {
+                            Assert.DoesNotThrow(() => CSVToLuaTableImporter.ValidateResourceKey(kind, key, path));
+                            Assert.IsTrue(manifest.resources.Any(resource => resource.kind == kind && resource.key == key), $"{path}: missing preload {kind}/{key}.");
+                        }
+        }
+    }
+
+    [Test]
+    public void LuaCsvResourceValidationRejectsPathsUnknownKeysAndWrongCategories()
+    {
+        Assert.Throws<InvalidOperationException>(() => CSVToLuaTableImporter.ValidateResourceKey(AddressableAssetKind.Prefab, "enemy/bat", "test"));
+        Assert.Throws<KeyNotFoundException>(() => CSVToLuaTableImporter.ValidateResourceKey(AddressableAssetKind.Prefab, "__missing_key__", "test"));
+        Assert.Throws<KeyNotFoundException>(() => CSVToLuaTableImporter.ValidateResourceKey(AddressableAssetKind.AudioClip, "Big_enemy", "test"));
     }
 
     [Test]

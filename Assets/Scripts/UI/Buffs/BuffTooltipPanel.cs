@@ -22,7 +22,13 @@ namespace Game.UI
         private void Awake()
         {
             ResolveReferences();
-            Hide();
+            // 场景中提示对象默认禁用; 首次 Show 激活时不能在 Awake 再关闭自身.
+            if (canvasGroup != null)
+            {
+                canvasGroup.alpha = 0f;
+                canvasGroup.interactable = false;
+                canvasGroup.blocksRaycasts = false;
+            }
         }
         private void Update()
         {
@@ -46,12 +52,12 @@ namespace Game.UI
 
             if (titleText != null)
             {
-                titleText.text = info.Buff.BuffName;
+                titleText.text = info.Config.Name;
             }
 
             if (descriptionText != null)
             {
-                descriptionText.text = info.Buff.Description;
+                descriptionText.text = info.Config.Description;
             }
 
             if (canvasGroup != null)
@@ -84,8 +90,13 @@ namespace Game.UI
                 return;
             }
 
-            // Tooltip 使用屏幕空间 Canvas, 直接跟随鼠标屏幕坐标.
-            rectTransform.position = screenPosition + screenOffset;
+            // GameUI 使用 Screen Space Camera, 先将屏幕坐标换算到父级 RectTransform 的局部坐标.
+            var parentRect = (RectTransform)rectTransform.parent;
+            var canvas = GetComponentInParent<Canvas>();
+            var eventCamera = canvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : canvas.worldCamera;
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                parentRect, screenPosition + screenOffset, eventCamera, out var localPoint);
+            rectTransform.position = parentRect.TransformPoint(localPoint);
         }
         private void ResolveReferences()
         {

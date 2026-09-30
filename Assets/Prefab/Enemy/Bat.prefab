@@ -159,18 +159,20 @@ MonoBehaviour:
   itemSpawner: {fileID: 7837503422260755806}
   OwnerFightRoom: {fileID: 0}
   audioPlay: {fileID: 3543157380447102985}
-  bulletPrefabKey: EnemyBuffBullet
+  attackAngle: 120
+  attackRange: 6
+  bulletPrefabKey: CurseBullet
   shootSoundsKeys:
   - EnemyShoot1
   - EnemyShoot2
   - EnemyShoot3
-  followBeforeAttackTime: 1.5
-  playerSafeDistance: 1
   attackShootDelay: 0.3
   attackLockDuration: 0.3
   bulletSpawnDistance: 0.5
   bulletCount: 5
-  bulletSpreadStepAngle: 2
+  bulletSpreadStepAngle: 10
+  followBeforeAttackTime: 1.5
+  playerSafeDistance: 1
 --- !u!50 &557012345000001002
 Rigidbody2D:
   serializedVersion: 5
@@ -232,8 +234,8 @@ CapsuleCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0.15376294, y: -0.41880214}
-  m_Size: {x: 1.8049109, y: 2.1965182}
+  m_Offset: {x: 0, y: 0}
+  m_Size: {x: 1.6, y: 1.6}
   m_Direction: 0
 --- !u!82 &557012345000001004
 AudioSource:
@@ -344,7 +346,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b7ba8308aff449a478c441a96611108f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  itemTableKey: BatTable
+  dropTableId: normal_default
 --- !u!114 &3543157380447102985
 MonoBehaviour:
   m_ObjectHideFlags: 0

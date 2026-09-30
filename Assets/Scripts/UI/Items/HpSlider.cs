@@ -16,15 +16,19 @@ namespace Game.UI
     {
         [Header("预制体与贴图")]
         // 配置保存短名, 资源来自阶段预加载缓存.
+
         [SerializeField, AddressableKey(AddressableAssetKind.Prefab)] public string HpPrefabKey = string.Empty;
         public GameObject HpPrefab => AddressableAssetAccess.Get<GameObject>(HpPrefabKey);
         // 配置保存短名, 资源来自阶段预加载缓存.
+
         [SerializeField, AddressableKey(AddressableAssetKind.Sprite)] public string heartFullKey = string.Empty;
         public Sprite heartFull => AddressableAssetAccess.Get<Sprite>(heartFullKey);
         // 配置保存短名, 资源来自阶段预加载缓存.
+
         [SerializeField, AddressableKey(AddressableAssetKind.Sprite)] public string heartHalfKey = string.Empty;
         public Sprite heartHalf => AddressableAssetAccess.Get<Sprite>(heartHalfKey);
         // 配置保存短名, 资源来自阶段预加载缓存.
+
         [SerializeField, AddressableKey(AddressableAssetKind.Sprite)] public string heartEmptyKey = string.Empty;
         public Sprite heartEmpty => AddressableAssetAccess.Get<Sprite>(heartEmptyKey);
 
@@ -35,6 +39,7 @@ namespace Game.UI
         public float heartScale = 1f;
         [Tooltip("行节点模板（可选）。为空时自动创建带 HorizontalLayoutGroup 的行节点。")]
         // 配置保存短名, 资源来自阶段预加载缓存.
+
         [SerializeField, AddressableKey(AddressableAssetKind.Prefab)] public string LineTransformKey = string.Empty;
         public Transform LineTransform => AddressableAssetAccess.Component<Transform>(LineTransformKey);
 

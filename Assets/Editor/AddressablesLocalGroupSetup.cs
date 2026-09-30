@@ -24,6 +24,8 @@ public static class AddressablesLocalGroupSetup
                 Entry("Assets/Prefab/Room/RoomTemplate/InitRoom.prefab", "room/init", "room", "room_template"),
                 Entry("Assets/Prefab/Room/RoomTemplate/NormalRoom.prefab", "room/normal", "room", "room_template"),
                 Entry("Assets/Prefab/Room/RoomTemplate/FinalRoom.prefab", "room/final", "room", "room_template"),
+                Entry("Assets/Prefab/Room/RoomTemplate/ChestRoom.prefab", "room/chest", "room", "room_template"),
+                Entry("Assets/Prefab/Room/RoomTemplate/SaveRoom.prefab", "room/save", "room", "room_template"),
                 Entry("Assets/Prefab/Room/CorridorTemplate/LRCorridor.prefab", "room/corridor_lr", "room", "corridor"),
                 Entry("Assets/Prefab/Room/CorridorTemplate/UDCorridor.prefab", "room/corridor_ud", "room", "corridor")
             }),
@@ -32,10 +34,12 @@ public static class AddressablesLocalGroupSetup
             new[]
             {
                 Entry("Assets/GameDataSO/DataBase/BuffDataBase.asset", "BuffDataBase", "buff", "database"),
-                Entry("Assets/Scripts/Gameplay/Buffs/Buff/SpeedBuff.lua.txt", "buff/lua/speed", "buff", "lua"),
-                Entry("Assets/Scripts/Gameplay/Buffs/Buff/MaxHpUpBuff.lua.txt", "buff/lua/max_hp", "buff", "lua"),
-                Entry("Assets/Scripts/Gameplay/Buffs/Buff/PoisonBuff.lua.txt", "buff/lua/poison", "buff", "lua"),
-                Entry("Assets/Scripts/Gameplay/Buffs/Buff/DamageUpBuff.lua.txt", "buff/lua/damage_up", "buff", "lua")
+                Entry("Assets/Prefab/BuffBehaviors/PoisonBehavior.prefab", "buff/poison_behavior", "buff", "prefab"),
+                Entry("Assets/Prefab/BuffBehaviors/FrenzyBehavior.prefab", "buff/frenzy_behavior", "buff", "prefab")
+
+
+
+
             }),
         new HotUpdateGroupDefinition(
             "Item",
@@ -60,7 +64,8 @@ public static class AddressablesLocalGroupSetup
                 Entry("Assets/Prefab/Enemy/Orc_Masked.prefab", "enemy/orc_masked", "enemy", "prefab"),
                 Entry("Assets/Prefab/Enemy/Orc_Shaman.prefab", "enemy/orc_shaman", "enemy", "prefab"),
                 Entry("Assets/Prefab/Enemy/Orc_Warrior.prefab", "enemy/orc_warrior", "enemy", "prefab"),
-                Entry("Assets/Prefab/Enemy/Slime.prefab", "enemy/slime", "enemy", "prefab")
+                Entry("Assets/Prefab/Enemy/Slime.prefab", "enemy/slime", "enemy", "prefab"),
+                Entry("Assets/Prefab/Enemy/Big_enemy.prefab", "enemy/big_enemy", "enemy", "prefab")
             }),
         new HotUpdateGroupDefinition(
             "Weapon",
@@ -81,6 +86,7 @@ public static class AddressablesLocalGroupSetup
             new[]
             {
                 // Shared 只放跨业务组重复依赖, 避免同一资源被多个 Bundle 各自打入.
+                Entry("Assets/LuaBundles/LuaBundle.bytes", "LuaBundle", "shared", "lua_bundle"),
                 Entry("Assets/Prefab/Player/Player.prefab", "shared/prefab/player/player", "shared", "player"),
                 Entry("Assets/GameDataSO/EnemySpawnTable/NormalRoomEnemySpawnTable.asset", "shared/gamedataso/enemyspawntable/normalroomenemyspawntable", "shared", "spawn_table"),
                 Entry("Assets/GameDataSO/ItemSpawnerTable/BatTable.asset", "shared/gamedataso/itemspawnertable/battable", "shared", "spawn_table"),

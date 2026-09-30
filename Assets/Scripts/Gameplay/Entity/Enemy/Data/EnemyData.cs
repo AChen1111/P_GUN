@@ -15,6 +15,7 @@ namespace Game.Gameplay
         public int enemyId;
         public string displayName;
         // 配置保存短名, 资源来自阶段预加载缓存.
+
         [SerializeField, AddressableKey(AddressableAssetKind.Prefab)] public string prefabKey;
         public EnemyBase prefab => AddressableAssetAccess.Component<EnemyBase>(prefabKey);
 

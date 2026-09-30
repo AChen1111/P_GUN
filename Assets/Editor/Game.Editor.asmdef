@@ -16,7 +16,8 @@
     "Edgar.Unity",
     "Game.UI",
     "Unity.ResourceManager",
-    "Game.Pooling"
+    "Game.Pooling",
+    "UnityEasyWorkTools.TableImporter.Importers.Editor"
   ],
   "includePlatforms": [
     "Editor"

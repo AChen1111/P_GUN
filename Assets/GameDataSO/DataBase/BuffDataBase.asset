@@ -18,7 +18,7 @@ MonoBehaviour:
     iconKey: escape icon
     description: "\u79FB\u52A8\u901F\u5EA6\u63D0\u534740%.1111"
     tag: 0
-    luaFileKey: SpeedBuff
+    luaFileKey: 
     duration: 5
     isPermanent: 0
     interval: 1
@@ -28,7 +28,7 @@ MonoBehaviour:
     iconKey: attack icon
     description: "\u5B50\u5F39\u4F24\u5BB3\u63D0\u534750%."
     tag: 0
-    luaFileKey: DamageUpBuff
+    luaFileKey: 
     duration: 5
     isPermanent: 0
     interval: 1
@@ -38,7 +38,7 @@ MonoBehaviour:
     iconKey: buff icon
     description: "\u6700\u5927\u751F\u547D\u503C\u63D0\u53472\u70B9"
     tag: 0
-    luaFileKey: MaxHpUpBuff
+    luaFileKey: 
     duration: 0
     isPermanent: 1
     interval: 1
@@ -48,7 +48,7 @@ MonoBehaviour:
     iconKey: confusion icon
     description: "\u6C38\u4E45\u4E2D\u6BD2: \u6BCF\u96945\u79D2\u6BCF\u5C42\u53D7\u52301\u70B9\u4F24\u5BB3"
     tag: 1
-    luaFileKey: PoisonBuff
+    luaFileKey: 
     duration: 0
     isPermanent: 1
     interval: 10

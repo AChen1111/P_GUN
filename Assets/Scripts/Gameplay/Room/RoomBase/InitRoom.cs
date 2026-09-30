@@ -15,11 +15,13 @@ namespace Game.Gameplay
 
         [Header("玩家预制体")]
         // 配置保存短名, 资源来自阶段预加载缓存.
+
         [SerializeField, AddressableKey(AddressableAssetKind.Prefab)] public string playerPrefabKey = string.Empty;
         private Player playerPrefab => AddressableAssetAccess.Component<Player>(playerPrefabKey);
         protected override void OnRoomInitialized()
         {
-            needGenerateDoors = false;
+            // 初始房间也要为已连接的走廊生成门, 避免只有走廊而没有门实例.
+            needGenerateDoors = true;
             PlacePlayerAtSpawn();
 
             void PlacePlayerAtSpawn()

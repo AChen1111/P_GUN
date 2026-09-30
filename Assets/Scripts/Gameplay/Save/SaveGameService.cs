@@ -1,4 +1,3 @@
-using Game.Core;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -15,7 +14,8 @@ namespace Game.Gameplay.Save
     {
         public const int SlotCount = 3;
         public const int SaveVersion = 2;
-        // 旧存档包含完整资源地址, 本版本只允许短名 key 存档.
+
+        // 首包迁移到短名资源 key 后拒绝旧格式, 仍保存关卡 id 和地图种子.
         public static bool IsCompatibleVersion(int version) => version == SaveVersion;
         internal const string GameplaySceneName = "GameScene";
 
@@ -58,7 +58,7 @@ namespace Game.Gameplay.Save
         }
 
         /// <summary>
-        /// 异步读档入口, 主菜单读档前先确保全局数据库已经加载.
+        /// 异步读档入口, 读取槽位后进入游戏场景并恢复存档.
         /// </summary>
         public static async Task<SaveOperationResult> LoadFromSlotAsync(int slotIndex)
         {
@@ -68,24 +68,13 @@ namespace Game.Gameplay.Save
                 return SaveOperationResult.Fail("读取失败, 槽位为空.");
             }
 
-            if (!IsCompatibleVersion(data.version)) return SaveOperationResult.Fail("存档版本不兼容, 请使用新版本重新保存.");
-            if (AddressableLoader.Instance.IsSceneTransitioning) return SaveOperationResult.Fail("场景正在加载.");
-            await EnsureDatabasesLoadedAsync();
+            // 玩法数值改由 Lua 数据表提供, 读档不再预载 ScriptableObject 数据库.
+            if (!IsCompatibleVersion(data.version)) return SaveOperationResult.Fail("存档版本不兼容, 请重新开始游戏.");
             pendingLoadData = data;
-            // 游戏内读档也必须重建场景, 使种子和关卡 key 在生成前生效.
-            await AddressableLoader.Instance.ReloadSceneAsync(GameplaySceneName);
+            var loader = Game.Core.AddressableLoader.Instance;
+            if (SceneManager.GetActiveScene().name == GameplaySceneName) await loader.ReloadSceneAsync(GameplaySceneName);
+            else await loader.LoadSceneAsync(GameplaySceneName);
             return SaveOperationResult.Ok("正在进入游戏场景并恢复存档.", data);
-        }
-
-        private static Task EnsureDatabasesLoadedAsync()
-        {
-            var manager = DataBaseManager.Instance;
-            if (manager == null)
-            {
-                throw new InvalidOperationException($"{nameof(DataBaseManager)} must exist before loading save.");
-            }
-
-            return manager.EnsureLoadedAsync();
         }
 
         public static SaveOperationResult DeleteSlot(int slotIndex)
@@ -96,17 +85,18 @@ namespace Game.Gameplay.Save
                 : SaveOperationResult.Fail("删除失败, 槽位为空.");
         }
 
-        public static void ApplyPendingGenerationSettings(AddressableDungeonBootstrapper bootstrapper, DungeonGeneratorGrid2D dungeonGenerator)
+        /// <summary>
+        /// 生成前把存档中的关卡 id 和种子写入随机房间生成器, 确保重建同一张地图.
+        /// </summary>
+        /// <param name="generator">场景中的随机房间生成器.</param>
+        public static void ApplyPendingGenerationSettings(RandomRoomGenerator generator)
         {
-            if (pendingLoadData == null || dungeonGenerator == null)
+            if (pendingLoadData == null || generator == null)
             {
                 return;
             }
 
-            // 生成前写入存档中的地图配方, 确保 Edgar 重建同一张地图.
-            bootstrapper?.OverrideLevelGraphKey(pendingLoadData.levelGraphKey);
-            dungeonGenerator.UseRandomSeed = false;
-            dungeonGenerator.RandomGeneratorSeed = pendingLoadData.mapSeed;
+            generator.OverrideLevel(pendingLoadData.levelId, pendingLoadData.mapSeed);
         }
 
         /// <summary>

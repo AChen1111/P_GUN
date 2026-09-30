@@ -93,12 +93,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemId: 3
-  itemDatabaseKey: ItemDatabase
   iconRenderer: {fileID: 4449328502507190729}
   isActive: 1
   pickInBackBag: 1
-  effectsKeys:
-  - ApplySpeedUpBuff
   pickupAudioKey: 
   _dotweenAnimation: {fileID: 0}
   _animator: {fileID: 0}

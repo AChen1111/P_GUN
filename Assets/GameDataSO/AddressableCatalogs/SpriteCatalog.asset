@@ -266,3 +266,410 @@ MonoBehaviour:
     luaModulePath: 
     labels:
     - hot_update
+  - key: magic icon
+    reference:
+      m_AssetGUID: 02c8ff8c0bc47984fb86ba8d5852dc10
+      m_SubObjectName: magic icon
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - buff
+    - hot_update
+  - key: poison icon
+    reference:
+      m_AssetGUID: 2d4c93aa1465d33499a2174f838e2ebf
+      m_SubObjectName: poison icon
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - buff
+    - hot_update
+  - key: defense icon
+    reference:
+      m_AssetGUID: 4547708ba0340c942b068d7eb7228d40
+      m_SubObjectName: defense icon
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - buff
+    - hot_update
+  - key: agility icon
+    reference:
+      m_AssetGUID: 58f68f223988f1e478f13f9aa8974e45
+      m_SubObjectName: agility icon
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - buff
+    - hot_update
+  - key: health icon
+    reference:
+      m_AssetGUID: 71c7daf7d6c79e540ae531707b8594e8
+      m_SubObjectName: health icon
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - buff
+    - hot_update
+  - key: will icon
+    reference:
+      m_AssetGUID: b0b1e4ef3c38a3a488f41b399b6a7ffa
+      m_SubObjectName: will icon
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - buff
+    - hot_update
+  - key: rage icon
+    reference:
+      m_AssetGUID: c904bc3d2dc42f34d85a4718f608d6c9
+      m_SubObjectName: rage icon
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - buff
+    - hot_update
+  - key: strength icon
+    reference:
+      m_AssetGUID: c92e835002a6da949b7f1d8d1b4ea1b9
+      m_SubObjectName: strength icon
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - buff
+    - hot_update
+  - key: block icon
+    reference:
+      m_AssetGUID: ce2df05a06ddb754db186597fc47a3c6
+      m_SubObjectName: block icon
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - buff
+    - hot_update
+  - key: paralysis icon
+    reference:
+      m_AssetGUID: d13a7737508e5dc479d794f7f7b28990
+      m_SubObjectName: paralysis icon
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - buff
+    - hot_update
+  - key: curse icon
+    reference:
+      m_AssetGUID: d6bc40b3b63989b44b977570d4fccd1e
+      m_SubObjectName: curse icon
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - buff
+    - hot_update
+  - key: debuff icon
+    reference:
+      m_AssetGUID: dc572a1d185013e43be827f3350ad82e
+      m_SubObjectName: debuff icon
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - buff
+    - hot_update
+  - key: death icon
+    reference:
+      m_AssetGUID: ead98e1717cbfcb4fba00f159e60bef1
+      m_SubObjectName: death icon
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - buff
+    - hot_update
+  - key: HP1
+    reference:
+      m_AssetGUID: 0f318e21560029444ace0783067f4820
+      m_SubObjectName: HP1
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+    - item
+  - key: flask_big_green
+    reference:
+      m_AssetGUID: 20aae47e48bf76c43990c9a2fd1f2a4e
+      m_SubObjectName: flask_big_green
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+    - item
+  - key: shield_generator
+    reference:
+      m_AssetGUID: 342acc70da6d023439ac0e356d5946f3
+      m_SubObjectName: shield_generator
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+    - item
+  - key: blood_tome
+    reference:
+      m_AssetGUID: 43626c4fd35b8cc4d8811ddaf0ed9a32
+      m_SubObjectName: blood_tome
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+    - item
+  - key: flask_big_blue
+    reference:
+      m_AssetGUID: 478a4517b4c7e8645ac14a1fa93a46ff
+      m_SubObjectName: flask_big_blue
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+    - item
+  - key: flask_big_red
+    reference:
+      m_AssetGUID: b34ed1aab557abf4ea038bbe600e7b65
+      m_SubObjectName: flask_big_red
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+    - item
+  - key: Potion_Round_Green
+    reference:
+      m_AssetGUID: bf817939e9a0a3241b3cf68a375367e7
+      m_SubObjectName: Potion_Round_Green
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+    - item
+  - key: Potion_Tall_Purple
+    reference:
+      m_AssetGUID: bf817939e9a0a3241b3cf68a375367e7
+      m_SubObjectName: Potion_Tall_Purple
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+    - item
+  - key: Potion_Tall_Violet
+    reference:
+      m_AssetGUID: bf817939e9a0a3241b3cf68a375367e7
+      m_SubObjectName: Potion_Tall_Violet
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+    - item
+  - key: Potion_Round_Yellow
+    reference:
+      m_AssetGUID: bf817939e9a0a3241b3cf68a375367e7
+      m_SubObjectName: Potion_Round_Yellow
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+    - item
+  - key: Potion_Tall_Cyan
+    reference:
+      m_AssetGUID: bf817939e9a0a3241b3cf68a375367e7
+      m_SubObjectName: Potion_Tall_Cyan
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+    - item
+  - key: Potion_Round_Rainbow
+    reference:
+      m_AssetGUID: bf817939e9a0a3241b3cf68a375367e7
+      m_SubObjectName: Potion_Round_Rainbow
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+    - item
+  - key: Potion_Tall_Black
+    reference:
+      m_AssetGUID: bf817939e9a0a3241b3cf68a375367e7
+      m_SubObjectName: Potion_Tall_Black
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+    - item
+  - key: Potion_Round_Black
+    reference:
+      m_AssetGUID: bf817939e9a0a3241b3cf68a375367e7
+      m_SubObjectName: Potion_Round_Black
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+    - item
+  - key: Potion_Tall_Green
+    reference:
+      m_AssetGUID: bf817939e9a0a3241b3cf68a375367e7
+      m_SubObjectName: Potion_Tall_Green
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+    - item
+  - key: Potion_Tall_Blue
+    reference:
+      m_AssetGUID: bf817939e9a0a3241b3cf68a375367e7
+      m_SubObjectName: Potion_Tall_Blue
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+    - item
+  - key: Potion_Tall_Yellow
+    reference:
+      m_AssetGUID: bf817939e9a0a3241b3cf68a375367e7
+      m_SubObjectName: Potion_Tall_Yellow
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+    - item
+  - key: Potion_Round_Cyan
+    reference:
+      m_AssetGUID: bf817939e9a0a3241b3cf68a375367e7
+      m_SubObjectName: Potion_Round_Cyan
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+    - item
+  - key: Potion_Round_Violet
+    reference:
+      m_AssetGUID: bf817939e9a0a3241b3cf68a375367e7
+      m_SubObjectName: Potion_Round_Violet
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+    - item
+  - key: Potion_Tall_Red
+    reference:
+      m_AssetGUID: bf817939e9a0a3241b3cf68a375367e7
+      m_SubObjectName: Potion_Tall_Red
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+    - item
+  - key: Potion_Tall_DarkBlue
+    reference:
+      m_AssetGUID: bf817939e9a0a3241b3cf68a375367e7
+      m_SubObjectName: Potion_Tall_DarkBlue
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+    - item
+  - key: ammo_crate
+    reference:
+      m_AssetGUID: c33faf6f8f47ba64c861ace482466381
+      m_SubObjectName: ammo_crate
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+    - item
+  - key: war_drum
+    reference:
+      m_AssetGUID: d5919c71dacfb1a48937712e1df55296
+      m_SubObjectName: war_drum
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+    - item
+  - key: flask_big_yellow
+    reference:
+      m_AssetGUID: f4358f337bc026743903234f6a99b356
+      m_SubObjectName: flask_big_yellow
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+    - item

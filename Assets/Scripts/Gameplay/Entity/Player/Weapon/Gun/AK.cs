@@ -13,10 +13,12 @@ namespace Game.Gameplay
     {
         public SpriteRenderer SR;
         // 配置保存短名, 资源来自阶段预加载缓存.
+
         [SerializeField, AddressableKey(AddressableAssetKind.Prefab)] public string PlayerBulletKey = string.Empty;
         public PlayerBullet PlayerBullet => AddressableAssetAccess.Component<PlayerBullet>(PlayerBulletKey);
         public UnityEngine.AudioSource SelfAudioSource;
         // 松开扳机的音频与其它武器音频一样通过短名读取.
+
         [SerializeField, AddressableKey(AddressableAssetKind.AudioClip)] public string AKShootEndKey = string.Empty;
         public AudioClip AKShootEnd => AddressableAssetAccess.Get<AudioClip>(AKShootEndKey);
 

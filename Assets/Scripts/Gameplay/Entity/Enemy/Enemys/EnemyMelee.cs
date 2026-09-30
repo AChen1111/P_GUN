@@ -1,13 +1,17 @@
 using System;
 using UnityEngine;
-using QFramework;
+using Game.Core;
+using Game.Pooling;
+using Game.Animation;
+using Game.Presentation;
+using Game.Items;
 
 namespace Game.Gameplay
 {
     /// <summary>
-    /// 近战敌人, 通过前方检测器发现玩家后播放攻击动画并造成伤害.
+    /// 近战敌人: 前方检测器碰到玩家且冷却结束后停步, 由攻击动画事件结算伤害.
     /// </summary>
-    public class EnemyMelee : EnemyBase
+    public class EnemyMelee : EnemyBase, IEnemyAttack
     {
         [Header("攻击组件")]
         [SerializeField] private MeleeAttackDetector attackDetector;
@@ -20,19 +24,18 @@ namespace Game.Gameplay
         [SerializeField] private Vector2 detectorLocalOffset = new Vector2(0.75f, 0f);
         [SerializeField] private Vector2 detectorSize = new Vector2(0.8f, 0.8f);
 
-        private Player cachedTarget;
         private float attackTimer;
         private float nextAttackTime;
         private bool hasAppliedDamage;
         private bool isAttacking;
 
         protected override WeaponType WeaponType => WeaponType.Melee;
+        protected override IEnemyAttack AttackModule => this;
+
         protected override void OnInit()
         {
             ResolveComponents();
-            OwnerFightRoom = FightRoom.currentFightRoom;
             nextAttackTime = 0f;
-            cachedTarget = null;
             hasAppliedDamage = false;
             isAttacking = false;
 
@@ -52,95 +55,58 @@ namespace Game.Gameplay
                 ConfigureDetector(false);
             }
 }
-        protected override void RegisterFSM(FSM<EnemyState> fsm)
-        {
-            fsm.State(EnemyState.Follow)
-                .OnUpdate(DoFollow);
-
-            fsm.State(EnemyState.Attack)
-                .OnEnter(BeginAttack)
-                .OnUpdate(UpdateAttack)
-                .OnExit(EndAttack);
-
-            fsm.StartState(EnemyState.Follow);
-
-            void EndAttack()
-            {
-                attackTimer = 0f;
-                hasAppliedDamage = false;
-                isAttacking = false;
-            }
-
-            void UpdateAttack()
-            {
-                attackTimer += EnemyDeltaTime;
-                if (attackTimer >= attackLockDuration)
-                {
-                    FSM.ChangeState(EnemyState.Follow);
-                }
-            }
-
-            void BeginAttack()
-            {
-                attackTimer = 0f;
-                hasAppliedDamage = false;
-                isAttacking = true;
-                nextAttackTime = EnemyTime + attackCooldown;
-                StopVelocity();
-                base.PlayAttackAnimation();
-            }
-
-            void DoFollow()
-            {
-                if (IsDead)
-                {
-                    StopVelocity();
-                    SetAnimatorSpeed(0f);
-                    return;
-                }
-
-                if (FollowPlayerWithBodySpace(out var dir))
-                {
-                    FaceDirection(dir);
-                }
-            }
-
-    void FaceDirection(Vector2 dir)
-    {
-        if (Sr == null)
-            return;
-        if (dir.x < 0f)
-            Sr.flipX = true;
-        else if (dir.x > 0f)
-            Sr.flipX = false;
-        UpdateDetectorDirection();
-    }
-
-    void UpdateDetectorDirection()
-    {
-        if (attackDetector == null || Sr == null)
-            return;
-        var facingSign = Sr.flipX ? -1f : 1f;
-        var localPosition = attackDetector.transform.localPosition;
-        // 翻转时只镜像当前手动配置的位置, 不再用默认偏移覆盖 prefab.
-        localPosition.x = Mathf.Abs(localPosition.x) * facingSign;
-        attackDetector.transform.localPosition = localPosition;
-    }
-}
 
         /// <summary>
-        /// 检测器发现玩家时调用, 统一由敌人本体控制攻击节奏.
+        /// 近战要求玩家处于攻击视锥并被检测器命中, 冷却沿用敌人局部时钟.
         /// </summary>
-        /// <param name="player">被检测到的玩家.</param>
+        public bool CanAttack(EnemyAttackContext context)
+        {
+            if (!context.IsPlayerInAttackCone || attackDetector == null || EnemyTime < nextAttackTime) return false;
+            return attackDetector.TryGetPlayerInRange(out _);
+        }
+
+        public void BeginAttack(EnemyAttackContext context)
+        {
+            attackTimer = 0f;
+            hasAppliedDamage = false;
+            isAttacking = true;
+            nextAttackTime = EnemyTime + attackCooldown;
+            PlayAttackAnimation();
+        }
+
+        public void TickAttack(EnemyAttackContext context, float enemyDeltaTime)
+        {
+            attackTimer += enemyDeltaTime;
+        }
+
+        public void EndAttack()
+        {
+            attackTimer = 0f;
+            hasAppliedDamage = false;
+            isAttacking = false;
+        }
+
+        /// <summary>
+        /// 近战攻击要求停步.
+        /// </summary>
+        public bool LocksMovement => true;
+
+        public float AttackLockDuration => Mathf.Max(0.01f, attackLockDuration);
+
+        /// <summary>
+        /// 面朝变化后翻转检测盒位置.
+        /// </summary>
+        protected override void OnFacingChanged()
+        {
+            UpdateDetectorDirection();
+        }
+
+        /// <summary>
+        /// 检测器发现玩家时调用, 保留给检测器的既有回调.
+        /// </summary>
         public void RequestAttack(Player player)
         {
             if (IsDead || player == null) return;
-
-            cachedTarget = player;
-            if (isAttacking) return;
-            if (EnemyTime < nextAttackTime) return;
-
-            FSM.ChangeState(EnemyState.Attack);
         }
 
         /// <summary>
@@ -200,13 +166,7 @@ namespace Game.Gameplay
 
             ConfigureDetector(false);
         }
-        private void StopVelocity()
-        {
-            if (Rb != null)
-            {
-                Rb.linearVelocity = Vector2.zero;
-            }
-        }
+
         private void ConfigureDetector(bool applyDefaultShape)
         {
             if (attackDetector == null) return;
@@ -234,6 +194,17 @@ namespace Game.Gameplay
                     detectorCollider.isTrigger = true;
                 }
             }
+        }
+
+        private void UpdateDetectorDirection()
+        {
+            if (attackDetector == null || Sr == null)
+                return;
+            var facingSign = Sr.flipX ? -1f : 1f;
+            var localPosition = attackDetector.transform.localPosition;
+            // 翻转时只镜像当前手动配置的位置, 不再用默认偏移覆盖 prefab.
+            localPosition.x = Mathf.Abs(localPosition.x) * facingSign;
+            attackDetector.transform.localPosition = localPosition;
         }
     }
 }

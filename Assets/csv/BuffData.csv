@@ -1,0 +1,16 @@
+buffId,buffName,description,iconKey,tag,duration,isPermanent,interval,modifiers,behaviorPrefabKey
+0,SpeedUpBuff,移动速度提升40%.,agility icon,Positive,5,FALSE,1,MoveSpeed:PercentAdd:0.4,
+1,PowerUpBuff,子弹伤害提升50%.,attack icon,Positive,5,FALSE,1,Attack:PercentAdd:0.5,
+2,MaxHpUpBuff,最大生命值提升2点,health icon,Positive,0,TRUE,1,MaxHp:Flat:2,
+3,PoisonBuff,永久中毒: 每隔10秒每层受到1点伤害,poison icon,Negative,0,TRUE,10,,PoisonBehavior
+4,血偿,攻击提升50%. 每5秒按层数受到1点伤害,curse icon,Negative,0,TRUE,5,Attack:PercentAdd:0.5,BloodPactBehavior
+5,血怒,立即消耗30%当前生命. 攻击提升40%持续20秒,rage icon,Positive,20,FALSE,1,Attack:PercentAdd:0.4,BloodRageBehavior
+6,吸血,击杀敌人时按层数回复生命,death icon,Positive,0,TRUE,1,,LifestealBehavior
+7,屠戮者,击杀敌人后4秒内攻击提升30%,strength icon,Positive,4,FALSE,1,Attack:PercentAdd:0.3,FrenzyBehavior
+8,弹夹大师,30秒内弹夹容量提升50%,ammo_crate,Positive,30,FALSE,1,,BandolierBehavior
+9,皮糙肉厚,15秒内受到的伤害降低1点,defense icon,Positive,15,FALSE,1,Defense:Flat:1,
+10,破甲,5秒内受到的伤害提高2点,debuff icon,Negative,5,FALSE,1,Defense:Flat:-2,
+11,血契,攻击提升2点. 生命上限降低1点,blood_tome,Positive,0,TRUE,1,Attack:Flat:2;MaxHp:Flat:-1,
+12,护盾,10秒内受到的伤害降低3点,shield_generator,Positive,10,FALSE,1,Defense:Flat:3,
+13,战鼓,60秒内击杀敌人回复1点生命,war_drum,Positive,60,FALSE,1,,WarDrumBehavior
+14,缓速,移动速度降低30%持续3秒,paralysis icon,Negative,3,FALSE,1,MoveSpeed:PercentAdd:-0.3,

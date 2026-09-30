@@ -24,10 +24,11 @@ MonoBehaviour:
     - hot_update
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 1d959031538d863408096fa52900ed46
-    m_Address: Assets/Prefab/Room/RoomTemplate/SaveRoom.prefab
+    m_Address: room/save
     m_ReadOnly: 0
     m_SerializedLabels:
     - hot_update
+    - room
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 35efb202e0c0b4b439f45af81a36f5d5
     m_Address: room/corridor_ud
@@ -54,10 +55,11 @@ MonoBehaviour:
     - room_template
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: ca31e30b28898ed46b4474424b244285
-    m_Address: Assets/Prefab/Room/RoomTemplate/ChestRoom.prefab
+    m_Address: room/chest
     m_ReadOnly: 0
     m_SerializedLabels:
     - hot_update
+    - room
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: d12f56f144e67244f9b540d241a530e7
     m_Address: room/corridor_lr

@@ -10,8 +10,9 @@ GameObject:
   m_Component:
   - component: {fileID: 8812285166366954893}
   - component: {fileID: 2968553758901501502}
-  - component: {fileID: 465086573499548629}
   - component: {fileID: 6202844698316131186}
+  - component: {fileID: 1377980453918648501}
+  - component: {fileID: 8986175176700008412}
   m_Layer: 0
   m_Name: ShotGun
   m_TagString: Untagged
@@ -34,6 +35,7 @@ Transform:
   m_Children:
   - {fileID: 578633306931416671}
   - {fileID: 7079153308986165606}
+  - {fileID: 7702693232670729321}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!82 &2968553758901501502
@@ -133,37 +135,6 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!114 &465086573499548629
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1681939207406572060}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 63a18faafeaa6b0429074751b27def89, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Namespace: QFramework.Example
-  ScriptName: ShotGun
-  ScriptsFolder: Assets\Scripts\Gameplay\Entity\Player\Weapon\Gun
-  GeneratePrefab: 0
-  PrefabFolder: Assets/Prefab
-  ArchitectureFullTypeName: 
-  ViewControllerFullTypeName: 
-  weaponId: ShotGun
-  weaponDatabaseKey: WeaponDatabase
-  firePoint: {fileID: 7079153308986165606}
-  MinDamage: 0
-  MaxDamage: 0
-  MaxBulletBagNum: 0
-  clipSize: 0
-  shootInterval: 0
-  bulletSpeed: 0
-  SR: {fileID: 8067500290940751689}
-  PlayerBulletKey: PlayerBullet
-  SelfAudioSource: {fileID: 2968553758901501502}
 --- !u!114 &6202844698316131186
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -179,6 +150,49 @@ MonoBehaviour:
   Binds:
   - MemberName: SelfAudioSource
     Object: {fileID: 2968553758901501502}
+--- !u!114 &1377980453918648501
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1681939207406572060}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c2b694a9ab0ce6c4a9df47d9f8ab862c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Namespace: QFramework.Example
+  ScriptName: ShotGun
+  ScriptsFolder: Assets\Scripts\Gameplay\Entity\Player\Weapon\Gun
+  GeneratePrefab: 0
+  PrefabFolder: Assets/Prefab
+  ArchitectureFullTypeName: 
+  ViewControllerFullTypeName: 
+  weaponId: ShotGun
+  firePoint: {fileID: 7702693232670729321}
+  MinDamage: 0
+  MaxDamage: 0
+  MaxBulletBagNum: 0
+  clipSize: 0
+  shootInterval: 0
+  bulletSpeed: 0
+  bulletPrefabKey: PlayerBullet
+--- !u!114 &8986175176700008412
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1681939207406572060}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d8682f06ec2c26f4092b11f83922c8f1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game.LuaComponent::LuaComponet
+  m_typeName: ShotGunModule
+  m_objectReferences: []
+  m_dataReferences: []
 --- !u!1 &3517244439982922828
 GameObject:
   m_ObjectHideFlags: 0
@@ -315,6 +329,37 @@ Transform:
   m_LocalPosition: {x: 0.519, y: 0.044, z: 0}
   m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_ConstrainProportionsScale: 1
+  m_Children: []
+  m_Father: {fileID: 8812285166366954893}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &5225752406423266295
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7702693232670729321}
+  m_Layer: 0
+  m_Name: FirePoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7702693232670729321
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5225752406423266295}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.519, y: 0.044, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8812285166366954893}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

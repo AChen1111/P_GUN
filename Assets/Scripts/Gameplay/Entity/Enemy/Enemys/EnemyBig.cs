@@ -1,75 +1,122 @@
-using UnityEngine.Serialization;
-using Game.Core;
 using System;
 using System.Collections.Generic;
-using QFramework;
 using UnityEngine;
+using Game.Core;
+using Game.Pooling;
+using Game.Animation;
+using Game.Presentation;
+using Game.Items;
 
 namespace Game.Gameplay
 {
     /// <summary>
-    /// 大型恶魔敌人, 在环形弹幕和追踪点射之间循环切换.
+    /// 大型敌人: 环形弹幕与追踪点射两段循环, 走位由行为大脑决定.
     /// </summary>
-    public class EnemyBig : EnemyBase
+    public class EnemyBig : EnemyBase, IEnemyAttack
     {
+        private enum BossPhase
+        {
+            Radial,
+            Aimed
+        }
+
         [Header("攻击资源")]
-        // 资源通过短名预加载, 业务读取已就绪的缓存.
-        [SerializeField, AddressableKey(AddressableAssetKind.Prefab)] public string bulletPrefabKey = string.Empty;
+        // 配置保存短名, 资源来自阶段预加载缓存.
+
+        [SerializeField, AddressableKey(AddressableAssetKind.Prefab)] private string bulletPrefabKey = string.Empty;
         private EnemyBullet bulletPrefab => AddressableAssetAccess.Component<EnemyBullet>(bulletPrefabKey);
-        // 资源通过短名预加载, 业务读取已就绪的缓存.
-        [SerializeField, AddressableKey(AddressableAssetKind.AudioClip)] public List<string> shootSoundsKeys = new List<string>();
-        private List<AudioClip> resolvedshootSounds;
-        private List<AudioClip> shootSounds => resolvedshootSounds ?? (resolvedshootSounds = AddressableAssetAccess.List<AudioClip>(shootSoundsKeys));
+        // 配置保存短名, 资源来自阶段预加载缓存.
+
+        [SerializeField, AddressableKey(AddressableAssetKind.AudioClip)] private List<string> shootSoundsKeys = new List<string>();
+        private List<AudioClip> shootSounds => AddressableAssetAccess.List<AudioClip>(shootSoundsKeys);
 
         [Header("动画参数")]
         [SerializeField] private string runBoolParameterName = "IsRun";
 
-        [Header("状态1, 环形弹幕")]
+        [Header("环形弹幕段")]
         [SerializeField] private float radialStateDuration = 2f;
         [SerializeField] private float radialBurstInterval = 0.75f;
         [SerializeField] private int radialBulletCount = 12;
         [SerializeField] private float radialBulletSpawnDistance = 0.6f;
 
-        [Header("状态2, 追踪玩家")]
+        [Header("追踪点射段")]
         [SerializeField] private float chaseStateDuration = 4f;
-        [SerializeField] private float playerSafeDistance = 3f;
         [SerializeField] private float aimedShotInterval = 1.2f;
         [SerializeField] private float aimedBulletSpawnDistance = 0.6f;
 
-        private float stateTimer;
+        [Header("旧走位参数, 待手感核对后删除")]
+        [SerializeField] private float playerSafeDistance = 3f;
+
+        private BossPhase phase;
+        private float phaseTimer;
         private float radialBurstTimer;
         private float aimedShotTimer;
+        private float nextAttackTime;
 
         protected override WeaponType WeaponType => WeaponType.Gun;
+        protected override IEnemyAttack AttackModule => this;
 
         protected override void OnInit()
         {
             if (bulletPrefab == null)
                 throw new InvalidOperationException($"{nameof(EnemyBig)} requires {nameof(bulletPrefab)} on prefab.");
 
-            OwnerFightRoom = FightRoom.currentFightRoom;
-            stateTimer = 0f;
+            phase = BossPhase.Radial;
+            phaseTimer = 0f;
+            radialBurstTimer = 0f;
+            aimedShotTimer = 0f;
+            nextAttackTime = 0f;
+            SetRunAnimation(false);
+        }
+
+        /// <summary>
+        /// 玩家位于攻击视锥内且冷却结束才进入两段循环.
+        /// </summary>
+        public bool CanAttack(EnemyAttackContext context)
+        {
+            return context.IsPlayerInAttackCone
+                && context.DistanceToPlayer <= BrainAttackRange
+                && EnemyTime >= nextAttackTime;
+        }
+
+        public void BeginAttack(EnemyAttackContext context)
+        {
+            phase = BossPhase.Radial;
+            phaseTimer = 0f;
+            radialBurstTimer = 0f;
+            aimedShotTimer = 0f;
+            nextAttackTime = EnemyTime + BrainAttackInterval;
+            SetRunAnimation(false);
+            ShootRadialBurst();
+        }
+
+        public void TickAttack(EnemyAttackContext context, float enemyDeltaTime)
+        {
+            phaseTimer += enemyDeltaTime;
+            if (phase == BossPhase.Radial)
+            {
+                TickRadialPhase(enemyDeltaTime);
+                return;
+            }
+
+            TickAimedPhase(context, enemyDeltaTime);
+        }
+
+        public void EndAttack()
+        {
+            phase = BossPhase.Radial;
+            phaseTimer = 0f;
             radialBurstTimer = 0f;
             aimedShotTimer = 0f;
             SetRunAnimation(false);
         }
 
-        protected override void RegisterFSM(FSM<EnemyState> fsm)
-        {
-            // Attack 表示状态1, 原地待机并重复释放环形弹幕.
-            fsm.State(EnemyState.Attack)
-                .OnEnter(BeginRadialState)
-                .OnUpdate(UpdateRadialState)
-                .OnExit(EndRadialState);
+        /// <summary>
+        /// 环形弹幕段停步, 点射段允许行为大脑继续走位.
+        /// </summary>
+        public bool LocksMovement => phase == BossPhase.Radial;
 
-            // Follow 表示状态2, 朝玩家移动并定时点射.
-            fsm.State(EnemyState.Follow)
-                .OnEnter(BeginChaseState)
-                .OnUpdate(UpdateChaseState)
-                .OnExit(EndChaseState);
-
-            fsm.StartState(EnemyState.Follow);
-        }
+        public float AttackLockDuration => Mathf.Max(0.01f, radialStateDuration) + Mathf.Max(0.01f, chaseStateDuration);
 
         protected override void OnDead()
         {
@@ -77,67 +124,45 @@ namespace Game.Gameplay
             base.OnDead();
         }
 
-        private void BeginRadialState()
+        /// <summary>
+        /// 环形段: 原地按间隔向四周释放弹幕, 到时切换点射段.
+        /// </summary>
+        private void TickRadialPhase(float enemyDeltaTime)
         {
-            stateTimer = 0f;
-            radialBurstTimer = 0f;
-            StopMove();
-            SetRunAnimation(false);
-            ShootRadialBurst();
-        }
-
-        private void UpdateRadialState()
-        {
-            stateTimer += EnemyDeltaTime;
-            radialBurstTimer += EnemyDeltaTime;
-
+            radialBurstTimer += enemyDeltaTime;
             if (radialBurstTimer >= Mathf.Max(0.01f, radialBurstInterval))
             {
                 radialBurstTimer = 0f;
                 ShootRadialBurst();
             }
 
-            if (stateTimer >= radialStateDuration)
+            if (phaseTimer >= radialStateDuration)
             {
-                FSM.ChangeState(EnemyState.Follow);
+                phase = BossPhase.Aimed;
+                phaseTimer = 0f;
+                aimedShotTimer = 0f;
+                SetRunAnimation(true);
             }
         }
 
-        private void EndRadialState()
+        /// <summary>
+        /// 点射段: 玩家在攻击视锥内时按间隔点射, 离开视锥后继续移动追击.
+        /// </summary>
+        private void TickAimedPhase(EnemyAttackContext context, float enemyDeltaTime)
         {
-            stateTimer = 0f;
-            radialBurstTimer = 0f;
-        }
-
-        private void BeginChaseState()
-        {
-            stateTimer = 0f;
-            aimedShotTimer = 0f;
-            SetRunAnimation(true);
-        }
-
-        private void UpdateChaseState()
-        {
-            stateTimer += EnemyDeltaTime;
-            aimedShotTimer += EnemyDeltaTime;
-
-            if (MoveTowardPlayerUntilSafe())
+            aimedShotTimer += enemyDeltaTime;
+            if (aimedShotTimer < Mathf.Max(0.01f, aimedShotInterval))
+            {
                 return;
-
-            TryShootAtPlayerByInterval();
-
-            if (stateTimer >= chaseStateDuration)
-            {
-                FSM.ChangeState(EnemyState.Attack);
             }
-        }
 
-        private void EndChaseState()
-        {
-            stateTimer = 0f;
             aimedShotTimer = 0f;
-            StopMove();
-            SetRunAnimation(false);
+            if (!context.IsPlayerInAttackCone || context.DirectionToPlayer.sqrMagnitude <= 0.0001f)
+            {
+                return;
+            }
+
+            ShootAtPlayer(context.DirectionToPlayer);
         }
 
         private void ShootRadialBurst()
@@ -150,85 +175,17 @@ namespace Game.Gameplay
                 var angle = angleStep * i * Mathf.Deg2Rad;
                 var direction = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)).normalized;
                 var spawnPosition = transform.position + (Vector3)(direction * radialBulletSpawnDistance);
-                EnemyBulletPool.Instance.Get(bulletPrefab, spawnPosition, Quaternion.identity, direction, AttackDamage);
+                WeaponManager.Instance.SpawnEnemyBullet(bulletPrefab, spawnPosition, direction, AttackDamage);
             }
 
             PlayShootSound();
         }
 
-        private void TryShootAtPlayerByInterval()
+        private void ShootAtPlayer(Vector2 direction)
         {
-            if (aimedShotTimer < Mathf.Max(0.01f, aimedShotInterval))
-                return;
-
-            aimedShotTimer = 0f;
-            ShootAtPlayer();
-        }
-
-        private void ShootAtPlayer()
-        {
-            if (PlayerRegistry.Current == null)
-                return;
-
-            var direction = (Vector2)(PlayerRegistry.Current.transform.position - transform.position);
-            if (direction.sqrMagnitude <= 0.0001f)
-                return;
-
-            direction.Normalize();
-            FaceDirection(direction);
-
             var spawnPosition = transform.position + (Vector3)(direction * aimedBulletSpawnDistance);
-            EnemyBulletPool.Instance.Get(bulletPrefab, spawnPosition, Quaternion.identity, direction, AttackDamage);
+            WeaponManager.Instance.SpawnEnemyBullet(bulletPrefab, spawnPosition, direction, AttackDamage);
             PlayShootSound();
-        }
-
-        private bool MoveTowardPlayerUntilSafe()
-        {
-            if (PlayerRegistry.Current == null)
-            {
-                StopMove();
-                SetRunAnimation(false);
-                return false;
-            }
-
-            var toPlayer = (Vector2)(PlayerRegistry.Current.transform.position - transform.position);
-            var safeDistance = Mathf.Max(0f, playerSafeDistance);
-            if (toPlayer.sqrMagnitude <= safeDistance * safeDistance)
-            {
-                StopMove();
-                SetRunAnimation(false);
-                // 进入安全距离后立刻回到环形弹幕状态, 避免继续贴近玩家.
-                FSM.ChangeState(EnemyState.Attack);
-                return true;
-            }
-
-            if (toPlayer.sqrMagnitude <= 0.0001f)
-            {
-                StopMove();
-                SetRunAnimation(false);
-                return false;
-            }
-
-            var direction = toPlayer.normalized;
-            if (Rb != null)
-            {
-                Rb.linearVelocity = direction * MoveSpeed * EnemyTimeScale;
-            }
-
-            FaceDirection(direction);
-            SetRunAnimation(MoveSpeed > 0.1f);
-            return false;
-        }
-
-        private void FaceDirection(Vector2 direction)
-        {
-            if (Sr == null)
-                return;
-
-            if (direction.x < 0f)
-                Sr.flipX = true;
-            else if (direction.x > 0f)
-                Sr.flipX = false;
         }
 
         private void SetRunAnimation(bool isRun)

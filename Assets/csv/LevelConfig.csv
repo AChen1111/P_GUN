@@ -1,0 +1,2 @@
+levelId,roomCount,initCount,finalCount,chestCount,saveCount,normalCount,initPrefabKey,finalPrefabKey,chestPrefabKey,savePrefabKey,normalPrefabKeys
+level1,8,1,1,1,1,4,InitRoom,FinalRoom,ChestRoom,SaveRoom,NormalRoom

@@ -50,9 +50,7 @@ MonoBehaviour:
   dir: {x: 0, y: 0}
   speed: 10
   rb: {fileID: 7924729754849289858}
-  lifeTime: 3
-  damage: 1
-  hitBuffId: 3
+  bulletId: 
   hitSoundsOnPlayerKeys:
   - BulletHitBody03
   hitSoundsOnWallKeys:

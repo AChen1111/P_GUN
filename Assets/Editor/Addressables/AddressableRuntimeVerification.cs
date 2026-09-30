@@ -117,7 +117,8 @@ public static class AddressableRuntimeVerification
     {
         try
         {
-            await WaitUntil(() => SceneManager.GetActiveScene().name == "StartScene" && DataBaseManager.Instance != null && DataBaseManager.Instance.IsLoaded, "Root startup did not finish.");
+            await WaitUntil(() => SceneManager.GetActiveScene().name == "StartScene" && AddressableLoader.Instance != null && AddressableLoader.Instance.IsInitialized, "Root startup did not finish.");
+            if (LuaDataRuntime.GetPlayerConfig().MaxHp <= 0) throw new InvalidOperationException("Lua gameplay data was not initialized.");
             var loader = AddressableLoader.Instance;
             var first = loader.LoadAssetAsync<Sprite>("Potion_Round_Red");
             var second = loader.LoadAssetAsync<Sprite>("Potion_Round_Red");
@@ -129,14 +130,24 @@ public static class AddressableRuntimeVerification
             await loader.LoadAssetAsync<Sprite>("Potion_Round_Red");
             await loader.LoadSceneAsync("GameScene");
             await WaitUntil(() => PlayerRegistry.Current != null && PlayerRegistry.Current.gun != null && Game.Gameplay.Room.ActiveRooms.Count > 0, "Dungeon/player/weapon initialization did not finish.");
+            await WaitUntil(() => Game.Gameplay.Room.ActiveRooms.Count == LuaDataRuntime.GetLevelConfig("level1").RoomCount, "Random-room generation did not finish.");
+            if (RandomRoomGenerator.Active == null || WeaponManager.Instance == null) throw new InvalidOperationException("Latest room/weapon managers were not retained.");
             var player = PlayerRegistry.Current;
             player.gun.Shoot(Vector2.right);
             var info = player.buffManager.AddBuffById(0);
             if (info == null) throw new InvalidOperationException("Buff Lua was not created.");
             player.buffManager.RemoveBuffById(0);
-            var item = ItemPool.Instance.Get("Heart", player.transform.position, Quaternion.identity);
-            if (item.ItemId != 1) throw new InvalidOperationException("Item key resolved to wrong prefab.");
-            ItemPool.Instance.Release(item);
+            var poison = player.buffManager.AddBuffById(3);
+            if (poison.Behavior == null) throw new InvalidOperationException("Preloaded Buff behavior was not initialized.");
+            player.buffManager.RemoveBuffById(3);
+            // 验证远端扩展的九种道具与十五种结晶都能按 CSV key 正确进入对象池.
+            foreach (var row in CSVToLuaTableImporter.ReadCsv(Path.GetFullPath("Assets/csv/ItemData.csv")).GetRange(1, 24))
+            {
+                var id = int.Parse(row[0]);
+                var item = ItemPool.Instance.Get(LuaDataRuntime.GetItemConfig(id).PrefabKey, player.transform.position + Vector3.right * 20f, Quaternion.identity);
+                if (item.ItemId != id) throw new InvalidOperationException($"Item key resolved to wrong prefab: {id}.");
+                ItemPool.Instance.Release(item);
+            }
             await Task.Delay(500);
             await loader.LoadSceneAsync("StartScene");
             await loader.LoadSceneAsync("GameScene");

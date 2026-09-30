@@ -1232,9 +1232,10 @@ GameObject:
   m_Component:
   - component: {fileID: 1340272846}
   - component: {fileID: 1340272845}
-  - component: {fileID: 1340272844}
   - component: {fileID: 1340272843}
   - component: {fileID: 1340272842}
+  - component: {fileID: 1340272847}
+  - component: {fileID: 1340272848}
   m_Layer: 0
   m_Name: HotUpdateBootstrap
   m_TagString: Untagged
@@ -1255,6 +1256,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   nextSceneName: StartScene
+  useLocalContentForAcceptance: 0
   statusText: {fileID: 781186201}
   progressSlider: {fileID: 689449497}
   updatePromptPanel: {fileID: 1483081612}
@@ -1302,18 +1304,6 @@ MonoBehaviour:
     m_SubObjectName: 
     m_SubObjectType: 
     m_EditorAssetChanged: 0
---- !u!114 &1340272844
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1340272841}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0a6f9a0ed6ce4d05aa1387397dba0c33, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &1340272845
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1345,6 +1335,30 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1340272847
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1340272841}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b92ef1052eaa87b42b8ba6f1f6e8b84e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game.LuaComponent::LuaManager
+--- !u!114 &1340272848
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1340272841}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8267b366520fedb4eb49f38cdbb2f5a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game.Lua::Game.Gameplay.PgunLuaRuntimeBootstrap
 --- !u!1 &1483081612
 GameObject:
   m_ObjectHideFlags: 0

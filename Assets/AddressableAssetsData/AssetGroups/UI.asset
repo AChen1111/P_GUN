@@ -23,12 +23,6 @@ MonoBehaviour:
     m_SerializedLabels:
     - hot_update
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 1d68049c6df2cee49b67b42cea633a5f
-    m_Address: Assets/Prefab/UI/GeneratedTemplates/Laser_PlayerBullet.prefab
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - hot_update
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 5c0488210f8a4ba49a1a0033233204fa
     m_Address: Assets/Prefab/UI/PlayerHeart/heart_half.png
     m_ReadOnly: 0

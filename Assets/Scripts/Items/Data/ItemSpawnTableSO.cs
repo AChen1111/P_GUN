@@ -12,6 +12,7 @@ namespace Game.Items
     public struct ItemSpawnEntry
     {
         // 配置保存短名, 资源来自阶段预加载缓存.
+
         [SerializeField, AddressableKey(AddressableAssetKind.Prefab)] public string prefabKey;
         public GameObject prefab => AddressableAssetAccess.Get<GameObject>(prefabKey);
 

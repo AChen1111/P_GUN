@@ -9,6 +9,7 @@
     "Unity.TextMeshPro",
     "QFramework",
     "QFramework.CoreKit",
+    "Game.Pooling",
     "Unity.ResourceManager"
   ],
   "includePlatforms": [],

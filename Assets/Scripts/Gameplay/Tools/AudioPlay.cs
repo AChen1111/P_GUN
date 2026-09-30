@@ -15,6 +15,7 @@ namespace Game.Gameplay
 
         [Header("音频列表")]
         // 资源通过短名预加载, 业务读取已就绪的缓存.
+
         [SerializeField, AddressableKey(AddressableAssetKind.AudioClip)] public List<string> clipsKeys = new List<string>();
         private List<AudioClip> resolvedclips;
         private List<AudioClip> clips => resolvedclips ?? (resolvedclips = AddressableAssetAccess.List<AudioClip>(clipsKeys));

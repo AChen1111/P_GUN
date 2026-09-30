@@ -13,5 +13,4 @@ MonoBehaviour:
   m_Name: HaHaBuff
   m_EditorClassIdentifier: 
   buffId: 4
-  buffDataBase: {fileID: 11400000, guid: 0ba30ec915a74a50a3b00b0e798dc227, type: 2}
   showHeadMessage: 1

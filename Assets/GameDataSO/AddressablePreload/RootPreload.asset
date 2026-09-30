@@ -20,8 +20,6 @@ MonoBehaviour:
   - kind: 3
     key: sad_game_over
   - kind: 4
-    key: MainHotfix
-  - kind: 4
-    key: player_bullet_reverse
+    key: LuaBundle
   - kind: 6
     key: AudioMixer

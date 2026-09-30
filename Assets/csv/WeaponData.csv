@@ -1,0 +1,9 @@
+weaponId,displayName,minDamage,maxDamage,maxBulletBagNum,clipSize,shootInterval,bulletSpeed,reloadSoundKey,shootSoundKeys
+AK,AK,11,20,100,30,0.1,50,AK47Reload,AKShooting
+AWP,AWP,20,40,10,5,2,51,AWPLaserReload,AWPShoot
+Bow,Bow,20,30,-1,-1,0,52,BowReload,BowShoot1;BowShoot2;BowShoot3;BowShoot4;BowShoot5;BowShoot6;BowShoot7;BowShoot8
+Laser,Laser,1,2,-1,-1,0,53,AWPLaserReload,LaserShoot
+MP5,MP5,10,12,100,30,0.1,54,MP5Reload,MP5Shoot
+Pistol,Pistol,2,5,100,10,0,55,PistolReload,PistolShoot2;PistolShoot1;PistolShoot3
+RocketGun,RocketGun,15,25,5,5,1,56,BowReload,RocketGunShoot1;RocketGunShoot2
+ShotGun,ShotGun,15,18,10,8,1,57,ShotGunRocketReload,ShotGun1;ShotGun2;ShotGun3

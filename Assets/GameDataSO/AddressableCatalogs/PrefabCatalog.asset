@@ -510,3 +510,470 @@ MonoBehaviour:
     luaModulePath: 
     labels:
     - hot_update
+  - key: BloodPactBehavior
+    reference:
+      m_AssetGUID: 1c52cf8355572f04f8ca918371af3e21
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - buff
+    - hot_update
+  - key: WarDrumBehavior
+    reference:
+      m_AssetGUID: 224314d5b7da4af4f830c7d0ab350b62
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - buff
+    - hot_update
+  - key: BandolierBehavior
+    reference:
+      m_AssetGUID: 610b6e0c4a028bb49bb86885f0167dd6
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - buff
+    - hot_update
+  - key: PoisonBehavior
+    reference:
+      m_AssetGUID: d20b3d0da4598244f96ff81e28a0a664
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - buff
+    - hot_update
+  - key: FrenzyBehavior
+    reference:
+      m_AssetGUID: d3ff981743b1cb6418e7981c69cc8112
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - buff
+    - hot_update
+  - key: BloodRageBehavior
+    reference:
+      m_AssetGUID: f112bb3f09b3edb42820275130cdfdb7
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - buff
+    - hot_update
+  - key: LifestealBehavior
+    reference:
+      m_AssetGUID: ff71437f0a7c147408f0ed457e02d435
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - buff
+    - hot_update
+  - key: FrostBullet
+    reference:
+      m_AssetGUID: 68f6c82c9fd451f48a5993075f0d5b05
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - enemy
+    - hot_update
+  - key: CurseBullet
+    reference:
+      m_AssetGUID: aabf385d907f77c4eb2e64fb37c90c52
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - enemy
+    - hot_update
+  - key: buff_crystal_8
+    reference:
+      m_AssetGUID: 03e52094c5625064ab7e4acb183afe12
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: shield_generator
+    reference:
+      m_AssetGUID: 11aa93244758d7348ad59c98bc43cc82
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+    - item
+  - key: buff_crystal_10
+    reference:
+      m_AssetGUID: 11f6507fd965d7f4e85d73af483cafde
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: buff_crystal_6
+    reference:
+      m_AssetGUID: 1e51c7106d7647a479f4949b8df2c811
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: buff_crystal_14
+    reference:
+      m_AssetGUID: 25bc3176d1e3f7443834d48c6d997568
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: buff_crystal_4
+    reference:
+      m_AssetGUID: 2c1629b52e7c04a4a95984e480fc0b3d
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: buff_crystal_12
+    reference:
+      m_AssetGUID: 2e4393c55e26fa04d89f7c08c971b215
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: damage
+    reference:
+      m_AssetGUID: 4a8a680ae32833840b1808f0d35f3ecc
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+    - item
+  - key: blood_tome
+    reference:
+      m_AssetGUID: 5611fcb64851bac4d8fd25f861667541
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+    - item
+  - key: buff_crystal_0
+    reference:
+      m_AssetGUID: 56d9ee7e02b0d194da79f2c8365c8531
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: ammo_crate
+    reference:
+      m_AssetGUID: 58ef2bb9a9c88b148930bcfd74e776c6
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+    - item
+  - key: DamagePotionModule
+    reference:
+      m_AssetGUID: 7512e8073820b814db75431107826eed
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+    - item
+  - key: buff_crystal_11
+    reference:
+      m_AssetGUID: 7d2c55fc50b93b64691f18292e5e81a1
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: BloodTomeModule
+    reference:
+      m_AssetGUID: 7efbecaffd4af004b88190a18416c835
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+    - item
+  - key: CleansePotionModule
+    reference:
+      m_AssetGUID: 8023ee613cebcaf4b8d68f8b736da21b
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+    - item
+  - key: WarDrumModule
+    reference:
+      m_AssetGUID: 82d25568967308f41b3d3801d80d2d4f
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+    - item
+  - key: ShieldGeneratorModule
+    reference:
+      m_AssetGUID: 8812a20bd4ab2464bab0ac13d0ee4adf
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+    - item
+  - key: mystery
+    reference:
+      m_AssetGUID: 90caddcf7815d6d429713c3b098d1fd1
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+    - item
+  - key: HealEffectModule
+    reference:
+      m_AssetGUID: 9698ebc88e969064285f017b5df0a339
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+    - item
+  - key: SpeedPotionModule
+    reference:
+      m_AssetGUID: a4804175cbbe39f4c9e24dd752845298
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+    - item
+  - key: speed
+    reference:
+      m_AssetGUID: a91769e6914a3a24994b84276f07f85b
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+    - item
+  - key: buff_crystal_9
+    reference:
+      m_AssetGUID: aad82cac353f25d4082c314b81647ac6
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: cleanse
+    reference:
+      m_AssetGUID: ab3de2ce327f7e9409c4460ad2189996
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+    - item
+  - key: AmmoCrateModule
+    reference:
+      m_AssetGUID: acbdcae35c3dcf647b4d9882cdf1282d
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+    - item
+  - key: war_drum
+    reference:
+      m_AssetGUID: af0fa65bbc3299b4080d743c5d8c4d57
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+    - item
+  - key: buff_crystal_3
+    reference:
+      m_AssetGUID: b47adb5e70b70834fb3ead6bbbd6f7bb
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: buff_crystal_2
+    reference:
+      m_AssetGUID: b70449cda3219c24cae5608390728b58
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: heal
+    reference:
+      m_AssetGUID: b790f34ed5b6d654885f4efc937727e6
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+    - item
+  - key: buff_crystal_1
+    reference:
+      m_AssetGUID: ba780eaf0ff081c4f8f3fa058a6ef90c
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: buff_crystal_13
+    reference:
+      m_AssetGUID: d4618f92295b5124a89508da2c14e780
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: buff_crystal_5
+    reference:
+      m_AssetGUID: dc2f6dea7379aa74b8f776bbf50c3fc3
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: BuffCrystalModule
+    reference:
+      m_AssetGUID: e325fef7044b60249bfd8f59acaba856
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: buff_crystal_7
+    reference:
+      m_AssetGUID: fb3289104cd56a940836306308120d3e
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+  - key: MysteryPotionModule
+    reference:
+      m_AssetGUID: fc460e68706fa644ca34bc06d7d16d34
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update
+    - item
+  - key: LuaGun_PlayerBullet
+    reference:
+      m_AssetGUID: 8802fd4ae66197445b79a3d506a89900
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    preloadManifestKey: 
+    luaModulePath: 
+    labels:
+    - hot_update

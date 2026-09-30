@@ -31,6 +31,7 @@ namespace Game.Gameplay
     public class EnemySpawnTableSO : ScriptableObject
     {
         // 资源通过短名预加载, 业务读取已就绪的缓存.
+
         [SerializeField, AddressableKey(AddressableAssetKind.ScriptableObject)] public string enemyDatabaseKey = string.Empty;
         private EnemyDatabase enemyDatabase => AddressableAssetAccess.Get<EnemyDatabase>(enemyDatabaseKey);
         [SerializeField] private List<EnemySpawnWave> waves = new List<EnemySpawnWave>();

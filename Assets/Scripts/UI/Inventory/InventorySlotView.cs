@@ -32,8 +32,10 @@ namespace Game.UI
 
                 if (iconImage != null)
                 {
-                    iconImage.sprite = stack.Data.icon;
-                    iconImage.enabled = stack.Data.icon != null;
+                    // 图标异步载入后从缓存获取, 避免堆叠创建时的空图标被永久保留.
+                    var icon = ItemSpriteCache.GetSprite(stack.ItemId);
+                    iconImage.sprite = icon;
+                    iconImage.enabled = icon != null;
                 }
 
                 if (countText != null)

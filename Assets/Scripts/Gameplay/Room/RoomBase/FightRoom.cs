@@ -31,8 +31,16 @@ namespace Game.Gameplay
         // 当前正在进行战斗流程的房间（给 Enemy 死亡回调使用）
         public static FightRoom currentFightRoom;
 
+        // 房间可行走格, 供 EnemyBrain 寻路, 房间禁用时清空.
+        private RoomWalkGrid walkGrid;
+
         public event Action<FightRoom> FightEnded;
         public override bool Cleared => isCleared;
+
+        /// <summary>
+        /// 房间可行走格, 敌人行为大脑从这里读流场和寻路.
+        /// </summary>
+        public RoomWalkGrid WalkGrid => walkGrid;
 
         /// <summary>
         /// 所有波次结束回调，给子类扩展
@@ -76,6 +84,8 @@ namespace Game.Gameplay
             doorStateIsOpen = true;
             totalWaveCount = Mathf.Max(1, GetInitialWaveCount());
             remainWaveCount = totalWaveCount;
+            // 敌人在本房间内寻路, 建格失败直接暴露配置问题.
+            walkGrid = RoomWalkGrid.BuildFrom(gameObject);
         }
 
         /// <summary>
@@ -239,6 +249,8 @@ namespace Game.Gameplay
         private void OnDisable()
         {
             if (currentFightRoom == this) currentFightRoom = null;
+            walkGrid?.ClearFlowField();
+            walkGrid = null;
         }
         public override void RestoreSaveData(RoomSaveData data)
         {

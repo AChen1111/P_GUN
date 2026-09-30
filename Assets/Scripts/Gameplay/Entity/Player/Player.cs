@@ -78,8 +78,8 @@ namespace Game.Gameplay
         [SerializeField] private float hurtSlowTimeScale = 0.9f;
         [SerializeField] private float hurtSlowDuration = 0.18f;
         [SerializeField] private float hurtInvincibleDuration = 1f;
-        [SerializeField] private float hurtKnockbackDistance = 0.65f;
-        [SerializeField] private float hurtKnockbackDuration = 0.12f;
+        [SerializeField] private float hurtKnockbackDistance = 0.18f;
+        [SerializeField] private float hurtKnockbackDuration = 0.1f;
 
         [Header("子弹时间")]
         // 子弹时间只减慢敌人, 不修改全局 Time.timeScale, 这样玩家移动和开火保持正常.
@@ -109,7 +109,7 @@ namespace Game.Gameplay
         float nextBulletTimeReadyTime;
         Coroutine bulletTimeCoroutine;
 
-        public int MaxHP => Mathf.Max(0, Mathf.RoundToInt(CalculateBuffedStat(StatType.MaxHp, maxHp)));
+        public int MaxHP => Mathf.Max(1, Mathf.RoundToInt(CalculateBuffedStat(StatType.MaxHp, maxHp)));
         public bool IsHPFull => HP >= MaxHP;
         public bool IsBulletTimeActive => isBulletTimeActive;
         public bool IsBulletTimeReady => !isBulletTimeActive && BulletTimeReadyRemainingTime <= 0f;
@@ -120,10 +120,24 @@ namespace Game.Gameplay
         #region Unity Lifecycle
 
         /// <summary>
+        /// 从 PlayerData.lua 读取基础数值, 覆盖预制体上的序列化字段.
+        /// </summary>
+        void ApplyPlayerDataConfig()
+        {
+            var config = LuaDataRuntime.GetPlayerConfig();
+            maxHp = config.MaxHp;
+            moveSpeed = config.MoveSpeed;
+            bulletTimeEnemyScale = config.BulletTimeEnemyScale;
+            bulletTimeDuration = config.BulletTimeDuration;
+            bulletTimeCooldown = config.BulletTimeCooldown;
+        }
+
+        /// <summary>
         /// 初始化运行时依赖.
         /// </summary>
         void Awake()
         {
+            ApplyPlayerDataConfig();
             PlayerRegistry.Register(this);
             ResolveBuffManager();
             Restart();
@@ -212,7 +226,7 @@ namespace Game.Gameplay
         }
 
         /// <summary>
-        /// 按玩家的武器短名列表加载并实例化武器.
+        /// 按玩家自己的武器地址列表加载并实例化武器.
         /// </summary>
         private async Task ApplyAddressableWeaponLoadoutAsync()
         {
@@ -228,9 +242,9 @@ namespace Game.Gameplay
             }
 
             ClearCurrentGunInstances();
-            foreach (var key in AddressableWeaponKeys)
+            foreach (var address in AddressableWeaponKeys)
             {
-                var prefab = await loader.LoadAssetAsync<GameObject>(key);
+                var prefab = await loader.LoadAssetAsync<GameObject>(address);
                 var instance = Instantiate(prefab, Weapon);
                 instance.name = prefab.name;
                 // 武器装载完成前保持隐藏, 避免加载过程中多把枪同时出现在玩家身上.
@@ -320,8 +334,8 @@ namespace Game.Gameplay
 
             if (hurtKnockbackTimer > 0f)
             {
-                // 受击后退使用真实时间计时, 避免慢动作影响后退距离.
-                hurtKnockbackTimer -= Time.unscaledDeltaTime;
+                // 受击位移按物理步长计时, 保持实际位移与配置距离一致.
+                hurtKnockbackTimer -= Time.fixedDeltaTime;
                 rb.linearVelocity = hurtKnockbackTimer > 0f ? hurtKnockbackVelocity : Vector2.zero;
             }
             else
@@ -412,6 +426,14 @@ namespace Game.Gameplay
         #region Initialize
         void SelectInitialGun()
         {
+            // 装载结果同步登记到 WeaponManager, 之后取枪和发射都走它中转.
+            if (WeaponManager.Instance == null)
+            {
+                throw new InvalidOperationException($"{nameof(Player)} requires {nameof(WeaponManager)} in scene before weapon loadout.");
+            }
+
+            WeaponManager.Instance.RegisterPlayerGuns(guns, currentGunIndex);
+
             if (guns == null || guns.Count == 0)
             {
                 gun = null;
@@ -463,6 +485,7 @@ namespace Game.Gameplay
                 gun = guns[currentGunIndex];
                 gun.Show();
                 gun.OnGunUsed();
+                WeaponManager.Instance.SetCurrentGunIndex(currentGunIndex);
             }
 
             if (Input.GetKeyDown(KeyCode.E))
@@ -472,6 +495,7 @@ namespace Game.Gameplay
                 gun = guns[currentGunIndex];
                 gun.Show();
                 gun.OnGunUsed();
+                WeaponManager.Instance.SetCurrentGunIndex(currentGunIndex);
             }
 
             if (Input.GetMouseButtonDown(1))
@@ -639,8 +663,10 @@ namespace Game.Gameplay
             StartHurtSlow();
             ApplyHurtKnockback(damageInfo.SourceDirection);
 
-            //扣血判断
-            HP = Mathf.Max(0, HP - Mathf.Max(1, damageInfo.Damage));
+            //扣血判断: Defense 按 Buff 公式结算后减伤, 结算后至少造成 1 点伤害.
+            var defense = Mathf.FloorToInt(CalculateBuffedStat(StatType.Defense, 0f));
+            var finalDamage = Mathf.Max(1, damageInfo.Damage - defense);
+            HP = Mathf.Max(0, HP - finalDamage);
             PublishHPChanged();
 
             if(HP <= 0)
@@ -749,6 +775,23 @@ namespace Game.Gameplay
             HP = MaxHP;
             PublishHPChanged();
         }
+
+        /// <summary>
+        /// 自伤入口: 不触发受击反馈, 无敌帧和击退, 供血怒和持续伤害类 Buff 使用.
+        /// </summary>
+        /// <param name="amount">自伤数值.</param>
+        public void SelfDamage(int amount)
+        {
+            if (amount <= 0 || HP <= 0) return;
+
+            HP = Mathf.Max(0, HP - amount);
+            PublishHPChanged();
+
+            if (HP <= 0)
+            {
+                EventCenter.Trigger(CoreEvents.PlayerDied);
+            }
+        }
         private void HandleGameEnded()
         {
             isGameEnded = true;
@@ -792,7 +835,7 @@ namespace Game.Gameplay
             transform.position = data.position.ToVector3();
 
             RestoreBuffs(data);
-            await RestoreInventoryAsync(data);
+            RestoreInventory(data);
             await EnsureWeaponLoadoutReadyAsync();
             RestoreWeapons(data);
 
@@ -844,9 +887,9 @@ namespace Game.Gameplay
         }
 
         /// <summary>
-        /// 恢复背包数据并按需加载物品效果.
+        /// 恢复背包数据, 效果预制体按 ItemData.lua 的地址预载.
         /// </summary>
-        private async Task RestoreInventoryAsync(PlayerSaveData data)
+        private void RestoreInventory(PlayerSaveData data)
         {
             var inventory = GetComponent<PlayerInventory>();
             if (inventory == null)
@@ -855,40 +898,13 @@ namespace Game.Gameplay
             }
 
             inventory.Clear();
-            var database = DataBaseManager.Instance != null ? DataBaseManager.Instance.Items : ItemDatabase.RuntimeDatabase;
             for (var i = 0; i < data.inventory.Count; i++)
             {
                 var stack = data.inventory[i];
                 if (stack == null)
                     continue;
-                inventory.RestoreStack(stack.itemId, stack.count, database, await ResolveItemEffectsAsync(stack.itemId));
+                inventory.RestoreStack(stack.itemId, stack.count);
             }
-        }
-
-        /// <summary>
-        /// 通过物品短名加载背包效果配置.
-        /// </summary>
-        private static async Task<IReadOnlyList<ItemEffectBase>> ResolveItemEffectsAsync(int itemId)
-        {
-            if (!AddressableItemAddressCatalog.TryGetKey(itemId, out var key))
-            {
-                throw new InvalidOperationException($"Missing addressable item key, ItemId: {itemId}.");
-            }
-
-            var loader = AddressableLoader.Instance;
-            if (loader == null)
-            {
-                throw new InvalidOperationException($"{nameof(AddressableLoader)} must exist before restoring inventory effects.");
-            }
-
-            var prefab = await loader.LoadAssetAsync<GameObject>(key);
-            var item = prefab.GetComponent<Item>();
-            if (item == null)
-            {
-                throw new InvalidOperationException($"Item prefab missing {nameof(Item)} component, Key: {key}.");
-            }
-
-            return item.Effects;
         }
         private void PublishHPChanged()
         {

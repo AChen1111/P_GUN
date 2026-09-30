@@ -97,6 +97,7 @@ public static class AddressableCatalogSetup
         if (path.Contains("/Enemy") || path.Contains("/EnemyDatabase")) return "Enemy";
         if (path.Contains("/GunList/") || path.Contains("/WeaponDatabase")) return "Weapon";
         if (path.Contains("/Hotfix/")) return "Hotfix";
+        if (path.StartsWith("Assets/LuaBundles/", StringComparison.Ordinal)) return "Shared";
         if (path.Contains("/Item") || path.Contains("/ItemDatabase")) return "Item";
         return "Shared";
     }
@@ -122,7 +123,11 @@ public static class AddressableCatalogSetup
         var subName = asset is Sprite ? asset.name : string.Empty;
         var catalog = Catalog(kind);
         var previous = catalog.entries.FirstOrDefault(e => e.reference.AssetGUID == guid && (e.reference.SubObjectName ?? string.Empty) == subName);
-        if (previous != null) return previous.key;
+        if (previous != null)
+        {
+            OldAddresses[Mark(path).address] = previous.key;
+            return previous.key;
+        }
         var key = ExplicitAliases.TryGetValue(path, out var alias) ? alias : asset is Sprite ? asset.name : Path.GetFileNameWithoutExtension(path);
         if (key.EndsWith(".lua", StringComparison.Ordinal)) key = key.Substring(0, key.Length - 4);
         var conflict = catalog.entries.FirstOrDefault(e => e.key == key);
@@ -174,8 +179,20 @@ public static class AddressableCatalogSetup
             var catalog = AssetDatabase.LoadAssetAtPath<AddressableCatalog>(path);
             if (catalog == null) { catalog = ScriptableObject.CreateInstance<AddressableCatalog>(); catalog.kind = kind; AssetDatabase.CreateAsset(catalog, path); }
             Catalogs[kind] = catalog;
+            // 远端已删除旧 Buff Lua host, 合并后移除其失效目录引用.
+            catalog.entries.RemoveAll(entry => string.IsNullOrEmpty(AssetDatabase.GUIDToAssetPath(entry.reference.AssetGUID)));
+            catalog.BuildMap();
+            foreach (var entry in catalog.entries) Mark(AssetDatabase.GUIDToAssetPath(entry.reference.AssetGUID));
+            EditorUtility.SetDirty(catalog);
             Mark(path, "Catalog");
         }
+        EnsureFolder("Assets/LuaBundles");
+        if (AssetDatabase.LoadAssetAtPath<TextAsset>("Assets/Resources/LuaBundle.bytes") != null)
+        {
+            var error = AssetDatabase.MoveAsset("Assets/Resources/LuaBundle.bytes", "Assets/LuaBundles/LuaBundle.bytes");
+            if (!string.IsNullOrEmpty(error)) throw new InvalidOperationException(error);
+        }
+        Register(AssetDatabase.LoadAssetAtPath<TextAsset>("Assets/LuaBundles/LuaBundle.bytes"));
         // 在任何资源重写前保留数据库内容与旧引用, 迁移可重复运行但不能覆盖已有 key.
         Directory.CreateDirectory("Library/AddressableKeyMigration");
         foreach (var guid in AssetDatabase.FindAssets("t:ScriptableObject", new[] { "Assets/GameDataSO" }))
@@ -235,6 +252,7 @@ public static class AddressableCatalogSetup
         RebuildManifests();
         SyncAddressKeys();
         AssetDatabase.SaveAssets();
+        RelocateGeneratedBulletTemplates();
         Validate();
         Debug.Log("ADDRESSABLE_KEY_MIGRATION_SUCCESS");
     }
@@ -302,11 +320,32 @@ public static class AddressableCatalogSetup
         if (!string.IsNullOrEmpty(AssetDatabase.GetAssetPath(reference))) return reference;
         var go = reference is Component component ? component.gameObject : reference as GameObject;
         if (go == null) throw new InvalidOperationException("Only GameObject templates may be scene references.");
-        EnsureFolder("Assets/Prefab/UI/GeneratedTemplates");
-        var path = $"Assets/Prefab/UI/GeneratedTemplates/{owner}_{go.name}.prefab";
+        var folder = go.GetComponent<PlayerBullet>() != null || go.GetComponent<EnemyBullet>() != null ? "Assets/Prefab/Bullet/Generated" : "Assets/Prefab/UI/GeneratedTemplates";
+        EnsureFolder(folder);
+        var path = $"{folder}/{owner}_{go.name}.prefab";
         var clone = Object.Instantiate(go);
         try { return PrefabUtility.SaveAsPrefabAsset(clone, path); }
         finally { Object.DestroyImmediate(clone); }
+    }
+
+    public static void RelocateGeneratedBulletTemplates()
+    {
+        // 迁移早期抽取的子弹模板归入子弹模块, GUID 和业务 key 保持不变.
+        const string folder = "Assets/Prefab/Bullet/Generated";
+        foreach (var guid in AssetDatabase.FindAssets("t:Prefab", new[] { "Assets/Prefab/UI/GeneratedTemplates" }))
+        {
+            var source = AssetDatabase.GUIDToAssetPath(guid);
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(source);
+            if (prefab.GetComponent<PlayerBullet>() == null && prefab.GetComponent<EnemyBullet>() == null) continue;
+            EnsureFolder(folder);
+            var path = folder + "/" + Path.GetFileName(source);
+            var error = AssetDatabase.MoveAsset(source, path);
+            if (!string.IsNullOrEmpty(error)) throw new InvalidOperationException(error);
+            var entry = Settings.CreateOrMoveEntry(guid, Group("Shared"), false, false);
+            entry.address = path;
+        }
+        AssetDatabase.SaveAssets();
+        Validate();
     }
 
     private static void MigrateObject(Object target)
@@ -316,6 +355,10 @@ public static class AddressableCatalogSetup
         foreach (var pair in KeyProperties(serialized).ToArray())
         {
             var key = pair.property;
+            // 旧 SO 数据库只保留为编辑器遗留数据, 已删除的 Buff 脚本不参与新 Lua 玩法.
+            if (key.propertyPath.EndsWith("luaFileKey", StringComparison.Ordinal) && !string.IsNullOrEmpty(key.stringValue)
+                && !Catalog(AddressableAssetKind.TextAsset).entries.Any(entry => entry.key == key.stringValue))
+                key.stringValue = string.Empty;
             if (string.IsNullOrEmpty(pair.attribute.LegacyField))
             {
                 if (key.propertyType == SerializedPropertyType.String && OldAddresses.TryGetValue(key.stringValue, out var shortKey)) key.stringValue = shortKey;
@@ -527,29 +570,43 @@ public static class AddressableCatalogSetup
 
     private static void RewriteCsvKeys()
     {
-        var databaseRows = new Dictionary<string, Dictionary<string, Dictionary<string, string>>>
+        foreach (var path in CSVToLuaTableImporter.SourcePaths)
         {
-            ["ItemDatabaseExcelImporter"] = AssetDatabase.LoadAssetAtPath<ItemDatabase>("Assets/GameDataSO/DataBase/ItemDatabase.asset").Items.ToDictionary(d => d.itemId.ToString(), d => new Dictionary<string, string> { ["icon"] = d.iconKey }),
-            ["BuffDatabaseExcelImporter"] = AssetDatabase.LoadAssetAtPath<BuffDataBase>("Assets/GameDataSO/DataBase/BuffDataBase.asset").Buffs.ToDictionary(d => d.Id.ToString(), d => new Dictionary<string, string> { ["icon"] = d.iconKey, ["luaFile"] = d.luaFileKey }),
-            ["WeaponDatabaseExcelImporter"] = AssetDatabase.LoadAssetAtPath<WeaponDatabase>("Assets/GameDataSO/DataBase/WeaponDatabase.asset").Weapons.ToDictionary(d => d.weaponId, d => new Dictionary<string, string> { ["reloadSound"] = d.reloadSoundKey, ["shootSounds"] = string.Join(";", d.shootSoundsKeys) }),
-            ["EnemyDatabaseExcelImporter"] = AssetDatabase.LoadAssetAtPath<EnemyDatabase>("Assets/GameDataSO/DataBase/EnemyDatabase.asset").Enemies.ToDictionary(d => d.enemyId.ToString(), d => new Dictionary<string, string> { ["prefab"] = d.prefabKey })
-        };
-        foreach (var pair in databaseRows)
-        {
-            var path = $"Assets/csv/{pair.Key}.csv";
-            var lines = File.ReadAllLines(path);
-            var header = lines[0].Split(',');
-            for (var i = 1; i < lines.Length; i++)
+            var rows = CSVToLuaTableImporter.ReadCsv(Path.GetFullPath(path));
+            var header = rows[0];
+            // 使用远端导入器的 CSV 解析器, 保留带逗号, 引号和换行的文本内容.
+            for (var column = 0; column < header.Length; column++)
             {
-                // 当前四张源表没有带逗号的引用列, 只替换资源单元格, 不重新导出玩法数据.
-                var cells = lines[i].Split(',');
-                if (cells.Length != header.Length) throw new InvalidOperationException($"CSV row shape changed: {path}:{i + 1}.");
-                if (!pair.Value.TryGetValue(cells[0], out var replacements)) throw new InvalidOperationException($"CSV row not found in existing database: {path}:{cells[0]}.");
-                foreach (var value in replacements) cells[Array.IndexOf(header, value.Key)] = value.Value;
-                lines[i] = string.Join(",", cells);
+                // LevelConfig 与新版资源列一起切换到明确的 Key 命名.
+                var legacyHeaders = new Dictionary<string, string> { ["initPrefab"] = "initPrefabKey", ["finalPrefab"] = "finalPrefabKey", ["chestPrefab"] = "chestPrefabKey", ["savePrefab"] = "savePrefabKey", ["normalPrefabs"] = "normalPrefabKeys" };
+                if (legacyHeaders.TryGetValue(header[column], out var newHeader)) header[column] = newHeader;
+                if (!CSVToLuaTableImporter.ResourceColumns.TryGetValue(header[column], out var kind)) continue;
+                for (var row = 1; row < rows.Count; row++)
+                    rows[row][column] = string.Join(";", rows[row][column].Split(';').Where(value => !string.IsNullOrWhiteSpace(value)).Select(value => ConvertCsvResource(kind, value.Trim())));
             }
-            File.WriteAllLines(path, lines, new UTF8Encoding(false));
+            File.WriteAllLines(path, rows.Select(row => string.Join(",", row.Select(CsvCell))), new UTF8Encoding(false));
         }
+        CSVToLuaTableImporter.ImportAll();
+        if (!EditorApplication.ExecuteMenuItem("Tools/Lua/Build LuaBundle")) throw new InvalidOperationException("LuaBundle builder is unavailable.");
+    }
+
+    private static string CsvCell(string value) => value.IndexOfAny(new[] { ',', '"', '\r', '\n' }) >= 0 ? "\"" + value.Replace("\"", "\"\"") + "\"" : value;
+
+    private static string ConvertCsvResource(AddressableAssetKind kind, string value)
+    {
+        if (Catalog(kind).entries.Any(entry => entry.key == value)) return value;
+        var address = Settings.groups.Where(group => group != null).SelectMany(group => group.entries).SingleOrDefault(entry => entry.address == value);
+        var path = address != null ? address.AssetPath : value;
+        Object asset;
+        if (kind == AddressableAssetKind.Sprite)
+        {
+            var sprites = AssetDatabase.LoadAllAssetsAtPath(path).OfType<Sprite>().ToArray();
+            if (sprites.Length != 1) throw new InvalidOperationException($"CSV Sprite {value} resolves to {sprites.Length} slices. Configure its exact short key.");
+            asset = sprites[0];
+        }
+        else asset = AssetDatabase.LoadMainAssetAtPath(path);
+        if (asset == null) throw new InvalidOperationException($"CSV {kind} reference cannot be resolved: {value}.");
+        return Register(asset, kind);
     }
 
     private static void Collect(Object asset, Dictionary<string, AddressableResourceKey> resources, HashSet<int> visited)
@@ -597,12 +654,19 @@ public static class AddressableCatalogSetup
                 if (stage == "Root")
                 {
                     AddDependency(AddressableAssetKind.Object, "AudioMixer", resources, visited);
-                    foreach (var entry in Catalog(AddressableAssetKind.TextAsset).entries.Where(e => e.labels.Contains("hotfix"))) AddDependency(AddressableAssetKind.TextAsset, entry.key, resources, visited);
+                    AddDependency(AddressableAssetKind.TextAsset, "LuaBundle", resources, visited);
                 }
                 if (stage == "GameScene")
                 {
-                    foreach (var key in new[] { "ItemDatabase", "WeaponDatabase", "BuffDataBase", "EnemyDatabase" }) AddDependency(AddressableAssetKind.ScriptableObject, key, resources, visited);
-                    foreach (var key in new[] { "AK", "AWP", "Bow", "Laser", "MP5", "Pistol", "RocketGun", "ShotGun", "Heart", "HarmUp", "SpeedUp", "PowerUp", "Purify" }) AddDependency(AddressableAssetKind.Prefab, key, resources, visited);
+                    foreach (var path in CSVToLuaTableImporter.SourcePaths)
+                    {
+                        var rows = CSVToLuaTableImporter.ReadCsv(Path.GetFullPath(path));
+                        for (var column = 0; column < rows[0].Length; column++)
+                            if (CSVToLuaTableImporter.ResourceColumns.TryGetValue(rows[0][column], out var kind))
+                                foreach (var row in rows.Skip(1))
+                                    foreach (var key in row[column].Split(';').Where(key => !string.IsNullOrWhiteSpace(key))) AddDependency(kind, key.Trim(), resources, visited);
+                    }
+                    foreach (var key in new[] { "AK", "AWP", "Bow", "Laser", "MP5", "Pistol", "RocketGun", "ShotGun" }) AddDependency(AddressableAssetKind.Prefab, key, resources, visited);
                 }
                 var manifest = AssetDatabase.LoadAssetAtPath<AddressablePreloadManifest>($"{ManifestFolder}/{stage}Preload.asset");
                 manifest.resources = resources.Values.OrderBy(r => r.kind).ThenBy(r => r.key, StringComparer.Ordinal).ToList();

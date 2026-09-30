@@ -1,0 +1,25 @@
+itemId,itemName,description,iconKey,effectPrefabKey,prefabKey
+1,心,回复一点生命值,HP1,HealEffectModule,heal
+2,奇特的药水,获取奇特的效果,flask_big_yellow,MysteryPotionModule,mystery
+3,加速药水,加速,flask_big_green,SpeedPotionModule,speed
+4,增伤药水,增加伤害,flask_big_red,DamagePotionModule,damage
+5,净化药水,移除所有负面Buff,flask_big_blue,CleansePotionModule,cleanse
+6,血契宝典,攻击永久提升2点;生命上限永久降低1点(可叠加),blood_tome,BloodTomeModule,blood_tome
+7,护盾发生器,10秒内受到的伤害降低3点,shield_generator,ShieldGeneratorModule,shield_generator
+8,战鼓,60秒内击杀敌人回复1点生命,war_drum,WarDrumModule,war_drum
+9,弹药补给箱,立刻补满当前枪械的弹夹与备弹,ammo_crate,AmmoCrateModule,ammo_crate
+10,加速结晶,使用后获得移动加速 Buff,agility icon,BuffCrystalModule,buff_crystal_0
+11,力量结晶,使用后获得增伤 Buff,attack icon,BuffCrystalModule,buff_crystal_1
+12,生命结晶,使用后获得生命上限 Buff,health icon,BuffCrystalModule,buff_crystal_2
+13,中毒结晶,使用后获得永久中毒负面 Buff,poison icon,BuffCrystalModule,buff_crystal_3
+14,血偿结晶,使用后获得血偿 Buff 并定期失血,curse icon,BuffCrystalModule,buff_crystal_4
+15,血怒结晶,使用后获得血怒 Buff 并立即失血,rage icon,BuffCrystalModule,buff_crystal_5
+16,吸血结晶,使用后获得击杀吸血 Buff,death icon,BuffCrystalModule,buff_crystal_6
+17,屠戮结晶,使用后获得屠戮者 Buff,strength icon,BuffCrystalModule,buff_crystal_7
+18,弹夹结晶,使用后获得弹夹大师 Buff,ammo_crate,BuffCrystalModule,buff_crystal_8
+19,坚韧结晶,使用后获得皮糙肉厚 Buff,defense icon,BuffCrystalModule,buff_crystal_9
+20,破甲结晶,使用后获得破甲负面 Buff,debuff icon,BuffCrystalModule,buff_crystal_10
+21,血契结晶,使用后获得血契 Buff 并降低生命上限,blood_tome,BuffCrystalModule,buff_crystal_11
+22,护盾结晶,使用后获得护盾 Buff,shield_generator,BuffCrystalModule,buff_crystal_12
+23,战鼓结晶,使用后获得战鼓 Buff,war_drum,BuffCrystalModule,buff_crystal_13
+24,缓速结晶,使用后获得缓速负面 Buff,paralysis icon,BuffCrystalModule,buff_crystal_14

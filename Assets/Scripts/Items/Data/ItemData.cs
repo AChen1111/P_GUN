@@ -18,6 +18,7 @@ namespace Game.Items
         public string description;
 
         // 配置保存短名, 资源来自阶段预加载缓存.
+
         [SerializeField, AddressableKey(AddressableAssetKind.Sprite)] public string iconKey;
         public Sprite icon => AddressableAssetAccess.Get<Sprite>(iconKey);
 

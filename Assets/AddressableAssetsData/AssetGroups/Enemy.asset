@@ -52,9 +52,10 @@ MonoBehaviour:
     - hot_update
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 51b9ce51afd7dbb488f5c37c4797e0d6
-    m_Address: Assets/Prefab/Enemy/Big_enemy.prefab
+    m_Address: enemy/big_enemy
     m_ReadOnly: 0
     m_SerializedLabels:
+    - enemy
     - hot_update
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 5997eda64fd4b9e46ab562272521a078
@@ -81,6 +82,13 @@ MonoBehaviour:
     - hot_update
     - prefab
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 68f6c82c9fd451f48a5993075f0d5b05
+    m_Address: enemy/frost_bullet
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - enemy
+    - hot_update
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 73085d0d90bddfc47afdd98cf9f84cd6
     m_Address: enemy/ogre
     m_ReadOnly: 0
@@ -88,6 +96,13 @@ MonoBehaviour:
     - enemy
     - hot_update
     - prefab
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: aabf385d907f77c4eb2e64fb37c90c52
+    m_Address: enemy/curse_bullet
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - enemy
+    - hot_update
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: b78964bc8875e5142a36b88e05a23ac0
     m_Address: enemy/orc_warrior

@@ -11,7 +11,8 @@ GameObject:
   - component: {fileID: 5227532224138308355}
   - component: {fileID: 7609457125886288384}
   - component: {fileID: 1348510770317443411}
-  - component: {fileID: 3149202430478700654}
+  - component: {fileID: 670237788300885454}
+  - component: {fileID: 1223230331185971601}
   m_Layer: 0
   m_Name: Bow
   m_TagString: Untagged
@@ -35,6 +36,7 @@ Transform:
   - {fileID: 8625821110002072894}
   - {fileID: 1817490437116976433}
   - {fileID: 329057997544267524}
+  - {fileID: 1226167112741143973}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!82 &7609457125886288384
@@ -149,7 +151,7 @@ MonoBehaviour:
   Binds:
   - MemberName: SelfAudioSource
     Object: {fileID: 7609457125886288384}
---- !u!114 &3149202430478700654
+--- !u!114 &670237788300885454
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -158,7 +160,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 754602514769843546}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 27e9c27725044c941ac0c5b5fa9aa3cf, type: 3}
+  m_Script: {fileID: 11500000, guid: c2b694a9ab0ce6c4a9df47d9f8ab862c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   Namespace: QFramework.Example
@@ -169,17 +171,62 @@ MonoBehaviour:
   ArchitectureFullTypeName: 
   ViewControllerFullTypeName: 
   weaponId: Bow
-  weaponDatabaseKey: WeaponDatabase
-  firePoint: {fileID: 329057997544267524}
+  firePoint: {fileID: 1226167112741143973}
   MinDamage: 0
   MaxDamage: 0
   MaxBulletBagNum: 0
   clipSize: 0
   shootInterval: 0
   bulletSpeed: 0
-  PlayerBulletKey: ArrowBullet
-  Arrow: {fileID: 3818672352476444957}
-  SelfAudioSource: {fileID: 7609457125886288384}
+  bulletPrefabKey: ArrowBullet
+--- !u!114 &1223230331185971601
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 754602514769843546}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d8682f06ec2c26f4092b11f83922c8f1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game.LuaComponent::LuaComponet
+  m_typeName: BowModule
+  m_objectReferences:
+  - name: m_Arrow
+    value: {fileID: 3818672352476444957}
+  m_dataReferences: []
+--- !u!1 &2260205140343746639
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1226167112741143973}
+  m_Layer: 0
+  m_Name: FirePoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1226167112741143973
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2260205140343746639}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.519, y: 0.044, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5227532224138308355}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &3431150011091814042
 GameObject:
   m_ObjectHideFlags: 0

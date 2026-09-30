@@ -10,6 +10,7 @@ namespace Game.UI
     {
         [Header("Buff 状态配置")]
         // 配置保存短名, 资源来自阶段预加载缓存.
+
         [SerializeField, AddressableKey(AddressableAssetKind.Prefab)] public string iconPrefabKey = string.Empty;
         private BuffStatusIcon iconPrefab => AddressableAssetAccess.Component<BuffStatusIcon>(iconPrefabKey);
         [SerializeField] private Transform iconRoot;

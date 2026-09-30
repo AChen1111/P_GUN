@@ -31,6 +31,7 @@ namespace Game.Gameplay
 
         [Tooltip("Buff 在状态栏中显示的图标.")]
         // 配置保存短名, 资源来自阶段预加载缓存.
+
         [SerializeField, AddressableKey(AddressableAssetKind.Sprite)] public string iconKey = string.Empty;
         private Sprite icon => AddressableAssetAccess.Get<Sprite>(iconKey);
 
@@ -43,6 +44,7 @@ namespace Game.Gameplay
 
         [Tooltip("Buff 绑定的 Lua 文件, 文件需要返回包含生命周期方法的 table.")]
         // 配置保存短名, 资源来自阶段预加载缓存.
+
         [SerializeField, AddressableKey(AddressableAssetKind.TextAsset)] public string luaFileKey = string.Empty;
         private TextAsset luaFile => AddressableAssetAccess.Get<TextAsset>(luaFileKey);
 

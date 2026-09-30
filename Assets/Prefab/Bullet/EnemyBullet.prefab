@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 3476784641148006059}
   - component: {fileID: 7924729754849289858}
   - component: {fileID: 6960414137244129148}
+  - component: {fileID: 8601580550530511582}
   m_Layer: 8
   m_Name: EnemyBullet
   m_TagString: Untagged
@@ -50,9 +51,7 @@ MonoBehaviour:
   dir: {x: 0, y: 0}
   speed: 10
   rb: {fileID: 7924729754849289858}
-  lifeTime: 3
-  damage: 1
-  hitBuffId: -1
+  bulletId: enemy_bullet
   hitSoundsOnPlayerKeys:
   - BulletHitBody03
   hitSoundsOnWallKeys:
@@ -87,7 +86,7 @@ CircleCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
@@ -179,3 +178,18 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!114 &8601580550530511582
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7189879553000536}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d8682f06ec2c26f4092b11f83922c8f1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game.LuaComponent::LuaComponet
+  m_typeName: EnemyBulletModule
+  m_objectReferences: []
+  m_dataReferences: []

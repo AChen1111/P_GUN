@@ -23,3 +23,8 @@
 !/docs/
 !/docs/resume-tech-doc/
 !/docs/resume-tech-doc/**
+!/Docs/
+!/Docs/Validation/
+!/Docs/Validation/**
+# xLua 注入生成的带时间戳备份只用于本地调试.
+/Assets/XLua/Src/Gen/Resources/hotfix_id_map*.lua.txt.[0-9]*

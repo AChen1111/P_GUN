@@ -15,11 +15,13 @@ namespace Game.Items
     {
         [Tooltip("优先使用的物品生成表")]
         // 配置保存短名, 资源来自阶段预加载缓存.
+
         [SerializeField, AddressableKey(AddressableAssetKind.ScriptableObject)] public string spawnTableKey = string.Empty;
         private ItemSpawnTableSO spawnTable => AddressableAssetAccess.Get<ItemSpawnTableSO>(spawnTableKey);
 
         [Tooltip("旧配置兼容：未配置生成表时从这里随机抽取")]
         // 配置保存短名, 资源来自阶段预加载缓存.
+
         [SerializeField, AddressableKey(AddressableAssetKind.Prefab)] public List<string> lootTableKeys = new List<string>();
         private List<GameObject> resolvedLootTable;
         private List<GameObject> lootTable => resolvedLootTable ?? (resolvedLootTable = AddressableAssetAccess.List<GameObject>(lootTableKeys));

@@ -3,6 +3,7 @@ using Game.Core;
 using UnityEngine;
 using UnityEngine.Pool;
 using System.Collections.Generic;
+using System;
 
 namespace Game.Pooling
 {
@@ -18,20 +19,27 @@ namespace Game.Pooling
     public abstract class PoolBase<T> : MonoBehaviour where T : MonoBehaviour, IPoolable {
         // 每个 T 类型只保留一个池入口, 子类可以通过 new static Instance 暴露更具体的类型.
         private static PoolBase<T> _instance;
+        private static readonly Dictionary<Type, PoolBase<T>> InstancesByType = new Dictionary<Type, PoolBase<T>>();
 
         public static PoolBase<T> Instance => _instance;
+
+        protected static TPool GetPoolInstance<TPool>() where TPool : PoolBase<T>
+        {
+            return InstancesByType.TryGetValue(typeof(TPool), out var pool) ? pool as TPool : null;
+        }
 
         [Header("Pool Config")]
         [SerializeField] private int defaultCapacity = 16;
         [SerializeField] private int maxSize = 128;
-        [SerializeField] private List<PrefabInfo> prefabInfos;
+        [SerializeField] private List<PrefabInfo> prefabInfos = new List<PrefabInfo>();
 
     #region 池中物体信息
         [System.Serializable]
         private struct PrefabInfo
         {
             // 配置保存短名, 资源来自阶段预加载缓存.
-            [SerializeField, AddressableKey(AddressableAssetKind.Prefab)] public string prefabKey;
+
+        [SerializeField, AddressableKey(AddressableAssetKind.Prefab)] public string prefabKey;
             public T prefab => AddressableAssetAccess.Component<T>(prefabKey);
             public int prewarmCount; //预热数量
         }
@@ -111,18 +119,29 @@ namespace Game.Pooling
         /// 初始化运行时依赖.
         /// </summary>
         protected virtual void Awake() {
-            // 同一个 T 类型只允许存在一个 PoolBase 实例.
-            // 如果场景里重复放了池组件, 后创建的会被销毁.
-            if (_instance != null && _instance != this) {
-                Destroy(gameObject);
-                return;
+            // 同一具体池类型只允许一个实例, 不同用途的 Lua 池可以共用组件基类.
+            var poolType = GetType();
+            if (InstancesByType.TryGetValue(poolType, out var existing) && existing != null && existing != this) {
+                throw new InvalidOperationException($"对象池重复摆放: {poolType.Name}.");
             }
 
-            _instance = this;
+            InstancesByType[poolType] = this;
+            if (_instance == null) _instance = this;
 
             foreach(var prefabInfo in prefabInfos) {
                 Prewarm(prefabInfo.prefab, prefabInfo.prewarmCount);
             }
+        }
+
+        protected virtual void OnDestroy()
+        {
+            var poolType = GetType();
+            if (InstancesByType.TryGetValue(poolType, out var existing) && existing == this)
+            {
+                InstancesByType.Remove(poolType);
+            }
+
+            if (_instance == this) _instance = null;
         }
 
         /// <summary>

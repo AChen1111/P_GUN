@@ -1,4 +1,5 @@
-using UnityEngine.Serialization;
+using Game.Pooling;
+using System;
 using System.Collections.Generic;
 using QFramework;
 using UnityEngine;
@@ -13,19 +14,22 @@ namespace Game.Gameplay
     /// </summary>
     [SerializeField] private string weaponId;
 
-    /// <summary>
-    /// 武器数据库。
-    /// </summary>
-    // 资源通过短名预加载, 业务读取已就绪的缓存.
-    [SerializeField, AddressableKey(AddressableAssetKind.ScriptableObject)] public string weaponDatabaseKey = string.Empty;
-    private WeaponDatabase weaponDatabase => AddressableAssetAccess.Get<WeaponDatabase>(weaponDatabaseKey);
-
     public string WeaponId => string.IsNullOrWhiteSpace(weaponId) ? GetType().Name : weaponId.Trim();
 
     /// <summary>
     /// 射击音频列表
     /// </summary>
-    [System.NonSerialized] public List<AudioClip> shootSounds = new List<AudioClip>();
+    [NonSerialized] public List<AudioClip> shootSounds = new List<AudioClip>();
+
+    /// <summary>
+    /// 换弹音效地址, 来自 WeaponData.lua.
+    /// </summary>
+    private string reloadSoundKey;
+
+    /// <summary>
+    /// 射击音效地址列表, 来自 WeaponData.lua.
+    /// </summary>
+    private List<string> shootSoundKeys = new List<string>();
 
     /// <summary>
     /// 子弹预制体
@@ -37,9 +41,14 @@ namespace Game.Gameplay
     /// </summary>
     [SerializeField] private Transform firePoint;
 
-    protected Vector2 FirePointPosition => firePoint != null ? firePoint.Position2D() : BulletPrefab.Position2D();
+    // 枪口必须由武器预制体明确绑定, 避免把子弹预制体的原点当成世界坐标.
+    protected Vector2 FirePointPosition => RequiredFirePoint.Position2D();
 
-    protected Quaternion FirePointRotation => firePoint != null ? firePoint.rotation : BulletPrefab.transform.rotation;
+    protected Quaternion FirePointRotation => RequiredFirePoint.rotation;
+
+    private Transform RequiredFirePoint => firePoint != null
+        ? firePoint
+        : throw new InvalidOperationException($"{name} 未绑定枪口 firePoint.");
 
     /// <summary>
     /// 音频源,所有武器公用一个
@@ -49,7 +58,7 @@ namespace Game.Gameplay
     /// <summary>
     /// 换子弹音频
     /// </summary>
-    [System.NonSerialized] public AudioClip ReloadSound;
+    [NonSerialized] public AudioClip ReloadSound;
 
     /// <summary>
     /// 伤害信息
@@ -57,7 +66,7 @@ namespace Game.Gameplay
     [Header("伤害设置")]
     public int MinDamage;
     public int MaxDamage;
-    public int Damage => Random.Range(MinDamage, MaxDamage + 1);
+    public int Damage => UnityEngine.Random.Range(MinDamage, MaxDamage + 1);
 
 
     [Header("备弹设置")]
@@ -72,6 +81,16 @@ namespace Game.Gameplay
     protected ShootDuration shootDuration;
     protected GunClip gunClip;
     protected BulletBag bulletBag;
+
+    /// <summary>
+    /// 本枪的 Lua 行为组件, 开火规则在对应模块里.
+    /// </summary>
+    private LuaBehaviourHost gunLua;
+
+    /// <summary>
+    /// 基类开火缺少 Lua 组件时只警告一次, 避免逐帧刷屏.
+    /// </summary>
+    private bool reportedMissingGunLua;
 
     public virtual BulletBag BulletBag => bulletBag;
     public GunClip GunClip => gunClip;
@@ -93,7 +112,9 @@ namespace Game.Gameplay
     /// </summary>
     protected virtual void Awake()
     {
-        ApplyDataFromDatabase();
+        gunLua = GetComponent<LuaBehaviourHost>();
+        ApplyDataFromLuaTable();
+        LoadSounds();
 
         if (clipSize != 0)
         {
@@ -102,63 +123,166 @@ namespace Game.Gameplay
             bulletBag = new BulletBag(MaxBulletBagNum);
         }
 
-        void ApplyDataFromDatabase()
+        void ApplyDataFromLuaTable()
         {
-            var database = weaponDatabase != null ? weaponDatabase : DataBaseManager.Instance?.Weapons;
-            if (database != null && database.TryGetById(WeaponId, out var data))
-            {
-                data.ApplyTo(this);
-            }
-            else
-            {
-                Debug.LogWarning($"Weapon {WeaponId} not found in database.");
-            }
+            // 数值来自 WeaponData.lua, 不再读 WeaponDatabase.
+            var config = LuaDataRuntime.GetWeaponConfig(WeaponId);
+            MinDamage = config.MinDamage;
+            MaxDamage = config.MaxDamage;
+            MaxBulletBagNum = config.MaxBulletBagNum;
+            clipSize = config.ClipSize;
+            shootInterval = config.ShootInterval;
+            bulletSpeed = config.BulletSpeed;
+            reloadSoundKey = config.ReloadSoundKey;
+            shootSoundKeys = config.ShootSoundKeys;
         }
 }
-    public void ApplyData(WeaponData data)
-    {
-        shootSounds.Clear();
-        if (data.shootSounds != null)
-        {
-            foreach (var sound in data.shootSounds)
-            {
-                if (sound != null)
-                {
-                    shootSounds.Add(sound);
-                }
-            }
-        }
 
-        ReloadSound = data.reloadSound;
-        MinDamage = data.minDamage;
-        MaxDamage = data.MaxDamage;
-        MaxBulletBagNum = data.maxBulletBagNum;
-        clipSize = data.clipSize;
-        shootInterval = data.ShootInterval;
-        bulletSpeed = data.bulletSpeed;
+    /// <summary>
+    /// 通过短名 key 从阶段缓存读取射击与换弹音效.
+    /// </summary>
+    private void LoadSounds()
+    {
+        // 场景激活前完成资源预加载, 枪械初始化只使用同步缓存.
+        shootSounds = AddressableAssetAccess.List<AudioClip>(shootSoundKeys);
+        ReloadSound = AddressableAssetAccess.Get<AudioClip>(reloadSoundKey);
     }
 
     /// <summary>
-    /// 鼠标按下
+    /// 鼠标按下, 转发给枪械 Lua 模块.
     /// </summary>
     public virtual void ShootDown(Vector2 dir) {
-
+        ForwardToLua("ShootDown", dir);
     }
 
     /// <summary>
-    /// 鼠标抬起
+    /// 鼠标抬起, 转发给枪械 Lua 模块.
     /// </summary>
     public virtual void ShootUp(Vector2 dir)
     {
-
+        ForwardToLua("ShootUp", dir);
     }
 
     /// <summary>
-    /// 鼠标按住
+    /// 鼠标按住, 转发给枪械 Lua 模块, 并传入本帧时间.
     /// </summary>
     public virtual void Shooting(Vector2 dir)
     {
+        ForwardToLua("Shooting", dir, Time.deltaTime);
+    }
 
+    /// <summary>
+    /// 把开火转发给 Lua 模块.
+    /// 未换绑的旧预制体走子类覆盖, 基类只警告一次并保持空操作, 换绑完成后不再走到这里.
+    /// </summary>
+    private void ForwardToLua(string functionName, Vector2 dir)
+    {
+        if (!EnsureGunLua()) return;
+
+        gunLua.CallLuaFunction(functionName, dir);
+    }
+
+    private void ForwardToLua(string functionName, Vector2 dir, float deltaTime)
+    {
+        if (!EnsureGunLua()) return;
+
+        gunLua.CallLuaFunction(functionName, dir, deltaTime);
+    }
+
+    /// <summary>
+    /// 校验 Lua 组件存在, 缺失时只警告一次并保持空操作.
+    /// </summary>
+    private bool EnsureGunLua()
+    {
+        if (gunLua != null)
+        {
+            return true;
+        }
+
+        if (!reportedMissingGunLua)
+        {
+            Debug.LogWarning($"{GetType().Name} 未挂 LuaComponet, 基类开火保持空操作; 请按待办清单换绑枪械预制体.", this);
+            reportedMissingGunLua = true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// 尝试按射击间隔和弹药状态消耗一发, 供枪械 Lua 模块调用.
+    /// </summary>
+    public bool TryConsumeShot()
+    {
+        if (gunClip == null || shootDuration == null)
+        {
+            throw new InvalidOperationException($"{GetType().Name} 弹药组件未初始化.");
+        }
+
+        gunClip.CheckAmmo();
+        if (!shootDuration.CanShoot || !gunClip.CanShoot)
+        {
+            return false;
+        }
+
+        shootDuration.RecordShootTime();
+        gunClip.Shoot();
+        return true;
+    }
+
+    /// <summary>
+    /// 按方向发射一发子弹, 生成走 WeaponManager.
+    /// </summary>
+    public PlayerBullet FireBullet(Vector2 dir)
+    {
+        return GetBullet(dir);
+    }
+
+    /// <summary>
+    /// 播放射击音效, 供枪械 Lua 模块调用.
+    /// </summary>
+    public void PlayFireSound(bool loop = false)
+    {
+        TryPlaySound(loop);
+    }
+
+    /// <summary>
+    /// 播放指定音效, 例如抬起时的结束音.
+    /// </summary>
+    public void PlaySoundClip(AudioClip clip, bool loop = false)
+    {
+        TryPlaySound(clip, loop);
+    }
+
+    /// <summary>
+    /// 停止共用音源.
+    /// </summary>
+    public void StopFireSound()
+    {
+        PlayerAudioSource?.Stop();
+    }
+
+    /// <summary>
+    /// 播放枪口火光, 供枪械 Lua 模块调用.
+    /// </summary>
+    public void PlayFireVfx(Vector2 dir)
+    {
+        PlayGunFire(dir);
+    }
+
+    /// <summary>
+    /// 获取开火点位置, 供枪械 Lua 模块计算弹道.
+    /// </summary>
+    public Vector2 GetFirePointPosition()
+    {
+        return FirePointPosition;
+    }
+
+    /// <summary>
+    /// 获取射击间隔, 供枪械 Lua 模块使用.
+    /// </summary>
+    public float GetShootInterval()
+    {
+        return shootInterval;
     }
 
     /// <summary>
@@ -216,10 +340,11 @@ namespace Game.Gameplay
         gunClip?.OnGunUsed();
     }
 
-    protected void PlayGunFire(Vector2 direction)
-    {
-        WeaponGlobal.Instance.PlayGunFire(FirePointPosition, direction);
-    }
+protected void PlayGunFire(Vector2 direction)
+        {
+            // 枪口火光经 WeaponManager 中转, Gun 不直接接触场景表现单例.
+            WeaponManager.Instance.PlayGunFire(FirePointPosition, direction);
+        }
 
     /// <summary>
     /// 尝试播放声音
@@ -255,32 +380,32 @@ namespace Game.Gameplay
 
         //播放新声音
         int n = shootSounds.Count;
-        int index = Random.Range(0, n);
+        int index = UnityEngine.Random.Range(0, n);
         PlayerAudioSource.clip = shootSounds[index];
         PlayerAudioSource.loop = loop;
         PlayerAudioSource.Play();
     }
 
-    /// <summary>
-    /// 获取子弹
-    /// </summary>
-    protected virtual PlayerBullet GetBullet(Vector2 dir)
-    {
-        if (BulletPrefab == null)
+/// <summary>
+        /// 获取子弹
+        /// </summary>
+        protected virtual PlayerBullet GetBullet(Vector2 dir)
         {
-            Debug.LogError($"{GetType().Name}: 子弹预制体为空,无法发射。", this);
-            return null;
-        }
+            if (BulletPrefab == null)
+            {
+                Debug.LogError($"{GetType().Name}: 子弹预制体为空,无法发射。", this);
+                return null;
+            }
 
-        var obj = PlayerBulletPool.Instance.Get(
-            BulletPrefab,
-            FirePointPosition,
-            FirePointRotation,
-            dir,
-            Damage,
-            bulletSpeed
-        );
-        return obj;
-    }
+            var obj = WeaponManager.Instance.SpawnPlayerBullet(
+                BulletPrefab,
+                FirePointPosition,
+                FirePointRotation,
+                dir,
+                Damage,
+                bulletSpeed
+            );
+            return obj;
+        }
     }
 }

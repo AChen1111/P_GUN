@@ -11,7 +11,8 @@ GameObject:
   - component: {fileID: 6806940762501830615}
   - component: {fileID: 1672551333272874651}
   - component: {fileID: 4092646423337198217}
-  - component: {fileID: 2166409405118941676}
+  - component: {fileID: 5950021145964217814}
+  - component: {fileID: 4064087855946664885}
   m_Layer: 0
   m_Name: RocketGun
   m_TagString: Untagged
@@ -34,6 +35,7 @@ Transform:
   m_Children:
   - {fileID: 1918332938443224204}
   - {fileID: 6527307647709449692}
+  - {fileID: 9098008578555728045}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!82 &1672551333272874651
@@ -148,7 +150,7 @@ MonoBehaviour:
   Binds:
   - MemberName: SelfAudioSource
     Object: {fileID: 1672551333272874651}
---- !u!114 &2166409405118941676
+--- !u!114 &5950021145964217814
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -157,7 +159,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 777593251254390890}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6017371005973ba41bcc8ea7a8fb59eb, type: 3}
+  m_Script: {fileID: 11500000, guid: c2b694a9ab0ce6c4a9df47d9f8ab862c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   Namespace: QFramework.Example
@@ -168,16 +170,29 @@ MonoBehaviour:
   ArchitectureFullTypeName: 
   ViewControllerFullTypeName: 
   weaponId: RocketGun
-  weaponDatabaseKey: WeaponDatabase
-  firePoint: {fileID: 6527307647709449692}
+  firePoint: {fileID: 9098008578555728045}
   MinDamage: 0
   MaxDamage: 0
   MaxBulletBagNum: 0
   clipSize: 0
   shootInterval: 0
   bulletSpeed: 0
-  PlayerBulletKey: PlayerBullet
-  SelfAudioSource: {fileID: 1672551333272874651}
+  bulletPrefabKey: PlayerBullet
+--- !u!114 &4064087855946664885
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 777593251254390890}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d8682f06ec2c26f4092b11f83922c8f1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game.LuaComponent::LuaComponet
+  m_typeName: RocketGunModule
+  m_objectReferences: []
+  m_dataReferences: []
 --- !u!1 &5857577819958823559
 GameObject:
   m_ObjectHideFlags: 0
@@ -269,6 +284,37 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!1 &7858445878936572050
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 9098008578555728045}
+  m_Layer: 0
+  m_Name: FirePoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &9098008578555728045
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7858445878936572050}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.519, y: 0.044, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6806940762501830615}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7963408140705593245
 GameObject:
   m_ObjectHideFlags: 0

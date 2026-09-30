@@ -11,8 +11,10 @@ namespace Game.Animation
         public override void Play(GameObject target, float duration, Action onComplete)
         {
             var t = target.transform;
+            // 缩放动画以预制体的原始尺寸为终点, 世界道具不能统一放大到 1.
+            var targetScale = t.localScale;
             t.localScale = Vector3.zero;
-            t.DOScale(Vector3.one, duration)
+            t.DOScale(targetScale, duration)
                 .SetEase(ease)
                 .SetUpdate(true)
                 .SetLink(target)

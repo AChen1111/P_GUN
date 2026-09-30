@@ -1,5 +1,3 @@
-using UnityEngine.Serialization;
-using System.Collections.Generic;
 using System.Collections;
 using DG.Tweening;
 using UnityEngine;
@@ -20,24 +18,17 @@ namespace Game.Items
 
         [Header("物品数据")]
         [SerializeField] private int itemId;
-        // 配置保存短名, 资源来自阶段预加载缓存.
-        [SerializeField, AddressableKey(AddressableAssetKind.ScriptableObject)] public string itemDatabaseKey = string.Empty;
-        private ItemDatabase itemDatabase => AddressableAssetAccess.Get<ItemDatabase>(itemDatabaseKey);
         [SerializeField] private SpriteRenderer iconRenderer;
 
         [Header("拾取状态")]
         [SerializeField] private bool isActive = true;
         [Header("是否加入背包")]
         [SerializeField] private bool pickInBackBag = true;
-        [Header("效果列表")]
-        // 配置保存短名, 资源来自阶段预加载缓存.
-        [SerializeField, AddressableKey(AddressableAssetKind.ScriptableObject)] public List<string> effectsKeys = new List<string>();
-        private List<ItemEffectBase> resolvedEffects;
-        private List<ItemEffectBase> effects => resolvedEffects ?? (resolvedEffects = AddressableAssetAccess.List<ItemEffectBase>(effectsKeys));
 
         [Header("拾取音效")]
         // 配置保存短名, 资源来自阶段预加载缓存.
-        [SerializeField, AddressableKey(AddressableAssetKind.AudioClip)] public string pickupAudioKey = string.Empty;
+
+        [SerializeField, AddressableKey(AddressableAssetKind.AudioClip)] private string pickupAudioKey = string.Empty;
         private AudioClip pickupAudio => AddressableAssetAccess.Get<AudioClip>(pickupAudioKey);
 
         [Header("DOTween动画器")]
@@ -57,15 +48,17 @@ namespace Game.Items
         private bool pickupPresentationFinished;
         private PlayerInventory playerInventoryInRange;
         private Coroutine animatorFallbackCoroutine;
+        private LuaBehaviourHost itemLua;
+        private Vector3 prefabLocalScale;
 
         public int ItemId => itemId;
-        public IReadOnlyList<ItemEffectBase> Effects => effects;
 
         /// <summary>
         /// 初始化运行时依赖.
         /// </summary>
         private void Awake()
         {
+            prefabLocalScale = transform.localScale;
             if (_dotweenAnimation == null)
             {
                 _dotweenAnimation = GetComponent<GameDOTweenAnimation>();
@@ -75,6 +68,9 @@ namespace Game.Items
             {
                 _animator = GetComponent<Animator>();
             }
+
+            // 世界道具的拾取规则在预制体的 LuaComponet 模块里, 入背包的道具可以不挂.
+            itemLua = GetComponent<LuaBehaviourHost>();
         }
 
         /// <summary>
@@ -142,7 +138,7 @@ namespace Game.Items
     {
         if (!pickInBackBag)
         {
-            ApplyEffectsDirectly();
+            ApplyPickupLua();
             return true;
         }
 
@@ -153,17 +149,34 @@ namespace Game.Items
             return false;
         }
 
-        return TryAddToInventory(inventory);
+        if (!TryAddToInventory(inventory))
+        {
+            return false;
+        }
+
+        // 入背包的道具也可以带 Lua 模块处理拾取时刻的规则, 没挂时跳过.
+        if (itemLua != null)
+        {
+            itemLua.SetLuaField("itemId", itemId);
+            itemLua.SetLuaField("sourceObject", gameObject);
+            itemLua.CallLuaFunction("OnPickedUp");
+        }
+
+        return true;
     }
 
-    void ApplyEffectsDirectly()
+    void ApplyPickupLua()
     {
-        // 非背包物品拾取时直接执行效果, 这里按需求不构造额外效果上下文.
-        var ctx = default(ItemEffectContext);
-        for (int i = 0; i < effects.Count; i++)
+        // 非背包物品的效果完全由世界道具预制体上的 LuaComponet 决定.
+        if (itemLua == null)
         {
-            effects[i]?.OnPick(ctx);
+            Debug.LogError($"{nameof(Item)}拾取失败, pickInBackBag=false 的道具必须挂 LuaComponet.", this);
+            return;
         }
+
+        itemLua.SetLuaField("itemId", itemId);
+        itemLua.SetLuaField("sourceObject", gameObject);
+        itemLua.CallLuaFunction("OnPickedUp");
     }
 
     bool TryPlayAnimatorPickup()
@@ -224,6 +237,9 @@ namespace Game.Items
         }
         public void OnSpawnFromPool()
         {
+            // 上次生成动画可能中途回池, 每次取出都恢复预制体缩放.
+            transform.DOKill(false);
+            transform.localScale = prefabLocalScale;
             ResetPoolRuntimeState();
             ResetAnimatorState();
 
@@ -352,19 +368,19 @@ namespace Game.Items
         }
         private bool TryResolveItemData(out ItemData data)
         {
-            if (itemDatabase != null && itemDatabase.TryGetById(itemId, out data))
+            // 显示数据来自 ItemData.lua, 图标取自按 id 缓存的 Sprite.
+            try
             {
+                var config = LuaDataRuntime.GetItemConfig(itemId);
+                data = new ItemData(itemId, config.Name, config.Description, config.IconKey);
                 return true;
             }
-
-            var runtimeDatabase = ItemDatabase.RuntimeDatabase;
-            if (runtimeDatabase != null && runtimeDatabase.TryGetById(itemId, out data))
+            catch (System.Exception exception)
             {
-                return true;
+                Debug.LogError($"{nameof(Item)}: 读取 ItemData 失败, itemId={itemId}, Error: {exception.Message}", this);
+                data = default;
+                return false;
             }
-
-            data = default;
-            return false;
         }
         private static bool IsPlayer(Collider2D other)
         {

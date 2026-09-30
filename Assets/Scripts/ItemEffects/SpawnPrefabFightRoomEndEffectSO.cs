@@ -15,9 +15,11 @@ namespace Game.ItemEffects
     public class SpawnPrefabFightRoomEndEffectSO : FightRoomEndEffectSO
     {
         // 配置保存短名, 资源来自阶段预加载缓存.
+
         [SerializeField, AddressableKey(AddressableAssetKind.Prefab)] public string prefabKey = string.Empty;
         private GameObject prefab => AddressableAssetAccess.Get<GameObject>(prefabKey);
         // 配置保存短名, 资源来自阶段预加载缓存.
+
         [SerializeField, AddressableKey(AddressableAssetKind.ScriptableObject)] public string spawnTableKey = string.Empty;
         private ItemSpawnTableSO spawnTable => AddressableAssetAccess.Get<ItemSpawnTableSO>(spawnTableKey);
         [SerializeField] private Vector3 worldOffset = Vector3.zero;

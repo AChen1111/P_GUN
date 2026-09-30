@@ -97,6 +97,7 @@ namespace Game.UI
         }
         public void Initialize(UIPanelBase mainPanel)
         {
+            Debug.Log($"UIStackManager: Initialize {mainPanel?.name}.", this);
             if (mainPanel == null)
             {
                 Debug.LogError("UIStackManager初始化失败, 主面板不能为空.");
@@ -183,6 +184,7 @@ namespace Game.UI
         }
         private void OnActiveSceneChanged(Scene previousScene, Scene nextScene)
         {
+            Debug.Log($"UIStackManager: Scene changed {previousScene.name} -> {nextScene.name}.", this);
             // 场景切换时清空旧面板引用, 防止持有已销毁对象.
             Clear();
         }

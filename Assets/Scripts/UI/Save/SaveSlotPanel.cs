@@ -15,6 +15,7 @@ namespace Game.UI.Save
     {
         [Header("槽位列表")]
         // 配置保存短名, 资源来自阶段预加载缓存.
+
         [SerializeField, AddressableKey(AddressableAssetKind.Prefab)] public string slotPrefabKey = string.Empty;
         private SaveSlotItem slotPrefab => AddressableAssetAccess.Component<SaveSlotItem>(slotPrefabKey);
         [SerializeField] private Transform slotRoot;

@@ -119,7 +119,8 @@ GameObject:
   - component: {fileID: 7562206068638061457}
   - component: {fileID: 6788132863477469686}
   - component: {fileID: 4241229015538628685}
-  - component: {fileID: 8293612997416178283}
+  - component: {fileID: 6359465225733379123}
+  - component: {fileID: 7233671958452060129}
   m_Layer: 0
   m_Name: AK
   m_TagString: Untagged
@@ -256,7 +257,9 @@ MonoBehaviour:
   Binds:
   - MemberName: SelfAudioSource
     Object: {fileID: 6788132863477469686}
---- !u!114 &8293612997416178283
+  - MemberName: AKShootEnd
+    Object: {fileID: 8300000, guid: 1e108a665f3ec78488b43fa3772b48b3, type: 3}
+--- !u!114 &6359465225733379123
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -265,7 +268,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 8546515740741070984}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8671f3f9c6c9b1b488a6b7d3b4cd5832, type: 3}
+  m_Script: {fileID: 11500000, guid: c2b694a9ab0ce6c4a9df47d9f8ab862c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   Namespace: QFramework.Example
@@ -276,7 +279,6 @@ MonoBehaviour:
   ArchitectureFullTypeName: 
   ViewControllerFullTypeName: 
   weaponId: AK
-  weaponDatabaseKey: WeaponDatabase
   firePoint: {fileID: 7052560199138315782}
   MinDamage: 0
   MaxDamage: 0
@@ -284,10 +286,24 @@ MonoBehaviour:
   clipSize: 0
   shootInterval: 0
   bulletSpeed: 0
-  SR: {fileID: 4322138692861771031}
-  PlayerBulletKey: PlayerBullet
-  SelfAudioSource: {fileID: 6788132863477469686}
-  AKShootEndKey: AKShootEnd
+  bulletPrefabKey: PlayerBullet
+--- !u!114 &7233671958452060129
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8546515740741070984}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d8682f06ec2c26f4092b11f83922c8f1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game.LuaComponent::LuaComponet
+  m_typeName: AKModule
+  m_objectReferences:
+  - name: m_ShootEndClip
+    value: {fileID: 8300000, guid: 1e108a665f3ec78488b43fa3772b48b3, type: 3}
+  m_dataReferences: []
 --- !u!1 &9074132046847884278
 GameObject:
   m_ObjectHideFlags: 0

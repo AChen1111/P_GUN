@@ -117,9 +117,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2922342392877944398}
-  - component: {fileID: 4723494418564551696}
   - component: {fileID: 7185094619324971760}
   - component: {fileID: 8916925949717473127}
+  - component: {fileID: 8085482174796769658}
+  - component: {fileID: 2227050899626975965}
   m_Layer: 0
   m_Name: Pistol
   m_TagString: Untagged
@@ -144,37 +145,6 @@ Transform:
   - {fileID: 7693558358771612464}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &4723494418564551696
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7376051957420276494}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d07e652b522e8994eaff8b39a3679d97, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Namespace: QFramework.Example
-  ScriptName: Pistol
-  ScriptsFolder: Assets\Scripts\Gameplay\Entity\Player\Weapon\Gun
-  GeneratePrefab: 0
-  PrefabFolder: Assets/Prefab
-  ArchitectureFullTypeName: 
-  ViewControllerFullTypeName: 
-  weaponId: Pistol
-  weaponDatabaseKey: WeaponDatabase
-  firePoint: {fileID: 7693558358771612464}
-  MinDamage: 0
-  MaxDamage: 0
-  MaxBulletBagNum: 0
-  clipSize: 0
-  shootInterval: 0
-  bulletSpeed: 0
-  SR: {fileID: 5571980048204267968}
-  PlayerBulletKey: PlayerBullet
-  SelfAudioSource: {fileID: 7185094619324971760}
 --- !u!82 &7185094619324971760
 AudioSource:
   m_ObjectHideFlags: 0
@@ -287,6 +257,49 @@ MonoBehaviour:
   Binds:
   - MemberName: SelfAudioSource
     Object: {fileID: 7185094619324971760}
+--- !u!114 &8085482174796769658
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7376051957420276494}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c2b694a9ab0ce6c4a9df47d9f8ab862c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Namespace: QFramework.Example
+  ScriptName: Pistol
+  ScriptsFolder: Assets\Scripts\Gameplay\Entity\Player\Weapon\Gun
+  GeneratePrefab: 0
+  PrefabFolder: Assets/Prefab
+  ArchitectureFullTypeName: 
+  ViewControllerFullTypeName: 
+  weaponId: Pistol
+  firePoint: {fileID: 7693558358771612464}
+  MinDamage: 0
+  MaxDamage: 0
+  MaxBulletBagNum: 0
+  clipSize: 0
+  shootInterval: 0
+  bulletSpeed: 0
+  bulletPrefabKey: PlayerBullet
+--- !u!114 &2227050899626975965
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7376051957420276494}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d8682f06ec2c26f4092b11f83922c8f1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game.LuaComponent::LuaComponet
+  m_typeName: PistolModule
+  m_objectReferences: []
+  m_dataReferences: []
 --- !u!1 &7446925369859170466
 GameObject:
   m_ObjectHideFlags: 0
