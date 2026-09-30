@@ -149,6 +149,14 @@ namespace Game.Gameplay
             // 仅在 Scene 视图绘制, 避免 Game 视图打开 Gizmos 时遮挡战斗画面.
             if (UnityEditor.SceneView.currentDrawingSceneView == null) return;
 #endif
+            DrawAttackRangeGizmos();
+        }
+
+        /// <summary>
+        /// 子类可替换攻击范围的 Scene 绘制, 例如 Slime 使用圆形自爆范围.
+        /// </summary>
+        protected virtual void DrawAttackRangeGizmos()
+        {
             if (attackRange <= 0f || attackAngle <= 0f) return;
             var sprite = sr != null ? sr : GetComponent<SpriteRenderer>();
             var facing = Application.isPlaying ? brainFacingDirection

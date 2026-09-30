@@ -37,6 +37,8 @@ namespace Game.Gameplay
 		private bool doorsGenerated;
 		protected List<Door> doorsList = new List<Door>();
 		private string cachedSaveRoomId;
+		private Tilemap entryFloorTilemap;
+		private bool playerConfirmedInside;
 
 		// 随机生成的格子坐标, 由 RandomRoomGenerator 在实例化后写入.
 		private Vector2Int? gridCell;
@@ -129,7 +131,7 @@ namespace Game.Gameplay
 		/// </summary>
 		public void InitRoom()
 		{
-
+			entryFloorTilemap = GetComponentsInChildren<Tilemap>().First(tilemap => tilemap.name == "Floor");
 			OnRoomInitialized();
 			RoomInitialized?.Invoke(this);
 
@@ -232,7 +234,26 @@ namespace Game.Gameplay
 		/// <param name="other">玩家的碰撞器</param>
 		private void OnTriggerEnter2D(Collider2D other)
 		{
-			if(other.CompareTag("Player"))
+			TryConfirmPlayerEntry(other);
+		}
+
+		private void OnTriggerStay2D(Collider2D other)
+		{
+			TryConfirmPlayerEntry(other);
+		}
+
+		/// <summary>
+		/// 玩家碰撞体完全越过外圈门格后才确认进房, 避免在走廊中提前关门.
+		/// </summary>
+		private void TryConfirmPlayerEntry(Collider2D other)
+		{
+			if (!other.CompareTag("Player") || playerConfirmedInside) return;
+			var bounds = entryFloorTilemap.cellBounds;
+			var minimum = entryFloorTilemap.WorldToCell(other.bounds.min);
+			var maximum = entryFloorTilemap.WorldToCell(other.bounds.max);
+			if (minimum.x <= bounds.xMin || maximum.x >= bounds.xMax - 1 ||
+				minimum.y <= bounds.yMin || maximum.y >= bounds.yMax - 1) return;
+			playerConfirmedInside = true;
 			{
 				// 玩家当前房间只记录安全点存档需要的稳定进度.
 				Visited = true;
@@ -255,8 +276,9 @@ namespace Game.Gameplay
 		/// <param name="other">玩家的碰撞器</param>
 		private void OnTriggerExit2D(Collider2D other)
 		{
-			if (other.CompareTag("Player"))
+			if (other.CompareTag("Player") && playerConfirmedInside)
 			{
+				playerConfirmedInside = false;
 				OnPlayerExitedRoom(other);
 				PlayerExitedRoom?.Invoke(this, other);
 			}

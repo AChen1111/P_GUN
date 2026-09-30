@@ -1,4 +1,4 @@
 enemyId,displayName,prefabAddress,maxHp,moveSpeed,damage,itemDropChance,attackAngle,separationRadius,separationWeight,attackInterval,attackRange
 1,Bat,enemy/bat,10,2.5,1,1,120,1.8,1.5,1,6
-2,Slime,enemy/slime,3,2.5,1,0.25,120,1.8,1.5,1,1
+2,Slime,enemy/slime,3,2.5,1,0.25,360,1.8,1.5,1,1.25
 3,Big_enemy,enemy/big_enemy,35,1.6,2,1,120,2.2,1.5,1.5,8

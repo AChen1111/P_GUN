@@ -22,11 +22,11 @@ return {
         moveSpeed = 2.5,
         damage = 1,
         itemDropChance = 0.25,
-        attackAngle = 120,
+        attackAngle = 360,
         separationRadius = 1.8,
         separationWeight = 1.5,
         attackInterval = 1,
-        attackRange = 1,
+        attackRange = 1.25,
     },
     ["3"] = {
         displayName = "Big_enemy",
