@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Game.Core;
@@ -13,7 +14,7 @@ namespace Game.Gameplay
     /// <summary>
     /// 随机房间生成器, 挂在 GameScene.
     /// 按 LevelData 的关卡行做带种子的随机游走, 实例化房间预制体,
-    /// 在相邻门锚点之间拼走廊, 并填充小地图高亮数据.
+    /// 在相邻门锚点之间拼走廊, 并发布九宫格小地图数据.
     /// 不再调用 Edgar 的关卡图布局.
     /// </summary>
     public sealed class RandomRoomGenerator : MonoBehaviour
@@ -32,8 +33,6 @@ namespace Game.Gameplay
         [SerializeField, AddressableKey(AddressableAssetKind.Prefab)] private string udCorridorPrefabKey = string.Empty;
         private GameObject udCorridorPrefab => AddressableAssetAccess.Get<GameObject>(udCorridorPrefabKey);
 
-        [Header("小地图")]
-        [SerializeField] private int minimapLayer = 0;
         [SerializeField] private string floorTilemapName = "Floor";
 
         public static RandomRoomGenerator Active { get; private set; }
@@ -46,6 +45,18 @@ namespace Game.Gameplay
 
         public string LevelId => string.IsNullOrWhiteSpace(forcedLevelId) ? levelId : forcedLevelId;
         public int LastGeneratedSeed => lastGeneratedSeed;
+
+        // UI 读取最终生成结果, 不自行维护另一份房间拓扑.
+        public RoomGraph GeneratedGraph { get; private set; }
+        public IReadOnlyDictionary<Vector2Int, Room> GeneratedRooms { get; private set; }
+
+        public LocalMinimapSnapshot GetLocalMinimap()
+        {
+            if (GeneratedGraph == null) return null;
+            var current = Room.CurrentPlayerRoom;
+            var center = current != null ? current.GridCell : Vector2Int.zero;
+            return LocalMinimapSnapshot.Build(GeneratedGraph, center, cell => GeneratedRooms[cell].Visited);
+        }
 
         /// <summary>
         /// 初始化运行时依赖.
@@ -132,7 +143,10 @@ namespace Game.Gameplay
                         normalRoom.GenerateObstacles(seed, pair.Key);
                     }
                 }
-                FillMinimapData(roomInstances);
+                GeneratedGraph = graph;
+                GeneratedRooms = new ReadOnlyDictionary<Vector2Int, Room>(roomInstances);
+                // 生成完成后显示起始房, 读档稍后会通过当前房间事件切换到恢复位置.
+                roomInstances[Vector2Int.zero].MarkVisited();
 
                 lastGeneratedSeed = seed;
                 generated = true;
@@ -188,6 +202,7 @@ namespace Game.Gameplay
                     .Select(neighborCell => neighborCell - node.Cell)
                     .ToList();
                 room.InitializeGenerationContext(node.Cell, neighborDirections);
+                SealUnusedDoorways(room, neighborDirections);
                 roomInstances[node.Cell] = room;
             }
 
@@ -303,6 +318,34 @@ namespace Game.Gameplay
             }
         }
 
+        /// <summary>
+        /// 未连接方向恢复两格墙体, 即使相邻格有房间也不能误穿到非生成树边.
+        /// </summary>
+        private static void SealUnusedDoorways(Room room, IReadOnlyCollection<Vector2Int> connectedDirections)
+        {
+            var walls = FindTilemap(room.gameObject, "Walls");
+            var bounds = FindTilemap(room.gameObject, "Floor").cellBounds;
+            foreach (var direction in new[] { Vector2Int.up, Vector2Int.right, Vector2Int.down, Vector2Int.left })
+            {
+                if (connectedDirections.Contains(direction)) continue;
+                var horizontal = direction.x != 0;
+                var edge = horizontal
+                    ? (direction.x > 0 ? bounds.xMax - 1 : bounds.xMin)
+                    : (direction.y > 0 ? bounds.yMax - 1 : bounds.yMin);
+                var middle = horizontal
+                    ? Mathf.FloorToInt((bounds.yMin + bounds.yMax - 1) * 0.5f)
+                    : Mathf.FloorToInt((bounds.xMin + bounds.xMax - 1) * 0.5f);
+                var wallSample = horizontal
+                    ? new Vector3Int(edge, middle - 1, 0)
+                    : new Vector3Int(middle - 1, edge, 0);
+                var tile = walls.GetTile(wallSample);
+                if (tile == null)
+                    throw new InvalidOperationException($"房间 {room.name} 的 {direction} 墙边缺少封门用图块.");
+                for (var i = 0; i < 2; i++)
+                    walls.SetTile(horizontal ? new Vector3Int(edge, middle + i, 0) : new Vector3Int(middle + i, edge, 0), tile);
+            }
+        }
+
         private static Tilemap FindTilemap(GameObject root, string tilemapName)
         {
             var tilemap = root.GetComponentsInChildren<Tilemap>(true)
@@ -312,93 +355,6 @@ namespace Game.Gameplay
                 throw new InvalidOperationException($"{root.name} 缺少 {tilemapName} Tilemap.");
             }
             return tilemap;
-        }
-
-        /// <summary>
-        /// 从房间与走廊 Floor Tilemap 重建小地图底图, 并记录房间高亮格子.
-        /// </summary>
-        private void FillMinimapData(Dictionary<Vector2Int, Room> roomInstances)
-        {
-            if (GetComponent<Grid>() == null)
-            {
-                gameObject.AddComponent<Grid>();
-            }
-
-            var baseObject = new GameObject("Minimap Base");
-            baseObject.transform.SetParent(transform, false);
-            baseObject.layer = minimapLayer;
-            var baseTilemap = baseObject.AddComponent<Tilemap>();
-            var baseRenderer = baseObject.AddComponent<TilemapRenderer>();
-            baseRenderer.sortingOrder = 20;
-
-            var visitedObject = new GameObject("Minimap Visited");
-            visitedObject.transform.SetParent(transform, false);
-            visitedObject.layer = minimapLayer;
-            var visitedTilemap = visitedObject.AddComponent<Tilemap>();
-            var visitedRenderer = visitedObject.AddComponent<TilemapRenderer>();
-            visitedRenderer.sortingOrder = 25;
-
-            var highlightObject = new GameObject("Minimap Highlight");
-            highlightObject.transform.SetParent(transform, false);
-            highlightObject.layer = minimapLayer;
-
-            var highlightTilemap = highlightObject.AddComponent<Tilemap>();
-            var renderer = highlightObject.AddComponent<TilemapRenderer>();
-            // 高亮层排在普通小地图之上.
-            renderer.sortingOrder = 30;
-
-            // 底图包含房间及走廊, 保持玩家未进入区域的地形可见.
-            foreach (var source in GetComponentsInChildren<Tilemap>())
-            {
-                if (source.name != floorTilemapName) continue;
-                foreach (var sourceCell in source.cellBounds.allPositionsWithin)
-                {
-                    var tile = source.GetTile(sourceCell);
-                    if (tile == null) continue;
-                    var targetCell = baseTilemap.WorldToCell(source.GetCellCenterWorld(sourceCell));
-                    baseTilemap.SetTile(targetCell, tile);
-                }
-            }
-
-            foreach (var pair in roomInstances)
-            {
-                var room = pair.Value;
-                var floorTilemap = room.GetComponentsInChildren<Tilemap>()
-                    .FirstOrDefault(tilemap => tilemap.name == floorTilemapName);
-                if (floorTilemap == null)
-                {
-                    throw new InvalidOperationException($"房间 {room.name} 缺少名为 {floorTilemapName} 的 Tilemap, 无法填充小地图数据.");
-                }
-
-                var data = room.GetComponent<MinimapRoomData>();
-                if (data == null)
-                {
-                    throw new InvalidOperationException($"房间 {room.name} 缺少 {nameof(MinimapRoomData)} 组件.");
-                }
-
-                var positions = new List<Vector3Int>();
-                foreach (var localPos in floorTilemap.cellBounds.allPositionsWithin)
-                {
-                    if (!floorTilemap.HasTile(localPos)) continue;
-
-                    // 房间实例的世界坐标不同, 统一换算到高亮层的格子.
-                    positions.Add(highlightTilemap.WorldToCell(floorTilemap.GetCellCenterWorld(localPos)));
-                }
-
-                data.Positions = positions;
-                data.BaseTilemap = baseTilemap;
-                data.VisitedTilemap = visitedTilemap;
-                data.HighlightTilemap = highlightTilemap;
-                // 生成时先遮黑未到达的房间, 已访问房间显示绿色.
-                data.SetVisited(room.Visited);
-            }
-
-#if UNITY_EDITOR
-            // 小地图复制层只供小地图相机使用, 在 Scene 视图隐藏以便检查真实墙体和障碍.
-            UnityEditor.SceneVisibilityManager.instance.Hide(baseObject, true);
-            UnityEditor.SceneVisibilityManager.instance.Hide(visitedObject, true);
-            UnityEditor.SceneVisibilityManager.instance.Hide(highlightObject, true);
-#endif
         }
 
         /// <summary>

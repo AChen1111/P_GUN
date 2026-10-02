@@ -4,6 +4,8 @@ namespace Game.Gameplay
 {
     public static class GameplayEvents
     {
+        // 生成完成, 进房及读档更新时通知 HUD 重建局部地图.
+        public static readonly GameEventId LocalMinimapChanged = new GameEventId(nameof(LocalMinimapChanged));
         public static readonly GameEventId<Player> PlayerHPChanged = new GameEventId<Player>(nameof(PlayerHPChanged));
         public static readonly GameEventId PlayerBuffsChanged = new GameEventId(nameof(PlayerBuffsChanged));
         public static readonly GameEventId<GunClip> BulletClipChanged = new GameEventId<GunClip>(nameof(BulletClipChanged));

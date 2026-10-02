@@ -1,0 +1,6 @@
+{
+  "name": "Game.Room.EditorTests",
+  "references": ["Game.Core", "Game.Gameplay", "Game.UI", "Game.Editor"],
+  "includePlatforms": ["Editor"],
+  "optionalUnityReferences": ["TestAssemblies"]
+}

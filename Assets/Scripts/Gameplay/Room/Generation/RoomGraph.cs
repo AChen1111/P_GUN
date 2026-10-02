@@ -1,231 +1,220 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using Game.Core;
 using UnityEngine;
 
 namespace Game.Gameplay
 {
-    /// <summary>
-    /// 随机生成房间类型.
-    /// </summary>
-    public enum GeneratedRoomType
-    {
-        Init,
-        Normal,
-        Chest,
-        Save,
-        Final
-    }
+    public enum GeneratedRoomType { Init, Normal, Chest, Save, Final }
 
     /// <summary>
-    /// 房间图里的一个逻辑房间: 格子坐标, 类型, 预制体地址和四个方向的邻居.
+    /// 房间图只读节点, 连接仅由生成器维护.
     /// </summary>
     public sealed class RoomGraphNode
     {
-        public Vector2Int Cell;
-        public GeneratedRoomType Type;
-        public bool TypeAssigned;
-        public string PrefabKey;
-        public readonly List<Vector2Int> Neighbors = new List<Vector2Int>();
+        internal readonly List<Vector2Int> Connections = new List<Vector2Int>();
+        public Vector2Int Cell { get; internal set; }
+        public GeneratedRoomType Type { get; internal set; }
+        internal bool TypeAssigned;
+        public string PrefabKey { get; internal set; }
+        public IReadOnlyList<Vector2Int> Neighbors { get; }
+
+        internal RoomGraphNode(Vector2Int cell)
+        {
+            Cell = cell;
+            Neighbors = Connections.AsReadOnly();
+        }
     }
 
     /// <summary>
-    /// 房间图: 带种子的紧凑分支生长生成一棵连通树, 再按关卡配置分配类型.
-    /// 全程只用同一个 System.Random, 同一关卡配置加同一颗种子得到同一张图.
+    /// 分段随机生长房间位置, 用随机权重最小生成树确定通路, 再裁掉起点不可达的房间.
+    /// 坐标与边均稳定排序, 同配置和同种子得到相同房间及连接.
     /// </summary>
     public sealed class RoomGraph
     {
         private static readonly Vector2Int[] Directions =
         {
-            Vector2Int.up,
-            Vector2Int.right,
-            Vector2Int.down,
-            Vector2Int.left,
+            Vector2Int.up, Vector2Int.right, Vector2Int.down, Vector2Int.left
         };
-
         private readonly Dictionary<Vector2Int, RoomGraphNode> nodesByCell = new Dictionary<Vector2Int, RoomGraphNode>();
-
-        public IReadOnlyDictionary<Vector2Int, RoomGraphNode> NodesByCell => nodesByCell;
+        public IReadOnlyDictionary<Vector2Int, RoomGraphNode> NodesByCell { get; }
         public IReadOnlyCollection<RoomGraphNode> Nodes => nodesByCell.Values;
 
-        /// <summary>
-        /// 按关卡配置和种子生成房间图.
-        /// </summary>
-        /// <param name="config">关卡配置, 来自 LevelData.lua.</param>
-        /// <param name="seed">随机种子, 读档时必须与首生成一致.</param>
-        /// <returns>房间图.</returns>
+        public RoomGraph()
+        {
+            NodesByCell = new ReadOnlyDictionary<Vector2Int, RoomGraphNode>(nodesByCell);
+        }
+
         public static RoomGraph Generate(LevelConfig config, int seed)
         {
-            if (config == null)
-            {
-                throw new ArgumentNullException(nameof(config));
-            }
-
-            if (config.RoomCount <= 0)
-            {
-                throw new InvalidOperationException("关卡 roomCount 必须大于 0.");
-            }
-
-            if (config.NormalCount > 0 && (config.NormalPrefabKeys == null || config.NormalPrefabKeys.Count == 0))
-            {
-                throw new InvalidOperationException($"关卡 {config.LevelId} 的 normalPrefabKeys 为空, 无法分配普通房.");
-            }
-
+            ValidateConfig(config);
             var rng = new System.Random(seed);
             var graph = new RoomGraph();
-            GrowCompactCells(graph, config.RoomCount, rng);
-            AssignTypes(graph, config, rng);
+            graph.GrowCells(config.RoomCount, rng);
+            graph.FinalizeGraph(config, rng);
             return graph;
         }
 
         /// <summary>
-        /// 从已生成房间的边界扩展, 优先选靠近起点且能形成分支的位置.
+        /// 从外部候选格生成通路, 供编辑器验证断开区域的裁剪与类型分配.
+        /// 候选格必须唯一并包含起点, 不补齐删除掉的房间.
         /// </summary>
-        private static void GrowCompactCells(RoomGraph graph, int roomCount, System.Random rng)
+        public static RoomGraph GenerateFromCells(LevelConfig config, int seed, IEnumerable<Vector2Int> cells)
         {
-            var origin = Vector2Int.zero;
-            graph.CreateNode(origin);
-            var depths = new Dictionary<Vector2Int, int> { [origin] = 0 };
-            var radius = Mathf.CeilToInt((Mathf.Sqrt(roomCount) - 1f) * 0.5f);
+            ValidateConfig(config);
+            var graph = new RoomGraph();
+            foreach (var cell in cells.OrderBy(cell => cell.x).ThenBy(cell => cell.y))
+                graph.nodesByCell.Add(cell, new RoomGraphNode(cell));
+            if (!graph.nodesByCell.ContainsKey(Vector2Int.zero))
+                throw new InvalidOperationException("候选房间必须包含起点 (0, 0).");
+            if (graph.nodesByCell.Count > config.RoomCount)
+                throw new InvalidOperationException("候选房间数不能超过关卡 roomCount.");
+            graph.FinalizeGraph(config, new System.Random(seed));
+            return graph;
+        }
 
-            while (graph.nodesByCell.Count < roomCount)
+        private static void ValidateConfig(LevelConfig config)
+        {
+            if (config == null) throw new ArgumentNullException(nameof(config));
+            if (config.InitCount != 1 || config.FinalCount != 1 || config.ChestCount < 0 ||
+                config.SaveCount < 0 || config.NormalCount < 0 ||
+                config.RoomCount != 2 + config.ChestCount + config.SaveCount + config.NormalCount)
+                throw new InvalidOperationException($"关卡 {config.LevelId} 房间数量配置不合法.");
+            if (config.NormalCount > 0 && config.NormalPrefabKeys.Count == 0)
+                throw new InvalidOperationException($"关卡 {config.LevelId} 的 normalPrefabKeys 为空.");
+        }
+
+        private List<Vector2Int> OrderedCells() => nodesByCell.Keys.OrderBy(cell => cell.x).ThenBy(cell => cell.y).ToList();
+
+        private void GrowCells(int roomCount, System.Random rng)
+        {
+            nodesByCell.Add(Vector2Int.zero, new RoomGraphNode(Vector2Int.zero));
+            while (nodesByCell.Count < roomCount)
             {
-                var candidates = new List<(Vector2Int parent, Vector2Int cell, int score)>();
-                foreach (var parent in graph.nodesByCell.Keys)
+                // 每段重新选起点, 不用距离分数把地图强行填成方块.
+                var frontier = OrderedCells().Where(cell => Directions.Any(dir => !nodesByCell.ContainsKey(cell + dir))).ToList();
+                var current = frontier[rng.Next(frontier.Count)];
+                var length = rng.Next(2, 7);
+                for (var step = 0; step < length && nodesByCell.Count < roomCount; step++)
                 {
-                    foreach (var direction in Directions)
-                    {
-                        var cell = parent + direction;
-                        if (graph.nodesByCell.ContainsKey(cell) ||
-                            Mathf.Abs(cell.x) > radius || Mathf.Abs(cell.y) > radius) continue;
-
-                        // 曼哈顿距离约束外扩, 深度与已有连接数抑制单条长链.
-                        var score = (Mathf.Abs(cell.x) + Mathf.Abs(cell.y)) * 4
-                            + depths[parent] * 3 + graph.nodesByCell[parent].Neighbors.Count * 2;
-                        candidates.Add((parent, cell, score));
-                    }
+                    var free = Directions.Where(dir => !nodesByCell.ContainsKey(current + dir)).ToList();
+                    if (free.Count == 0) break;
+                    current += free[rng.Next(free.Count)];
+                    nodesByCell.Add(current, new RoomGraphNode(current));
                 }
+            }
+        }
 
-                if (candidates.Count == 0)
+        private void FinalizeGraph(LevelConfig config, System.Random rng)
+        {
+            BuildMinimumSpanningTree(rng);
+            var distances = PruneUnreachable();
+            var specialCount = 2 + config.ChestCount + config.SaveCount;
+            if (nodesByCell.Count < specialCount)
+                throw new InvalidOperationException($"关卡 {config.LevelId} 裁剪后仅有 {nodesByCell.Count} 间, 无法容纳 {specialCount} 间特殊房.");
+            AssignTypes(config, rng, distances);
+        }
+
+        private void BuildMinimumSpanningTree(System.Random rng)
+        {
+            var cells = OrderedCells();
+            var indices = cells.Select((cell, index) => (cell, index)).ToDictionary(pair => pair.cell, pair => pair.index);
+            var parents = Enumerable.Range(0, cells.Count).ToArray();
+            var edges = new List<(int a, int b, int weight)>();
+            for (var a = 0; a < cells.Count; a++)
+            {
+                // 只枚举右边与上边, 每条无向候选边赋一次随机权重.
+                foreach (var dir in new[] { Vector2Int.right, Vector2Int.up })
+                    if (indices.TryGetValue(cells[a] + dir, out var b))
+                        edges.Add((a, b, rng.Next()));
+            }
+            edges.Sort((left, right) =>
+            {
+                var comparison = left.weight.CompareTo(right.weight);
+                if (comparison != 0) return comparison;
+                comparison = left.a.CompareTo(right.a);
+                return comparison != 0 ? comparison : left.b.CompareTo(right.b);
+            });
+            foreach (var edge in edges)
+            {
+                var aRoot = Find(edge.a);
+                var bRoot = Find(edge.b);
+                if (aRoot == bRoot) continue;
+                parents[bRoot] = aRoot;
+                nodesByCell[cells[edge.a]].Connections.Add(cells[edge.b]);
+                nodesByCell[cells[edge.b]].Connections.Add(cells[edge.a]);
+            }
+            foreach (var node in nodesByCell.Values)
+                node.Connections.Sort((a, b) => a.x != b.x ? a.x.CompareTo(b.x) : a.y.CompareTo(b.y));
+
+            int Find(int index)
+            {
+                while (parents[index] != index)
                 {
-                    radius++;
-                    continue;
+                    parents[index] = parents[parents[index]];
+                    index = parents[index];
                 }
-
-                var bestScore = candidates.Min(candidate => candidate.score);
-                var best = candidates.Where(candidate => candidate.score == bestScore).ToList();
-                var selected = best[rng.Next(best.Count)];
-                graph.CreateNode(selected.cell);
-                graph.Connect(selected.parent, selected.cell);
-                depths[selected.cell] = depths[selected.parent] + 1;
+                return index;
             }
         }
 
-        /// <summary>
-        /// 按关卡配置分配房间类型和预制体地址.
-        /// </summary>
-        private static void AssignTypes(RoomGraph graph, LevelConfig config, System.Random rng)
+        private Dictionary<Vector2Int, int> PruneUnreachable()
         {
-            var origin = graph.nodesByCell[Vector2Int.zero];
-            Assign(origin, GeneratedRoomType.Init, config.InitPrefabKey);
-
-            // 终点取曼哈顿距离最远的一间, 并列时按种子随机取.
-            var finalNode = graph.nodesByCell.Values
-                .Where(node => node != origin)
-                .GroupBy(node => ManhattanDistance(node.Cell))
-                .OrderByDescending(group => group.Key)
-                .First()
-                .ToList();
-            Assign(finalNode[rng.Next(finalNode.Count)], GeneratedRoomType.Final, config.FinalPrefabKey);
-
-            // 宝箱房和存档房优先从死胡同里取, 不够再从其余未分配房间补足.
-            AssignDeadEndPreferred(graph, GeneratedRoomType.Chest, config.ChestCount, config.ChestPrefabKey, rng);
-            AssignDeadEndPreferred(graph, GeneratedRoomType.Save, config.SaveCount, config.SavePrefabKey, rng);
-
-            // 剩余房间必须正好等于普通房数量, 数量对不上直接暴露配置问题.
-            var remaining = graph.nodesByCell.Values.Where(node => !node.TypeAssigned).ToList();
-            if (remaining.Count != config.NormalCount)
+            var distances = new Dictionary<Vector2Int, int> { [Vector2Int.zero] = 0 };
+            var pending = new Queue<Vector2Int>();
+            pending.Enqueue(Vector2Int.zero);
+            while (pending.Count > 0)
             {
-                throw new InvalidOperationException(
-                    $"关卡 {config.LevelId} 分配后剩余 {remaining.Count} 间房, 与 normalCount {config.NormalCount} 不一致.");
+                var cell = pending.Dequeue();
+                foreach (var neighbor in nodesByCell[cell].Neighbors)
+                {
+                    if (distances.ContainsKey(neighbor)) continue;
+                    distances.Add(neighbor, distances[cell] + 1);
+                    pending.Enqueue(neighbor);
+                }
+            }
+            foreach (var cell in OrderedCells().Where(cell => !distances.ContainsKey(cell)))
+                nodesByCell.Remove(cell);
+            foreach (var node in nodesByCell.Values)
+                node.Connections.RemoveAll(cell => !distances.ContainsKey(cell));
+            return distances;
+        }
+
+        private void AssignTypes(LevelConfig config, System.Random rng, Dictionary<Vector2Int, int> distances)
+        {
+            Assign(nodesByCell[Vector2Int.zero], GeneratedRoomType.Init, config.InitPrefabKey);
+            // 路径距离最远的终点, 不再用几何距离代替实际路线长度.
+            var farthestDistance = distances.Values.Max();
+            var finalCandidates = OrderedCells().Where(cell => distances[cell] == farthestDistance).ToList();
+            Assign(nodesByCell[finalCandidates[rng.Next(finalCandidates.Count)]], GeneratedRoomType.Final, config.FinalPrefabKey);
+            AssignSpecial(GeneratedRoomType.Chest, config.ChestCount, config.ChestPrefabKey);
+            AssignSpecial(GeneratedRoomType.Save, config.SaveCount, config.SavePrefabKey);
+            foreach (var cell in OrderedCells())
+            {
+                var node = nodesByCell[cell];
+                if (!node.TypeAssigned)
+                    Assign(node, GeneratedRoomType.Normal, config.NormalPrefabKeys[rng.Next(config.NormalPrefabKeys.Count)]);
             }
 
-            foreach (var node in remaining)
+            void AssignSpecial(GeneratedRoomType type, int count, string key)
             {
-                var prefabIndex = rng.Next(config.NormalPrefabKeys.Count);
-                Assign(node, GeneratedRoomType.Normal, config.NormalPrefabKeys[prefabIndex]);
-            }
-
-            void Assign(RoomGraphNode node, GeneratedRoomType type, string prefabKey)
-            {
-                node.Type = type;
-                node.TypeAssigned = true;
-                node.PrefabKey = prefabKey;
+                for (var i = 0; i < count; i++)
+                {
+                    var unassigned = OrderedCells().Select(cell => nodesByCell[cell]).Where(node => !node.TypeAssigned).ToList();
+                    var deadEnds = unassigned.Where(node => node.Neighbors.Count == 1).ToList();
+                    var candidates = deadEnds.Count > 0 ? deadEnds : unassigned;
+                    Assign(candidates[rng.Next(candidates.Count)], type, key);
+                }
             }
         }
 
-        /// <summary>
-        /// 按目标数量分配宝箱房或存档房, 死胡同优先.
-        /// </summary>
-        private static void AssignDeadEndPreferred(
-            RoomGraph graph,
-            GeneratedRoomType type,
-            int count,
-            string prefabKey,
-            System.Random rng)
+        private static void Assign(RoomGraphNode node, GeneratedRoomType type, string key)
         {
-            var assigned = 0;
-            var unassigned = graph.nodesByCell.Values.Where(node => !node.TypeAssigned).ToList();
-
-            // 先从死胡同里抽, 死胡同只有一条边, 适合放奖励和存档点.
-            var deadEnds = unassigned.Where(node => node.Neighbors.Count == 1).ToList();
-            while (assigned < count && deadEnds.Count > 0)
-            {
-                var index = rng.Next(deadEnds.Count);
-                var node = deadEnds[index];
-                node.Type = type;
-                node.TypeAssigned = true;
-                node.PrefabKey = prefabKey;
-                deadEnds.RemoveAt(index);
-                unassigned.Remove(node);
-                assigned++;
-            }
-
-            // 死胡同不够时从其余未分配房间补足.
-            while (assigned < count && unassigned.Count > 0)
-            {
-                var index = rng.Next(unassigned.Count);
-                var node = unassigned[index];
-                node.Type = type;
-                node.TypeAssigned = true;
-                node.PrefabKey = prefabKey;
-                unassigned.RemoveAt(index);
-                assigned++;
-            }
-
-            if (assigned < count)
-            {
-                throw new InvalidOperationException($"关卡房间数量不足, 无法分配 {assigned}/{count} 间 {type} 房.");
-            }
-        }
-
-        private static int ManhattanDistance(Vector2Int cell)
-        {
-            return Mathf.Abs(cell.x) + Mathf.Abs(cell.y);
-        }
-
-        private RoomGraphNode CreateNode(Vector2Int cell)
-        {
-            var node = new RoomGraphNode { Cell = cell };
-            nodesByCell[cell] = node;
-            return node;
-        }
-
-        private void Connect(Vector2Int a, Vector2Int b)
-        {
-            nodesByCell[a].Neighbors.Add(b);
-            nodesByCell[b].Neighbors.Add(a);
+            node.Type = type;
+            node.TypeAssigned = true;
+            node.PrefabKey = key;
         }
     }
 }

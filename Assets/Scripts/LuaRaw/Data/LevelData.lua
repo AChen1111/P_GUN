@@ -3,12 +3,12 @@
 
 return {
     ["level1"] = {
-        roomCount = 8,
+        roomCount = 100,
         initCount = 1,
         finalCount = 1,
         chestCount = 1,
         saveCount = 1,
-        normalCount = 4,
+        normalCount = 96,
         initPrefabKey = "InitRoom",
         finalPrefabKey = "FinalRoom",
         chestPrefabKey = "ChestRoom",

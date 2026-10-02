@@ -55,6 +55,8 @@ namespace Game.Gameplay
 
 		public static IReadOnlyList<Room> ActiveRooms => activeRooms;
 		public static Room CurrentPlayerRoom { get; private set; }
+        // 生成上下文必须先写入, UI 与存档共用同一个逻辑坐标.
+        public Vector2Int GridCell => gridCell ?? throw new InvalidOperationException($"{name} 未写入生成格子坐标.");
 		public string SaveRoomId
 		{
 			get
@@ -125,7 +127,7 @@ namespace Game.Gameplay
 			activeRooms.Remove(this);
 			if (CurrentPlayerRoom == this)
 			{
-				CurrentPlayerRoom = null;
+                SetCurrentPlayerRoom(null);
 			}
 		}
 
@@ -260,14 +262,7 @@ namespace Game.Gameplay
 			playerConfirmedInside = true;
 			{
 				// 玩家当前房间只记录安全点存档需要的稳定进度.
-				Visited = true;
-				CurrentPlayerRoom = this;
-
-				if (TryGetComponent<MinimapRoomData>(out var minimapData))
-				{
-					minimapData.SetVisited(true);
-					minimapData.Highlight();
-				}
+                MarkVisited();
 
 				OnPlayerEnteredRoom(other);
 				PlayerEnteredRoom?.Invoke(this, other);
@@ -294,23 +289,21 @@ namespace Game.Gameplay
 		}
 		public static void SetCurrentPlayerRoom(Room room)
 		{
-			CurrentPlayerRoom = room;
-		}
-		public void MarkVisited()
-		{
-			Visited = true;
-			CurrentPlayerRoom = this;
-			if (TryGetComponent<MinimapRoomData>(out var minimapData))
-				minimapData.SetVisited(true);
-		}
+            CurrentPlayerRoom = room;
+            EventCenter.Trigger(GameplayEvents.LocalMinimapChanged);
+        }
+        public void MarkVisited()
+        {
+            Visited = true;
+            SetCurrentPlayerRoom(this);
+        }
 		public virtual void RestoreSaveData(RoomSaveData data)
 		{
 			if (data == null) return;
 
 			// 读档只覆盖安全点状态, 不重放房间生成或掉落逻辑.
 			Visited = data.visited;
-			if (TryGetComponent<MinimapRoomData>(out var minimapData))
-				minimapData.SetVisited(Visited);
+            EventCenter.Trigger(GameplayEvents.LocalMinimapChanged);
 		}
 		protected void SetDoorsOpen(bool isOpen)
 		{

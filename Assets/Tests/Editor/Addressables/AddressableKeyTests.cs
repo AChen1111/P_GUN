@@ -160,7 +160,8 @@ public sealed class AddressableKeyTests
     [Test]
     public void OlderSaveVersionIsExplicitlyIncompatible()
     {
-        Assert.AreEqual(2, SaveGameService.SaveVersion);
+        Assert.AreEqual(3, SaveGameService.SaveVersion);
+        Assert.IsFalse(SaveGameService.IsCompatibleVersion(2));
         Assert.IsFalse(SaveGameService.IsCompatibleVersion(1));
         Assert.IsTrue(SaveGameService.IsCompatibleVersion(new GameSaveData().version));
     }

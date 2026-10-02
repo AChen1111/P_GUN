@@ -10,7 +10,7 @@ namespace Game.Gameplay.Save
     [Serializable]
     public class GameSaveData
     {
-        public int version = 2;
+        public int version = 3;
         public string savedAtUtc;
         public string sceneName;
         // 关卡 id 对应 LevelData.lua 的 levelId, 与种子一起重建同一张地图.

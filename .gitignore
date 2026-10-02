@@ -28,3 +28,69 @@
 !/Docs/Validation/**
 # xLua 注入生成的带时间戳备份只用于本地调试.
 /Assets/XLua/Src/Gen/Resources/hotfix_id_map*.lua.txt.[0-9]*
+
+# 文档仅保留本地, 不再提交到 Git.
+/.agents/
+/AGENTS.md
+/[dD][oO][cC][sS]/
+/[dD][oO][cC][sS].meta
+*.[mM][dD]
+*.[mM][dD].meta
+*.[mM][aA][rR][kK][dD][oO][wW][nN]
+*.[mM][aA][rR][kK][dD][oO][wW][nN].meta
+*.[pP][dD][fF]
+*.[pP][dD][fF].meta
+*.[dD][oO][cC]
+*.[dD][oO][cC].meta
+*.[dD][oO][cC][xX]
+*.[dD][oO][cC][xX].meta
+*.[rR][tT][fF]
+*.[rR][tT][fF].meta
+*.[rR][sS][tT]
+*.[rR][sS][tT].meta
+*.[oO][dD][tT]
+*.[oO][dD][tT].meta
+*.[eE][pP][uU][bB]
+*.[eE][pP][uU][bB].meta
+/Assets/EX/QFramework/Toolkits/_CoreKit/PackageKit/Markdown/license.txt
+/Assets/EX/QFramework/Toolkits/_CoreKit/PackageKit/Markdown/license.txt.meta
+/Assets/Extern/QFramework/Toolkits/_CoreKit/PackageKit/Markdown/license.txt
+/Assets/Extern/QFramework/Toolkits/_CoreKit/PackageKit/Markdown/license.txt.meta
+/Assets/Malicious_statusiconset1/read_me.txt
+/Assets/Malicious_statusiconset1/read_me.txt.meta
+/Assets/Plugins/Demigiant/DOTween/readme.txt
+/Assets/Plugins/Demigiant/DOTween/readme.txt.meta
+/Assets/Plugins/Demigiant/DOTweenPro/readme.txt
+/Assets/Plugins/Demigiant/DOTweenPro/readme.txt.meta
+/Assets/Plugins/Demigiant/readme_DOTweenPro.txt
+/Assets/Plugins/Demigiant/readme_DOTweenPro.txt.meta
+/Assets/QFramework/Toolkits/_CoreKit/PackageKit/Markdown/license.txt
+/Assets/QFramework/Toolkits/_CoreKit/PackageKit/Markdown/license.txt.meta
+/Assets/TextMesh Pro/Examples & Extras/Fonts/Anton OFL.txt
+/Assets/TextMesh Pro/Examples & Extras/Fonts/Anton OFL.txt.meta
+/Assets/TextMesh Pro/Examples & Extras/Fonts/Bangers - OFL.txt
+/Assets/TextMesh Pro/Examples & Extras/Fonts/Bangers - OFL.txt.meta
+/Assets/TextMesh Pro/Examples & Extras/Fonts/Oswald-Bold - OFL.txt
+/Assets/TextMesh Pro/Examples & Extras/Fonts/Oswald-Bold - OFL.txt.meta
+/Assets/TextMesh Pro/Examples & Extras/Fonts/Roboto-Bold - AFL.txt
+/Assets/TextMesh Pro/Examples & Extras/Fonts/Roboto-Bold - AFL.txt.meta
+/Assets/TextMesh Pro/Examples & Extras/Fonts/Roboto-Bold - License.txt
+/Assets/TextMesh Pro/Examples & Extras/Fonts/Roboto-Bold - License.txt.meta
+/Assets/TextMesh Pro/Examples & Extras/Fonts/Unity - OFL.txt
+/Assets/TextMesh Pro/Examples & Extras/Fonts/Unity - OFL.txt.meta
+/Assets/TextMesh Pro/Fonts/LiberationSans - OFL.txt
+/Assets/TextMesh Pro/Fonts/LiberationSans - OFL.txt.meta
+/Assets/TextMesh Pro/Sprites/EmojiOne Attribution.txt
+/Assets/TextMesh Pro/Sprites/EmojiOne Attribution.txt.meta
+/Assets/Voxel Labs/Ultimate Preview/Editor/Plugins/Third party/Harmony/Harmony.License.txt
+/Assets/Voxel Labs/Ultimate Preview/Editor/Plugins/Third party/Harmony/Harmony.License.txt.meta
+/Assets/Voxel Labs/Ultimate Preview/Editor/Resources/UltimatePreviewWindow/Settings/Readme.txt
+/Assets/Voxel Labs/Ultimate Preview/Editor/Resources/UltimatePreviewWindow/Settings/Readme.txt.meta
+/Assets/Voxel Labs/Ultimate Preview/Read Me.txt
+/Assets/Voxel Labs/Ultimate Preview/Read Me.txt.meta
+/Assets/Voxel Labs/Ultimate Preview/Third Party Notice.txt
+/Assets/Voxel Labs/Ultimate Preview/Third Party Notice.txt.meta
+*[rR][eE][aA][dD][mM][eE]*.txt
+*[rR][eE][aA][dD][mM][eE]*.txt.meta
+*[lL][iI][cC][eE][nN][sS][eE]*.txt
+*[lL][iI][cC][eE][nN][sS][eE]*.txt.meta

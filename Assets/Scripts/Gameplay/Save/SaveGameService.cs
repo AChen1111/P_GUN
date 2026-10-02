@@ -13,9 +13,9 @@ namespace Game.Gameplay.Save
     public static class SaveGameService
     {
         public const int SlotCount = 3;
-        public const int SaveVersion = 2;
+        public const int SaveVersion = 3;
 
-        // 首包迁移到短名资源 key 后拒绝旧格式, 仍保存关卡 id 和地图种子.
+        // 最小生成树改变同种子布局, 拒绝旧存档以免恢复到错误的房间.
         public static bool IsCompatibleVersion(int version) => version == SaveVersion;
         internal const string GameplaySceneName = "GameScene";
 

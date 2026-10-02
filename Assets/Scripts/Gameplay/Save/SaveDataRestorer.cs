@@ -49,10 +49,6 @@ namespace Game.Gameplay.Save
                 if (room == null || room.SaveRoomId != currentRoomId) continue;
 
                 Room.SetCurrentPlayerRoom(room);
-                if (room.TryGetComponent<MinimapRoomData>(out var minimapData))
-                {
-                    minimapData.Highlight();
-                }
 
                 return;
             }
